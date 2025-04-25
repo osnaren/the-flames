@@ -1,0 +1,83 @@
+## 🔥 The Flames
+
+For all designs I ask you to make, have them be **beautiful, interactive, and full of personality** — not cookie-cutter. The entire app should feel **fun, dramatic, and modern**, while remaining production-ready and mobile-responsive.
+
+---
+
+### 💻 Stack Guidelines
+
+- Use **JSX + Tailwind CSS** for layout and styles  
+- Use **React hooks** for logic  
+- Use **`lucide-react`** for all icons — do not use any other icon packs unless explicitly asked  
+- Do not install any additional UI libraries, component frameworks, or themes unless I request them  
+- Use **stock images or textures from Unsplash** by linking directly to known working URLs — do not download or embed base64 images
+
+---
+
+### 🌟 Project Description
+
+**The Flames** is a playful, nostalgic reimagining of the classic childhood FLAMES game (Friendship, Love, Affection, Marriage, Enemy, Sibling) — turned into a sleek, interactive web app.
+
+The goal is to let users:
+- Enter two names
+- See the FLAMES process play out visually (crossing letters, revealing result)
+- Get a fun, dramatic result like “Love 💘” or “Enemy 😬”
+- Share or explore more
+
+The experience should be **single-page**, cinematic, and flow-driven — no need for hard routing between views (unless optional).
+
+---
+
+### 🧠 App Themes & Feel
+
+- **Playful + smooth** animations
+- **Fun, quirky** emoji usage and copy
+- **Nostalgia-inspired** styling with a modern twist
+- Cleanly structured codebase and modular logic
+- Optional toggles for things like dark mode, animations, or sound
+
+---
+
+### 🧩 Functional Requirements
+- Works on both desktop and mobile
+- Fully keyboard accessible and readable
+- Performance optimized and visually polished
+
+---
+
+### 🧱 Project Structure & Modularity
+
+- Code should be **highly modular, readable, and easy to maintain**
+- Avoid cluttering logic in one component — break down views into subcomponents
+- Keep animations, utility functions, and constants in separate modules
+- Prefer **colocation of logic** (e.g., `FlamesResult.tsx` + `flamesResult.utils.ts` if needed)
+- Each major visual or logic section should be in its own reusable component
+
+---
+
+### 📁 Suggested Folder Structure
+
+```plaintext
+src/
+├── components/         # Reusable UI components
+│   ├── ui/             # Small presentational elements (buttons, toggles)
+│   ├── layout/         # App layout wrappers (footer, control panel)
+│   └── common/         # Reusable blocks (e.g., result card, letter tile)
+├── features/           # Feature logic grouped by domain
+│   └── flames/         # FLAMES game logic, visuals, animations
+├── hooks/              # Custom reusable hooks
+├── lib/                # Constants, utils, schemas
+├── pages/              # Main page-level components
+├── styles/             # Global styles, theme variables
+└── types/              # Shared TypeScript types/interfaces
+```
+
+---
+
+### ✅ Code Style & Best Practices
+
+- Use **Tailwind CSS** for styling, but organize logic like a design system (using tokens, states, spacing scales)
+- All logic should follow **React best practices**: state isolation, clear side effect boundaries, reusable hooks where possible
+- Keep business logic **separated from UI logic**
+- Naming should be intuitive and scoped
+- Avoid unnecessary re-renders; memoize or split components as needed
