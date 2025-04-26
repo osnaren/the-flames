@@ -1,27 +1,27 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  BarChart3,
-  Users, 
-  Heart, 
-  Star, 
-  BellRing as Ring, 
-  Sword, 
-  RefreshCcw,
-  X,
-  Clock,
+import { useGlobalStats } from '@hooks/useGlobalStats';
+import Button from '@ui/Button';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
   Award,
-  Loader2
+  BarChart3,
+  Clock,
+  Heart,
+  Loader2,
+  RefreshCcw,
+  BellRing as Ring,
+  Star,
+  Sword,
+  Users,
+  X,
 } from 'lucide-react';
-import Button from '../../ui/Button/Button';
+import { useEffect, useState } from 'react';
 import ChartStats from './ChartStats';
 import NameLeaderboard from './NameLeaderboard';
-import ResultTrendBars from './ResultTrendBars';
 import PairingsGrid from './PairingsGrid';
 import RegionalStats from './RegionalStats';
+import ResultTrendBars from './ResultTrendBars';
+import { FlamesResult, TimeFilter } from './types';
 import { getRandomTagline } from './utils';
-import { GlobalStats, TimeFilter, FlamesResult } from './types';
-import { useGlobalStats } from '../../../hooks/useGlobalStats';
 
 // Mapping of result letters to meanings and icons
 const resultInfo = {
@@ -30,7 +30,7 @@ const resultInfo = {
   A: { text: 'Affection', icon: Star, color: 'text-yellow-500', bgColor: 'bg-yellow-100 dark:bg-yellow-900' },
   M: { text: 'Marriage', icon: Ring, color: 'text-purple-500', bgColor: 'bg-purple-100 dark:bg-purple-900' },
   E: { text: 'Enemy', icon: Sword, color: 'text-orange-500', bgColor: 'bg-orange-100 dark:bg-orange-900' },
-  S: { text: 'Siblings', icon: Users, color: 'text-green-500', bgColor: 'bg-green-100 dark:bg-green-900' }
+  S: { text: 'Siblings', icon: Users, color: 'text-green-500', bgColor: 'bg-green-100 dark:bg-green-900' },
 };
 
 interface GlobalChartsProps {
@@ -39,69 +39,61 @@ interface GlobalChartsProps {
   isStandalone?: boolean;
 }
 
-export default function GlobalCharts({ 
-  onClose, 
-  isVisible = true, 
-  isStandalone = false 
-}: GlobalChartsProps) {
+export default function GlobalCharts({ onClose, isVisible = true, isStandalone = false }: GlobalChartsProps) {
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('today');
-  const [tagline, setTagline] = useState<string>("");
-  
+  const [tagline, setTagline] = useState<string>('');
+
   // Use the custom hook to fetch stats with retry and error handling
   const { data, isLoading, error, refetch } = useGlobalStats(timeFilter);
-  
+
   // Update tagline when data changes
   useEffect(() => {
-    if (data?.resultStats?.length > 0) {
+    if (data && data.resultStats && data.resultStats.length > 0) {
       const topResult = data.resultStats[0].result as FlamesResult;
       setTagline(getRandomTagline(topResult));
     }
-  }, [data?.resultStats]);
-  
+  }, [data?.resultStats, data]);
+
   // Find the result with highest percentage growth
   const hottestTrend = data?.resultStats?.sort((a, b) => b.trend - a.trend)[0] || null;
-  
+
   // Loading state component
   const LoadingState = () => (
     <div className="flex flex-col items-center justify-center py-12">
-      <Loader2 className="w-8 h-8 text-orange-500 animate-spin mb-4" />
+      <Loader2 className="mb-4 h-8 w-8 animate-spin text-orange-500" />
       <p className="text-gray-600 dark:text-gray-400">Loading global stats...</p>
     </div>
   );
-  
+
   // Error state component
   const ErrorState = () => (
     <div className="flex flex-col items-center justify-center py-12">
-      <div className="text-red-500 mb-4">⚠️</div>
-      <p className="text-gray-600 dark:text-gray-400 text-center">
+      <div className="mb-4 text-red-500">⚠️</div>
+      <p className="text-center text-gray-600 dark:text-gray-400">
         Oops! Something went wrong while loading the stats.
         <br />
         Please try again later.
       </p>
-      <Button 
-        variant="secondary"
-        onClick={() => window.location.reload()}
-        className="mt-4"
-      >
+      <Button variant="secondary" onClick={() => window.location.reload()} className="mt-4">
         Retry
       </Button>
     </div>
   );
-  
+
   // Create content component to reuse in both modal and standalone views
   const ChartsContent = () => (
     <>
       {/* Header */}
       <div className="relative">
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 p-6 dark:from-orange-600 dark:to-red-600 rounded-t-xl">
-          <div className="flex justify-between items-start">
+        <div className="rounded-t-xl bg-gradient-to-r from-orange-500 to-red-500 p-6 dark:from-orange-600 dark:to-red-600">
+          <div className="flex items-start justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-white mb-1 flex items-center">
+              <h2 className="mb-1 flex items-center text-2xl font-bold text-white">
                 <BarChart3 className="mr-2 h-5 w-5" />
                 Global FLAMES Charts
               </h2>
-              <motion.p 
-                className="text-white/90 text-sm"
+              <motion.p
+                className="text-sm text-white/90"
                 animate={{ opacity: [0.8, 1, 0.8] }}
                 transition={{ duration: 3, repeat: Infinity }}
               >
@@ -111,21 +103,21 @@ export default function GlobalCharts({
             {!isStandalone && onClose && (
               <button
                 onClick={onClose}
-                className="text-white/80 hover:text-white p-1 rounded-full transition"
+                className="rounded-full p-1 text-white/80 transition hover:text-white"
                 aria-label="Close global charts"
               >
                 <X className="h-5 w-5" />
               </button>
             )}
           </div>
-          
+
           {/* Stats Overview */}
           {data && <ChartStats data={data} hottestTrend={hottestTrend} />}
         </div>
       </div>
-      
+
       {/* Main Content */}
-      <div className="p-6 max-h-[70vh] overflow-y-auto">
+      <div className="max-h-[70vh] overflow-y-auto p-6">
         {isLoading ? (
           <LoadingState />
         ) : error ? (
@@ -133,82 +125,73 @@ export default function GlobalCharts({
         ) : data ? (
           <>
             {/* Filters */}
-            <div className="flex space-x-2 mb-6">
+            <div className="mb-6 flex space-x-2">
               <button
                 onClick={() => setTimeFilter('today')}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium flex items-center
-                          ${timeFilter === 'today'
-                            ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200'
-                            : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'}
-                          transition-colors duration-200 hover:brightness-95`}
+                className={`flex items-center rounded-full px-3 py-1.5 text-sm font-medium ${
+                  timeFilter === 'today'
+                    ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200'
+                    : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                } transition-colors duration-200 hover:brightness-95`}
                 aria-pressed={timeFilter === 'today'}
               >
-                <Clock className="w-3.5 h-3.5 mr-1" /> Today
+                <Clock className="mr-1 h-3.5 w-3.5" /> Today
               </button>
               <button
                 onClick={() => setTimeFilter('week')}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium flex items-center
-                          ${timeFilter === 'week' 
-                            ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200' 
-                            : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'}`}
+                className={`flex items-center rounded-full px-3 py-1.5 text-sm font-medium ${
+                  timeFilter === 'week'
+                    ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200'
+                    : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                }`}
               >
-                <Clock className="w-3.5 h-3.5 mr-1" /> This Week
+                <Clock className="mr-1 h-3.5 w-3.5" /> This Week
               </button>
               <button
                 onClick={() => setTimeFilter('alltime')}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium flex items-center
-                          ${timeFilter === 'alltime' 
-                            ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200' 
-                            : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'}`}
+                className={`flex items-center rounded-full px-3 py-1.5 text-sm font-medium ${
+                  timeFilter === 'alltime'
+                    ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200'
+                    : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                }`}
               >
-                <Award className="w-3.5 h-3.5 mr-1" /> All Time
+                <Award className="mr-1 h-3.5 w-3.5" /> All Time
               </button>
               <motion.button
-                onClick={() => window.location.reload()}
-                className="ml-auto px-3 py-1.5 rounded-full text-sm font-medium flex items-center
-                          bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200
-                          hover:brightness-95 transition-colors duration-200"
+                className="ml-auto flex items-center rounded-full bg-blue-100 px-3 py-1.5 text-sm font-medium text-blue-700 transition-colors duration-200 hover:brightness-95 dark:bg-blue-900 dark:text-blue-200"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95, rotate: 180 }}
                 transition={{ duration: 0.4 }}
                 onClick={refetch}
                 aria-label="Refresh statistics"
               >
-                <RefreshCcw className="w-3.5 h-3.5 mr-1" /> Refresh
+                <RefreshCcw className="mr-1 h-3.5 w-3.5" /> Refresh
               </motion.button>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               {/* Popular Names */}
               <NameLeaderboard names={data.popularNames} />
-              
+
               {/* Result Stats */}
               <ResultTrendBars results={data.resultStats} resultInfo={resultInfo} />
-              
+
               {/* Popular Pairings */}
               <PairingsGrid pairs={data.popularPairs} resultInfo={resultInfo} />
-              
+
               {/* Regional Stats */}
-              {data.regionalStats && (
-                <RegionalStats stats={data.regionalStats} resultInfo={resultInfo} />
-              )}
+              {data.regionalStats && <RegionalStats stats={data.regionalStats} resultInfo={resultInfo} />}
             </div>
           </>
         ) : null}
       </div>
-      
+
       {/* Footer */}
       {!isStandalone && (
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
-          <div className="text-xs text-gray-500 dark:text-gray-400 italic">
-            Data refreshes every few minutes
-          </div>
+        <div className="flex items-center justify-between border-t border-gray-200 p-4 dark:border-gray-700">
+          <div className="text-xs text-gray-500 italic dark:text-gray-400">Data refreshes every few minutes</div>
           {onClose && (
-            <Button 
-              variant="primary"
-              onClick={onClose}
-              size="md"
-            >
+            <Button variant="primary" onClick={onClose} size="md">
               Play FLAMES
             </Button>
           )}
@@ -220,25 +203,25 @@ export default function GlobalCharts({
   // For standalone page version
   if (isStandalone) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden">
+      <div className="overflow-hidden rounded-xl bg-white shadow-xl dark:bg-gray-800">
         <ChartsContent />
       </div>
     );
   }
-  
+
   // For modal version
   return (
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
+          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
         >
           <motion.div
-            className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-3xl overflow-hidden shadow-2xl"
+            className="w-full max-w-3xl overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-gray-800"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}

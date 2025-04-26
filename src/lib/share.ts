@@ -34,7 +34,7 @@ export const copyShareUrl = async (name1: string, name2: string): Promise<void> 
   try {
     await navigator.clipboard.writeText(url);
     return Promise.resolve();
-  } catch (error) {
+  } catch {
     return Promise.reject(new Error('Failed to copy to clipboard'));
   }
 };
@@ -42,17 +42,11 @@ export const copyShareUrl = async (name1: string, name2: string): Promise<void> 
 /**
  * Shares the result using the Web Share API (mobile)
  */
-export const shareResult = async ({ 
-  name1, 
-  name2, 
-  result, 
-  resultText,
-  imageUrl 
-}: ShareData): Promise<void> => {
+export const shareResult = async ({ name1, name2, result, resultText, imageUrl }: ShareData): Promise<void> => {
   const shareData: ShareOptions = {
-    title: 'My FLAMES result!',
+    title: '✨ My FLAMES Result! ✨',
     text: `${name1} ${result} ${name2} = ${resultText} ✨\nDiscover your relationship destiny at FLAMES!`,
-    url: generateShareUrl(name1, name2)
+    url: generateShareUrl(name1, name2),
   };
 
   // If we have an image URL, fetch and add it to share data
@@ -72,7 +66,7 @@ export const shareResult = async ({
       await navigator.share(shareData);
       return Promise.resolve();
     } catch (error) {
-      if (error.name !== 'AbortError') {
+      if ((error as Error).name !== 'AbortError') {
         return Promise.reject(new Error('Share failed'));
       }
     }
@@ -89,69 +83,53 @@ export const shareResult = async ({
 /**
  * Shares the result on Twitter
  */
-export const shareOnTwitter = ({ name1, name2, resultText }: ShareData): void => {
-  const text = encodeURIComponent(
-    `Just discovered my FLAMES destiny with ${name2}... We're ${resultText}! 💕🔥\nFind your match at`
-  );
-  const url = encodeURIComponent(window.location.origin);
-  window.open(
-    `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
-    '_blank'
-  );
+export const shareOnTwitter = (data: ShareData): void => {
+  const { name2, result } = data;
+  const text = `🔥 ${name2} got ${result} in FLAMES! ✨ Find out your result too! 👇 #FLAMESGame`;
+  const url = window.location.origin;
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+  window.open(twitterUrl, '_blank', 'noopener,noreferrer');
 };
 
 /**
  * Shares the result on Telegram
  */
-export const shareOnTelegram = ({ name1, name2, resultText }: ShareData): void => {
-  const text = encodeURIComponent(
-    `Just discovered my FLAMES destiny with ${name2}... We're ${resultText}! 💕🔥\nFind your match at ${window.location.origin}`
-  );
-  window.open(
-    `https://t.me/share/url?url=${window.location.origin}&text=${text}`,
-    '_blank'
-  );
+export const shareOnTelegram = (data: ShareData): void => {
+  const { name2, result } = data;
+  const text = `🔥 ${name2} got ${result} in FLAMES! ✨ Find out your result too! 👇 ${window.location.origin} #FLAMESGame`;
+  const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(window.location.origin)}&text=${encodeURIComponent(text)}`;
+  window.open(telegramUrl, '_blank', 'noopener,noreferrer');
 };
 
 /**
  * Downloads the result card as an image
  */
-export const downloadResultCard = async (elementRef: HTMLElement): Promise<void> => {
-  // Add watermark temporarily
-  const watermarkWrapper = document.createElement('div');
-  watermarkWrapper.className = 'absolute bottom-4 right-4 flex items-center gap-1.5';
-  
-  const watermarkIcon = document.createElement('span');
-  watermarkIcon.textContent = '🔥';
-  
-  const watermarkText = document.createElement('span');
-  watermarkText.className = 'text-sm font-medium text-gray-500 dark:text-gray-400';
-  watermarkText.textContent = 'theflames.app';
-  
-  watermarkWrapper.appendChild(watermarkIcon);
-  watermarkWrapper.appendChild(watermarkText);
-  elementRef.appendChild(watermarkWrapper);
-
+export const downloadResultCard = async (element: HTMLElement): Promise<void> => {
   try {
-    const canvas = await html2canvas(elementRef, {
-      backgroundColor: null,
-      scale: window.devicePixelRatio * 2, // For better quality on high DPI screens
+    const canvas = await html2canvas(element, {
+      scale: 3, // Increase scale for better resolution
       useCORS: true,
-      logging: false,
-      allowTaint: true,
+      backgroundColor: null, // Use element's background
+      logging: false, // Disable logging
+      imageTimeout: 15000, // Increase timeout for loading images
+      onclone: (document) => {
+        // Ensure watermark is visible and centered during capture
+        const watermark = document.getElementById('watermark');
+        if (watermark) {
+          watermark.style.display = 'block';
+          watermark.style.opacity = '1';
+        }
+      },
     });
-
-    // Create download link
+    const dataUrl = canvas.toDataURL('image/png');
     const link = document.createElement('a');
-    link.download = 'flames-result.png';
-    link.href = canvas.toDataURL('image/png', 1.0);
+    link.href = dataUrl;
+    link.download = `flames-result-${Date.now()}.png`;
+    document.body.appendChild(link);
     link.click();
-    
-    return Promise.resolve();
-  } catch (error) {
-    return Promise.reject(new Error('Failed to download image'));
-  } finally {
-    // Remove watermark
-    elementRef.removeChild(watermarkWrapper);
+    document.body.removeChild(link);
+  } catch {
+    console.error('Error generating canvas for download:');
+    throw new Error('Failed to generate result card image.');
   }
 };

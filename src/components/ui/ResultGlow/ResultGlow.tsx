@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { FlamesResult } from '../../../features/flamesGame/flames.types';
-import { resultVisuals } from '../../../features/flamesGame/resultVisuals';
+import { getResultVisuals } from '../../../features/flamesGame/resultVisuals';
 import { useEffect, useState, useMemo, memo } from 'react';
 
 interface ResultGlowProps {
@@ -42,30 +42,22 @@ function ResultGlow({
   }, [animationsEnabled, prefersReducedMotion]);
   
   // Get the appropriate colors based on the result
-  const glowColor = useMemo(() => {
-    if (!result) return 'rgba(249, 115, 22, 0.4)'; // Enhanced orange glow
-    return resultVisuals[result].glowColor;
+  const visualConfig = useMemo(() => {
+    return getResultVisuals(result);
   }, [result]);
   
-  const darkGlowColor = useMemo(() => {
-    if (!result) return 'rgba(234, 88, 12, 0.5)'; // Enhanced dark orange glow
-    return resultVisuals[result].darkGlowColor;
-  }, [result]);
-  
-  // Get accessible label for the glow effect
-  const accessibilityLabel = useMemo(() => {
-    if (!result) return 'Decorative background glow';
-    return resultVisuals[result].accessibilityLabel;
-  }, [result]);
+  const glowColor = visualConfig.glowColor;
+  const darkGlowColor = visualConfig.darkGlowColor;
+  const accessibilityLabel = visualConfig.accessibilityLabel;
   
   // No animations, return an enhanced static glow
   if (!shouldAnimate) {
     return isVisible ? (
       <div 
-        className="absolute inset-0 rounded-xl overflow-hidden -z-10 opacity-70 dark:opacity-50"
+        className="absolute inset-0 rounded-xl overflow-hidden -z-10 opacity-80 dark:opacity-60"
         style={{
           background: `radial-gradient(circle at center, ${glowColor} 0%, transparent 70%)`,
-          boxShadow: `0 0 30px 5px ${glowColor}`
+          boxShadow: `0 0 40px 8px ${glowColor}`,
         }}
         aria-hidden="true"
         role="presentation"
@@ -73,7 +65,7 @@ function ResultGlow({
     ) : null;
   }
   
-  // With animations, return the animated glow effect
+  // With animations, return the enhanced animated glow effect
   return (
     <AnimatePresence>
       {isVisible && (
@@ -82,40 +74,90 @@ function ResultGlow({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
           aria-hidden="true"
           role="presentation"
           aria-label={accessibilityLabel}
         >
+          {/* Primary central glow */}
           <motion.div 
             className="absolute inset-0 dark:opacity-90" 
             style={{
               background: `radial-gradient(circle at center, ${glowColor} 0%, transparent 70%)`,
-              filter: 'blur(20px)'
+              filter: 'blur(25px)'
             }}
-            animate={shouldAnimate ? {
-              scale: [1, 1.05, 1],
-              opacity: [0.7, 0.9, 0.7], // Enhanced light mode visibility
-            } : {}}
+            initial={{ scale: 0.9, opacity: 0.5 }}
+            animate={{
+              scale: [0.9, 1.05, 1],
+              opacity: [0.5, 0.9, 0.8],
+            }}
             transition={{
               duration: 3,
+              times: [0, 0.7, 1],
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "easeInOut"
+            }}
+          />
+          
+          {/* Secondary offset glow */}
+          <motion.div 
+            className="absolute inset-0 dark:opacity-90" 
+            style={{
+              background: `radial-gradient(circle at 30% 70%, ${darkGlowColor} 0%, transparent 55%)`,
+              filter: 'blur(20px)'
+            }}
+            initial={{ scale: 1.1, opacity: 0.3 }}
+            animate={{
+              scale: [1.1, 1, 1.15],
+              opacity: [0.5, 0.7, 0.5],
+              x: [0, 10, -10, 0],
+              y: [0, -10, 5, 0]
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "easeInOut"
+            }}
+          />
+          
+          {/* Accent glow particles */}
+          <motion.div
+            className="absolute h-32 w-32 rounded-full"
+            style={{
+              background: `radial-gradient(circle at center, ${glowColor} 0%, transparent 70%)`,
+              filter: 'blur(8px)'
+            }}
+            initial={{ x: "20%", y: "20%", opacity: 0 }}
+            animate={{
+              x: ["20%", "30%", "25%"],
+              y: ["20%", "25%", "35%"],
+              opacity: [0.4, 0.7, 0.4],
+              scale: [1, 1.2, 1]
+            }}
+            transition={{
+              duration: 5,
               repeat: Infinity,
               repeatType: "reverse"
             }}
           />
           
-          <motion.div 
-            className="absolute inset-0 dark:opacity-90" 
+          <motion.div
+            className="absolute h-24 w-24 rounded-full"
             style={{
-              background: `radial-gradient(circle at 30% 70%, ${darkGlowColor} 0%, transparent 50%)`,
-              filter: 'blur(15px)'
+              background: `radial-gradient(circle at center, ${glowColor} 0%, transparent 70%)`,
+              filter: 'blur(6px)'
             }}
-            animate={shouldAnimate ? {
-              scale: [1, 1.1, 1],
-              opacity: [0.5, 0.7, 0.5], // Enhanced light mode visibility
-            } : {}}
+            initial={{ x: "70%", y: "30%", opacity: 0 }}
+            animate={{
+              x: ["70%", "65%", "75%"],
+              y: ["30%", "25%", "20%"],
+              opacity: [0.3, 0.6, 0.3],
+              scale: [1, 1.3, 1]
+            }}
             transition={{
-              duration: 4,
+              duration: 7,
               repeat: Infinity,
               repeatType: "reverse",
               delay: 0.5

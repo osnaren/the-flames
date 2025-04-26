@@ -1,0 +1,191 @@
+:root,
+[data-theme],
+.dark,
+.light,
+.dark-hc,
+.dark-mc,
+.light-hc,
+.light-mc {
+  transition:
+    background-color var(--duration, 0.3s) cubic-bezier(0.23, 1, 0.32, 1),
+    color var(--duration, 0.3s) cubic-bezier(0.23, 1, 0.32, 1),
+    border-color var(--duration, 0.3s) cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow var(--duration, 0.3s) cubic-bezier(0.23, 1, 0.32, 1),
+    background var(--duration, 0.3s) cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@theme {
+  /* Spacing & Timing */
+  --radius: 0.5rem;
+  --duration: 0.3s;
+
+  /* Font Families */
+  --font-josefin: 'Josefin Sans', sans-serif;
+  --font-rubik: 'Rubik Wet Paint', cursive;
+  --font-gummy: 'Sour Gummy', cursive;
+  --font-playpen: 'Playpen Sans', cursive;
+  --font-body: 'Noto Sans', sans-serif;
+
+  /* Font Sizes */
+  --text-h1: clamp(3.5rem, 4vw + 2rem, 6rem);
+  --text-h2: clamp(2.5rem, 3vw + 1.5rem, 4.5rem);
+  --text-h3: clamp(2rem, 2vw + 1rem, 3rem);
+  --text-subheading: clamp(1.5rem, 2vw + 1rem, 2.5rem);
+  --text-body: clamp(1rem, 3vw, 1.625rem);
+
+  /* Animations */
+  --animate-btn-pulse: btn-pulse var(--duration) ease-out infinite;
+  --animate-shine: shine var(--duration) linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulseSlow var(--duration) ease-in-out infinite;
+  --animate-fade-in: fade-in var(--duration) ease-out forwards;
+
+  @keyframes btn-pulse {
+    0%,
+    50% {
+      box-shadow: 0 0 0 0 var(--pulse-color);
+    }
+    100% {
+      box-shadow: 0 0 0 8px var(--pulse-color);
+    }
+  }
+
+  @keyframes shine {
+    0% {
+      background-position: 100%;
+    }
+    100% {
+      background-position: -100%;
+    }
+  }
+
+  @keyframes pulseSlow {
+    0% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 0.9;
+    }
+    100% {
+      opacity: 0.7;
+    }
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-15px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@theme inline {
+  /* --- Colors --- */
+
+  /* Backgrounds */
+  --color-background: var(--md-color-background);
+  --color-background-gradient: var(--md-color-background-gradient);
+  --color-secondary-background: var(--md-color-secondary-background);
+  --color-surface: var(--md-color-surface);
+  --color-surface-tint: var(--md-color-surface-tint);
+
+  /* Text Colors */
+  --color-text-primary: var(--md-color-text-primary);
+  --color-text-secondary: var(--md-color-text-secondary);
+  --color-text-muted: var(--md-color-text-muted);
+  --color-on-background: var(--md-color-on-background);
+  --color-on-surface: var(--md-color-on-surface);
+
+  /* Primary Colors */
+  --color-primary: var(--md-color-primary);
+  --color-on-primary: var(--md-color-on-primary);
+  --color-primary-container: var(--md-color-primary-container);
+  --color-on-primary-container: var(--md-color-on-primary-container);
+
+  /* Secondary Colors */
+  --color-secondary: var(--md-color-secondary);
+  --color-on-secondary: var(--md-color-on-secondary);
+  --color-secondary-container: var(--md-color-secondary-container);
+  --color-on-secondary-container: var(--md-color-on-secondary-container);
+
+  /* Tertiary Colors */
+  --color-tertiary: var(--md-color-tertiary);
+  --color-on-tertiary: var(--md-color-on-tertiary);
+  --color-tertiary-container: var(--md-color-tertiary-container);
+  --color-on-tertiary-container: var(--md-color-on-tertiary-container);
+
+  /* Error Colors */
+  --color-error: var(--md-color-error);
+  --color-on-error: var(--md-color-on-error);
+  --color-error-container: var(--md-color-error-container);
+  --color-on-error-container: var(--md-color-on-error-container);
+
+  /* Additional Material Colors */
+  --color-surface-variant: var(--md-color-surface-variant);
+  --color-on-surface-variant: var(--md-color-on-surface-variant);
+  --color-outline: var(--md-color-outline);
+  --color-outline-variant: var(--md-color-outline-variant);
+  --color-shadow: var(--md-color-shadow);
+  --color-scrim: var(--md-color-scrim);
+  --color-inverse-surface: var(--md-color-inverse-surface);
+  --color-inverse-on-surface: var(--md-color-inverse-on-surface);
+  --color-inverse-primary: var(--md-color-inverse-primary);
+
+  /* Fixed Colors */
+  --color-primary-fixed: var(--md-color-primary-fixed);
+  --color-on-primary-fixed: var(--md-color-on-primary-fixed);
+  --color-primary-fixed-dim: var(--md-color-primary-fixed-dim);
+  --color-on-primary-fixed-variant: var(--md-color-on-primary-fixed-variant);
+  --color-secondary-fixed: var(--md-color-secondary-fixed);
+  --color-on-secondary-fixed: var(--md-color-on-secondary-fixed);
+  --color-secondary-fixed-dim: var(--md-color-secondary-fixed-dim);
+  --color-on-secondary-fixed-variant: var(--md-color-on-secondary-fixed-variant);
+  --color-tertiary-fixed: var(--md-color-tertiary-fixed);
+  --color-on-tertiary-fixed: var(--md-color-on-tertiary-fixed);
+  --color-tertiary-fixed-dim: var(--md-color-tertiary-fixed-dim);
+  --color-on-tertiary-fixed-variant: var(--md-color-on-tertiary-fixed-variant);
+
+  /* Surface and Container Variants */
+  --color-surface-dim: var(--md-color-surface-dim);
+  --color-surface-bright: var(--md-color-surface-bright);
+  --color-surface-container-lowest: var(--md-color-surface-container-lowest);
+  --color-surface-container-low: var(--md-color-surface-container-low);
+  --color-surface-container: var(--md-color-surface-container);
+  --color-surface-container-high: var(--md-color-surface-container-high);
+  --color-surface-container-highest: var(--md-color-surface-container-highest);
+
+  /* Extended Colors from Material Theme Builder */
+  --color-custom1: var(--md-color-custom1); /* Custom Color 1 */
+  --color-custom2: var(--md-color-custom2); /* Custom Color 2 */
+  --color-custom3: var(--md-color-custom3); /* Custom Color 3 */
+
+  /* Custom Colors (from light/dark.css) */
+  --color-custom-color1-color: var(--md-color-custom-color1-color);
+  --color-custom-color1-on-color: var(--md-color-custom-color1-on-color);
+  --color-custom-color1-color-container: var(--md-color-custom-color1-color-container);
+  --color-custom-color1-on-color-container: var(--md-color-custom-color1-on-color-container);
+  --color-custom-color2-color: var(--md-color-custom-color2-color);
+  --color-custom-color2-on-color: var(--md-color-custom-color2-on-color);
+  --color-custom-color2-color-container: var(--md-color-custom-color2-color-container);
+  --color-custom-color2-on-color-container: var(--md-color-custom-color2-on-color-container);
+  --color-custom-color3-color: var(--md-color-custom-color3-color);
+  --color-custom-color3-on-color: var(--md-color-custom-color3-on-color);
+  --color-custom-color3-color-container: var(--md-color-custom-color3-color-container);
+  --color-custom-color3-on-color-container: var(--md-color-custom-color3-on-color-container);
+}

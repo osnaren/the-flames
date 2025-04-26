@@ -15,6 +15,7 @@ export default function FloatingControlPanel({
 }: FloatingControlPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [exitingPanel, setExitingPanel] = useState(false); // Track panel closing state
   
   const [
     { isDarkTheme, isSoundEnabled },
@@ -49,7 +50,13 @@ export default function FloatingControlPanel({
       top: 0, 
       behavior: prefersReducedMotion ? 'auto' : 'smooth' 
     });
-    setIsExpanded(false);
+    
+    // Animate panel closing
+    setExitingPanel(true);
+    setTimeout(() => {
+      setIsExpanded(false);
+      setExitingPanel(false);
+    }, 300);
     
     // Set focus after scroll completes
     setTimeout(() => {
@@ -66,7 +73,7 @@ export default function FloatingControlPanel({
       inactiveIcon: Moon,
       active: !isDarkTheme,
       toggle: toggleTheme,
-      color: 'bg-yellow-100 dark:bg-indigo-900',
+      color: 'bg-yellow-50 dark:bg-indigo-900/70',
       activeColor: 'text-yellow-500',
       inactiveColor: 'text-indigo-400'
     },
@@ -76,7 +83,7 @@ export default function FloatingControlPanel({
       inactiveIcon: Flame,
       active: animationsEnabled,
       toggle: handleToggleAnimations,
-      color: 'bg-orange-100 dark:bg-orange-950',
+      color: 'bg-orange-50 dark:bg-orange-950/70',
       activeColor: 'text-orange-500',
       inactiveColor: 'text-gray-400'
     },
@@ -86,7 +93,7 @@ export default function FloatingControlPanel({
       inactiveIcon: VolumeX,
       active: isSoundEnabled,
       toggle: toggleSound,
-      color: 'bg-green-100 dark:bg-green-950',
+      color: 'bg-green-50 dark:bg-green-950/70',
       activeColor: 'text-green-500',
       inactiveColor: 'text-gray-400'
     }
@@ -95,52 +102,112 @@ export default function FloatingControlPanel({
   // Only show animations if they're enabled and user doesn't prefer reduced motion
   const shouldAnimate = animationsEnabled && !prefersReducedMotion;
 
+  // Define animation variants
+  const panelVariants = {
+    collapsed: { 
+      width: '48px',
+      height: '48px', 
+      borderRadius: '24px',
+    },
+    expanded: { 
+      width: '220px', 
+      height: 'auto',
+      borderRadius: '16px',
+    }
+  };
+  
+  // Staggered children animations
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        when: "beforeChildren",
+        staggerChildren: 0.1,
+      }
+    },
+    exit: {
+      opacity: 0,
+      transition: {
+        when: "afterChildren",
+        staggerChildren: 0.05,
+        staggerDirection: -1
+      }
+    }
+  };
+
+  const childVariants = {
+    hidden: { opacity: 0, x: 20 },
+    visible: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: 10 }
+  };
+
   return (
-    <div className="fixed top-4 right-4 z-50">
+    <div className="fixed top-5 right-5 md:top-6 md:right-6 z-50">
       <motion.div
-        className={`backdrop-blur-lg bg-white/70 dark:bg-gray-900/70 rounded-xl shadow-lg 
-                   border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-300
-                   ${isExpanded ? 'w-52' : 'w-10'}`}
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
+        className={`backdrop-blur-lg bg-white/80 dark:bg-gray-900/80 shadow-lg 
+                   border border-gray-200 dark:border-gray-700 overflow-hidden
+                   ${exitingPanel ? 'transition-all duration-300' : ''}`}
+        variants={panelVariants}
+        initial="collapsed"
+        animate={isExpanded ? "expanded" : "collapsed"}
+        transition={{ 
+          type: "spring", 
+          stiffness: 500, 
+          damping: 30,
+          duration: 0.3
+        }}
       >
-        <button
+        <motion.button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="absolute top-2 left-2 p-1.5 rounded-full bg-white/80 dark:bg-gray-800/80 
-                    hover:bg-white dark:hover:bg-gray-800 shadow-sm text-gray-600 dark:text-gray-300
-                    transition-all hover:scale-110"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className={`
+            absolute ${isExpanded ? 'top-3 right-3' : 'inset-0'} 
+            rounded-full 
+            flex items-center justify-center
+            ${isExpanded 
+              ? 'w-8 h-8 bg-white/90 dark:bg-gray-800/90 shadow-sm' 
+              : 'w-full h-full bg-transparent'}
+            text-gray-600 dark:text-gray-300
+            hover:bg-white dark:hover:bg-gray-800 
+            z-20
+          `}
           aria-label={isExpanded ? "Collapse control panel" : "Expand control panel"}
         >
           {isExpanded ? (
-            <ChevronUp size={16} />
+            <ChevronUp size={18} />
           ) : (
             <Settings 
-              size={16} 
+              size={20} 
               className={shouldAnimate ? 'animate-spin-slow' : ''} 
             />
           )}
-        </button>
+        </motion.button>
 
         <AnimatePresence>
           {isExpanded && (
             <motion.div
-              className="pt-10 pb-3 px-3"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              className="pt-14 pb-3 px-3"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
             >
-              <h3 className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium mb-3 text-center text-shadow-sm">
-                Preferences
-              </h3>
+              <motion.h3 
+                variants={childVariants}
+                className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium mb-3 text-center"
+              >
+                <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
+                  Preferences
+                </span>
+              </motion.h3>
               
-              <div className="space-y-2.5">
-                {controls.map((control, index) => (
+              <div className="space-y-3">
+                {controls.map((control) => (
                   <motion.div
                     key={control.label}
-                    initial={shouldAnimate ? { opacity: 0, x: 20 } : { opacity: 1, x: 0 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: shouldAnimate ? index * 0.1 : 0 }}
+                    variants={childVariants}
                   >
                     <Toggle
                       isActive={control.active}
@@ -156,13 +223,13 @@ export default function FloatingControlPanel({
                 ))}
                 
                 <motion.div
-                  className="text-xs text-center text-gray-500 dark:text-gray-400 mt-3 pt-2 border-t border-gray-200 dark:border-gray-700"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
+                  className="text-xs text-center text-gray-500 dark:text-gray-400 mt-4 pt-3 border-t border-gray-200 dark:border-gray-700"
+                  variants={childVariants}
                 >
                   <button 
-                    className="flex items-center justify-center w-full gap-1.5 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                    className="flex items-center justify-center w-full gap-1.5 py-1.5 px-2 rounded-md
+                              hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 
+                              transition-colors"
                     aria-label="Jump to input section"
                     onClick={handleScrollToTop}
                   >
@@ -177,16 +244,16 @@ export default function FloatingControlPanel({
 
         {!isExpanded && shouldAnimate && (
           <motion.div 
-            className="h-10 w-10 flex items-center justify-center"
+            className="h-12 w-12 flex items-center justify-center absolute inset-0"
             animate={{ 
-              rotate: [0, 10, 0, -10, 0],
-              scale: [1, 1.1, 1, 1.1, 1],
+              rotate: [0, 5, 0, -5, 0],
+              scale: [1, 1.05, 1, 1.05, 1],
             }}
             transition={{ 
-              duration: 1.5, 
+              duration: 2, 
               ease: "easeInOut",
               repeat: Infinity,
-              repeatDelay: 5
+              repeatDelay: 4
             }}
           />
         )}
