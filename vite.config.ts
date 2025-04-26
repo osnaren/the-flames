@@ -10,6 +10,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      src: path.resolve(__dirname, './src'),
       '@components': path.resolve(__dirname, './src/components'),
       '@layout': path.resolve(__dirname, './src/components/layout'),
       '@ui': path.resolve(__dirname, './src/components/ui'),
@@ -18,6 +19,7 @@ export default defineConfig({
       '@lib': path.resolve(__dirname, './src/lib'),
       '@pages': path.resolve(__dirname, './src/pages'),
       '@styles': path.resolve(__dirname, './src/styles'),
+      '@utils': path.resolve(__dirname, './src/utils'),
     },
   },
 });
