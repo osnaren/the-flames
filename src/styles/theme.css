@@ -169,22 +169,51 @@
   --color-surface-container-high: var(--md-color-surface-container-high);
   --color-surface-container-highest: var(--md-color-surface-container-highest);
 
-  /* Extended Colors from Material Theme Builder */
-  --color-custom1: var(--md-color-custom1); /* Custom Color 1 */
-  --color-custom2: var(--md-color-custom2); /* Custom Color 2 */
-  --color-custom3: var(--md-color-custom3); /* Custom Color 3 */
+  /* Custom Meaning Colors */
+  --color-friendship: var(--md-color-friendship);
+  --color-on-friendship: var(--md-color-on-friendship);
+  --color-friendship-container: var(--md-color-friendship-container);
+  --color-on-friendship-container: var(--md-color-on-friendship-container);
 
-  /* Custom Colors (from light/dark.css) */
-  --color-custom-color1-color: var(--md-color-custom-color1-color);
-  --color-custom-color1-on-color: var(--md-color-custom-color1-on-color);
-  --color-custom-color1-color-container: var(--md-color-custom-color1-color-container);
-  --color-custom-color1-on-color-container: var(--md-color-custom-color1-on-color-container);
-  --color-custom-color2-color: var(--md-color-custom-color2-color);
-  --color-custom-color2-on-color: var(--md-color-custom-color2-on-color);
-  --color-custom-color2-color-container: var(--md-color-custom-color2-color-container);
-  --color-custom-color2-on-color-container: var(--md-color-custom-color2-on-color-container);
-  --color-custom-color3-color: var(--md-color-custom-color3-color);
-  --color-custom-color3-on-color: var(--md-color-custom-color3-on-color);
-  --color-custom-color3-color-container: var(--md-color-custom-color3-color-container);
-  --color-custom-color3-on-color-container: var(--md-color-custom-color3-on-color-container);
+  --color-affection: var(--md-color-affection);
+  --color-on-affection: var(--md-color-on-affection);
+  --color-affection-container: var(--md-color-affection-container);
+  --color-on-affection-container: var(--md-color-on-affection-container);
+
+  --color-siblings: var(--md-color-siblings);
+  --color-on-siblings: var(--md-color-on-siblings);
+  --color-siblings-container: var(--md-color-siblings-container);
+  --color-on-siblings-container: var(--md-color-on-siblings-container);
+
+  --color-love: var(--md-color-love);
+  --color-on-love: var(--md-color-on-love);
+  --color-love-container: var(--md-color-love-container);
+  --color-on-love-container: var(--md-color-on-love-container);
+
+  --color-marriage: var(--md-color-marriage);
+  --color-on-marriage: var(--md-color-on-marriage);
+  --color-marriage-container: var(--md-color-marriage-container);
+  --color-on-marriage-container: var(--md-color-on-marriage-container);
+
+  --color-enemy: var(--md-color-enemy);
+  --color-on-enemy: var(--md-color-on-enemy);
+  --color-enemy-container: var(--md-color-enemy-container);
+  --color-on-enemy-container: var(--md-color-on-enemy-container);
+
+  /* --- Shadows --- */
+  --shadow-small: 0 1px 2px var(--color-outline-variant);
+  --shadow-medium: 0 2px 4px var(--color-outline-variant);
+  --shadow-large: 0 4px 8px var(--color-outline-variant);
+  --shadow-xlarge: 0 8px 16px var(--color-outline-variant);
+  --shadow-inset: inset 0 1px 2px var(--color-outline-variant);
+  --shadow-elevation-small: 0 1px 2px var(--color-outline-variant), 0 2px 4px var(--color-outline-variant);
+  --shadow-elevation:
+    0 2px 4px var(--color-outline-variant), 0 4px 8px var(--color-outline-variant),
+    0 8px 16px var(--color-outline-variant);
+  --shadow-elevation-high:
+    0 4px 8px var(--color-outline-variant), 0 8px 16px var(--color-outline-variant),
+    0 16px 32px var(--color-outline-variant);
+  --shadow-elevation-xlarge:
+    0 8px 16px var(--color-outline-variant), 0 16px 32px var(--color-outline-variant),
+    0 32px 64px var(--color-outline-variant);
 }

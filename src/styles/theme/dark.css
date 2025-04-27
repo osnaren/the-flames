@@ -49,4 +49,36 @@
   --md-color-surface-container: #201f1f;
   --md-color-surface-container-high: #2b2a29;
   --md-color-surface-container-highest: #363434;
+
+  /* Custom Meaning Colors */
+  --md-color-friendship: #fcd34d; /* Amber 400 */
+  --md-color-on-friendship: #451a03; /* Amber 950 */
+  --md-color-friendship-container: #b45309; /* Amber 700 */
+  --md-color-on-friendship-container: #fef3c7; /* Amber 100 */
+
+  --md-color-affection: #f9a8d4; /* Pink 300 */
+  --md-color-on-affection: #581c87; /* Pink 950 */
+  --md-color-affection-container: #be185d; /* Pink 700 */
+  --md-color-on-affection-container: #fce7f3; /* Pink 100 */
+
+  --md-color-siblings: #5eead4; /* Teal 300 */
+  --md-color-on-siblings: #064e3b; /* Teal 900 */
+  --md-color-siblings-container: #0f766e; /* Teal 700 */
+  --md-color-on-siblings-container: #ccfbf1; /* Teal 100 */
+
+  /* Map existing themes to meaning colors */
+  --md-color-love: var(--md-color-primary);
+  --md-color-on-love: var(--md-color-on-primary);
+  --md-color-love-container: var(--md-color-primary-container);
+  --md-color-on-love-container: var(--md-color-on-primary-container);
+
+  --md-color-marriage: var(--md-color-tertiary);
+  --md-color-on-marriage: var(--md-color-on-tertiary);
+  --md-color-marriage-container: var(--md-color-tertiary-container);
+  --md-color-on-marriage-container: var(--md-color-on-tertiary-container);
+
+  --md-color-enemy: var(--md-color-error);
+  --md-color-on-enemy: var(--md-color-on-error);
+  --md-color-enemy-container: var(--md-color-error-container);
+  --md-color-on-enemy-container: var(--md-color-on-error-container);
 }
