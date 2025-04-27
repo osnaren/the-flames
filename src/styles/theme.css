@@ -20,11 +20,10 @@
   --duration: 0.3s;
 
   /* Font Families */
-  --font-josefin: 'Josefin Sans', sans-serif;
-  --font-rubik: 'Rubik Wet Paint', cursive;
-  --font-gummy: 'Sour Gummy', cursive;
-  --font-playpen: 'Playpen Sans', cursive;
+  --font-heading: 'DM Serif Text', serif;
   --font-body: 'Noto Sans', sans-serif;
+  --font-josefin: 'Josefin Sans', sans-serif;
+  --font-space: 'Space Grotesk', sans-serif;
 
   /* Font Sizes */
   --text-h1: clamp(3.5rem, 4vw + 2rem, 6rem);
