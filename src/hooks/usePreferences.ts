@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Preferences {
   isDarkTheme: boolean;
@@ -33,6 +33,9 @@ export function usePreferences(): [Preferences, PreferenceActions] {
     // Initialize dark mode if needed
     if (storedTheme === 'dark') {
       document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
     }
   }, []);
 
@@ -41,11 +44,13 @@ export function usePreferences(): [Preferences, PreferenceActions] {
     const newTheme = !isDarkTheme;
     setIsDarkTheme(newTheme);
     localStorage.setItem('theme', newTheme ? 'dark' : 'light');
-    
+
     if (newTheme) {
       document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      document.documentElement.setAttribute('data-theme', 'light');
     }
   };
 
@@ -65,6 +70,6 @@ export function usePreferences(): [Preferences, PreferenceActions] {
 
   return [
     { isDarkTheme, animationsEnabled, isSoundEnabled },
-    { toggleTheme, toggleAnimations, toggleSound }
+    { toggleTheme, toggleAnimations, toggleSound },
   ];
 }
