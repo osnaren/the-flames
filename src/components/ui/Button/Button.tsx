@@ -42,74 +42,74 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const variantStyles = {
       primary: cn(
         'bg-primary-container text-on-primary-container',
-        'hover:opacity-90',
+        'hover:opacity-95',
         'shadow-lg shadow-primary-container/30',
         'hover:shadow-xl hover:shadow-primary-container/40',
-        'after:absolute after:inset-0 after:opacity-0 after:rounded-lg ',
-        'after:bg-gradient-to-r after:from-primary/30 after:to-primary/20',
-        'hover:after:opacity-100 after:transition-opacity after:duration-300',
-        'after:-z-10 hover:z-10 relative'
+        'relative overflow-hidden',
+        'after:absolute after:inset-0 after:opacity-0 after:rounded-lg',
+        'after:bg-gradient-to-r after:from-primary/20 after:to-primary/10',
+        'hover:after:opacity-100 after:transition-opacity after:duration-300'
       ),
       secondary: cn(
         'bg-secondary-container text-on-secondary-container',
-        'hover:opacity-90',
+        'hover:opacity-95',
         'shadow-md shadow-secondary-container/30',
         'hover:shadow-lg hover:shadow-secondary-container/40',
         'relative overflow-hidden',
-        'after:absolute after:inset-0 after:opacity-0 after:rounded-lg ',
-        'after:bg-gradient-to-r after:from-secondary/30 after:to-secondary/20',
+        'after:absolute after:inset-0 after:opacity-0 after:rounded-lg',
+        'after:bg-gradient-to-r after:from-secondary/20 after:to-secondary/10',
         'hover:after:opacity-100 after:transition-opacity after:duration-300'
       ),
       outline: cn(
         'bg-transparent border-2 border-outline text-on-surface',
-        'hover:bg-surface-container-lowest',
+        'hover:bg-surface-container-lowest/70',
         'hover:border-primary hover:text-primary',
-        'transition-colors duration-300'
+        'transition-colors duration-200'
       ),
       ghost: cn(
         'bg-transparent text-on-surface-variant',
-        'hover:bg-surface-container-lowest',
+        'hover:bg-surface-container-lowest/80',
         'hover:text-on-surface',
-        'transition-colors duration-300'
+        'transition-colors duration-200'
       ),
       blue: cn(
         'bg-tertiary-container text-on-tertiary-container',
-        'hover:opacity-90',
+        'hover:opacity-95',
         'shadow-md shadow-tertiary-container/30',
         'hover:shadow-lg hover:shadow-tertiary-container/40',
         'relative overflow-hidden',
         'after:absolute after:inset-0 after:opacity-0 after:rounded-lg',
-        'after:bg-gradient-to-r after:from-tertiary/30 after:to-tertiary/20',
+        'after:bg-gradient-to-r after:from-tertiary/20 after:to-tertiary/10',
         'hover:after:opacity-100 after:transition-opacity after:duration-300'
       ),
       green: cn(
         'bg-green-50 text-green-700 hover:bg-green-100',
-        'dark:bg-green-900/70 dark:text-green-200 dark:hover:bg-green-800',
+        'dark:bg-green-900/80 dark:text-green-200 dark:hover:bg-green-800',
         'shadow-md shadow-green-200/40 dark:shadow-green-900/40',
         'hover:shadow-lg hover:shadow-green-300/40 dark:hover:shadow-green-800/50',
         'relative overflow-hidden',
         'after:absolute after:inset-0 after:opacity-0 after:rounded-lg',
-        'after:bg-gradient-to-r after:from-green-100/30 after:to-green-200/30',
+        'after:bg-gradient-to-r after:from-green-100/20 after:to-green-200/20',
         'hover:after:opacity-100 after:transition-opacity after:duration-300'
       ),
       purple: cn(
         'bg-tertiary-container text-on-tertiary-container',
-        'hover:opacity-90',
+        'hover:opacity-95',
         'shadow-md shadow-tertiary-container/30',
         'hover:shadow-lg hover:shadow-tertiary-container/40',
         'relative overflow-hidden',
-        'after:absolute after:inset-0 after:opacity-0 after:rounded-lg ',
-        'after:bg-gradient-to-r after:from-tertiary/30 after:to-tertiary/20',
+        'after:absolute after:inset-0 after:opacity-0 after:rounded-lg',
+        'after:bg-gradient-to-r after:from-tertiary/20 after:to-tertiary/10',
         'hover:after:opacity-100 after:transition-opacity after:duration-300'
       ),
       red: cn(
         'bg-error-container text-on-error-container',
-        'hover:opacity-90',
+        'hover:opacity-95',
         'shadow-md shadow-error-container/30',
         'hover:shadow-lg hover:shadow-error-container/40',
         'relative overflow-hidden',
-        'after:absolute after:inset-0 after:opacity-0 after:rounded-lg ',
-        'after:bg-gradient-to-r after:from-error/30 after:to-error/20',
+        'after:absolute after:inset-0 after:opacity-0 after:rounded-lg',
+        'after:bg-gradient-to-r after:from-error/20 after:to-error/10',
         'hover:after:opacity-100 after:transition-opacity after:duration-300'
       ),
     };
@@ -121,7 +121,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const baseStyles = cn(
-      'rounded-lg font-medium transition-all duration-200',
+      'rounded-lg font-medium transition-all duration-200 cursor-pointer',
       'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-surface',
       'focus-visible:ring-2 focus-visible:ring-primary dark:focus-visible:ring-primary',
       'focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface',

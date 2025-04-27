@@ -27,12 +27,12 @@ export default function Card({ children, className = '', variant = 'default', el
     },
   };
 
-  // Elevation styles
+  // Elevation styles using theme color variables for consistent shadows
   const elevationStyles = {
     none: '',
-    sm: 'shadow-sm hover:shadow',
-    md: 'shadow-md hover:shadow-lg',
-    lg: 'shadow-lg hover:shadow-xl',
+    sm: 'shadow-sm hover:shadow border-outline/10',
+    md: 'shadow-md hover:shadow-lg border-outline/5',
+    lg: 'shadow-lg hover:shadow-xl border-outline/5',
   };
 
   // Base styles
@@ -40,10 +40,9 @@ export default function Card({ children, className = '', variant = 'default', el
     bg-gradient-to-br from-surface-container-lowest to-surface-container text-on-surface
     dark:bg-gradient-to-br dark:from-surface-container-lowest dark:to-surface-container dark:text-on-surface
     rounded-xl
-    transition-all duration-200
+    transition-all duration-var(--duration)
     backdrop-blur-xs
-    border border-outline/5
-    ${variant === 'interactive' ? 'hover:shadow-glow-sm' : ''}
+    ${variant === 'interactive' ? 'hover:shadow-primary/10' : ''}
     ${elevationStyles[elevation]}
     ${className}
   `;
