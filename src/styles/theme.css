@@ -201,6 +201,10 @@
   --color-enemy-container: var(--md-color-enemy-container);
   --color-on-enemy-container: var(--md-color-on-enemy-container);
 
+  /* Custom Colors */
+  --color-customBg-1: var(--md-color-customBg-1);
+  --color-customBg-2: var(--md-color-customBg-2);
+
   /* --- Shadows --- */
   --shadow-small: 0 1px 2px var(--color-outline-variant);
   --shadow-medium: 0 2px 4px var(--color-outline-variant);

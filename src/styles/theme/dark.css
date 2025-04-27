@@ -81,4 +81,8 @@
   --md-color-on-enemy: var(--md-color-on-error);
   --md-color-enemy-container: var(--md-color-error-container);
   --md-color-on-enemy-container: var(--md-color-on-error-container);
+
+  /* Custom Colors */
+  --md-color-customBg-1: #111827;
+  --md-color-customBg-2: #450a0a;
 }
