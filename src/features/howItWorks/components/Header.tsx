@@ -48,12 +48,12 @@ export default function Header() {
             ease: 'easeInOut',
           }}
         >
-          <Flame className="h-16 w-16 text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.5)] dark:text-orange-400" />
+          <Flame className="text-primary-container h-16 w-16 drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]" />
         </motion.div>
         <h1 className="font-heading text-on-background mb-4 text-4xl font-bold tracking-tight md:text-5xl">
-          How Does <span className="text-orange-500">FLAMES</span> Ignite?
+          How Does <span className="text-primary-container">FLAMES</span> Ignite?
         </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-300">
+        <p className="text-on-surface-variant text-lg">
           Discover the sparks behind the classic childhood game, one step at a time.
         </p>
       </motion.div>

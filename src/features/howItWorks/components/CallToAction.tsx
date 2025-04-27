@@ -15,7 +15,7 @@ export default function CallToAction() {
       viewport={{ once: true, amount: 0.5 }}
       transition={{ duration: 0.8, ease: 'easeOut' }}
     >
-      <h2 className="font-heading mb-6 text-3xl font-bold text-gray-800 md:text-4xl dark:text-white">
+      <h2 className="font-heading text-on-surface mb-6 text-3xl font-bold md:text-4xl">
         🔥 Ready to Find Your Own Spark?
       </h2>
       <div className="flex justify-center">
@@ -24,7 +24,8 @@ export default function CallToAction() {
             variant="primary"
             size="lg"
             icon={ArrowRight}
-            className="bg-gradient-to-r from-orange-500 to-red-500 px-8 py-3 text-lg shadow-lg transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+            iconPosition="right"
+            className="hover:shadow-elevation px-8"
           >
             Play The Flames Now!
           </Button>

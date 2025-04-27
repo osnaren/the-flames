@@ -22,6 +22,11 @@ export default function Step3FlamesSimulation({ remainingLettersCount }: Step3Pr
   // FLAMES counting animation
   const startFlamesSimulation = async () => {
     if (isCounting) return;
+    // Handle invalid count
+    if (remainingLettersCount <= 0) {
+      setStepMessage('The count must be greater than 0 to start the simulation.');
+      return;
+    }
     setIsCounting(true);
     setFinalResult(null);
     setEliminatedLetter(null);
@@ -38,22 +43,32 @@ export default function Step3FlamesSimulation({ remainingLettersCount }: Step3Pr
 
     while (currentFlames.length > 1) {
       const count = remainingLettersCount;
-      const steps = count % currentFlames.length;
-      let targetIndex = (currentIndex + steps) % currentFlames.length;
+      // Ensure count is positive for modulo operation
+      const positiveCount = Math.max(1, count);
+      const steps = positiveCount % currentFlames.length;
+      let targetIndex;
 
-      // Adjust targetIndex if it lands on the same spot due to modulo
+      // Adjust targetIndex if steps is 0 (meaning count is a multiple of currentFlames.length)
+      // In this case, the last element should be removed.
       if (steps === 0) {
-        targetIndex = (currentIndex + currentFlames.length) % currentFlames.length;
+        targetIndex = currentFlames.length - 1;
+      } else {
+        // Normal calculation: steps is the offset from the *next* position relative to currentIndex
+        targetIndex = (currentIndex + steps) % currentFlames.length;
       }
 
-      setStepMessage(`Counting ${count} steps...`);
+      setStepMessage(`Counting ${positiveCount} steps...`);
 
       // Animate the count highlight
-      for (let i = 1; i <= count; i++) {
-        const highlightIdx = (currentIndex + i) % currentFlames.length;
-        setHighlightedIndex(highlightIdx);
+      let animationIndex = currentIndex;
+      for (let i = 1; i <= positiveCount; i++) {
+        animationIndex = (animationIndex + 1) % currentFlames.length;
+        setHighlightedIndex(animationIndex);
         await delay(150); // Faster highlight step
       }
+      // Ensure the final highlighted index matches the target index before removal
+      setHighlightedIndex(targetIndex);
+      await delay(300); // Short pause on the letter to be removed
 
       const letterToRemove = currentFlames[targetIndex];
       setEliminatedLetter(letterToRemove);
@@ -66,7 +81,10 @@ export default function Step3FlamesSimulation({ remainingLettersCount }: Step3Pr
       setHighlightedIndex(null); // Clear highlight
 
       // Adjust the starting point for the next round
-      currentIndex = targetIndex - 1; // Start count from the position *before* the removed item
+      // The next count should start from the position *before* the removed item's original index.
+      // Since splice modifies the array, if we removed at targetIndex, the next item is now
+      // at targetIndex. Counting starts *before* that.
+      currentIndex = targetIndex - 1;
       if (currentIndex < 0 && currentFlames.length > 0) {
         currentIndex = currentFlames.length - 1; // Wrap around if needed
       }
@@ -100,10 +118,10 @@ export default function Step3FlamesSimulation({ remainingLettersCount }: Step3Pr
       transition={{ duration: 0.7 }}
       className="relative"
     >
-      <Card className="p-8 shadow-lg dark:shadow-yellow-900/20">
+      <Card className="p-8 shadow-lg">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 0.5 }}>
-          <h2 className="font-heading mb-6 flex items-center gap-3 text-2xl font-bold">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-yellow-100 text-yellow-600 dark:bg-yellow-900/50 dark:text-yellow-300">
+          <h2 className="font-heading text-on-surface mb-6 flex items-center gap-3 text-2xl font-bold">
+            <span className="bg-secondary-container/20 text-secondary flex h-8 w-8 items-center justify-center rounded-full">
               3
             </span>
             Count Through FLAMES
@@ -117,29 +135,31 @@ export default function Step3FlamesSimulation({ remainingLettersCount }: Step3Pr
 
                 return (
                   <motion.div
-                    key={`flames-${letter}-${i}`}
+                    key={`flames-${letter}-${i}`} // Ensure key is unique even if letters repeat (though not in FLAMES)
                     layout
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{
                       opacity: isEliminated ? 0.3 : 1,
                       scale: isHighlighted ? 1.15 : isFinal ? 1.1 : 1,
                       filter: isHighlighted ? 'brightness(1.2)' : 'brightness(1)',
+                      // Add a subtle bounce for the final result
+                      ...(isFinal && { y: [0, -5, 0], transition: { duration: 0.4, ease: 'easeInOut' } }),
                     }}
                     transition={{ duration: 0.2, ease: 'circOut' }}
                     exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.3 } }}
                     className={`relative flex h-12 w-12 items-center justify-center rounded-lg font-mono text-xl font-bold shadow-md md:h-14 md:w-14 ${
                       isFinal
-                        ? 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white ring-2 ring-white dark:from-yellow-500 dark:to-orange-600'
+                        ? 'from-secondary to-primary-container text-on-secondary ring-outline/20 bg-gradient-to-br ring-2'
                         : isHighlighted
-                          ? 'bg-orange-400 text-white ring-2 ring-orange-200 dark:bg-orange-500'
-                          : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200'
+                          ? 'bg-primary-container text-on-primary-container ring-primary/20 ring-2'
+                          : 'bg-surface-container-high text-on-surface'
                     }`}
                   >
                     {letter}
                     {isEliminated && (
                       <motion.div className="absolute inset-0 flex items-center justify-center">
                         <motion.svg
-                          className="h-10 w-10 text-red-500 opacity-80"
+                          className="text-error h-10 w-10 opacity-80"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -161,16 +181,17 @@ export default function Step3FlamesSimulation({ remainingLettersCount }: Step3Pr
             </AnimatePresence>
           </div>
 
-          <div className="mb-6 min-h-[2em] text-center text-gray-600 dark:text-gray-300">
+          <div className="text-on-surface-variant mb-6 min-h-[2em] text-center">
             <AnimatePresence mode="wait">
               <motion.p
-                key={stepMessage || 'default'}
+                key={stepMessage || 'default'} // Use message as key for animation trigger
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
               >
-                {stepMessage || `Use the count (${remainingLettersCount}) to eliminate letters one by one.`}
+                {stepMessage ||
+                  `Use the count (${remainingLettersCount > 0 ? remainingLettersCount : 'N/A'}) to eliminate letters one by one.`}
               </motion.p>
             </AnimatePresence>
           </div>
@@ -181,26 +202,25 @@ export default function Step3FlamesSimulation({ remainingLettersCount }: Step3Pr
               size="sm"
               onClick={startFlamesSimulation}
               icon={Flame}
-              disabled={isCounting}
-              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+              disabled={isCounting || remainingLettersCount <= 0}
+              className="disabled:opacity-50"
+              aria-label={finalResult ? 'Play FLAMES simulation again' : 'Start FLAMES simulation'}
             >
-              {finalResult ? 'Play Simulation Again' : 'Start Simulation'}
+              {finalResult ? 'Play Again' : 'Start Simulation'}
             </Button>
+            {/* Show Reset button only when simulation is running or has finished */}
             {(isCounting || finalResult) && (
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={resetSimulation}
+                onClick={resetSimulation} // Call reset directly
                 icon={RefreshCcw}
-                disabled={isCounting && !finalResult}
+                aria-label="Reset FLAMES simulation"
               >
                 Reset
               </Button>
             )}
           </div>
-          <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
-            This continues until only one letter remains. That's your result!
-          </p>
         </motion.div>
       </Card>
     </motion.div>

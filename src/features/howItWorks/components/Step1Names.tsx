@@ -18,92 +18,56 @@ export default function Step1Names({ name1, name2 }: Step1Props) {
       transition={{ duration: 0.7 }}
       className="relative"
     >
-      <Card className="p-8 shadow-lg dark:shadow-orange-900/20">
+      <Card className="p-8 shadow-lg">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 0.5 }}>
-          <h2 className="font-heading mb-6 flex items-center gap-3 text-2xl font-bold">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-100 text-orange-600 dark:bg-orange-900/50 dark:text-orange-300">
+          <h2 className="font-heading text-on-surface mb-6 flex items-center gap-3 text-2xl font-bold">
+            <span className="bg-primary-container/20 text-primary flex h-8 w-8 items-center justify-center rounded-full">
               1
             </span>
             Enter Two Names
           </h2>
           <div className="relative mb-6 flex flex-col items-center justify-center gap-6 md:flex-row">
-            <div className="rounded-lg bg-orange-50 p-6 text-2xl font-medium text-gray-700 shadow-inner dark:bg-orange-900/30 dark:text-gray-200">
+            <div className="bg-surface-container-highest/80 text-on-surface rounded-lg p-6 text-2xl font-medium shadow-inner">
               {name1}
             </div>
 
-            <div className="relative flex h-24 w-12 items-center justify-center overflow-visible md:h-12 md:w-24">
-              {/* Vertical Beam (Mobile) */}
-              <div className="absolute inset-0 block md:hidden">
-                <motion.div
-                  className="absolute top-0 left-1/2 h-full w-2 -translate-x-1/2 rounded-full bg-gradient-to-b from-orange-400 via-yellow-300 to-orange-400 opacity-80 blur-md"
-                  animate={{
-                    y: [0, 24, 0, -24, 0], // Vertical movement
-                    opacity: [0.7, 1, 0.7, 1, 0.7],
-                    scaleY: [1, 1.2, 1, 1.2, 1], // Scale vertically
-                  }}
-                  transition={{
-                    duration: 2.5,
-                    repeat: Infinity,
-                    repeatType: 'loop',
-                    ease: 'easeInOut',
-                  }}
-                />
-                <motion.div
-                  className="absolute top-0 left-1/2 h-1/3 w-2 -translate-x-1/2 rounded-full bg-yellow-300 opacity-80 blur-lg"
-                  animate={{
-                    y: [0, 48, 0, -48, 0], // Larger vertical movement
-                    opacity: [0.8, 1, 0.8, 1, 0.8],
-                    scaleY: [1, 1.5, 1, 1.5, 1], // Scale vertically
-                  }}
-                  transition={{
-                    duration: 2.5,
-                    repeat: Infinity,
-                    repeatType: 'loop',
-                    ease: 'easeInOut',
-                  }}
-                />
-              </div>
+            <div className="relative flex h-24 w-12 items-center justify-center md:h-12 md:w-24">
+              <motion.div
+                className="from-primary/5 via-primary-container/20 to-primary/5 absolute inset-0 rounded-full bg-gradient-to-b blur-md md:bg-gradient-to-r"
+                animate={{ opacity: [0.5, 0.9, 0.5], scale: [1, 1.03, 1] }}
+                transition={{ duration: 3, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
+              />
+              <div className="from-primary/80 via-primary-container/90 to-primary/80 h-full w-1 rounded-full bg-gradient-to-b opacity-70 md:h-1 md:w-full md:bg-gradient-to-r" />
 
-              {/* Horizontal Beam (Desktop) */}
-              <div className="absolute inset-0 hidden md:block">
-                <motion.div
-                  className="absolute top-1/2 left-0 h-2 w-full -translate-y-1/2 rounded-full bg-gradient-to-r from-orange-400 via-yellow-300 to-orange-400 opacity-80 blur-md"
-                  animate={{
-                    x: [0, 24, 0, -24, 0], // Horizontal movement
-                    opacity: [0.7, 1, 0.7, 1, 0.7],
-                    scaleX: [1, 1.2, 1, 1.2, 1], // Scale horizontally
-                  }}
-                  transition={{
-                    duration: 2.5,
-                    repeat: Infinity,
-                    repeatType: 'loop',
-                    ease: 'easeInOut',
-                  }}
-                />
-                <motion.div
-                  className="absolute top-1/2 left-0 h-2 w-1/3 -translate-y-1/2 rounded-full bg-yellow-300 opacity-80 blur-lg"
-                  animate={{
-                    x: [0, 48, 0, -48, 0], // Larger horizontal movement
-                    opacity: [0.8, 1, 0.8, 1, 0.8],
-                    scaleX: [1, 1.5, 1, 1.5, 1], // Scale horizontally
-                  }}
-                  transition={{
-                    duration: 2.5,
-                    repeat: Infinity,
-                    repeatType: 'loop',
-                    ease: 'easeInOut',
-                  }}
-                />
-              </div>
+              <motion.div
+                className="bg-primary shadow-[0_0_8px_2px_theme(colors.primary/80)] absolute h-3 w-1 rounded-full md:hidden"
+                initial={{ y: '-70%' }}
+                animate={{ y: ['-70%', '50%', '-70%'] }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'linear',
+                  repeatType: 'loop',
+                }}
+              />
+              <motion.div
+                className="bg-primary shadow-[0_0_8px_2px_theme(colors.primary/80)] absolute hidden h-1 w-3 rounded-full md:block"
+                initial={{ x: '-70%' }}
+                animate={{ x: ['-70%', '50%', '-70%'] }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'linear',
+                  repeatType: 'loop',
+                }}
+              />
             </div>
 
-            <div className="rounded-lg bg-orange-50 p-6 text-2xl font-medium text-gray-700 shadow-inner dark:bg-orange-900/30 dark:text-gray-200">
+            <div className="bg-surface-container-highest/80 text-on-surface rounded-lg p-6 text-2xl font-medium shadow-inner">
               {name2}
             </div>
           </div>
-          <p className="text-center text-gray-600 dark:text-gray-300">
-            We start with two names, ready to uncover the spark.
-          </p>
+          <p className="text-on-surface-variant text-center">We start with two names, ready to uncover the spark.</p>
         </motion.div>
       </Card>
     </motion.div>
