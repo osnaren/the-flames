@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import React from 'react';
+import { cn } from 'src/utils';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'blue' | 'green' | 'purple' | 'red';
 
@@ -39,82 +40,78 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     // Style maps for different variants and sizes
     const variantStyles = {
-      primary: `
-        bg-gradient-to-r from-orange-500 to-red-500 text-white 
-        hover:from-orange-600 hover:to-red-600 
-        dark:from-orange-600 dark:to-red-600 
-        dark:hover:from-orange-500 dark:hover:to-red-500
-        shadow-lg shadow-orange-500/30 dark:shadow-orange-900/40
-        hover:shadow-xl hover:shadow-orange-500/40 dark:hover:shadow-orange-800/50
-        after:absolute after:inset-0 after:opacity-0 after:rounded-lg 
-        after:bg-gradient-to-r after:from-orange-400/30 after:to-red-400/30
-        hover:after:opacity-100 after:transition-opacity after:duration-300
-        after:-z-10 hover:z-10 relative
-      `,
-      secondary: `
-        bg-white text-gray-700 hover:bg-gray-50 
-        dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700
-        shadow-md shadow-gray-200/60 dark:shadow-gray-900/60
-        hover:shadow-lg hover:shadow-gray-300/50 dark:hover:shadow-black/40
-        relative overflow-hidden
-        after:absolute after:inset-0 after:opacity-0 after:rounded-lg 
-        after:bg-gradient-to-r after:from-gray-100/30 after:to-gray-200/30
-        hover:after:opacity-100 after:transition-opacity after:duration-300
-      `,
-      outline: `
-        bg-transparent border-2 border-gray-300 text-gray-700 
-        hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 
-        dark:hover:bg-gray-800
-        hover:border-orange-400 dark:hover:border-orange-500
-        hover:text-orange-600 dark:hover:text-orange-400
-        transition-colors duration-300
-      `,
-      ghost: `
-        bg-transparent text-gray-600 hover:bg-gray-100 
-        dark:text-gray-400 dark:hover:bg-gray-800
-        hover:text-gray-900 dark:hover:text-gray-100
-        transition-colors duration-300
-      `,
-      blue: `
-        bg-blue-50 text-blue-700 hover:bg-blue-100 
-        dark:bg-blue-900/70 dark:text-blue-200 dark:hover:bg-blue-800
-        shadow-md shadow-blue-200/40 dark:shadow-blue-900/40
-        hover:shadow-lg hover:shadow-blue-300/40 dark:hover:shadow-blue-800/50
-        relative overflow-hidden
-        after:absolute after:inset-0 after:opacity-0 after:rounded-lg 
-        after:bg-gradient-to-r after:from-blue-100/30 after:to-blue-200/30
-        hover:after:opacity-100 after:transition-opacity after:duration-300
-      `,
-      green: `
-        bg-green-50 text-green-700 hover:bg-green-100 
-        dark:bg-green-900/70 dark:text-green-200 dark:hover:bg-green-800
-        shadow-md shadow-green-200/40 dark:shadow-green-900/40
-        hover:shadow-lg hover:shadow-green-300/40 dark:hover:shadow-green-800/50
-        relative overflow-hidden
-        after:absolute after:inset-0 after:opacity-0 after:rounded-lg 
-        after:bg-gradient-to-r after:from-green-100/30 after:to-green-200/30
-        hover:after:opacity-100 after:transition-opacity after:duration-300
-      `,
-      purple: `
-        bg-purple-50 text-purple-700 hover:bg-purple-100 
-        dark:bg-purple-900/70 dark:text-purple-200 dark:hover:bg-purple-800
-        shadow-md shadow-purple-200/40 dark:shadow-purple-900/40
-        hover:shadow-lg hover:shadow-purple-300/40 dark:hover:shadow-purple-800/50
-        relative overflow-hidden
-        after:absolute after:inset-0 after:opacity-0 after:rounded-lg 
-        after:bg-gradient-to-r after:from-purple-100/30 after:to-purple-200/30
-        hover:after:opacity-100 after:transition-opacity after:duration-300
-      `,
-      red: `
-        bg-red-50 text-red-700 hover:bg-red-100 
-        dark:bg-red-900/70 dark:text-red-200 dark:hover:bg-red-800
-        shadow-md shadow-red-200/40 dark:shadow-red-900/40
-        hover:shadow-lg hover:shadow-red-300/40 dark:hover:shadow-red-800/50
-        relative overflow-hidden
-        after:absolute after:inset-0 after:opacity-0 after:rounded-lg 
-        after:bg-gradient-to-r after:from-red-100/30 after:to-red-200/30
-        hover:after:opacity-100 after:transition-opacity after:duration-300
-      `,
+      primary: cn(
+        'bg-primary-container text-on-primary-container',
+        'hover:opacity-90',
+        'shadow-lg shadow-primary-container/30',
+        'hover:shadow-xl hover:shadow-primary-container/40',
+        'after:absolute after:inset-0 after:opacity-0 after:rounded-lg ',
+        'after:bg-gradient-to-r after:from-primary/30 after:to-primary/20',
+        'hover:after:opacity-100 after:transition-opacity after:duration-300',
+        'after:-z-10 hover:z-10 relative'
+      ),
+      secondary: cn(
+        'bg-secondary-container text-on-secondary-container',
+        'hover:opacity-90',
+        'shadow-md shadow-secondary-container/30',
+        'hover:shadow-lg hover:shadow-secondary-container/40',
+        'relative overflow-hidden',
+        'after:absolute after:inset-0 after:opacity-0 after:rounded-lg ',
+        'after:bg-gradient-to-r after:from-secondary/30 after:to-secondary/20',
+        'hover:after:opacity-100 after:transition-opacity after:duration-300'
+      ),
+      outline: cn(
+        'bg-transparent border-2 border-outline text-on-surface',
+        'hover:bg-surface-container-lowest',
+        'hover:border-primary hover:text-primary',
+        'transition-colors duration-300'
+      ),
+      ghost: cn(
+        'bg-transparent text-on-surface-variant',
+        'hover:bg-surface-container-lowest',
+        'hover:text-on-surface',
+        'transition-colors duration-300'
+      ),
+      blue: cn(
+        'bg-tertiary-container text-on-tertiary-container',
+        'hover:opacity-90',
+        'shadow-md shadow-tertiary-container/30',
+        'hover:shadow-lg hover:shadow-tertiary-container/40',
+        'relative overflow-hidden',
+        'after:absolute after:inset-0 after:opacity-0 after:rounded-lg',
+        'after:bg-gradient-to-r after:from-tertiary/30 after:to-tertiary/20',
+        'hover:after:opacity-100 after:transition-opacity after:duration-300'
+      ),
+      green: cn(
+        'bg-green-50 text-green-700 hover:bg-green-100',
+        'dark:bg-green-900/70 dark:text-green-200 dark:hover:bg-green-800',
+        'shadow-md shadow-green-200/40 dark:shadow-green-900/40',
+        'hover:shadow-lg hover:shadow-green-300/40 dark:hover:shadow-green-800/50',
+        'relative overflow-hidden',
+        'after:absolute after:inset-0 after:opacity-0 after:rounded-lg',
+        'after:bg-gradient-to-r after:from-green-100/30 after:to-green-200/30',
+        'hover:after:opacity-100 after:transition-opacity after:duration-300'
+      ),
+      purple: cn(
+        'bg-tertiary-container text-on-tertiary-container',
+        'hover:opacity-90',
+        'shadow-md shadow-tertiary-container/30',
+        'hover:shadow-lg hover:shadow-tertiary-container/40',
+        'relative overflow-hidden',
+        'after:absolute after:inset-0 after:opacity-0 after:rounded-lg ',
+        'after:bg-gradient-to-r after:from-tertiary/30 after:to-tertiary/20',
+        'hover:after:opacity-100 after:transition-opacity after:duration-300'
+      ),
+      red: cn(
+        'bg-error-container text-on-error-container',
+        'hover:opacity-90',
+        'shadow-md shadow-error-container/30',
+        'hover:shadow-lg hover:shadow-error-container/40',
+        'relative overflow-hidden',
+        'after:absolute after:inset-0 after:opacity-0 after:rounded-lg ',
+        'after:bg-gradient-to-r after:from-error/30 after:to-error/20',
+        'hover:after:opacity-100 after:transition-opacity after:duration-300'
+      ),
     };
 
     const sizeStyles = {
@@ -123,20 +120,20 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       lg: 'px-6 py-3.5 text-lg',
     };
 
-    const baseStyles = `
-      rounded-lg font-medium transition-all duration-200
-      focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 dark:focus:ring-offset-gray-900
-      focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-orange-400
-      focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900
-      disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:after:opacity-0
-      active:scale-[0.96]
-      flex items-center justify-center gap-2
-      ${disabled || isLoading ? 'opacity-50 cursor-not-allowed' : ''}
-      ${fullWidth ? 'w-full' : ''}
-      ${sizeStyles[size]}
-      ${variantStyles[variant]}
-      ${className}
-    `;
+    const baseStyles = cn(
+      'rounded-lg font-medium transition-all duration-200',
+      'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-surface',
+      'focus-visible:ring-2 focus-visible:ring-primary dark:focus-visible:ring-primary',
+      'focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface',
+      'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:after:opacity-0',
+      'active:scale-[0.96]',
+      'flex items-center justify-center gap-2',
+      disabled || isLoading ? 'opacity-50 cursor-not-allowed' : '',
+      fullWidth ? 'w-full' : '',
+      sizeStyles[size],
+      variantStyles[variant],
+      className
+    );
 
     // Enhanced hover/tap animations based on variant
     const hoverScale = variant === 'primary' || variant === 'secondary' ? 1.03 : 1.02;

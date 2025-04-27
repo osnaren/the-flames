@@ -13,7 +13,7 @@ function App() {
   const [animationsEnabled, setAnimationsEnabled] = useState(true);
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-gradient-to-br from-orange-50 to-red-50 transition-colors duration-500 dark:from-gray-900 dark:to-red-950">
+    <div className="from-background to-primary-container relative flex min-h-screen flex-col bg-gradient-to-br transition-colors duration-500">
       <FlameBackground animationsEnabled={animationsEnabled} />
       <Navbar />
 

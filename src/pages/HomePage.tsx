@@ -189,7 +189,7 @@ function HomePage({ animationsEnabled }: HomePageProps) {
             exit={{ opacity: 0 }}
           >
             {/* Input form ambient glow */}
-            <AmbientGlow isVisible={true} animationsEnabled={animationsEnabled} />
+            {/* <AmbientGlow isVisible={true} animationsEnabled={animationsEnabled} /> */}
 
             <div className="mb-4">
               <label htmlFor="name1" className="sr-only">

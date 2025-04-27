@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { DivideIcon as LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface ToggleProps {
   isActive: boolean;
@@ -21,20 +21,15 @@ export default function Toggle({
   activeIcon: ActiveIcon,
   inactiveIcon: InactiveIcon,
   label,
-  activeColor = 'text-orange-500',
-  inactiveColor = 'text-gray-400',
-  backgroundColor = 'bg-orange-100 dark:bg-orange-950',
+  activeColor = 'text-primary text-glow-sm',
+  inactiveColor = 'text-on-surface-variant',
+  backgroundColor = 'bg-gradient-to-r from-primary-container/20 to-transparent dark:from-primary-container/20 dark:to-transparent',
 }: ToggleProps) {
   const Icon = isActive ? ActiveIcon : InactiveIcon;
-  
+
   return (
     <motion.button
-      className={`flex items-center justify-between w-full p-2.5 rounded-lg 
-                ${backgroundColor} transition-all duration-200
-                focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400
-                focus:ring-offset-2 dark:focus:ring-offset-gray-900
-                hover:brightness-105 dark:hover:brightness-110
-                active:scale-95`}
+      className={`flex w-full items-center justify-between rounded-lg p-2.5 ${backgroundColor} border-outline/10 border backdrop-blur-xs transition-all duration-200 ${isActive ? 'shadow-glow-sm' : ''} focus:ring-primary dark:focus:ring-primary dark:focus:ring-offset-surface hover:brightness-105 focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-95 dark:hover:brightness-110`}
       onClick={onToggle}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
@@ -43,9 +38,7 @@ export default function Toggle({
       aria-checked={isActive}
       aria-label={`Toggle ${label}`}
     >
-      <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-        {label}
-      </span>
+      <span className="text-on-surface dark:text-on-surface text-sm font-medium">{label}</span>
       <Icon
         size={18}
         className={`${isActive ? activeColor : inactiveColor} transition-colors duration-200`}

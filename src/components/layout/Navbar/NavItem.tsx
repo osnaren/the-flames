@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { DivideIcon as LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface NavItemProps {
   icon?: LucideIcon;
@@ -19,11 +19,11 @@ export default function NavItem({
   isActive = false,
   onClick,
   mobileOnly = false,
-  className = ''
+  className = '',
 }: NavItemProps) {
   const content = (
     <>
-      {Icon && <Icon className="w-4 h-4 mr-2" />}
+      {Icon && <Icon className="mr-2 h-4 w-4" />}
       <span>{label}</span>
     </>
   );
@@ -32,9 +32,10 @@ export default function NavItem({
   const baseClasses = `
     flex items-center px-3 py-2 text-sm font-medium rounded-lg
     transition-all duration-200
-    ${isActive 
-      ? 'text-orange-500 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20' 
-      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+    ${
+      isActive
+        ? 'text-primary bg-primary-container/20'
+        : 'text-on-surface-variant hover:bg-surface-container-lowest hover:text-on-surface'
     }
     ${mobileOnly ? 'md:hidden' : ''}
     ${className}
@@ -44,7 +45,7 @@ export default function NavItem({
   const motionVariants = {
     hover: {
       scale: 1.05,
-    }
+    },
   };
 
   if (to) {
@@ -58,12 +59,7 @@ export default function NavItem({
   }
 
   return (
-    <motion.button
-      onClick={onClick}
-      className={baseClasses}
-      whileHover="hover"
-      variants={motionVariants}
-    >
+    <motion.button onClick={onClick} className={baseClasses} whileHover="hover" variants={motionVariants}>
       {content}
     </motion.button>
   );
