@@ -1,115 +1,196 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { BarChart3, BookOpen, Flame, Moon, Sun, Wand2 } from 'lucide-react';
+import Logo from '@components/ui/Logo';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { BarChart3, BookOpen, Flame, Wand2, X } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavItem from './NavItem';
 
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  isDarkTheme: boolean;
-  toggleTheme: () => void;
   pathname: string;
 }
 
-export default function MobileMenu({ isOpen, onClose, isDarkTheme, toggleTheme, pathname }: MobileMenuProps) {
+export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProps) {
   const navigate = useNavigate();
+  const prefersReducedMotion = useReducedMotion();
+  const menuRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
+  // Handle navigation and close menu
   const handleNavigation = (path: string) => {
     navigate(path);
     onClose();
   };
 
+  // Focus management and keyboard trap
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isOpen) return;
+
+      // Close on escape key
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+
+      // Trap focus within menu
+      if (e.key === 'Tab' && menuRef.current) {
+        const focusable = menuRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+
+        const firstElement = focusable[0] as HTMLElement;
+        const lastElement = focusable[focusable.length - 1] as HTMLElement;
+
+        if (e.shiftKey && document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    // Auto-focus close button when menu opens
+    if (isOpen && closeButtonRef.current) {
+      setTimeout(() => closeButtonRef.current?.focus(), 100);
+    }
+
+    // Re-enable scrolling when component unmounts
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
+  // Animation variants
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  };
+
+  const menuVariants = {
+    hidden: { x: '100%' },
+    visible: { x: 0 },
+  };
+
+  // Navigation items with staggered animation
+  const navItems = [
+    { label: 'Home', icon: Flame, path: '/', isActive: pathname === '/' },
+    { label: 'How it Works', icon: BookOpen, path: '/how-it-works', isActive: pathname === '/how-it-works' },
+    { label: 'Global Charts', icon: BarChart3, path: '/charts', isActive: pathname === '/charts' },
+    { label: 'Manual Mode', icon: Wand2, path: '/manual', isActive: pathname === '/manual' },
+  ];
+
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-60 md:hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-60 flex md:hidden"
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          transition={{ duration: prefersReducedMotion ? 0.1 : 0.2 }}
           role="dialog"
           aria-modal="true"
-          aria-label="Mobile navigation menu"
+          aria-labelledby="mobile-menu-heading"
         >
           {/* Backdrop */}
           <motion.div
             className="bg-scrim/40 absolute inset-0 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            variants={backdropVariants}
+            transition={{ duration: prefersReducedMotion ? 0.1 : 0.2 }}
             onClick={onClose}
+            aria-hidden="true"
           />
 
           {/* Menu panel */}
           <motion.div
-            className="bg-surface absolute top-0 right-0 h-full w-64 shadow-lg"
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            ref={menuRef}
+            className="bg-surface absolute top-0 right-0 h-full w-72 overflow-y-auto shadow-xl"
+            variants={menuVariants}
+            transition={{
+              type: prefersReducedMotion ? 'tween' : 'spring',
+              damping: 25,
+              stiffness: 300,
+              duration: prefersReducedMotion ? 0.2 : undefined,
+            }}
           >
-            <div className="p-4">
-              <div className="border-outline/20 mb-8 flex items-center justify-between border-b pb-3">
-                <div className="flex items-center">
-                  <Flame className="text-primary h-5 w-5" aria-hidden="true" />
-                  <span className="text-on-surface ml-2 text-lg font-bold">FLAMES</span>
-                </div>
-                <button
-                  className="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest rounded-full p-2 transition-colors"
+            {/* Header */}
+            <div className="border-outline/20 mb-6 border-b">
+              <div className="flex items-center justify-end p-4">
+                <h2 id="mobile-menu-heading" className="sr-only">
+                  Mobile navigation menu
+                </h2>
+                <motion.button
+                  ref={closeButtonRef}
+                  className="text-on-surface-variant hover:bg-surface-container-lowest active:bg-surface-container focus:ring-primary/30 rounded-full p-2 transition-colors focus:ring-2"
                   onClick={onClose}
                   aria-label="Close mobile menu"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                  <X className="h-5 w-5" aria-hidden="true" />
+                </motion.button>
               </div>
-
-              <nav className="space-y-2" role="navigation" aria-label="Mobile navigation">
-                <NavItem
-                  label="Home"
-                  icon={Flame}
-                  isActive={pathname === '/'}
-                  onClick={() => handleNavigation('/')}
-                  mobileOnly
-                />
-                <NavItem
-                  label="How it Works"
-                  icon={BookOpen}
-                  isActive={pathname === '/how-it-works'}
-                  onClick={() => handleNavigation('/how-it-works')}
-                  mobileOnly
-                />
-                <NavItem
-                  label="Global Charts"
-                  icon={BarChart3}
-                  isActive={pathname === '/charts'}
-                  onClick={() => handleNavigation('/charts')}
-                  mobileOnly
-                />
-                <NavItem
-                  label="Manual Mode"
-                  icon={Wand2}
-                  isActive={pathname === '/manual'}
-                  onClick={() => handleNavigation('/manual')}
-                  mobileOnly
-                />
-                <NavItem
-                  label={isDarkTheme ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                  icon={isDarkTheme ? Sun : Moon}
-                  onClick={toggleTheme}
-                  mobileOnly
-                />
-              </nav>
             </div>
+
+            {/* Navigation links */}
+            <nav className="px-4 pb-16" role="navigation" aria-label="Mobile navigation">
+              <div className="space-y-2">
+                {navItems.map((item, index) => (
+                  <motion.div
+                    key={item.path}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{
+                      delay: prefersReducedMotion ? 0 : index * 0.05,
+                      duration: 0.3,
+                    }}
+                  >
+                    <NavItem
+                      label={item.label}
+                      icon={item.icon}
+                      isActive={item.isActive}
+                      onClick={() => handleNavigation(item.path)}
+                      mobileOnly
+                    />
+                  </motion.div>
+                ))}
+
+                {/* Note about settings - direct users to the control panel */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{
+                    delay: prefersReducedMotion ? 0 : navItems.length * 0.05,
+                    duration: 0.3,
+                  }}
+                  className="pt-4"
+                >
+                  <div className="bg-outline/20 mb-4 h-px w-full"></div>
+                  <p className="text-on-surface-variant/70 px-3 py-2 text-xs italic">
+                    Use the settings panel for theme and animation controls.
+                  </p>
+                </motion.div>
+              </div>
+            </nav>
+
+            {/* Footer brand info */}
+            <motion.div
+              className="from-surface to-surface/5 text-on-surface-variant absolute right-0 bottom-0 left-0 bg-gradient-to-t p-4 pt-12 pb-8 text-center text-sm"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <div className="flex flex-col items-center">
+                <Logo variant="animated" animationType="continuous" showText={false} />
+                <p className="mt-2">FLAMES © {new Date().getFullYear()}</p>
+              </div>
+            </motion.div>
           </motion.div>
         </motion.div>
       )}
