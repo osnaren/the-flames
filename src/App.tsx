@@ -1,4 +1,4 @@
-import FloatingControlPanel from '@layout/FloatingControlPanel';
+import SponsorFAB from '@features/sponsor/SponsorFAB';
 import Footer from '@layout/Footer';
 import Navbar from '@layout/Navbar';
 import ChartsPage from '@pages/ChartsPage';
@@ -22,6 +22,7 @@ function App() {
           <Route path="/manual" element={<ManualModePage />} />
         </Routes>
       </main>
+      <SponsorFAB />
       <Footer />
     </div>
   );
