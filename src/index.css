@@ -6,6 +6,12 @@
 
 @import 'tailwindcss';
 
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+@import '@styles/custom.css';
+
 @import '@styles/theme/light.css';
 @import '@styles/theme/dark.css';
 
