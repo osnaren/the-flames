@@ -1,8 +1,9 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { usePreferences } from '@hooks/usePreferences';
+import Toggle from '@ui/Toggle';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ChevronUp, Flame, Moon, MousePointerClick, Settings, Sun, Volume2, VolumeX } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
-import { usePreferences } from '../../../hooks/usePreferences';
-import Toggle from '../../ui/Toggle';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { cn } from 'src/utils';
 
 interface FloatingControlPanelProps {
   animationsEnabled: boolean;
@@ -11,25 +12,12 @@ interface FloatingControlPanelProps {
 
 export default function FloatingControlPanel({ animationsEnabled, setAnimationsEnabled }: FloatingControlPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const [exitingPanel, setExitingPanel] = useState(false); // Track panel closing state
+  const [exitingPanel, setExitingPanel] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const [{ isDarkTheme, isSoundEnabled }, { toggleTheme, toggleSound, toggleAnimations }] = usePreferences();
-
-  // Check for reduced motion preference
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
-
-    const handleMediaChange = (e: MediaQueryListEvent) => {
-      setPrefersReducedMotion(e.matches);
-    };
-
-    mediaQuery.addEventListener('change', handleMediaChange);
-    return () => {
-      mediaQuery.removeEventListener('change', handleMediaChange);
-    };
-  }, []);
 
   // Local wrapper for toggling animations to ensure parent state is updated too
   const handleToggleAnimations = useCallback(() => {
@@ -40,13 +28,17 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
   // Handle scroll to top with proper focus management
   const handleScrollToTop = useCallback(() => {
     const firstFocusableElement = document.querySelector('main button, main a, main input, main [tabindex="0"]');
+
+    // Animate panel closing with better UX
+    setExitingPanel(true);
+
+    // Scroll to top
     window.scrollTo({
       top: 0,
       behavior: prefersReducedMotion ? 'auto' : 'smooth',
     });
 
-    // Animate panel closing
-    setExitingPanel(true);
+    // Close panel after scroll starts
     setTimeout(() => {
       setIsExpanded(false);
       setExitingPanel(false);
@@ -63,6 +55,67 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
     );
   }, [prefersReducedMotion]);
 
+  // Handle keyboard interactions
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isExpanded) return;
+
+      if (e.key === 'Escape') {
+        setIsExpanded(false);
+        toggleButtonRef.current?.focus();
+      }
+
+      // Focus trap for accessibility
+      if (e.key === 'Tab' && panelRef.current) {
+        const focusable = panelRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+
+        const firstElement = focusable[0] as HTMLElement;
+        const lastElement = focusable[focusable.length - 1] as HTMLElement;
+
+        if (e.shiftKey && document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isExpanded]);
+
+  // Auto-focus first control when expanding
+  useEffect(() => {
+    if (isExpanded && panelRef.current) {
+      const firstFocusable = panelRef.current.querySelector(
+        'button:not([aria-label="Collapse control panel"]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      ) as HTMLElement;
+
+      if (firstFocusable) {
+        setTimeout(() => firstFocusable.focus(), 150);
+      }
+    }
+  }, [isExpanded]);
+
+  // Close panel when clicking outside
+  useEffect(() => {
+    if (!isExpanded) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+        setIsExpanded(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isExpanded]);
+
+  // Controls configuration
   const controls = [
     {
       label: 'Theme',
@@ -73,6 +126,7 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
       color: 'bg-gradient-to-r from-tertiary-container/30 to-tertiary/10',
       activeColor: 'text-primary text-glow-sm',
       inactiveColor: 'text-on-surface-variant',
+      ariaLabel: isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme',
     },
     {
       label: 'Animations',
@@ -83,6 +137,7 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
       color: 'bg-gradient-to-r from-primary-container/30 to-primary/10',
       activeColor: 'text-primary text-glow-sm',
       inactiveColor: 'text-on-surface-variant',
+      ariaLabel: animationsEnabled ? 'Turn off animations' : 'Turn on animations',
     },
     {
       label: 'Sound',
@@ -93,13 +148,14 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
       color: 'bg-gradient-to-r from-secondary-container/30 to-secondary/10',
       activeColor: 'text-secondary text-glow-sm',
       inactiveColor: 'text-on-surface-variant',
+      ariaLabel: isSoundEnabled ? 'Turn off sound' : 'Turn on sound',
     },
   ];
 
   // Only show animations if they're enabled and user doesn't prefer reduced motion
   const shouldAnimate = animationsEnabled && !prefersReducedMotion;
 
-  // Define animation variants
+  // Animation variants
   const panelVariants = {
     collapsed: {
       width: '48px',
@@ -107,7 +163,7 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
       borderRadius: '24px',
     },
     expanded: {
-      width: '220px',
+      width: '280px',
       height: 'auto',
       borderRadius: '16px',
     },
@@ -120,14 +176,14 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
       opacity: 1,
       transition: {
         when: 'beforeChildren',
-        staggerChildren: 0.1,
+        staggerChildren: prefersReducedMotion ? 0 : 0.08,
       },
     },
     exit: {
       opacity: 0,
       transition: {
         when: 'afterChildren',
-        staggerChildren: 0.05,
+        staggerChildren: prefersReducedMotion ? 0 : 0.05,
         staggerDirection: -1,
       },
     },
@@ -140,29 +196,42 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
   };
 
   return (
-    <div className="fixed top-20 right-5 z-50 md:top-6 md:right-6">
+    <div className={cn('fixed top-20 right-5 z-50 md:right-6')}>
       <motion.div
-        className={`from-surface-container-low/90 to-surface-container-high/80 border-outline/20 overflow-hidden border bg-gradient-to-br shadow-lg backdrop-blur-lg ${isExpanded ? 'shadow-[0_0_15px_2px_rgba(255,255,255,0.1)] dark:shadow-[0_0_15px_2px_rgba(255,182,144,0.15)]' : ''} // Adjusted glow ${exitingPanel ? 'transition-all duration-300' : ''}`}
+        ref={panelRef}
+        className={cn(
+          'border-outline/20 from-surface-container-low/90 to-surface-container-high/80 overflow-hidden border bg-gradient-to-br backdrop-blur-lg',
+          isExpanded && 'shadow-lg',
+          isExpanded && isDarkTheme && 'shadow-[0_0_15px_2px_rgba(255,182,144,0.15)]',
+          isExpanded && !isDarkTheme && 'shadow-[0_0_15px_2px_rgba(0,0,0,0.1)]',
+          exitingPanel && 'transition-all duration-300'
+        )}
         variants={panelVariants}
         initial="collapsed"
         animate={isExpanded ? 'expanded' : 'collapsed'}
         transition={{
-          type: 'spring',
+          type: prefersReducedMotion ? 'tween' : 'spring',
           stiffness: 500,
           damping: 30,
-          duration: 0.3,
+          duration: prefersReducedMotion ? 0.2 : undefined,
         }}
+        aria-label="Settings panel"
+        aria-modal={isExpanded}
+        aria-expanded={isExpanded}
       >
         <motion.button
+          ref={toggleButtonRef}
           onClick={() => setIsExpanded(!isExpanded)}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          className={`absolute ${isExpanded ? 'top-3 right-3' : 'inset-0'} flex items-center justify-center rounded-full ${
+          whileHover={{ scale: shouldAnimate ? 1.1 : 1 }}
+          whileTap={{ scale: shouldAnimate ? 0.9 : 1 }}
+          className={cn(
+            'absolute z-20 flex items-center justify-center rounded-full transition-all',
             isExpanded
-              ? 'from-surface-container-high to-surface-container h-8 w-8 bg-gradient-to-br shadow-sm'
-              : 'h-full w-full bg-transparent'
-          } text-on-surface-variant hover:text-primary hover:bg-surface-container-low hover:text-glow-sm z-20`}
-          aria-label={isExpanded ? 'Collapse control panel' : 'Expand control panel'}
+              ? 'from-surface-container-high to-surface-container top-3 right-3 h-8 w-8 bg-gradient-to-br shadow-sm'
+              : 'inset-0 h-full w-full bg-transparent',
+            'text-on-surface-variant hover:text-primary hover:bg-surface-container-low hover:text-glow-sm focus:ring-primary/50 focus:ring-2 focus:outline-none'
+          )}
+          aria-label={isExpanded ? 'Close settings' : 'Open settings'}
         >
           {isExpanded ? (
             <ChevronUp size={18} />
@@ -171,26 +240,23 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
           )}
         </motion.button>
 
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {isExpanded && (
             <motion.div
-              className="px-3 pt-14 pb-3"
+              className="px-4 pt-14 pb-3"
               variants={containerVariants}
               initial="hidden"
               animate="visible"
               exit="exit"
             >
-              <motion.h3
-                variants={childVariants}
-                className="text-on-surface-variant mb-3 text-center text-xs font-medium tracking-wider uppercase"
-              >
-                <span className="from-primary via-primary-container to-error bg-gradient-to-r bg-clip-text text-transparent">
-                  Preferences
-                </span>
-              </motion.h3>
+              <motion.div variants={childVariants} className="mb-4 flex items-center justify-center">
+                <h3 className="from-primary via-primary-container to-error bg-gradient-to-r bg-clip-text text-center text-xs font-medium tracking-wider text-transparent uppercase">
+                  Settings
+                </h3>
+              </motion.div>
 
               <div className="space-y-3">
-                {controls.map((control) => (
+                {controls.map((control, _index) => (
                   <motion.div key={control.label} variants={childVariants}>
                     <Toggle
                       isActive={control.active}
@@ -201,20 +267,23 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
                       activeColor={control.activeColor}
                       inactiveColor={control.inactiveColor}
                       backgroundColor={control.color}
+                      ariaLabel={control.ariaLabel}
+                      tabIndex={isExpanded ? 0 : -1}
                     />
                   </motion.div>
                 ))}
 
                 <motion.div
-                  className="text-on-surface-variant border-outline/20 mt-4 border-t pt-3 text-center text-xs"
+                  className="border-outline/20 text-on-surface-variant mt-4 border-t pt-4 text-center text-xs"
                   variants={childVariants}
                 >
                   <button
-                    className="hover:text-on-surface hover:bg-surface-container-lowest hover:text-glow-sm flex w-full items-center justify-center gap-1.5 rounded-md px-2 py-1.5 transition-colors"
-                    aria-label="Jump to input section"
+                    className="hover:bg-surface-container-lowest hover:text-on-surface hover:text-glow-sm focus:ring-primary/50 flex w-full items-center justify-center gap-1.5 rounded-md px-3 py-2 transition-colors focus:ring-2 focus:outline-none"
+                    aria-label="Jump to top of page"
                     onClick={handleScrollToTop}
+                    tabIndex={isExpanded ? 0 : -1}
                   >
-                    <MousePointerClick size={12} />
+                    <MousePointerClick size={14} />
                     <span>Jump to top</span>
                   </button>
                 </motion.div>
