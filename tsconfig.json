@@ -23,8 +23,11 @@
     /* Path Aliases */
     "baseUrl": ".",
     "paths": {
+      "@/*": ["./src/*"],
       "src/*": ["src/*"],
+      "@assets/*": ["src/assets/*"],
       "@components/*": ["src/components/*"],
+      "@shadcn/*": ["src/components/shadcn/ui/*"],
       "@layout/*": ["src/components/layout/*"],
       "@ui/*": ["src/components/ui/*"],
       "@features/*": ["src/features/*"],

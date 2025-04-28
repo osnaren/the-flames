@@ -1,17 +1,21 @@
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig } from 'vite';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
   resolve: {
     alias: {
+      '@': path.resolve(__dirname, './src'),
       src: path.resolve(__dirname, './src'),
+      '@assets': path.resolve(__dirname, './src/assets'),
       '@components': path.resolve(__dirname, './src/components'),
+      '@shadcn': path.resolve(__dirname, './src/components/shadcn/ui'),
       '@layout': path.resolve(__dirname, './src/components/layout'),
       '@ui': path.resolve(__dirname, './src/components/ui'),
       '@features': path.resolve(__dirname, './src/features'),
