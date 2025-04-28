@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { FlamesResult } from '@features/flamesGame/flames.types';
 import { resultMeanings } from '@features/flamesGame/flames.utils';
 import { useFlamesEngine } from '@features/flamesGame/useFlamesEngine';
+import { usePreferences } from '@hooks/usePreferences';
 import { copyShareUrl, shareResult } from '@lib/share';
 import AmbientGlow from '@ui/AmbientGlow';
 import Button from '@ui/Button';
@@ -14,13 +15,8 @@ import ResultGlow from '@ui/ResultGlow';
 import SharePopover from '@ui/SharePopover';
 import SlotMachineLetter from '@ui/SlotMachineLetter';
 
-interface HomePageProps {
-  animationsEnabled: boolean;
-}
-
-function HomePage({ animationsEnabled }: HomePageProps) {
-  // Keep navigate for future route handling implementations
-  // const navigate = useNavigate(); // Reserved for future navigation features
+function HomePage() {
+  const [{ animationsEnabled }] = usePreferences();
   const resultCardRef = useRef<HTMLDivElement>(null);
   const resultActionsRef = useRef<HTMLDivElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
