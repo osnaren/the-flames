@@ -10,6 +10,8 @@ interface ToggleProps {
   activeColor?: string;
   inactiveColor?: string;
   backgroundColor?: string;
+  ariaLabel?: string;
+  tabIndex?: number;
 }
 
 /**
@@ -24,6 +26,8 @@ export default function Toggle({
   activeColor = 'text-primary text-glow-sm',
   inactiveColor = 'text-on-surface-variant',
   backgroundColor = 'bg-gradient-to-r from-primary-container/20 to-transparent dark:from-primary-container/20 dark:to-transparent',
+  ariaLabel,
+  tabIndex,
 }: ToggleProps) {
   const Icon = isActive ? ActiveIcon : InactiveIcon;
 
@@ -36,7 +40,8 @@ export default function Toggle({
       whileFocus={{ scale: 1.02 }}
       role="switch"
       aria-checked={isActive}
-      aria-label={`Toggle ${label}`}
+      aria-label={ariaLabel || `Toggle ${label}`}
+      tabIndex={tabIndex}
     >
       <span className="text-on-surface dark:text-on-surface text-sm font-medium">{label}</span>
       <Icon
