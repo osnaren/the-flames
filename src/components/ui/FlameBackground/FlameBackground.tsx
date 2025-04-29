@@ -1,4 +1,5 @@
 import { usePreferences } from '@hooks/usePreferences';
+import { colorToRgbaPrefix } from '@utils/colorUtils'; // Import the function
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 
@@ -31,6 +32,26 @@ export default function FlameBackground() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Get computed theme colors
+    const computedStyle = getComputedStyle(document.documentElement);
+    const primaryContainer = computedStyle.getPropertyValue('--md-color-primary-container');
+    const secondaryContainer = computedStyle.getPropertyValue('--md-color-secondary-container');
+    const tertiaryContainer = computedStyle.getPropertyValue('--md-color-tertiary-container');
+    const primary = computedStyle.getPropertyValue('--md-color-primary');
+
+    // Convert theme colors to RGBA prefixes for canvas
+    const particleColorPrefixes = [
+      colorToRgbaPrefix(primaryContainer),
+      colorToRgbaPrefix(secondaryContainer),
+      colorToRgbaPrefix(tertiaryContainer),
+      colorToRgbaPrefix(primary),
+    ].filter((prefix) => prefix !== 'rgba(0, 0, 0, '); // Filter out fallback color if parsing failed
+
+    // Handle case where all color parsing fails
+    if (particleColorPrefixes.length === 0) {
+      particleColorPrefixes.push('rgba(249, 115, 22, '); // Add a default fallback color prefix
+    }
+
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -55,10 +76,9 @@ export default function FlameBackground() {
         this.speedX = Math.random() * 2 - 1;
         this.speedY = -Math.random() * 3 - 1;
 
-        const colors = ['rgba(249, 115, 22, ', 'rgba(251, 191, 36, ', 'rgba(192, 132, 252, ', 'rgba(157, 67, 0, '];
-
-        this.color = colors[Math.floor(Math.random() * colors.length)];
-        this.opacity = Math.random() * 0.7 + 0.3;
+        // Use dynamically fetched and converted theme colors
+        this.color = particleColorPrefixes[Math.floor(Math.random() * particleColorPrefixes.length)];
+        this.opacity = Math.random() * 0.5 + 0.5; // Keep increased opacity
       }
 
       update() {
@@ -70,7 +90,9 @@ export default function FlameBackground() {
       }
 
       draw() {
-        ctx!.fillStyle = this.color + this.opacity + ')';
+        // Ensure color string ends correctly
+        const colorPrefix = this.color.endsWith(', ') ? this.color : particleColorPrefixes[0]; // Use first available prefix as fallback
+        ctx!.fillStyle = colorPrefix + this.opacity + ')';
         ctx!.beginPath();
         ctx!.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx!.fill();
