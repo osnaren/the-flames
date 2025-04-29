@@ -182,7 +182,7 @@ export default function Step3FlamesSimulation({ remainingLettersCount }: Step3Pr
           </div>
 
           <div className="text-on-surface-variant mb-6 min-h-[2em] text-center">
-            <AnimatePresence mode="wait">
+            <AnimatePresence>
               <motion.p
                 key={stepMessage || 'default'} // Use message as key for animation trigger
                 initial={{ opacity: 0, y: 10 }}
