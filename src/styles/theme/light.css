@@ -51,20 +51,20 @@
   --md-color-surface-container-highest: #e6e2e0;
 
   /* Custom Meaning Colors */
-  --md-color-friendship: #f59e0b; /* Amber 600 */
+  --md-color-friendship: #f59e0b;
   --md-color-on-friendship: #ffffff;
-  --md-color-friendship-container: #fcd34d; /* Amber 400 */
-  --md-color-on-friendship-container: #78350f; /* Amber 900 */
+  --md-color-friendship-container: #fcd34d;
+  --md-color-on-friendship-container: #78350f;
 
-  --md-color-affection: #ec4899; /* Pink 500 */
+  --md-color-affection: #ec4899;
   --md-color-on-affection: #ffffff;
-  --md-color-affection-container: #fbcfe8; /* Pink 200 */
-  --md-color-on-affection-container: #831843; /* Pink 900 */
+  --md-color-affection-container: #fbcfe8;
+  --md-color-on-affection-container: #831843;
 
-  --md-color-siblings: #0d9488; /* Teal 600 */
+  --md-color-siblings: #0d9488;
   --md-color-on-siblings: #ffffff;
-  --md-color-siblings-container: #99f6e4; /* Teal 200 */
-  --md-color-on-siblings-container: #042f2e; /* Teal 950 */
+  --md-color-siblings-container: #99f6e4;
+  --md-color-on-siblings-container: #042f2e;
 
   /* Map existing themes to meaning colors */
   --md-color-love: var(--md-color-primary);
@@ -83,6 +83,6 @@
   --md-color-on-enemy-container: var(--md-color-on-error-container);
 
   /* Custom Colors */
-  --md-color-customBg-1: rgba(218, 52, 55, 0.15);
-  --md-color-customBg-2: rgba(249, 116, 22, 0.75);
+  --md-color-customBg-1: color-mix(in srgb, var(--md-color-error-container) 15%, transparent);
+  --md-color-customBg-2: color-mix(in srgb, var(--md-color-primary-container) 25%, transparent);
 }
