@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useMediaQuery } from './use-media-query';
+import { useMediaQuery } from './useMediaQuery';
 
 export type DeviceType = 'mobile' | 'tablet' | 'desktop';
 
