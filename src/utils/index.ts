@@ -3,4 +3,5 @@
  * Re-exports all utility functions for easier imports
  */
 
+export * from './colorUtils';
 export * from './tailwindUtils';
