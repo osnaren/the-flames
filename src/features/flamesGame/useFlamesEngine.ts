@@ -16,6 +16,7 @@ interface FlamesEngineState {
   stage: GameStage;
   commonLetters: string[];
   slotStopIndex: number;
+  anonymous: boolean;
 }
 
 interface FlamesEngineActions {
@@ -23,6 +24,7 @@ interface FlamesEngineActions {
   setName2: (name: string) => void;
   handleSubmit: (e: React.FormEvent) => void;
   resetGame: () => void;
+  setAnonymous: (value: boolean) => void;
 }
 
 /**
@@ -36,6 +38,7 @@ export function useFlamesEngine({ animationsEnabled }: FlamesEngineOptions): [Fl
   const [commonLetters, setCommonLetters] = useState<string[]>([]);
   const [slotStopIndex, setSlotStopIndex] = useState<number>(-1);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState<boolean>(false);
+  const [anonymous, setAnonymous] = useState<boolean>(false);
 
   // Check for reduced motion preference
   useMemo(() => {
@@ -101,9 +104,16 @@ export function useFlamesEngine({ animationsEnabled }: FlamesEngineOptions): [Fl
 
           // Record the match in Supabase (non-blocking) only if result is not null
           if (flamesResult !== null) {
-            insertMatch(validName1, validName2, flamesResult).catch((error) => {
-              console.error('Failed to record match:', error);
-            });
+            // If anonymous is true, pass null for name values
+            if (anonymous) {
+              insertMatch(null, null, flamesResult).catch((error) => {
+                console.error('Failed to record anonymous match:', error);
+              });
+            } else {
+              insertMatch(validName1, validName2, flamesResult).catch((error) => {
+                console.error('Failed to record match:', error);
+              });
+            }
           }
 
           if (shouldAnimate) {
@@ -136,7 +146,7 @@ export function useFlamesEngine({ animationsEnabled }: FlamesEngineOptions): [Fl
         }
       }
     },
-    [name1, name2, shouldAnimate]
+    [name1, name2, shouldAnimate, anonymous]
   );
 
   /**
@@ -149,12 +159,13 @@ export function useFlamesEngine({ animationsEnabled }: FlamesEngineOptions): [Fl
     setStage('input');
     setCommonLetters([]);
     setSlotStopIndex(-1);
+    setAnonymous(false);
   }, []);
 
   // Memoize the state object to prevent unnecessary re-renders
   const state = useMemo((): FlamesEngineState => {
-    return { name1, name2, result, stage, commonLetters, slotStopIndex };
-  }, [name1, name2, result, stage, commonLetters, slotStopIndex]);
+    return { name1, name2, result, stage, commonLetters, slotStopIndex, anonymous };
+  }, [name1, name2, result, stage, commonLetters, slotStopIndex, anonymous]);
 
   // Memoize the actions object to prevent unnecessary re-renders
   const actions = useMemo((): FlamesEngineActions => {
@@ -163,8 +174,9 @@ export function useFlamesEngine({ animationsEnabled }: FlamesEngineOptions): [Fl
       setName2: handleSetName2,
       handleSubmit,
       resetGame,
+      setAnonymous,
     };
-  }, [handleSetName1, handleSetName2, handleSubmit, resetGame]);
+  }, [handleSetName1, handleSetName2, handleSubmit, resetGame, setAnonymous]);
 
   return [state, actions];
 }
