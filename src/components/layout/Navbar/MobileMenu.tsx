@@ -188,7 +188,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
             >
               <div className="flex flex-col items-center">
                 <Logo variant="animated" animationType="continuous" showText={false} />
-                <p className="mt-2">FLAMES © {new Date().getFullYear()}</p>
+                <p className="mt-2">© {new Date().getFullYear()} OSLabs</p>
               </div>
             </motion.div>
           </motion.div>
