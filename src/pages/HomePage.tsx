@@ -49,7 +49,7 @@ function HomePage() {
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       {/* Confetti effect */}
-      <ConfettiEffect result={result} isActive={stage === 'result'} animationsEnabled={animationsEnabled} />
+      <ConfettiEffect result={result} isActive={stage === 'result'} />
 
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">

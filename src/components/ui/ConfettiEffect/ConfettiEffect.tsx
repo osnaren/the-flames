@@ -1,172 +1,182 @@
-import { useRef, useEffect, useState, useCallback, memo } from 'react';
+import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
+import { useDeviceType } from '@/hooks/useDeviceType';
+import { FlamesResult } from '@features/flamesGame/flames.types';
+import { getResultVisuals } from '@features/flamesGame/resultVisuals';
 import confetti from 'canvas-confetti';
-import { FlamesResult } from '../../../features/flamesGame/flames.types';
-import { getResultVisuals } from '../../../features/flamesGame/resultVisuals';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
 interface ConfettiEffectProps {
   result: FlamesResult;
   isActive: boolean;
-  animationsEnabled: boolean;
+}
+
+interface CannonPosition {
+  name: string;
+  origin: { x: number; y: number };
+  angle: number;
 }
 
 /**
  * Component that generates confetti animations based on the FLAMES result
  * Memoized to prevent unnecessary re-renders
  */
-function ConfettiEffect({ 
-  result, 
-  isActive, 
-  animationsEnabled 
-}: ConfettiEffectProps) {
+function ConfettiEffect({ result, isActive }: ConfettiEffectProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isLowEndDevice, setIsLowEndDevice] = useState(false);
-  
-  // Create confetti instances for left and right cannons
-  const leftCannonRef = useRef<confetti.CreateTypes | null>(null);
-  const rightCannonRef = useRef<confetti.CreateTypes | null>(null);
-  
-  // Check device capabilities and user preferences
+
+  // Use our custom hooks
+  const deviceType = useDeviceType();
+  const { shouldAnimate } = useAnimationPreferences();
+
+  // Store a single confetti instance instead of multiple ones
+  const confettiInstanceRef = useRef<confetti.CreateTypes | null>(null);
+
+  // Check device capabilities
   useEffect(() => {
-    // Check for reduced motion preference
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
-    
     // Detect if likely a low-end device
     setIsLowEndDevice(
       // Check for CPU cores or low memory devices
       (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
-      // Check if it's a mobile device
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+        // Check if it's a mobile device
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     );
-    
-    // Update if preference changes
-    const handleMediaChange = (e: MediaQueryListEvent) => {
-      setPrefersReducedMotion(e.matches);
-    };
-    
-    mediaQuery.addEventListener('change', handleMediaChange);
-    return () => {
-      mediaQuery.removeEventListener('change', handleMediaChange);
-    };
   }, []);
-  
-  // Should we enable animations based on both user settings and system preferences
-  const shouldAnimate = animationsEnabled && !prefersReducedMotion;
-  
-  // Create confetti cannons when component mounts
+
+  // Define cannon positions based on device type
+  const cannonPositions = useCallback((): CannonPosition[] => {
+    switch (deviceType) {
+      case 'desktop':
+        return [
+          { name: 'left', origin: { x: 0.1, y: 0.5 }, angle: 60 },
+          { name: 'right', origin: { x: 0.9, y: 0.5 }, angle: 120 },
+          { name: 'leftTop', origin: { x: 0.2, y: 0.1 }, angle: 80 },
+          { name: 'rightTop', origin: { x: 0.8, y: 0.1 }, angle: 100 },
+        ];
+      case 'tablet':
+        return [
+          { name: 'left', origin: { x: 0.1, y: 0.5 }, angle: 60 },
+          { name: 'right', origin: { x: 0.9, y: 0.5 }, angle: 120 },
+        ];
+      case 'mobile':
+      default:
+        return [
+          { name: 'left', origin: { x: 0.1, y: 0.5 }, angle: 60 },
+          { name: 'right', origin: { x: 0.9, y: 0.5 }, angle: 120 },
+        ];
+    }
+  }, [deviceType]);
+
+  // Create confetti instance when component mounts
   useEffect(() => {
     if (!canvasRef.current || !shouldAnimate) return;
-    
+
     const myCanvas = canvasRef.current;
-    
+
     // Set initial canvas size
     const updateCanvasSize = () => {
-      myCanvas.width = window.innerWidth;
-      myCanvas.height = window.innerHeight;
+      if (!confettiInstanceRef.current) {
+        myCanvas.width = window.innerWidth;
+        myCanvas.height = window.innerHeight;
+      }
     };
     updateCanvasSize();
-    
+
     // Listen for window resize to update canvas dimensions
     window.addEventListener('resize', updateCanvasSize);
-    
-    // Only create new instances if they don't exist
-    if (!leftCannonRef.current) {
-      leftCannonRef.current = confetti.create(myCanvas, {
-        useWorker: true
+
+    // Create only one confetti instance
+    if (!confettiInstanceRef.current) {
+      confettiInstanceRef.current = confetti.create(myCanvas, {
+        useWorker: true,
+        resize: true,
       });
     }
-    
-    if (!rightCannonRef.current) {
-      rightCannonRef.current = confetti.create(myCanvas, {
-        useWorker: true
-      });
-    }
-    
+
     return () => {
       // Cleanup
       window.removeEventListener('resize', updateCanvasSize);
-      if (leftCannonRef.current) {
-        leftCannonRef.current.reset();
-      }
-      if (rightCannonRef.current) {
-        rightCannonRef.current.reset();
+      if (confettiInstanceRef.current) {
+        confettiInstanceRef.current.reset();
       }
     };
   }, [shouldAnimate]);
-  
-  // Fire confetti from a side cannon
-  const fireSideCannon = useCallback((cannon: confetti.CreateTypes | null, origin: { x: number, y: number }, angle: number) => {
-    if (!cannon || !result) return;
-    
-    const visualConfig = getResultVisuals(result);
-    const particleCount = isLowEndDevice ? Math.floor(visualConfig.particleCount * 0.6) : visualConfig.particleCount;
-    
-    // Fire colored confetti
-    cannon({
-      particleCount: particleCount,
-      angle: angle,
-      spread: visualConfig.confetti.spread,
-      origin: origin,
-      colors: visualConfig.confetti.colors,
-      ticks: isLowEndDevice ? 150 : 200,
-      gravity: 1,
-      scalar: visualConfig.confetti.strength,
-      drift: 0.2,
-      shapes: ['circle', 'square']
-    });
-    
-    // Fire emoji confetti with slight delay
-    if (!isLowEndDevice) {
+
+  // Fire confetti from a position
+  const fireConfetti = useCallback(
+    (origin: { x: number; y: number }, angle: number, delay: number = 0) => {
+      if (!confettiInstanceRef.current || !result) return;
+
       setTimeout(() => {
-        // For emoji confetti, we'll use a custom draw function
-        const customConfettiOptions = {
-          particleCount: Math.floor(particleCount * 0.2),
+        const visualConfig = getResultVisuals(result);
+        const particleCount = isLowEndDevice
+          ? Math.floor(visualConfig.particleCount * 0.6)
+          : visualConfig.particleCount;
+
+        const confettiInstance = confettiInstanceRef.current;
+        if (!confettiInstance) return;
+
+        // Launch standard confetti particles in colors from the theme
+        confettiInstance({
+          particleCount: Math.floor(particleCount * 0.7),
           angle: angle,
-          spread: visualConfig.confetti.spread * 0.8,
+          spread: visualConfig.confetti.spread,
           origin: origin,
-          ticks: 150,
-          gravity: 0.8,
-          scalar: visualConfig.confetti.strength * 1.2,
-          drift: 0.1,
-          shapes: ['circle'],
-          // Use custom draw function for emojis
-          customShape: (ctx: CanvasRenderingContext2D) => {
-            const emoji = visualConfig.confetti.emojis[Math.floor(Math.random() * visualConfig.confetti.emojis.length)];
-            ctx.font = '18px serif';
-            ctx.fillText(emoji, 0, 0);
-          }
-        };
-        // Cast to any to bypass typing limitations in the library
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        cannon(customConfettiOptions as any);
-      }, 200);
-    }
-  }, [result, isLowEndDevice]);
-  
+          colors: visualConfig.confetti.colors,
+          ticks: isLowEndDevice ? 150 : 200,
+          gravity: 1,
+          scalar: visualConfig.confetti.strength,
+          drift: 0.2,
+          shapes: ['circle', 'square'],
+        });
+
+        // Launch emoji confetti using shapeFromText
+        setTimeout(() => {
+          if (!confettiInstance) return;
+
+          // Create emoji shapes that can be passed to the worker
+          const emojiShapes = visualConfig.confetti.emojis.map((emoji) =>
+            confetti.shapeFromText({ text: emoji, scalar: visualConfig.confetti.strength * 1.2 })
+          );
+
+          const emojiOptions = {
+            particleCount: Math.floor(particleCount * 0.3),
+            angle: angle,
+            spread: visualConfig.confetti.spread * 0.8,
+            origin: origin,
+            ticks: isLowEndDevice ? 120 : 180,
+            gravity: 0.8,
+            scalar: visualConfig.confetti.strength * 1.2, // Scalar is now part of shapeFromText
+            drift: 0.1,
+            shapes: emojiShapes, // Use the generated emoji shapes
+            colors: visualConfig.confetti.colors, // Emojis have their own colors, but specify base colors
+          };
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          confettiInstance(emojiOptions as any);
+        }, 150);
+      }, delay);
+    },
+    [result, isLowEndDevice]
+  );
+
   // Trigger confetti when result changes or becomes active
   useEffect(() => {
-    if (!leftCannonRef.current || !rightCannonRef.current || !isActive || !result || !shouldAnimate) return;
-    
-    // Prevent firing confetti for null result
-    if (result === null) return;
-    
-    // Fire left cannon
-    fireSideCannon(leftCannonRef.current, { x: 0.1, y: 0.5 }, 60);
-    
-    // Fire right cannon with slight delay
-    setTimeout(() => {
-      fireSideCannon(rightCannonRef.current, { x: 0.9, y: 0.5 }, 120);
-    }, 100);
-    
-  }, [result, isActive, shouldAnimate, fireSideCannon]);
-  
+    if (!isActive || !result || !shouldAnimate) return;
+
+    // Get the positions for the current device type
+    const positions = cannonPositions();
+
+    // Fire confetti from different positions with delays
+    positions.forEach((pos, index) => {
+      fireConfetti(pos.origin, pos.angle, index * 150);
+    });
+  }, [result, isActive, shouldAnimate, fireConfetti, cannonPositions]);
+
   if (!shouldAnimate) return null;
-  
+
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-[60]"
+      className="pointer-events-none fixed inset-0 z-[60]"
       style={{ width: '100%', height: '100%' }}
       aria-hidden="true"
     />
