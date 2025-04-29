@@ -1,9 +1,9 @@
+import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { motion } from 'framer-motion';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 interface AmbientGlowProps {
   isVisible: boolean;
-  animationsEnabled: boolean;
 }
 
 /**
@@ -11,31 +11,21 @@ interface AmbientGlowProps {
  * Used before the result is revealed
  * Memoized to prevent unnecessary re-renders
  */
-function AmbientGlow({ isVisible, animationsEnabled }: AmbientGlowProps) {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+function AmbientGlow({ isVisible }: AmbientGlowProps) {
+  const [isVisibleState, setIsVisibleState] = useState(false);
+  const { shouldAnimate } = useAnimationPreferences();
 
   useEffect(() => {
-    // Check for reduced motion preference
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
+    // Only show glow if animations are enabled
+    if (!shouldAnimate) {
+      setIsVisibleState(false);
+      return;
+    }
+    // Set internal visibility based on prop
+    setIsVisibleState(isVisible);
+  }, [isVisible, shouldAnimate]);
 
-    // Update if preference changes
-    const handleMediaChange = (e: MediaQueryListEvent) => {
-      setPrefersReducedMotion(e.matches);
-    };
-
-    mediaQuery.addEventListener('change', handleMediaChange);
-    return () => {
-      mediaQuery.removeEventListener('change', handleMediaChange);
-    };
-  }, []);
-
-  // Should we enable animations based on both user settings and system preferences
-  const shouldAnimate = useMemo(() => {
-    return animationsEnabled && !prefersReducedMotion;
-  }, [animationsEnabled, prefersReducedMotion]);
-
-  if (!isVisible) return null;
+  if (!isVisibleState) return null;
 
   // Simple static glow for when animations are disabled or reduced motion preferred
   if (!shouldAnimate) {

@@ -1,34 +1,16 @@
-import { usePreferences } from '@hooks/usePreferences';
+import { useAnimationPreferences } from '@/hooks/useAnimationPreferences'; // Import hook
 import { colorToRgbaPrefix } from '@utils/colorUtils'; // Import the function
 import { motion } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function FlameBackground() {
-  const [{ animationsEnabled }] = usePreferences();
-
+  const { shouldAnimate } = useAnimationPreferences(); // Use hook
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
-
-    const handleMediaChange = (e: MediaQueryListEvent) => {
-      setPrefersReducedMotion(e.matches);
-    };
-
-    mediaQuery.addEventListener('change', handleMediaChange);
-    return () => {
-      mediaQuery.removeEventListener('change', handleMediaChange);
-    };
-  }, []);
-
-  const shouldAnimate = animationsEnabled && !prefersReducedMotion;
-
-  useEffect(() => {
-    if (!shouldAnimate || !canvasRef.current) return;
-
     const canvas = canvasRef.current;
+    if (!shouldAnimate || !canvas) return;
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -70,8 +52,8 @@ export default function FlameBackground() {
       opacity: number;
 
       constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = canvas.height + 10;
+        this.x = Math.random() * (canvas?.width ?? window.innerWidth);
+        this.y = (canvas?.height ?? window.innerHeight) + 10;
         this.size = Math.random() * 3 + 1;
         this.speedX = Math.random() * 2 - 1;
         this.speedY = -Math.random() * 3 - 1;

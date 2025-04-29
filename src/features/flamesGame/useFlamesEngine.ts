@@ -1,13 +1,10 @@
+import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { insertMatch } from '@lib/supabase';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
 import { FlamesResult, GameStage } from './flames.types';
 import { calculateFlamesResult, findCommonLetters, nameSchema } from './flames.utils';
-
-interface FlamesEngineOptions {
-  animationsEnabled: boolean;
-}
 
 interface FlamesEngineState {
   name1: string;
@@ -30,37 +27,17 @@ interface FlamesEngineActions {
 /**
  * Custom hook for managing the FLAMES game logic
  */
-export function useFlamesEngine({ animationsEnabled }: FlamesEngineOptions): [FlamesEngineState, FlamesEngineActions] {
+export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
   const [name1, setName1] = useState<string>('');
   const [name2, setName2] = useState<string>('');
   const [result, setResult] = useState<FlamesResult>(null);
   const [stage, setStage] = useState<GameStage>('input');
   const [commonLetters, setCommonLetters] = useState<string[]>([]);
   const [slotStopIndex, setSlotStopIndex] = useState<number>(-1);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState<boolean>(false);
   const [anonymous, setAnonymous] = useState<boolean>(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Check for reduced motion preference
-  useMemo(() => {
-    if (typeof window !== 'undefined') {
-      const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-      setPrefersReducedMotion(mediaQuery.matches);
-
-      const handleMediaChange = (e: MediaQueryListEvent) => {
-        setPrefersReducedMotion(e.matches);
-      };
-
-      mediaQuery.addEventListener('change', handleMediaChange);
-      return () => {
-        mediaQuery.removeEventListener('change', handleMediaChange);
-      };
-    }
-  }, []);
-
-  // Determine if animations should be used based on both user settings and system preferences
-  const shouldAnimate = useMemo(() => {
-    return animationsEnabled && !prefersReducedMotion;
-  }, [animationsEnabled, prefersReducedMotion]);
+  const { shouldAnimate } = useAnimationPreferences();
 
   // Memoized name setters with validation feedback
   const handleSetName1 = useCallback((input: string) => {
@@ -92,8 +69,12 @@ export function useFlamesEngine({ animationsEnabled }: FlamesEngineOptions): [Fl
         setStage('processing');
         const delay = shouldAnimate ? 1500 : 100;
 
-        // Optimize with a single setTimeout rather than nested ones
-        setTimeout(async () => {
+        // Clear any existing timeout before starting a new one
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+
+        timeoutRef.current = setTimeout(async () => {
           // Find common letters
           const common = findCommonLetters(validName1, validName2);
           setCommonLetters(common);
