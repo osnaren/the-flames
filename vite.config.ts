@@ -16,6 +16,7 @@ export default defineConfig({
       '@assets': path.resolve(__dirname, './src/assets'),
       '@components': path.resolve(__dirname, './src/components'),
       '@shadcn': path.resolve(__dirname, './src/components/shadcn'),
+      '@magicui': path.resolve(__dirname, './src/components/magicui'),
       '@layout': path.resolve(__dirname, './src/components/layout'),
       '@ui': path.resolve(__dirname, './src/components/ui'),
       '@features': path.resolve(__dirname, './src/features'),

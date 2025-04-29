@@ -28,6 +28,7 @@
       "@assets/*": ["src/assets/*"],
       "@components/*": ["src/components/*"],
       "@shadcn/*": ["src/components/shadcn/*"],
+      "@magicui/*": ["src/components/magicui/*"],
       "@layout/*": ["src/components/layout/*"],
       "@ui/*": ["src/components/ui/*"],
       "@features/*": ["src/features/*"],
