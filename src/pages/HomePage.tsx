@@ -11,15 +11,13 @@ import { useShareActions } from '@hooks/useShareActions';
 import ConfettiEffect from '@ui/ConfettiEffect';
 import SharePopover from '@ui/SharePopover';
 import { AnimatePresence, motion } from 'framer-motion';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 
 // Import modular components
-import FlamesSlotMachine from '@components/homepage/FlamesSlotMachine';
 import InputForm from '@components/homepage/InputForm';
-import NameTiles from '@components/homepage/NameTiles';
 import ProcessingView from '@components/homepage/ProcessingView';
 import ResultCard from '@components/homepage/ResultCard';
 
@@ -37,9 +35,7 @@ function HomePage() {
   // References for scrolling and layout
   const resultCardRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // State for controlling animations and transition timing
-  const [showIntroAmbientGlow, setShowIntroAmbientGlow] = useState(true);
+  const processingContainerRef = useRef<HTMLDivElement>(null);
 
   // FLAMES game engine state and actions
   const [
@@ -54,25 +50,19 @@ function HomePage() {
     result
   );
 
-  // Effect to track processing completion for a smoother transition to results
+  // Effect to handle timing between animations
   useEffect(() => {
     if (stage === 'processing' && !isSlotMachineAnimating && result) {
-      // Short delay before marking processing as complete for smoother transitions
-      const timer = setTimeout(() => {}, 500);
-      return () => clearTimeout(timer);
+      // Short delay before transitioning to result stage
+      // This is handled internally by the useFlamesEngine hook
     }
   }, [stage, isSlotMachineAnimating, result]);
-
-  // Show/hide ambient glow based on stage
-  useEffect(() => {
-    setShowIntroAmbientGlow(stage === 'input');
-  }, [stage]);
 
   // Scroll to results when they appear with a proper delay
   useEffect(() => {
     if (stage === 'result' && resultCardRef.current) {
       // Wait for animations to complete before scrolling
-      const scrollDelay = shouldAnimate ? 800 : 100;
+      const scrollDelay = shouldAnimate ? 1000 : 100;
       const timer = setTimeout(() => {
         resultCardRef.current?.scrollIntoView({
           behavior: 'smooth',
@@ -172,7 +162,7 @@ function HomePage() {
         </div>
 
         {/* Main content area with AnimatePresence for transitions */}
-        <AnimatePresence>
+        <AnimatePresence mode="sync">
           {/* Input Stage - Only shown during input stage */}
           {stage === 'input' && (
             <motion.div
@@ -197,63 +187,67 @@ function HomePage() {
             </motion.div>
           )}
 
-          {/* Processing Stage - Shown during processing */}
-          {stage === 'processing' && (
+          {/* Shared container for processing and results - This ensures layout consistency */}
+          {(stage === 'processing' || stage === 'result') && (
             <motion.div
-              key="processing"
-              className="bg-background/60 rounded-xl p-6 shadow-lg backdrop-blur-sm md:p-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.4 }}
-            >
-              <ProcessingView
-                name1={name1}
-                name2={name2}
-                commonLetters={commonLetters}
-                result={result}
-                shouldAnimate={shouldAnimate}
-                stage={stage}
-              />
-            </motion.div>
-          )}
-
-          {/* Result Stage */}
-          {stage === 'result' && (
-            <motion.div
-              key="result"
-              className="relative space-y-8"
+              key="process-result-container"
+              className="relative"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.5 }}
+              ref={processingContainerRef}
             >
-              {/* Processing view components in a soft container */}
-              <motion.div
-                className="bg-background/60 rounded-xl p-6 shadow-sm backdrop-blur-sm md:p-8"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-              >
-                {/* Keep NameTiles visible during result stage */}
-                <NameTiles name1={name1} name2={name2} commonLetters={commonLetters} shouldAnimate={false} />
+              {/* Processing Stage */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key="processing"
+                  className="bg-background/60 rounded-xl p-6 shadow-lg backdrop-blur-sm md:p-8"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <ProcessingView
+                    name1={name1}
+                    name2={name2}
+                    commonLetters={commonLetters}
+                    result={result}
+                    shouldAnimate={shouldAnimate}
+                    stage={stage}
+                  />
+                </motion.div>
+              </AnimatePresence>
 
-                {/* Keep FlamesSlotMachine visible during result stage */}
-                <FlamesSlotMachine result={result} shouldAnimate={false} stage={stage} />
-              </motion.div>
-
-              {/* Result Card with ref for scrolling */}
-              <div ref={resultCardRef}>
-                <ResultCard
-                  name1={name1}
-                  name2={name2}
-                  result={result as FlamesResult}
-                  shouldAnimate={shouldAnimate}
-                  onReset={resetGame}
-                  onShare={handleShare}
-                  onCopyLink={handleCopyLink}
-                />
-              </div>
+              {/* Result Card - Positioned absolutely during transition, then normal flow */}
+              <AnimatePresence>
+                {stage === 'result' && (
+                  <motion.div
+                    key="result-card-container"
+                    className="mt-8"
+                    ref={resultCardRef}
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.8,
+                      delay: 0.2,
+                      type: 'spring',
+                      stiffness: 100,
+                      damping: 15,
+                    }}
+                  >
+                    <ResultCard
+                      name1={name1}
+                      name2={name2}
+                      result={result as FlamesResult}
+                      shouldAnimate={shouldAnimate}
+                      onReset={resetGame}
+                      onShare={handleShare}
+                      onCopyLink={handleCopyLink}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           )}
         </AnimatePresence>
