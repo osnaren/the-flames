@@ -4,9 +4,7 @@ import { FlamesResult } from './flames.types';
 
 export interface ResultVisualConfig {
   color: string;
-  darkColor: string;
   glowColor: string;
-  darkGlowColor: string;
   confetti: {
     colors: string[];
     emojis: string[];
@@ -18,6 +16,8 @@ export interface ResultVisualConfig {
   icon: React.ElementType;
   particleCount: number;
   accessibilityLabel: string; // Added for screen readers
+  quote: string; // Quote for the result
+  endText: string; // Optional end text for the result
 }
 
 // Define keys without null to satisfy TypeScript's Record type requirements
@@ -30,10 +30,8 @@ type NonNullFlamesResult = Exclude<FlamesResult, null>;
 export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
   F: {
     // Friendship - Blue theme
-    color: 'var(--md-color-tertiary)',
-    darkColor: 'var(--md-color-tertiary-container)',
-    glowColor: 'rgba(139, 92, 246, 0.4)', // Purple with opacity for friendship
-    darkGlowColor: 'rgba(124, 58, 237, 0.5)', // Darker purple with opacity
+    color: 'var(--color-friendship-container)',
+    glowColor: 'var(--color-friendship)',
     confetti: {
       colors: ['#C084FC', '#A78BFA', '#93C5FD', '#BFDBFE'],
       emojis: ['🤝', '⭐️', '🎉'],
@@ -45,13 +43,13 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
     icon: Users,
     particleCount: 80,
     accessibilityLabel: 'Friendship result with blue friendship symbols',
+    quote: 'Best friends are the siblings we choose! 🤝',
+    endText: 'friends',
   },
   L: {
     // Love - Red theme aligned with primary colors
-    color: 'var(--md-color-primary)',
-    darkColor: 'var(--md-color-primary-container)',
-    glowColor: 'rgba(249, 115, 22, 0.4)', // Primary container with opacity
-    darkGlowColor: 'rgba(234, 88, 12, 0.5)', // Darker primary with opacity
+    color: 'var(--color-love-container)',
+    glowColor: 'var(--color-love)',
     confetti: {
       colors: ['#F97316', '#FB923C', '#FDBA74', '#FED7AA'],
       emojis: ['❤️', '💘', '🌹'],
@@ -63,13 +61,13 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
     icon: Heart,
     particleCount: 100,
     accessibilityLabel: 'Love result with red heart symbols',
+    quote: 'When two hearts beat as one! 💘',
+    endText: 'lovers',
   },
   A: {
-    // Affection - Amber/Yellow theme aligned with secondary colors
-    color: 'var(--md-color-secondary)',
-    darkColor: 'var(--md-color-secondary-container)',
-    glowColor: 'rgba(251, 191, 36, 0.4)', // Secondary container with opacity
-    darkGlowColor: 'rgba(217, 119, 6, 0.5)', // Darker secondary with opacity
+    // Affection - Amber/Yellow theme
+    color: 'var(--color-affection-container)',
+    glowColor: 'var(--color-affection)',
     confetti: {
       colors: ['#FBBF24', '#F59E0B', '#FCD34D', '#FDE68A'],
       emojis: ['💕', '💖', '✨'],
@@ -81,13 +79,13 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
     icon: Star,
     particleCount: 90,
     accessibilityLabel: 'Affection result with yellow star symbols',
+    quote: 'The spark that keeps the flame alive! ✨',
+    endText: 'affectionate',
   },
   M: {
     // Marriage - Purple theme
-    color: 'var(--md-color-tertiary)',
-    darkColor: 'var(--md-color-tertiary-container)',
-    glowColor: 'rgba(192, 132, 252, 0.4)', // Tertiary container with opacity
-    darkGlowColor: 'rgba(168, 85, 247, 0.5)', // Darker tertiary with opacity
+    color: 'var(--color-marriage-container)',
+    glowColor: 'var(--color-marriage)',
     confetti: {
       colors: ['#C084FC', '#A78BFA', '#C4B5FD', '#DDD6FE'],
       emojis: ['💍', '💑', '🎊'],
@@ -99,13 +97,13 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
     icon: BellRing,
     particleCount: 110,
     accessibilityLabel: 'Marriage result with purple ring symbols',
+    quote: 'Destined for a lifetime together! 💍',
+    endText: 'married',
   },
   E: {
     // Enemy - Orange theme aligned with error colors
-    color: 'var(--md-color-error)',
-    darkColor: 'var(--md-color-error-container)',
-    glowColor: 'rgba(239, 68, 68, 0.4)', // Error with opacity
-    darkGlowColor: 'rgba(220, 38, 38, 0.5)', // Darker error with opacity
+    color: 'var(--color-enemy-container)',
+    glowColor: 'var(--color-enemy)',
     confetti: {
       colors: ['#EF4444', '#FB923C', '#FDBA74', '#FED7AA'],
       emojis: ['💣', '🔥', '😈'],
@@ -117,13 +115,13 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
     icon: Sword,
     particleCount: 70,
     accessibilityLabel: 'Enemy result with orange sword symbols',
+    quote: 'That escalated quickly... 😅',
+    endText: 'enemies',
   },
   S: {
     // Siblings - Green theme
-    color: 'var(--md-color-secondary-fixed)',
-    darkColor: 'var(--md-color-secondary-fixed-dim)',
-    glowColor: 'rgba(16, 185, 129, 0.4)', // Green with opacity
-    darkGlowColor: 'rgba(5, 150, 105, 0.5)', // Darker green with opacity
+    color: 'var(--color-siblings-container)',
+    glowColor: 'var(--color-siblings)',
     confetti: {
       colors: ['#10B981', '#34D399', '#6EE7B7', '#A7F3D0'],
       emojis: ['🧸', '👫', '🎈'],
@@ -135,6 +133,8 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
     icon: Users,
     particleCount: 85,
     accessibilityLabel: 'Siblings result with green family symbols',
+    quote: 'Family vibes only! 👪',
+    endText: 'siblings',
   },
 };
 
