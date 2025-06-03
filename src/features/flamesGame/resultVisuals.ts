@@ -4,6 +4,7 @@ import { FlamesResult } from './flames.types';
 
 export interface ResultVisualConfig {
   color: string;
+  onColor: string;
   glowColor: string;
   confetti: {
     colors: string[];
@@ -16,8 +17,8 @@ export interface ResultVisualConfig {
   icon: React.ElementType;
   particleCount: number;
   accessibilityLabel: string; // Added for screen readers
-  quote: string; // Quote for the result
-  endText: string; // Optional end text for the result
+  quote: string;
+  endText: string;
 }
 
 // Define keys without null to satisfy TypeScript's Record type requirements
@@ -31,6 +32,7 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
   F: {
     // Friendship - Blue theme
     color: 'var(--color-friendship-container)',
+    onColor: 'var(--color-on-friendship-container)',
     glowColor: 'var(--color-friendship)',
     confetti: {
       colors: ['#C084FC', '#A78BFA', '#93C5FD', '#BFDBFE'],
@@ -49,6 +51,7 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
   L: {
     // Love - Red theme aligned with primary colors
     color: 'var(--color-love-container)',
+    onColor: 'var(--color-on-love-container)',
     glowColor: 'var(--color-love)',
     confetti: {
       colors: ['#F97316', '#FB923C', '#FDBA74', '#FED7AA'],
@@ -67,6 +70,7 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
   A: {
     // Affection - Amber/Yellow theme
     color: 'var(--color-affection-container)',
+    onColor: 'var(--color-on-affection-container)',
     glowColor: 'var(--color-affection)',
     confetti: {
       colors: ['#FBBF24', '#F59E0B', '#FCD34D', '#FDE68A'],
@@ -85,6 +89,7 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
   M: {
     // Marriage - Purple theme
     color: 'var(--color-marriage-container)',
+    onColor: 'var(--color-on-marriage-container)',
     glowColor: 'var(--color-marriage)',
     confetti: {
       colors: ['#C084FC', '#A78BFA', '#C4B5FD', '#DDD6FE'],
@@ -103,6 +108,7 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
   E: {
     // Enemy - Orange theme aligned with error colors
     color: 'var(--color-enemy-container)',
+    onColor: 'var(--color-on-enemy-container)',
     glowColor: 'var(--color-enemy)',
     confetti: {
       colors: ['#EF4444', '#FB923C', '#FDBA74', '#FED7AA'],
@@ -121,6 +127,7 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
   S: {
     // Siblings - Green theme
     color: 'var(--color-siblings-container)',
+    onColor: 'var(--color-on-siblings-container)',
     glowColor: 'var(--color-siblings)',
     confetti: {
       colors: ['#10B981', '#34D399', '#6EE7B7', '#A7F3D0'],

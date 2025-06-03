@@ -47,7 +47,16 @@ export function ResultCard({ name1, name2, result, shouldAnimate, onReset, onSha
   const visualConfig = useMemo(() => getResultVisuals(result), [result]);
 
   // Destructure commonly used properties for better readability
-  const { color, glowColor, icon: ResultIcon, quote, accessibilityLabel, particleCount, endText } = visualConfig;
+  const {
+    color,
+    onColor,
+    glowColor,
+    icon: ResultIcon,
+    quote,
+    accessibilityLabel,
+    particleCount,
+    endText,
+  } = visualConfig;
 
   // Get the text representation of the result for CSS variable lookup
   const resultText = useMemo(() => {
@@ -295,7 +304,7 @@ export function ResultCard({ name1, name2, result, shouldAnimate, onReset, onSha
             {name2}
           </motion.span>{' '}
           are destined to be{' '}
-          <span className="font-semibold" style={{ color: color }}>
+          <span className="font-semibold" style={{ color: onColor }}>
             {endText || resultDisplayText.toLowerCase()}!
           </span>
         </motion.p>

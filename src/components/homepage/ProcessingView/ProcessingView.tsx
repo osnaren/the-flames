@@ -51,11 +51,6 @@ export function ProcessingView({ name1, name2, commonLetters, result, shouldAnim
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
     >
-      {/* Ambient glow animation - positioned to fill container */}
-      {/* <div className="absolute inset-0 -z-10 overflow-hidden rounded-xl">
-        <AmbientGlow isVisible={true} />
-      </div> */}
-
       {/* Name Tiles Section with margin for better spacing */}
       <motion.div
         className="mb-8"
@@ -87,7 +82,7 @@ export function ProcessingView({ name1, name2, commonLetters, result, shouldAnim
               transition={{ duration: 0.3 }}
             >
               <p
-                className="bg-secondary-container/20 text-on-secondary-container dark:bg-secondary-container/10 dark:text-on-secondary-container/90 inline-block rounded-full px-5 py-2 text-center text-sm font-medium italic"
+                className="bg-secondary-container/20 text-on-secondary-container dark:text-secondary inline-block rounded-full px-5 py-2 text-center text-sm font-medium italic"
                 aria-live="polite"
               >
                 {/* Add pulsing ellipsis effect to status message */}

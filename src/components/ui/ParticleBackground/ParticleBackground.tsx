@@ -1,7 +1,6 @@
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import type { Container, ISourceOptions } from '@tsparticles/engine';
 import { Particles, initParticlesEngine } from '@tsparticles/react';
-import { loadSlim } from '@tsparticles/slim';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface ParticleBackgroundProps {
@@ -17,7 +16,7 @@ interface ParticleBackgroundProps {
  * Uses tsparticles for high-performance particle animations
  */
 export function ParticleBackground({
-  color = 'var(--md-color-primary)',
+  color = 'var(--color-primary)',
   particleCount = 10,
   enabled = true,
   className = '',
@@ -29,14 +28,17 @@ export function ParticleBackground({
 
   // Initialize the particle engine once per application lifetime
   useEffect(() => {
-    if (showParticles) {
-      initParticlesEngine(async (engine) => {
-        await loadSlim(engine);
-      }).then(() => {
-        setInit(true);
-      });
-    }
-  }, [showParticles]);
+    // Initialize the engine once on component mount
+    initParticlesEngine(async (_engine) => {
+      // You can load specific presets or plugins here if needed, e.g.:
+      // await loadFull(engine); // Loads all features
+      // Or, load individual features if your options require them and they aren't auto-loaded.
+      // For the current options (circle shape, basic movement, opacity, size),
+      // explicit loading beyond initParticlesEngine might not be necessary with @tsparticles/react.
+    }).then(() => {
+      setInit(true);
+    });
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   const particlesLoaded = useCallback(async (_container?: Container): Promise<void> => {
     // Optional container parameter to match expected signature

@@ -73,7 +73,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         'transition-colors duration-200'
       ),
       blue: cn(
-        'bg-tertiary-container text-on-tertiary-container',
+        'bg-tertiary text-on-tertiary',
         'hover:opacity-95',
         'shadow-md shadow-tertiary-container/30',
         'hover:shadow-lg hover:shadow-tertiary-container/40',
