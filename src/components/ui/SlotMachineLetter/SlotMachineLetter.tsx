@@ -2,7 +2,7 @@ import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { motion } from 'framer-motion';
 import { memo, useMemo } from 'react'; // Removed unused useEffect, useState
 import { FlamesResult } from '../../../features/flamesGame/flames.types';
-import { resultMeanings } from '../../../features/flamesGame/flames.utils';
+import { resultData } from '../../../features/flamesGame/resultData';
 
 interface SlotMachineLetterProps {
   letter: string;
@@ -26,8 +26,8 @@ function SlotMachineLetter({ letter, index, slotStopIndex, result }: SlotMachine
 
   // Get the appropriate icon color based on the current letter, memoized to prevent recalculation
   const letterColor = useMemo(() => {
-    const currentLetter = letter as keyof typeof resultMeanings;
-    return resultMeanings[currentLetter]?.color || 'text-gray-800 dark:text-gray-200';
+    const currentLetter = letter as keyof typeof resultData;
+    return resultData[currentLetter]?.color || 'text-gray-800 dark:text-gray-200';
   }, [letter]);
 
   // Compute accessibility attributes

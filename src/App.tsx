@@ -1,12 +1,14 @@
 import SponsorFAB from '@features/sponsor/SponsorFAB';
 import Footer from '@layout/Footer';
+import GlobalErrorBoundary from '@layout/GlobalErrorBoundary';
 import Navbar from '@layout/Navbar';
-import ChartsPage from '@pages/ChartsPage';
 import HomePage from '@pages/HomePage';
 import HowItWorksPage from '@pages/HowItWorksPage';
-import ManualModePage from '@pages/ManualModePage';
 import FlameBackground from '@ui/FlameBackground';
+import { Suspense, lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
+const ChartsPage = lazy(() => import('@pages/ChartsPage'));
+const ManualModePage = lazy(() => import('@pages/ManualModePage'));
 
 function App() {
   return (
@@ -15,12 +17,16 @@ function App() {
       <Navbar />
 
       <main className="pt-6">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/charts" element={<ChartsPage />} />
-          <Route path="/how-it-works" element={<HowItWorksPage />} />
-          <Route path="/manual" element={<ManualModePage />} />
-        </Routes>
+        <GlobalErrorBoundary>
+          <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/charts" element={<ChartsPage />} />
+              <Route path="/how-it-works" element={<HowItWorksPage />} />
+              <Route path="/manual" element={<ManualModePage />} />
+            </Routes>
+          </Suspense>
+        </GlobalErrorBoundary>
       </main>
       <SponsorFAB />
       <Footer />

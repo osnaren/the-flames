@@ -1,5 +1,5 @@
 import { FlamesResult } from '@features/flamesGame/flames.types';
-import { getResultVisuals } from '@features/flamesGame/resultVisuals';
+import { getResultData } from '@features/flamesGame/resultData';
 import { useFlamesEngine } from '@features/flamesGame/useFlamesEngine';
 import ConfettiEffect from '@ui/ConfettiEffect';
 import { AnimatePresence, motion, useAnimationControls } from 'framer-motion';
@@ -51,7 +51,7 @@ export function FlamesSlotMachine({ result, shouldAnimate, stage }: FlamesSlotMa
   const resultLetterControls = useAnimationControls();
 
   // Get result styling based on theme
-  const { color: resultColorClass, glowColor } = result ? getResultVisuals(result) : { color: '', glowColor: '' };
+  const { color: resultColorClass, glowColor } = result ? getResultData(result) : { color: '', glowColor: '' };
 
   // Enhanced ring pulse animation for better visibility
   const ringPulseAnimation = {

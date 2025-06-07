@@ -1,5 +1,5 @@
 import { FlamesResult } from '@features/flamesGame/flames.types';
-import { resultMeanings } from '@features/flamesGame/flames.utils';
+import { getResultData } from '@features/flamesGame/resultData';
 import { copyShareUrl, shareResult } from '@lib/share';
 import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -17,7 +17,7 @@ export function useShareActions(name1: string, name2: string, result: FlamesResu
       name1,
       name2,
       result,
-      resultText: resultMeanings[result].text,
+      resultText: getResultData(result).text,
     };
 
     try {

@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import ShareActions from '@components/homepage/ShareActions';
 import ParticleBackground from '@components/ui/ParticleBackground';
 import { FlamesResult } from '@features/flamesGame/flames.types';
-import { getResultVisuals } from '@features/flamesGame/resultVisuals';
+import { getResultData } from '@features/flamesGame/resultData';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import Button from '@ui/Button';
 import { Wand2, X } from 'lucide-react';
@@ -44,7 +44,7 @@ export function ResultCard({ name1, name2, result, shouldAnimate, onReset, onSha
   }, [shouldUseAnimations]);
 
   // Get all styling and content info for this result
-  const visualConfig = useMemo(() => getResultVisuals(result), [result]);
+  const visualConfig = useMemo(() => getResultData(result), [result]);
 
   // Destructure commonly used properties for better readability
   const {

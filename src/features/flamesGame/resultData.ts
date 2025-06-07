@@ -2,7 +2,9 @@ import { BellRing, Heart, Star, Sword, Users } from 'lucide-react';
 import React from 'react';
 import { FlamesResult } from './flames.types';
 
-export interface ResultVisualConfig {
+export interface ResultData {
+  text: string;
+  icon: React.ElementType;
   color: string;
   onColor: string;
   glowColor: string;
@@ -14,23 +16,18 @@ export interface ResultVisualConfig {
     spread: number;
   };
   emoji: string;
-  icon: React.ElementType;
   particleCount: number;
-  accessibilityLabel: string; // Added for screen readers
+  accessibilityLabel: string;
   quote: string;
   endText: string;
 }
 
-// Define keys without null to satisfy TypeScript's Record type requirements
-type NonNullFlamesResult = Exclude<FlamesResult, null>;
+export type NonNullFlamesResult = Exclude<FlamesResult, null>;
 
-/**
- * Visual configurations for each FLAMES result
- * Aligned with the application's theme system while maintaining distinct identities
- */
-export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
+export const resultData: Record<NonNullFlamesResult, ResultData> = {
   F: {
-    // Friendship - Blue theme
+    text: 'Friendship',
+    icon: Users,
     color: 'var(--color-friendship-container)',
     onColor: 'var(--color-on-friendship-container)',
     glowColor: 'var(--color-friendship)',
@@ -42,14 +39,14 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
       spread: 70,
     },
     emoji: '🤝',
-    icon: Users,
     particleCount: 80,
     accessibilityLabel: 'Friendship result with blue friendship symbols',
     quote: 'Best friends are the siblings we choose! 🤝',
     endText: 'friends',
   },
   L: {
-    // Love - Red theme aligned with primary colors
+    text: 'Love',
+    icon: Heart,
     color: 'var(--color-love-container)',
     onColor: 'var(--color-on-love-container)',
     glowColor: 'var(--color-love)',
@@ -61,14 +58,14 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
       spread: 80,
     },
     emoji: '💘',
-    icon: Heart,
     particleCount: 100,
     accessibilityLabel: 'Love result with red heart symbols',
     quote: 'When two hearts beat as one! 💘',
     endText: 'lovers',
   },
   A: {
-    // Affection - Amber/Yellow theme
+    text: 'Affection',
+    icon: Star,
     color: 'var(--color-affection-container)',
     onColor: 'var(--color-on-affection-container)',
     glowColor: 'var(--color-affection)',
@@ -80,14 +77,14 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
       spread: 75,
     },
     emoji: '✨',
-    icon: Star,
     particleCount: 90,
     accessibilityLabel: 'Affection result with yellow star symbols',
     quote: 'The spark that keeps the flame alive! ✨',
     endText: 'affectionate',
   },
   M: {
-    // Marriage - Purple theme
+    text: 'Marriage',
+    icon: BellRing,
     color: 'var(--color-marriage-container)',
     onColor: 'var(--color-on-marriage-container)',
     glowColor: 'var(--color-marriage)',
@@ -99,14 +96,14 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
       spread: 85,
     },
     emoji: '💍',
-    icon: BellRing,
     particleCount: 110,
     accessibilityLabel: 'Marriage result with purple ring symbols',
     quote: 'Destined for a lifetime together! 💍',
     endText: 'married',
   },
   E: {
-    // Enemy - Orange theme aligned with error colors
+    text: 'Enemy',
+    icon: Sword,
     color: 'var(--color-enemy-container)',
     onColor: 'var(--color-on-enemy-container)',
     glowColor: 'var(--color-enemy)',
@@ -118,14 +115,14 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
       spread: 90,
     },
     emoji: '⚔️',
-    icon: Sword,
     particleCount: 70,
     accessibilityLabel: 'Enemy result with orange sword symbols',
     quote: 'That escalated quickly... 😅',
     endText: 'enemies',
   },
   S: {
-    // Siblings - Green theme
+    text: 'Siblings',
+    icon: Users,
     color: 'var(--color-siblings-container)',
     onColor: 'var(--color-on-siblings-container)',
     glowColor: 'var(--color-siblings)',
@@ -137,7 +134,6 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
       spread: 75,
     },
     emoji: '👪',
-    icon: Users,
     particleCount: 85,
     accessibilityLabel: 'Siblings result with green family symbols',
     quote: 'Family vibes only! 👪',
@@ -145,8 +141,6 @@ export const resultVisuals: Record<NonNullFlamesResult, ResultVisualConfig> = {
   },
 };
 
-// Helper function to get visual config safely when result might be null
-export function getResultVisuals(result: FlamesResult): ResultVisualConfig {
-  // Default to 'F' when result is null
-  return result ? resultVisuals[result] : resultVisuals.F;
+export function getResultData(result: FlamesResult): ResultData {
+  return result ? resultData[result] : resultData.F;
 }
