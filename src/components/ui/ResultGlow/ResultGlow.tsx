@@ -1,5 +1,5 @@
 import { FlamesResult } from '@features/flamesGame/flames.types';
-import { getResultVisuals } from '@features/flamesGame/resultVisuals';
+import { getResultData } from '@features/flamesGame/resultData';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useEffect, useMemo, useState } from 'react';
@@ -37,7 +37,7 @@ function ResultGlow({ result, isVisible }: ResultGlowProps) {
 
   // Get the appropriate colors based on the result
   const visualConfig = useMemo(() => {
-    return getResultVisuals(result);
+    return getResultData(result);
   }, [result]);
 
   // Extract colors from visual config

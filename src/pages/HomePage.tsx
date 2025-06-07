@@ -1,10 +1,6 @@
 import { FlamesResult } from '@features/flamesGame/flames.types';
-import {
-  calculateFlamesResult,
-  findCommonLetters,
-  nameSchema,
-  resultMeanings,
-} from '@features/flamesGame/flames.utils';
+import { calculateFlamesResult, findCommonLetters, nameSchema } from '@features/flamesGame/flames.utils';
+import { getResultData } from '@features/flamesGame/resultData';
 import { useFlamesEngine } from '@features/flamesGame/useFlamesEngine';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { useShareActions } from '@hooks/useShareActions';
@@ -262,7 +258,7 @@ function HomePage() {
           name1,
           name2,
           result: result || '',
-          resultText: result ? resultMeanings[result].text : '',
+          resultText: result ? getResultData(result).text : '',
         }}
       />
     </div>

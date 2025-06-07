@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { usePreferencesStore } from '../store/usePreferencesStore';
 
 interface Preferences {
   isDarkTheme: boolean;
@@ -16,57 +17,13 @@ interface PreferenceActions {
  * Custom hook for managing user preferences with localStorage persistence
  */
 export function usePreferences(): [Preferences, PreferenceActions] {
-  const [isDarkTheme, setIsDarkTheme] = useState(false);
-  const [animationsEnabled, setAnimationsEnabled] = useState(true);
-  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const { isDarkTheme, animationsEnabled, isSoundEnabled, toggleTheme, toggleAnimations, toggleSound, init } =
+    usePreferencesStore();
 
   // Load preferences from localStorage on mount
   useEffect(() => {
-    const storedTheme = localStorage.getItem('theme');
-    const storedAnimations = localStorage.getItem('animations');
-    const storedSound = localStorage.getItem('sound');
-
-    if (storedTheme) setIsDarkTheme(storedTheme === 'dark');
-    if (storedAnimations) setAnimationsEnabled(storedAnimations === 'true');
-    if (storedSound) setIsSoundEnabled(storedSound === 'true');
-
-    // Initialize dark mode if needed
-    if (storedTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'light');
-    }
-  }, []);
-
-  // Toggle theme and update DOM and localStorage
-  const toggleTheme = () => {
-    const newTheme = !isDarkTheme;
-    setIsDarkTheme(newTheme);
-    localStorage.setItem('theme', newTheme ? 'dark' : 'light');
-
-    if (newTheme) {
-      document.documentElement.classList.add('dark');
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.setAttribute('data-theme', 'light');
-    }
-  };
-
-  // Toggle animations and update localStorage
-  const toggleAnimations = () => {
-    const newAnimations = !animationsEnabled;
-    setAnimationsEnabled(newAnimations);
-    localStorage.setItem('animations', String(newAnimations));
-  };
-
-  // Toggle sound and update localStorage
-  const toggleSound = () => {
-    const newSound = !isSoundEnabled;
-    setIsSoundEnabled(newSound);
-    localStorage.setItem('sound', String(newSound));
-  };
+    init();
+  }, [init]);
 
   return [
     { isDarkTheme, animationsEnabled, isSoundEnabled },

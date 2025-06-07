@@ -1,7 +1,7 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { FlamesResult } from '@features/flamesGame/flames.types';
-import { getResultVisuals } from '@features/flamesGame/resultVisuals';
+import { getResultData } from '@features/flamesGame/resultData';
 import confetti from 'canvas-confetti';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
@@ -107,7 +107,7 @@ function ConfettiEffect({ result, isActive }: ConfettiEffectProps) {
       if (!confettiInstanceRef.current || !result) return;
 
       setTimeout(() => {
-        const visualConfig = getResultVisuals(result);
+        const visualConfig = getResultData(result);
         const particleCount = isLowEndDevice
           ? Math.floor(visualConfig.particleCount * 0.6)
           : visualConfig.particleCount;
