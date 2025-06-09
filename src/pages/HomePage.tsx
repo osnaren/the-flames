@@ -4,7 +4,9 @@ import { getResultData } from '@features/flamesGame/resultData';
 import { useFlamesEngine } from '@features/flamesGame/useFlamesEngine';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { useShareActions } from '@hooks/useShareActions';
+import AmbientGlow from '@ui/AmbientGlow';
 import ConfettiEffect from '@ui/ConfettiEffect';
+import ParticleBackground from '@ui/ParticleBackground';
 import SharePopover from '@ui/SharePopover';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useCallback, useEffect, useRef } from 'react';
@@ -136,6 +138,8 @@ function HomePage() {
       className="relative flex min-h-screen flex-col items-center justify-center p-4 py-8 md:py-12"
       ref={containerRef}
     >
+      <AmbientGlow isVisible={stage !== 'result'} />
+      <ParticleBackground enabled={stage === 'input'} className="z-0" />
       {/* Confetti effect - remains active during result stage */}
       <ConfettiEffect result={result} isActive={stage === 'result'} />
 
@@ -153,7 +157,7 @@ function HomePage() {
               repeatType: 'reverse',
             }}
           >
-            Discover your relationship destiny!
+            Enter two names and let the sparks fly ✨
           </motion.p>
         </div>
 

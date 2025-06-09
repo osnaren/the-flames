@@ -37,16 +37,14 @@ export function InputForm({
   return (
     <motion.form
       onSubmit={onSubmit}
-      className="relative space-y-6"
+      className="relative space-y-6 md:space-y-8"
       initial={shouldAnimate ? { opacity: 0 } : { opacity: 1 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{
-        duration: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--duration')) || 0.3,
-      }}
+      transition={{ duration: 0.4 }}
     >
       <div className="mb-4">
-        <label htmlFor="name1" className="sr-only">
+        <label htmlFor="name1" className="text-on-surface-variant mb-1 block text-sm font-medium">
           Your name
         </label>
         <Input
@@ -56,13 +54,13 @@ export function InputForm({
           value={name1}
           onChange={(e) => setName1(e.target.value)}
           placeholder="Who are you? 💁"
-          className="border-primary-container hover:border-tertiary-container focus:ring-primary h-12 w-full rounded-lg border px-4 py-3.5 transition-all duration-200 outline-none focus:scale-[1.01] focus:border-orange-500 focus:ring-2"
+          className="border-primary-container hover:border-tertiary-container focus:ring-primary focus:ring-offset-background h-12 w-full rounded-lg border px-4 py-3.5 transition-all duration-200 outline-none focus:scale-[1.01] focus:border-orange-500 focus:ring-2 focus:ring-offset-2"
           required
           aria-label="Your name"
         />
       </div>
       <div className="mb-6">
-        <label htmlFor="name2" className="sr-only">
+        <label htmlFor="name2" className="text-on-surface-variant mb-1 block text-sm font-medium">
           Their name
         </label>
         <Input
@@ -71,7 +69,7 @@ export function InputForm({
           value={name2}
           onChange={(e) => setName2(e.target.value)}
           placeholder="Their name? 💘"
-          className="border-primary-container hover:border-tertiary-container focus:ring-primary h-12 w-full rounded-lg border px-4 py-3.5 transition-all duration-200 outline-none focus:scale-[1.01] focus:border-orange-500 focus:ring-2"
+          className="border-primary-container hover:border-tertiary-container focus:ring-primary focus:ring-offset-background h-12 w-full rounded-lg border px-4 py-3.5 transition-all duration-200 outline-none focus:scale-[1.01] focus:border-orange-500 focus:ring-2 focus:ring-offset-2"
           required
           aria-label="Their name"
         />

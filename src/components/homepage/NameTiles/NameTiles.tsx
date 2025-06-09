@@ -87,6 +87,18 @@ export function NameTiles({ name1, name2, commonLetters, shouldAnimate }: NameTi
           animate={currentAnimationState}
         >
           {letter}
+          {isCommon && (
+            <motion.span
+              className="bg-error absolute bottom-1/2 left-0 h-0.5 w-full origin-left"
+              initial={{ scaleX: 0 }}
+              animate={revealProcessedEffect ? { scaleX: 1 } : { scaleX: 0 }}
+              transition={{
+                delay: 0.1 + index * 0.05,
+                duration: 0.4,
+                ease: 'easeOut',
+              }}
+            />
+          )}
         </motion.div>
       );
     },
