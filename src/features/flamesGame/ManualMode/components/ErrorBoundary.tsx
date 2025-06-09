@@ -13,7 +13,7 @@ interface State {
 export default class ErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false,
-    error: null
+    error: null,
   };
 
   public static getDerivedStateFromError(error: Error): State {
@@ -32,18 +32,13 @@ export default class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="flex min-h-screen items-center justify-center p-4">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
-              Oops! Something went wrong
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <h2 className="mb-4 text-2xl font-bold text-gray-800 dark:text-white">Oops! Something went wrong</h2>
+            <p className="mb-6 text-gray-600 dark:text-gray-400">
               Don't worry, your love story isn't over! Let's try that again.
             </p>
-            <Button
-              variant="primary"
-              onClick={this.handleReset}
-            >
+            <Button variant="primary" onClick={this.handleReset}>
               Start Fresh 🔄
             </Button>
           </div>

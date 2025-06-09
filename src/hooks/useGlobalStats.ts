@@ -1,12 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { 
-  getStatsWithTrends,
-  getUserCountry,
-  TimeWindow,
-  StatsError
-} from '../lib/supabase';
-import { GlobalStats } from '../components/layout/GlobalCharts/types';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { GlobalStats } from '../components/layout/GlobalCharts/types';
+import { getStatsWithTrends, getUserCountry, StatsError, TimeWindow } from '../lib/supabase';
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const statsCache = new Map<string, { data: GlobalStats; timestamp: number }>();
@@ -18,7 +13,7 @@ const DEFAULT_STATS: GlobalStats = {
   popularNames: [],
   resultStats: [],
   popularPairs: [],
-  regionalStats: null
+  regionalStats: null,
 };
 
 export function useGlobalStats(timeWindow: TimeWindow = 'today') {
@@ -55,20 +50,20 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
       popularNames: (rawStats.names || []).map((name: any) => ({
         name: name?.name || '',
         count: name?.current_count || 0,
-        trend: Number(name?.trend_percentage || 0)
+        trend: Number(name?.trend_percentage || 0),
       })),
       resultStats: (rawStats.results || []).map((result: any) => ({
         result: result?.result || '',
         count: result?.current_count || 0,
-        trend: Number(result?.trend_percentage || 0)
+        trend: Number(result?.trend_percentage || 0),
       })),
       popularPairs: (rawStats.pairs || []).map((pair: any) => ({
         name1: pair?.name1 || '',
         name2: pair?.name2 || '',
         result: pair?.result || '',
-        count: pair?.count || 0
+        count: pair?.count || 0,
       })),
-      regionalStats: null // Will be populated separately if country is available
+      regionalStats: null, // Will be populated separately if country is available
     };
   }, []);
 
@@ -77,14 +72,14 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
     try {
       const cacheKey = `${timeWindow}-${userCountry || 'global'}`;
       const cached = statsCache.get(cacheKey);
-      
+
       // Return cached data if still valid
       if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
         setData(cached.data);
         setIsLoading(false);
         return;
       }
-      
+
       setIsLoading(true);
       setError(null);
 
@@ -101,19 +96,19 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
             names: (regionalStats.names || []).map((name: any) => ({
               name: name?.name || '',
               count: name?.current_count || 0,
-              trend: Number(name?.trend_percentage || 0)
+              trend: Number(name?.trend_percentage || 0),
             })),
             results: (regionalStats.results || []).map((result: any) => ({
               result: result?.result || '',
               count: result?.current_count || 0,
-              trend: Number(result?.trend_percentage || 0)
+              trend: Number(result?.trend_percentage || 0),
             })),
             pairs: (regionalStats.pairs || []).map((pair: any) => ({
               name1: pair?.name1 || '',
               name2: pair?.name2 || '',
               result: pair?.result || '',
-              count: pair?.count || 0
-            }))
+              count: pair?.count || 0,
+            })),
           };
         }
       }
@@ -121,7 +116,7 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
       setData(stats);
       setLastUpdate(Date.now());
       setRetryCount(0); // Reset retry count on success
-      
+
       // Update cache
       statsCache.set(cacheKey, { data: stats, timestamp: Date.now() });
     } catch (err) {
@@ -149,10 +144,13 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
 
       // Implement retry logic for certain errors
       if (retryCount < 3 && !(error instanceof StatsError)) {
-        setRetryCount(prev => prev + 1);
-        setTimeout(() => {
-          fetchStats();
-        }, Math.pow(2, retryCount) * 1000); // Exponential backoff
+        setRetryCount((prev) => prev + 1);
+        setTimeout(
+          () => {
+            fetchStats();
+          },
+          Math.pow(2, retryCount) * 1000
+        ); // Exponential backoff
       }
     } finally {
       setIsLoading(false);
@@ -164,12 +162,12 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
     fetchStats();
   }, [timeWindow, userCountry]);
 
-  return { 
-    data, 
-    isLoading, 
+  return {
+    data,
+    isLoading,
     error,
     userCountry,
     refetch: fetchStats,
-    lastUpdate
+    lastUpdate,
   };
 }

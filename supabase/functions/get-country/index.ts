@@ -1,10 +1,9 @@
 // @ts-ignore: Deno has issues with npm imports
-import { createClient } from "npm:@supabase/supabase-js@2.39.7";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
 // Explicitly declare network permissions
@@ -12,7 +11,7 @@ const corsHeaders = {
 
 Deno.serve(async (req: Request) => {
   // Handle CORS preflight requests
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, {
       status: 200,
       headers: corsHeaders,
@@ -21,9 +20,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     // Get client IP from request headers
-    const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0] || 
-                    req.headers.get("x-real-ip") || 
-                    "0.0.0.0";
+    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0] || req.headers.get('x-real-ip') || '0.0.0.0';
 
     // Add timeout to fetch request
     const controller = new AbortController();
@@ -32,7 +29,7 @@ Deno.serve(async (req: Request) => {
     try {
       // Call the IP geolocation API with timeout
       const response = await fetch(`https://api.country.is/${clientIP}`, {
-        signal: controller.signal
+        signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
@@ -43,39 +40,30 @@ Deno.serve(async (req: Request) => {
 
       const data = await response.json();
 
-      return new Response(
-        JSON.stringify({ country: data.country }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-            ...corsHeaders,
-          },
-        }
-      );
-    } catch (fetchError) {
-      // If the fetch fails, return a default country code
-      console.error("Fetch error:", fetchError);
-      return new Response(
-        JSON.stringify({ country: "US", error: "Failed to detect country, using default" }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-            ...corsHeaders,
-          },
-        }
-      );
-    }
-  } catch (error) {
-    console.error("Edge function error:", error);
-    return new Response(
-      JSON.stringify({ country: "US", error: "Internal server error" }),
-      {
-        status: 500,
+      return new Response(JSON.stringify({ country: data.country }), {
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           ...corsHeaders,
         },
-      }
-    );
+      });
+    } catch (fetchError) {
+      // If the fetch fails, return a default country code
+      console.error('Fetch error:', fetchError);
+      return new Response(JSON.stringify({ country: 'US', error: 'Failed to detect country, using default' }), {
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders,
+        },
+      });
+    }
+  } catch (error) {
+    console.error('Edge function error:', error);
+    return new Response(JSON.stringify({ country: 'US', error: 'Internal server error' }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders,
+      },
+    });
   }
 });
