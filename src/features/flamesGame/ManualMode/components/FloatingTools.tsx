@@ -1,5 +1,5 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { Eraser, RotateCcw, Share2, Palette } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Palette, RotateCcw, Share2 } from 'lucide-react';
 import Button from '../../../../components/ui/Button';
 
 interface FloatingToolsProps {
@@ -10,13 +10,7 @@ interface FloatingToolsProps {
   isChalkboard: boolean;
 }
 
-export default function FloatingTools({
-  onReset,
-  onShare,
-  onToggleStyle,
-  canShare,
-  isChalkboard
-}: FloatingToolsProps) {
+export default function FloatingTools({ onReset, onShare, onToggleStyle, canShare, isChalkboard }: FloatingToolsProps) {
   return (
     <motion.div
       className="fixed bottom-4 left-4 z-50"
@@ -32,26 +26,14 @@ export default function FloatingTools({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
             >
-              <Button
-                variant="primary"
-                size="sm"
-                icon={Share2}
-                onClick={onShare}
-                className="shadow-lg"
-              >
+              <Button variant="primary" size="sm" icon={Share2} onClick={onShare} className="shadow-lg">
                 Share
               </Button>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <Button
-          variant="secondary"
-          size="sm"
-          icon={RotateCcw}
-          onClick={onReset}
-          className="shadow-lg"
-        >
+        <Button variant="secondary" size="sm" icon={RotateCcw} onClick={onReset} className="shadow-lg">
           Reset
         </Button>
 
@@ -67,4 +49,4 @@ export default function FloatingTools({
       </div>
     </motion.div>
   );
-};
+}

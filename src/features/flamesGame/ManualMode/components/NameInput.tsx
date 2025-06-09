@@ -19,7 +19,7 @@ export default function NameInput({
   onLock,
   onEdit,
   placeholder,
-  isChalkboard = false
+  isChalkboard = false,
 }: NameInputProps) {
   return (
     <div className="relative">
@@ -27,18 +27,16 @@ export default function NameInput({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`rounded-lg p-4
-                   ${isChalkboard 
-                     ? 'bg-gray-800/50' 
-                     : 'bg-gray-50 dark:bg-gray-800'}`}
+          className={`rounded-lg p-4 ${isChalkboard ? 'bg-gray-800/50' : 'bg-gray-50 dark:bg-gray-800'}`}
         >
           <div className="flex items-center justify-between">
-            <span className={`font-handwriting text-xl
-                          ${isChalkboard ? 'text-white' : 'text-gray-800 dark:text-white'}`}>
+            <span
+              className={`font-handwriting text-xl ${isChalkboard ? 'text-white' : 'text-gray-800 dark:text-white'}`}
+            >
               {value}
             </span>
             <Button
-              variant={isChalkboard ? "ghost" : "secondary"}
+              variant={isChalkboard ? 'ghost' : 'secondary'}
               size="sm"
               icon={Pencil}
               onClick={onEdit}
@@ -46,8 +44,7 @@ export default function NameInput({
             />
           </div>
           <motion.div
-            className={`absolute bottom-0 left-0 right-0 h-0.5
-                     ${isChalkboard ? 'bg-white/50' : 'bg-orange-500'}`}
+            className={`absolute right-0 bottom-0 left-0 h-0.5 ${isChalkboard ? 'bg-white/50' : 'bg-orange-500'}`}
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ duration: 0.3 }}
@@ -60,19 +57,19 @@ export default function NameInput({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
-            className={`w-full px-4 py-3 rounded-lg border-2 font-handwriting text-xl
-                     transition-all duration-200
-                     ${isChalkboard 
-                       ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-white/50' 
-                       : 'border-gray-200 dark:border-gray-700 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 dark:bg-gray-800 dark:text-white dark:focus:ring-orange-900'}`}
+            className={`font-handwriting w-full rounded-lg border-2 px-4 py-3 text-xl transition-all duration-200 ${
+              isChalkboard
+                ? 'border-gray-700 bg-gray-800/50 text-white placeholder-gray-400 focus:border-white/50'
+                : 'border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-orange-900'
+            }`}
           />
           {value.trim() && (
             <Button
-              variant={isChalkboard ? "secondary" : "primary"}
+              variant={isChalkboard ? 'secondary' : 'primary'}
               size="sm"
               icon={Check}
               onClick={onLock}
-              className="absolute right-2 top-1/2 -translate-y-1/2"
+              className="absolute top-1/2 right-2 -translate-y-1/2"
               aria-label="Lock name"
             />
           )}
@@ -80,4 +77,4 @@ export default function NameInput({
       )}
     </div>
   );
-};
+}

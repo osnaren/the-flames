@@ -1,7 +1,18 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize the Supabase client
-export const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY);
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+if (!supabaseUrl || !supabaseKey || supabaseUrl === 'undefined' || supabaseKey === 'undefined') {
+  console.error('Supabase URL or Anon Key missing:', {
+    supabaseUrl: supabaseUrl || 'not set',
+    supabaseKey: supabaseKey ? '****' : 'not set',
+  });
+  throw new Error('Supabase URL and Anon Key must be set in environment variables (.env or .env.local)');
+}
+
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Time window types for stats
 export type TimeWindow = 'today' | 'week' | 'alltime';
