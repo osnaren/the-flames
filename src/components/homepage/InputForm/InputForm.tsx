@@ -13,7 +13,6 @@ interface InputFormProps {
   setName2: (name: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   shouldAnimate: boolean;
-  animationsEnabled: boolean;
   anonymous: boolean;
   setAnonymous: (value: boolean) => void;
 }
@@ -28,7 +27,6 @@ export function InputForm({
   setName2,
   onSubmit,
   shouldAnimate,
-  animationsEnabled: _animationsEnabled,
   anonymous,
   setAnonymous,
 }: InputFormProps) {

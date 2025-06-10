@@ -1,5 +1,4 @@
 import Logo from '@components/ui/Logo';
-import { usePreferences } from '@hooks/usePreferences';
 import FloatingControlPanel from '@layout/FloatingControlPanel';
 import { motion, useReducedMotion } from 'framer-motion';
 import { BarChart3, BookOpen, Menu, Wand2 } from 'lucide-react';
@@ -17,9 +16,6 @@ export default function Navbar() {
 
   // For scroll direction detection
   const lastScrollTop = useRef(0);
-
-  // Get theme preferences
-  const [{ animationsEnabled }, { toggleAnimations }] = usePreferences();
 
   // Throttled scroll handler for better performance
   const handleScroll = useCallback(() => {
@@ -145,7 +141,7 @@ export default function Navbar() {
       <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} pathname={pathname} />
 
       {/* Floating Control Panel - now positioned independently outside the navbar */}
-      <FloatingControlPanel animationsEnabled={animationsEnabled} setAnimationsEnabled={toggleAnimations} />
+      <FloatingControlPanel />
     </>
   );
 }

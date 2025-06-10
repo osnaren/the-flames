@@ -1,4 +1,5 @@
-import { motion, useReducedMotion } from 'framer-motion';
+import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
+import { motion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
@@ -22,15 +23,14 @@ function NavItem({
   mobileOnly = false,
   className = '',
 }: NavItemProps) {
-  const prefersReducedMotion = useReducedMotion();
-  const animationsEnabled = !prefersReducedMotion;
+  const { shouldAnimate } = useAnimationPreferences();
 
   const content = (
     <>
       {Icon && (
         <motion.div
           className="relative"
-          whileHover={animationsEnabled ? { rotate: [-5, 5, 0], transition: { duration: 0.5 } } : {}}
+          whileHover={shouldAnimate ? { rotate: [-5, 5, 0], transition: { duration: 0.5 } } : {}}
         >
           <Icon className="mr-2 h-4 w-4" />
         </motion.div>
@@ -52,10 +52,10 @@ function NavItem({
   // Variants for motion animation
   const motionVariants = {
     hover: {
-      scale: animationsEnabled ? 1.05 : 1,
+      scale: shouldAnimate ? 1.05 : 1,
     },
     tap: {
-      scale: animationsEnabled ? 0.95 : 1,
+      scale: shouldAnimate ? 0.95 : 1,
     },
   };
 

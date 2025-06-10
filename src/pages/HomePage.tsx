@@ -28,7 +28,7 @@ function HomePage() {
   const [searchParams] = useSearchParams();
 
   // Animation preferences using our custom hook
-  const { shouldAnimate, animationsEnabled } = useAnimationPreferences();
+  const { shouldAnimate } = useAnimationPreferences();
 
   // References for scrolling and layout
   const resultCardRef = useRef<HTMLDivElement>(null);
@@ -249,7 +249,6 @@ function HomePage() {
                 setName2={setName2}
                 onSubmit={onSubmitForm}
                 shouldAnimate={shouldAnimate}
-                animationsEnabled={animationsEnabled}
                 anonymous={anonymous}
                 setAnonymous={setAnonymous}
               />
