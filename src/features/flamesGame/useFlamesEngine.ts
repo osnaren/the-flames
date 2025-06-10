@@ -1,4 +1,5 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
+import { useTimers } from '@/hooks/useTimers';
 import { insertMatch } from '@lib/supabase';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -40,33 +41,13 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
   const [anonymous, setAnonymous] = useState<boolean>(false);
   const [isSlotMachineAnimating, setIsSlotMachineAnimating] = useState<boolean>(false);
 
-  // Refs for managing timeouts and state
-  const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
+  // Refs for managing state
   const processingRef = useRef<boolean>(false);
   const stageProgressRef = useRef<string | null>(null);
 
-  // Get animation preferences
+  // Get animation preferences and timer utilities
   const { shouldAnimate } = useAnimationPreferences();
-
-  // Clear all timeouts to prevent memory leaks and unwanted behavior
-  const clearAllTimeouts = useCallback(() => {
-    timeoutsRef.current.forEach((timeout) => clearTimeout(timeout));
-    timeoutsRef.current = [];
-  }, []);
-
-  // Add timeout with tracking for easier cleanup
-  const addTimeout = useCallback((callback: () => void, delay: number): NodeJS.Timeout => {
-    const timeout = setTimeout(() => {
-      // Filter out this timeout from the array
-      timeoutsRef.current = timeoutsRef.current.filter((t) => t !== timeout);
-      // Execute callback
-      callback();
-    }, delay);
-
-    // Add to tracked timeouts
-    timeoutsRef.current.push(timeout);
-    return timeout;
-  }, []);
+  const { addTimeout, clearAll } = useTimers();
 
   // Effect to handle any stuck states - acts as a failsafe
   useEffect(() => {
@@ -81,13 +62,6 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       return () => clearTimeout(emergencyTimeout);
     }
   }, [stage, result, addTimeout]);
-
-  // Clean up timeouts on unmount
-  useEffect(() => {
-    return () => {
-      clearAllTimeouts();
-    };
-  }, [clearAllTimeouts]);
 
   // Memoized name setters with validation feedback
   const handleSetName1 = useCallback((input: string) => {
@@ -136,8 +110,8 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
         processingRef.current = true;
         stageProgressRef.current = 'started';
 
-        // Clear any existing timeouts
-        clearAllTimeouts();
+        // Clear any existing timers
+        clearAll();
 
         // Update state to processing
         setStage('processing');
@@ -209,14 +183,14 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
         }
       }
     },
-    [name1, name2, shouldAnimate, anonymous, stage, clearAllTimeouts, addTimeout, onSlotMachineComplete]
+    [name1, name2, shouldAnimate, anonymous, stage, clearAll, addTimeout, onSlotMachineComplete]
   );
 
   /**
    * Reset the game state
    */
   const resetGame = useCallback(() => {
-    clearAllTimeouts();
+    clearAll();
     processingRef.current = false;
     stageProgressRef.current = null;
 
@@ -228,7 +202,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
     setSlotStopIndex(-1);
     setIsSlotMachineAnimating(false);
     setAnonymous(false);
-  }, [clearAllTimeouts]);
+  }, [clearAll]);
 
   // Memoize the state object to prevent unnecessary re-renders
   const state = useMemo((): FlamesEngineState => {

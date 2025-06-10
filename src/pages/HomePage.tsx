@@ -138,19 +138,64 @@ function HomePage() {
       className="relative flex min-h-screen flex-col items-center justify-center p-4 py-8 md:py-12"
       ref={containerRef}
     >
+      {/* Enhanced ambient background effects */}
       <AmbientGlow isVisible={stage !== 'result'} />
-      <ParticleBackground enabled={stage === 'input'} className="z-0" />
+      <ParticleBackground
+        enabled={stage === 'input'}
+        className="z-0"
+        particleCount={shouldAnimate ? 15 : 0}
+        color="var(--color-primary-container)"
+      />
+
       {/* Confetti effect - remains active during result stage */}
       <ConfettiEffect result={result} isActive={stage === 'result'} />
 
       <div className="w-full max-w-lg">
-        <div className="mb-8 text-center">
+        {/* Enhanced header with better visual hierarchy */}
+        <motion.div
+          className="mb-8 text-center"
+          initial={shouldAnimate ? { opacity: 0, y: -20 } : { opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
           <h1 className="sr-only">FLAMES - Relationship Calculator</h1>
+
+          {/* Main title with magical effects */}
+          <motion.div
+            className="mb-4"
+            animate={
+              shouldAnimate
+                ? {
+                    textShadow: [
+                      '0 0 20px rgba(var(--color-primary-rgb), 0.3)',
+                      '0 0 30px rgba(var(--color-primary-rgb), 0.5)',
+                      '0 0 20px rgba(var(--color-primary-rgb), 0.3)',
+                    ],
+                  }
+                : {}
+            }
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              repeatType: 'reverse',
+            }}
+          >
+            <h2 className="text-primary dark:text-primary text-4xl font-bold tracking-tight md:text-5xl">
+              F.L.A.M.E.S
+            </h2>
+          </motion.div>
+
+          {/* Enhanced tagline with pulsing glow */}
           <motion.p
             className="text-on-surface-variant dark:text-on-surface-variant text-lg font-medium"
-            animate={{
-              opacity: [0.7, 1, 0.7],
-            }}
+            animate={
+              shouldAnimate
+                ? {
+                    opacity: [0.7, 1, 0.7],
+                    scale: [1, 1.02, 1],
+                  }
+                : { opacity: 1 }
+            }
             transition={{
               duration: 4,
               repeat: Infinity,
@@ -159,7 +204,26 @@ function HomePage() {
           >
             Enter two names and let the sparks fly ✨
           </motion.p>
-        </div>
+
+          {/* Subtle magic sparkle animation */}
+          {shouldAnimate && stage === 'input' && (
+            <motion.div
+              className="absolute -top-4 left-1/2 -translate-x-1/2"
+              animate={{
+                y: [-5, -15, -5],
+                opacity: [0, 1, 0],
+                scale: [0.8, 1.2, 0.8],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                repeatDelay: 3,
+              }}
+            >
+              <span className="text-2xl">✨</span>
+            </motion.div>
+          )}
+        </motion.div>
 
         {/* Main content area with AnimatePresence for transitions */}
         <AnimatePresence mode="sync">
@@ -167,11 +231,16 @@ function HomePage() {
           {stage === 'input' && (
             <motion.div
               key="input"
-              className="transition-shadow duration-500"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              className="bg-surface/80 border-outline/20 rounded-xl border p-6 shadow-lg backdrop-blur-sm transition-shadow duration-500 md:p-8"
+              initial={shouldAnimate ? { opacity: 0, y: 20, scale: 0.95 } : { opacity: 1, y: 0, scale: 1 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
+              transition={{
+                duration: 0.6,
+                type: 'spring',
+                stiffness: 300,
+                damping: 24,
+              }}
             >
               <InputForm
                 name1={name1}
@@ -192,8 +261,8 @@ function HomePage() {
             <motion.div
               key="process-result-container"
               className="relative"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={shouldAnimate ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1 }}
+              animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
               ref={processingContainerRef}
@@ -202,20 +271,13 @@ function HomePage() {
               <AnimatePresence mode="wait">
                 <motion.div
                   key="processing"
-                  className="bg-background/60 rounded-xl p-6 shadow-lg backdrop-blur-sm md:p-8"
-                  initial={{ opacity: 0, y: 20 }}
+                  className="bg-surface/80 border-outline/20 rounded-xl border p-6 shadow-lg backdrop-blur-sm md:p-8"
+                  initial={shouldAnimate ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.98 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <ProcessingView
-                    name1={name1}
-                    name2={name2}
-                    commonLetters={commonLetters}
-                    result={result}
-                    shouldAnimate={shouldAnimate}
-                    stage={stage}
-                  />
+                  <ProcessingView stage={stage} isVisible={stage === 'processing'} />
                 </motion.div>
               </AnimatePresence>
 
@@ -226,8 +288,8 @@ function HomePage() {
                     key="result-card-container"
                     className="mt-8"
                     ref={resultCardRef}
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={shouldAnimate ? { opacity: 0, y: 50, scale: 0.9 } : { opacity: 1, y: 0, scale: 1 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{
                       duration: 0.8,
                       delay: 0.2,
@@ -240,10 +302,10 @@ function HomePage() {
                       name1={name1}
                       name2={name2}
                       result={result as FlamesResult}
-                      shouldAnimate={shouldAnimate}
-                      onReset={resetGame}
-                      onShare={handleShare}
-                      onCopyLink={handleCopyLink}
+                      stage={stage}
+                      onRetry={() => {}}
+                      onNavigateToManual={() => {}}
+                      onNavigateToStats={() => {}}
                     />
                   </motion.div>
                 )}

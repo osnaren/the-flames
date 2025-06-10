@@ -34,7 +34,7 @@ export const generateMockData = (): GlobalStats => {
   ];
 
   // Generate random popular names
-  const popularNames = Array.from({ length: 10 }, (_, i) => {
+  const popularNames = Array.from({ length: 10 }, (_, _i) => {
     const randomName = names[Math.floor(Math.random() * names.length)];
     return {
       name: randomName,
@@ -45,12 +45,36 @@ export const generateMockData = (): GlobalStats => {
 
   // Generate result statistics
   const resultStats = [
-    { result: 'F', count: Math.floor(Math.random() * 5000) + 1000, trend: Math.floor(Math.random() * 20) - 10 },
-    { result: 'L', count: Math.floor(Math.random() * 5000) + 1000, trend: Math.floor(Math.random() * 20) - 10 },
-    { result: 'A', count: Math.floor(Math.random() * 5000) + 1000, trend: Math.floor(Math.random() * 20) - 10 },
-    { result: 'M', count: Math.floor(Math.random() * 5000) + 1000, trend: Math.floor(Math.random() * 20) - 10 },
-    { result: 'E', count: Math.floor(Math.random() * 5000) + 1000, trend: Math.floor(Math.random() * 20) - 10 },
-    { result: 'S', count: Math.floor(Math.random() * 5000) + 1000, trend: Math.floor(Math.random() * 20) - 10 },
+    {
+      result: 'F' as FlamesResult,
+      count: Math.floor(Math.random() * 5000) + 1000,
+      trend: Math.floor(Math.random() * 20) - 10,
+    },
+    {
+      result: 'L' as FlamesResult,
+      count: Math.floor(Math.random() * 5000) + 1000,
+      trend: Math.floor(Math.random() * 20) - 10,
+    },
+    {
+      result: 'A' as FlamesResult,
+      count: Math.floor(Math.random() * 5000) + 1000,
+      trend: Math.floor(Math.random() * 20) - 10,
+    },
+    {
+      result: 'M' as FlamesResult,
+      count: Math.floor(Math.random() * 5000) + 1000,
+      trend: Math.floor(Math.random() * 20) - 10,
+    },
+    {
+      result: 'E' as FlamesResult,
+      count: Math.floor(Math.random() * 5000) + 1000,
+      trend: Math.floor(Math.random() * 20) - 10,
+    },
+    {
+      result: 'S' as FlamesResult,
+      count: Math.floor(Math.random() * 5000) + 1000,
+      trend: Math.floor(Math.random() * 20) - 10,
+    },
   ].sort((a, b) => b.count - a.count);
 
   // Generate popular pairs
@@ -72,6 +96,7 @@ export const generateMockData = (): GlobalStats => {
     popularNames,
     resultStats,
     popularPairs,
+    regionalStats: null,
   };
 };
 

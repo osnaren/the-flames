@@ -19,7 +19,7 @@ export default function FlamesCounter({ remainingLetters, onResult }: FlamesCoun
 
     setIsAnimating(true);
     let count = currentCount;
-    let step = currentStep;
+    const step = currentStep;
 
     const interval = setInterval(() => {
       count = (count + 1) % flames.length;
