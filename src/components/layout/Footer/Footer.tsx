@@ -1,14 +1,13 @@
-import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import Logo from '@components/ui/Logo';
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { ExternalLink, Heart, Sparkles, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FOOTER_CONFIG } from './config';
 import type { FooterLinkProps } from './types';
 
 export default function Footer() {
-  const { shouldAnimate } = useAnimationPreferences();
-  const prefersReducedMotion = useReducedMotion();
+  const { shouldAnimate, prefersReducedMotion } = useAnimationPreferences();
   const { scrollYProgress } = useScroll();
 
   // Enhanced scroll-based effects

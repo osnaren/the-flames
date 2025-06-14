@@ -1,5 +1,6 @@
 import Logo from '@components/ui/Logo';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
+import { AnimatePresence, motion } from 'framer-motion';
 import { BarChart3, BookOpen, Flame, Wand2, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +14,7 @@ interface MobileMenuProps {
 
 export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProps) {
   const navigate = useNavigate();
-  const prefersReducedMotion = useReducedMotion();
+  const { prefersReducedMotion } = useAnimationPreferences();
   const menuRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
