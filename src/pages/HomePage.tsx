@@ -116,6 +116,7 @@ function HomePage() {
                 setAnonymous={setAnonymous}
                 stage={stage}
                 isCollapsing={isProcessing}
+                isProcessing={isProcessing}
               />
             </motion.div>
           )}

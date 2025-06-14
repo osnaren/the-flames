@@ -113,7 +113,7 @@ export function validateName(name: string): ValidationResult {
     ) {
       result.warnings.push('Name contains emoji characters');
     }
-  } catch (error) {
+  } catch (_error) {
     result.errors.push('Validation failed due to an unexpected error');
     result.isValid = false;
   }

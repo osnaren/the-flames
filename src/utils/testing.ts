@@ -37,6 +37,7 @@ export interface TestResult {
   passed: boolean;
   error?: string;
   duration?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   result?: any;
 }
 
@@ -58,7 +59,7 @@ export function testValidation(): TestResult[] {
   const results: TestResult[] = [];
 
   // Test valid names
-  TEST_CASES.valid.forEach(({ name1, name2 }, index) => {
+  TEST_CASES.valid.forEach(({ name1, name2 }, _index) => {
     const start = performance.now();
     try {
       const result = validateFlamesInput(name1, name2);
@@ -79,7 +80,7 @@ export function testValidation(): TestResult[] {
   });
 
   // Test invalid names
-  TEST_CASES.invalid.forEach(({ name1, name2 }, index) => {
+  TEST_CASES.invalid.forEach(({ name1, name2 }, _index) => {
     const start = performance.now();
     try {
       const result = validateFlamesInput(name1, name2);
@@ -200,7 +201,7 @@ export async function testFlamesApi(): Promise<TestResult[]> {
  * Performance benchmark for validation
  */
 export function benchmarkValidation(testLevel: keyof typeof PERFORMANCE_TESTS = 'medium'): BenchmarkResult {
-  const { iterations, maxTime } = PERFORMANCE_TESTS[testLevel];
+  const { iterations, maxTime: maximumAllowedTime } = PERFORMANCE_TESTS[testLevel];
   const testCase = TEST_CASES.valid[0];
   const times: number[] = [];
 
@@ -236,8 +237,8 @@ export function benchmarkValidation(testLevel: keyof typeof PERFORMANCE_TESTS = 
     totalTime,
     averageTime,
     minTime,
-    maxTime,
-    passed: totalTime <= maxTime,
+    maxTime: maximumAllowedTime,
+    passed: totalTime <= maximumAllowedTime,
   };
 }
 
@@ -245,7 +246,7 @@ export function benchmarkValidation(testLevel: keyof typeof PERFORMANCE_TESTS = 
  * Performance benchmark for FLAMES calculation
  */
 export function benchmarkFlamesCalculation(testLevel: keyof typeof PERFORMANCE_TESTS = 'medium'): BenchmarkResult {
-  const { iterations, maxTime } = PERFORMANCE_TESTS[testLevel];
+  const { iterations, maxTime: maximumAllowedTime } = PERFORMANCE_TESTS[testLevel];
   const testCase = TEST_CASES.valid[0];
   const times: number[] = [];
 
@@ -281,8 +282,8 @@ export function benchmarkFlamesCalculation(testLevel: keyof typeof PERFORMANCE_T
     totalTime,
     averageTime,
     minTime,
-    maxTime,
-    passed: totalTime <= maxTime,
+    maxTime: maximumAllowedTime,
+    passed: totalTime <= maximumAllowedTime,
   };
 }
 

@@ -24,6 +24,7 @@ interface FlamesEngineState {
     flamesAnimationComplete: boolean;
     resultRevealed: boolean;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   newlyUnlockedBadges: any[];
 }
 
@@ -32,6 +33,7 @@ interface FlamesEngineActions {
   setName2: (name: string) => void;
   handleSubmit: (e: React.FormEvent) => void;
   resetGame: () => void;
+  resetProcessingState: () => void;
   setAnonymous: (value: boolean) => void;
   onCommonLettersComplete: () => void;
   onFlamesAnimationComplete: () => void;
@@ -159,7 +161,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       setCommonLetters(gameCommon);
       setStageProgress((prev) => ({ ...prev, commonLettersRevealed: true }));
 
-      // Progress to FLAMES animation after common letters are processed
+      // The common letters will stay visible, but we'll start the FLAMES animation after a delay
       addTimeout(
         () => {
           setStageProgress((prev) => ({ ...prev, flamesAnimationStarted: true }));
@@ -181,7 +183,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
         addPairing(name1, name2, gameResult, anonymous);
       }
 
-      // Progress to result reveal
+      // Give some time to see the final FLAMES letter before moving to result stage
       addTimeout(
         () => {
           setStageProgress((prev) => ({ ...prev, resultRevealed: true }));
@@ -219,19 +221,21 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       e.preventDefault();
 
       // Prevent multiple submissions
-      if (processingRef.current) return;
+      if (processingRef.current || isProcessing) {
+        return;
+      }
 
       try {
-        // Validate inputs
-        const validName1 = nameSchema.parse(name1);
-        const validName2 = nameSchema.parse(name2);
+        // Validate inputs first
+        const validName1 = nameSchema.parse(name1.trim());
+        const validName2 = nameSchema.parse(name2.trim());
 
         if (validName1.toLowerCase() === validName2.toLowerCase()) {
           toast.error('Names cannot be the same!');
           return;
         }
 
-        // Set processing state
+        // Set processing state immediately after validation passes
         processingRef.current = true;
         setIsProcessing(true);
         clearAll();
@@ -273,8 +277,12 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
           shouldAnimate ? STAGE_TIMINGS.FORM_COLLAPSE : 100
         );
       } catch (error) {
+        // Reset processing state on any error
         processingRef.current = false;
         setIsProcessing(false);
+
+        // Clear any pending timeouts
+        clearAll();
 
         if (error instanceof z.ZodError) {
           toast.error(error.errors[0].message);
@@ -289,6 +297,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       name2,
       anonymous,
       shouldAnimate,
+      isProcessing,
       clearAll,
       addTimeout,
       updateUrlParams,
@@ -323,6 +332,15 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
     // Clear URL params
     setSearchParams({}, { replace: true });
   }, [clearAll, setSearchParams]);
+
+  /**
+   * Force reset processing state - useful for when form validation fails
+   */
+  const resetProcessingState = useCallback(() => {
+    processingRef.current = false;
+    setIsProcessing(false);
+    clearAll();
+  }, [clearAll]);
 
   // Safety timeout to prevent getting stuck
   useEffect(() => {
@@ -375,6 +393,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       setName2: handleSetName2,
       handleSubmit,
       resetGame,
+      resetProcessingState,
       setAnonymous,
       onCommonLettersComplete,
       onFlamesAnimationComplete,
@@ -385,6 +404,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       handleSetName2,
       handleSubmit,
       resetGame,
+      resetProcessingState,
       setAnonymous,
       onCommonLettersComplete,
       onFlamesAnimationComplete,
