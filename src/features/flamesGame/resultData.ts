@@ -1,28 +1,5 @@
 import { BellRing, Heart, Star, Sword, Users } from 'lucide-react';
-import React from 'react';
-import { FlamesResult } from './flames.types';
-
-export interface ResultData {
-  text: string;
-  icon: React.ElementType;
-  color: string;
-  onColor: string;
-  glowColor: string;
-  confetti: {
-    colors: string[];
-    emojis: string[];
-    strength: number;
-    duration: number;
-    spread: number;
-  };
-  emoji: string;
-  particleCount: number;
-  accessibilityLabel: string;
-  quote: string;
-  endText: string;
-}
-
-export type NonNullFlamesResult = Exclude<FlamesResult, null>;
+import { FlamesResult, NonNullFlamesResult, ResultData } from './flames.types';
 
 export const resultData: Record<NonNullFlamesResult, ResultData> = {
   F: {

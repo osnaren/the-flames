@@ -1,365 +1,344 @@
-import { motion } from 'framer-motion';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import toast from 'react-hot-toast';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowLeft, Heart, RotateCcw, Share2, Sparkles } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 
-import ShareActions from '@components/homepage/ShareActions';
-import ParticleBackground from '@components/ui/ParticleBackground';
-import { FlamesResult } from '@features/flamesGame/flames.types';
-import { getResultData } from '@features/flamesGame/resultData';
+import ConfettiEffect from '@/components/ui/ConfettiEffect/ConfettiEffect';
+import ResultGlow from '@/components/ui/ResultGlow/ResultGlow';
+import { FlamesResult, GameStage } from '@features/flamesGame/flames.types';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
-import Button from '@ui/Button';
-import { Wand2, X } from 'lucide-react';
+import { useStaggeredAnimation } from '@hooks/useStaggeredAnimation';
 
 interface ResultCardProps {
-  name1: string;
-  name2: string;
   result: FlamesResult;
-  shouldAnimate: boolean;
-  onReset: () => void;
-  onShare: () => void;
-  onCopyLink: () => void;
+  stage: GameStage;
+  name1?: string;
+  name2?: string;
+  onRetry: () => void;
+  onNavigateToManual?: () => void;
+  onNavigateToStats?: () => void;
 }
+
+// Animation stages configuration
+const ANIMATION_STAGES = ['entry', 'icon', 'title', 'description', 'quote', 'actions'];
+const ANIMATION_DELAYS = [300, 600, 900, 1200, 1500, 1800];
+
+// Utility functions for result data
+const getFlamesDescription = (result: FlamesResult, name1?: string, name2?: string): string => {
+  const names = name1 && name2 ? `<strong>${name1}</strong> and <strong>${name2}</strong>` : 'You two';
+
+  switch (result) {
+    case 'F':
+      return `${names} are destined to be great friends! Your connection is built on trust, understanding, and mutual respect.`;
+    case 'L':
+      return `${names} share a deep romantic love! Your hearts beat as one, creating a beautiful love story.`;
+    case 'A':
+      return `${names} have a warm affection for each other! There's a special fondness and care in your relationship.`;
+    case 'M':
+      return `${names} are meant for marriage! Your souls are perfectly aligned for a lifetime of happiness together.`;
+    case 'E':
+      return `${names} have some conflicts to resolve. But remember, even enemies can become friends with understanding.`;
+    case 'S':
+      return `${names} share a sibling-like bond! Your relationship is filled with care, protection, and family-like love.`;
+    default:
+      return `${names} have a special connection that's unique and wonderful in its own way.`;
+  }
+};
+
+const getFlamesQuote = (result: FlamesResult): string => {
+  switch (result) {
+    case 'F':
+      return 'Friendship is the only cement that will ever hold the world together.';
+    case 'L':
+      return 'Love is not about how many days, months, or years you have been together. It is about how much you love each other every single day.';
+    case 'A':
+      return 'Affection is responsible for nine-tenths of whatever solid and durable happiness there is in our lives.';
+    case 'M':
+      return 'A successful marriage requires falling in love many times, always with the same person.';
+    case 'E':
+      return 'The best way to destroy an enemy is to make him a friend.';
+    case 'S':
+      return 'Siblings are the people we practice on, the people who teach us about fairness and cooperation.';
+    default:
+      return 'Every relationship teaches us something valuable about life and love.';
+  }
+};
 
 /**
  * Component for displaying the FLAMES result with enhanced animations and effects
  */
-export function ResultCard({ name1, name2, result, shouldAnimate, onReset, onShare, onCopyLink }: ResultCardProps) {
-  const resultActionsRef = useRef<HTMLDivElement>(null);
-  const [hasEntered, setHasEntered] = useState(false);
-  const { shouldAnimate: userPreferredAnimations } = useAnimationPreferences();
+export function ResultCard({
+  result,
+  stage,
+  name1,
+  name2,
+  onRetry,
+  onNavigateToManual,
+  onNavigateToStats,
+}: ResultCardProps) {
+  const { shouldAnimate } = useAnimationPreferences();
 
-  // Combine prop-based animation flag with user preferences
-  const shouldUseAnimations = shouldAnimate && userPreferredAnimations;
+  // Use the staggered animation hook
+  const { stageCompleted, hasStarted, startAnimation, resetAnimation } = useStaggeredAnimation({
+    stages: ANIMATION_STAGES,
+    delays: ANIMATION_DELAYS,
+    shouldAnimate,
+  });
 
-  // Track when animations have completed for additional effects
+  // Track the visible state for the container
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Start animation when component becomes visible
   useEffect(() => {
-    if (shouldUseAnimations) {
-      const timer = setTimeout(() => {
-        setHasEntered(true);
-      }, 800);
-      return () => clearTimeout(timer);
-    } else {
-      setHasEntered(true);
+    if (stage === 'result' && result && !hasStarted) {
+      setIsVisible(true);
+      startAnimation();
+    } else if (stage !== 'result') {
+      setIsVisible(false);
+      resetAnimation();
     }
-  }, [shouldUseAnimations]);
+  }, [stage, result, hasStarted, startAnimation, resetAnimation]);
 
-  // Get all styling and content info for this result
-  const visualConfig = useMemo(() => getResultData(result), [result]);
-
-  // Destructure commonly used properties for better readability
-  const {
-    color,
-    onColor,
-    glowColor,
-    icon: ResultIcon,
-    quote,
-    accessibilityLabel,
-    particleCount,
-    endText,
-  } = visualConfig;
-
-  // Get the text representation of the result for CSS variable lookup
-  const resultText = useMemo(() => {
-    if (!result) return '';
-
+  const getResultIcon = useCallback(() => {
     switch (result) {
-      case 'F':
-        return 'friendship';
       case 'L':
-        return 'love';
-      case 'A':
-        return 'affection';
+        return Heart;
       case 'M':
-        return 'marriage';
-      case 'E':
-        return 'enemy';
-      case 'S':
-        return 'siblings';
+        return Heart;
       default:
-        return '';
+        return Sparkles;
     }
   }, [result]);
 
-  // Function to handle transparency for CSS variables properly
-  const withOpacity = useCallback((color: string, opacity: number) => {
-    if (color.startsWith('var(--')) {
-      return `color-mix(in srgb, ${color}, transparent ${100 - opacity}%)`;
-    } else if (color.startsWith('rgba(')) {
-      return color.replace(/[\d.]+\)$/, `${opacity / 100})`);
-    } else {
-      return `${color}${Math.round(opacity * 2.55)
-        .toString(16)
-        .padStart(2, '0')}`;
-    }
-  }, []);
-
-  // Get the result text to display (Friendship, Love, etc.)
-  const resultDisplayText = useMemo(() => {
-    if (!result) return '';
-
+  const getResultColor = useCallback(() => {
     switch (result) {
-      case 'F':
-        return 'Friendship';
       case 'L':
-        return 'Love';
+        return 'from-pink-500 to-rose-500';
       case 'A':
-        return 'Affection';
+        return 'from-amber-500 to-orange-500';
       case 'M':
-        return 'Marriage';
+        return 'from-emerald-500 to-green-500';
       case 'E':
-        return 'Enemy';
+        return 'from-red-500 to-red-600';
+      case 'F':
+        return 'from-blue-500 to-indigo-500';
       case 'S':
-        return 'Siblings';
+        return 'from-purple-500 to-violet-500';
       default:
-        return '';
+        return 'from-gray-500 to-gray-600';
     }
   }, [result]);
 
-  // Show manual mode notification
-  const showManualMode = useCallback(() => {
-    toast('Manual Mode coming soon!', {
-      icon: '🔮',
-      duration: 3000,
-    });
-  }, []);
+  const handleShare = useCallback(() => {
+    const text = name1 && name2 ? `${name1} + ${name2} = ${result}! 💕` : `My FLAMES result is ${result}! 💕`;
 
-  // Animation variants - memoized to prevent recalculations
-  const animations = useMemo(() => {
-    const simplified = !shouldUseAnimations;
+    if (navigator.share) {
+      navigator
+        .share({
+          title: 'FLAMES Game Result',
+          text,
+          url: window.location.href,
+        })
+        .catch(() => {
+          // Fallback for browsers that don't support Web Share API
+          navigator.clipboard?.writeText(`${text} ${window.location.href}`);
+        });
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      navigator.clipboard?.writeText(`${text} ${window.location.href}`);
+    }
+  }, [result, name1, name2]);
 
-    return {
-      containerVariants: {
-        hidden: { opacity: 0 },
-        visible: {
-          opacity: 1,
-          transition: {
-            when: 'beforeChildren',
-            staggerChildren: simplified ? 0 : 0.1,
-            duration: 0.4,
-            ease: 'easeOut',
-          },
-        },
-      },
+  // Early return if not in result stage or no result
+  if (stage !== 'result' || !result) {
+    return null;
+  }
 
-      itemVariants: {
-        hidden: simplified ? { opacity: 0 } : { y: 15, opacity: 0, scale: 0.95 },
-        visible: {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          transition: {
-            type: simplified ? 'tween' : 'spring',
-            stiffness: 400,
-            damping: 17,
-            mass: 0.8,
-            duration: simplified ? 0.3 : undefined,
-          },
-        },
-      },
-
-      iconAnimation: simplified
-        ? {}
-        : {
-            scale: [1, 1.08, 1],
-            rotate: [0, 2, 0, -2, 0],
-            filter: [
-              `drop-shadow(0 0 4px ${withOpacity(color, 50)})`,
-              `drop-shadow(0 0 8px ${withOpacity(color, 70)})`,
-              `drop-shadow(0 0 4px ${withOpacity(color, 50)})`,
-            ],
-          },
-    };
-  }, [shouldUseAnimations, color, withOpacity]);
-
-  // Names highlighting animation
-  const nameHighlightAnimation = useMemo(() => {
-    if (!hasEntered || !shouldUseAnimations) return {};
-
-    return {
-      color: [color, 'var(--md-color-on-surface-variant)', color],
-    };
-  }, [hasEntered, shouldUseAnimations, color]);
-
-  // Create background gradient style
-  const cardGradientStyle = useMemo(() => {
-    if (!result) return {};
-
-    return {
-      background: `
-        radial-gradient(circle at 50% 0%, ${withOpacity(color, 15)} 0%, transparent 50%),
-        radial-gradient(circle at 100% 100%, ${withOpacity(color, 20)} 0%, transparent 40%)
-      `,
-      boxShadow: shouldUseAnimations ? `0 0 30px -5px ${withOpacity(color, 30)}` : undefined,
-    };
-  }, [result, color, shouldUseAnimations, withOpacity]);
+  const isResultPositive = result === 'L' || result === 'A' || result === 'M';
+  const description = getFlamesDescription(result, name1, name2);
+  const quote = getFlamesQuote(result);
+  const ResultIcon = getResultIcon();
+  const resultColor = getResultColor();
 
   return (
-    <motion.div
-      className="bg-surface relative mt-8 overflow-hidden rounded-xl p-5 text-center shadow-xl md:mt-12 md:p-8"
-      initial={shouldUseAnimations ? { opacity: 0, y: 20, scale: 0.97 } : { opacity: 1, y: 0, scale: 1 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{
-        type: 'spring',
-        stiffness: 300,
-        damping: 24,
-        delay: shouldUseAnimations ? 0.2 : 0,
-      }}
-      aria-live="polite"
-      role="region"
-      aria-label={accessibilityLabel}
-      style={{
-        ...cardGradientStyle,
-        willChange: shouldUseAnimations ? 'transform, opacity' : undefined,
-      }}
-    >
-      {/* Enhanced subtle glow effect */}
-      {hasEntered && (
-        <div
-          className="absolute inset-0 -z-10 overflow-hidden rounded-xl opacity-80"
-          style={{
-            background: `radial-gradient(circle at 50% 30%, ${withOpacity(color, 15)} 0%, transparent 70%)`,
-          }}
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Floating particles using the new ParticleBackground component */}
-      {hasEntered && shouldUseAnimations && (
-        <ParticleBackground color={glowColor} particleCount={Math.floor(particleCount / 12)} enabled={true} />
-      )}
-
-      <motion.div className="relative z-10" variants={animations.containerVariants} initial="hidden" animate="visible">
-        {/* Enhanced icon with animation and glow effects */}
-        <motion.div className="relative mb-6 md:mb-8" variants={animations.itemVariants}>
-          {ResultIcon && (
-            <motion.div
-              className="relative"
-              animate={animations.iconAnimation}
-              transition={{
-                duration: 6,
-                ease: 'easeInOut',
-                repeat: Infinity,
-                repeatType: 'reverse',
-              }}
-            >
-              {/* Improved pulsing background for icon with larger radius */}
-              {shouldUseAnimations && (
-                <motion.div
-                  className="absolute -inset-4 -z-10 rounded-full opacity-50"
-                  animate={{
-                    scale: [1, 1.8, 1],
-                    opacity: [0.2, 0.5, 0.2],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                  style={{
-                    background: `radial-gradient(circle at center, ${color} 0%, transparent 70%)`,
-                    filter: 'blur(12px)',
-                  }}
-                />
-              )}
-
-              <ResultIcon
-                className="mx-auto h-16 w-16 md:h-24 md:w-24"
-                style={{
-                  color: color,
-                  filter: shouldUseAnimations ? `drop-shadow(0 0 8px ${withOpacity(glowColor, 60)})` : undefined,
-                }}
-                aria-hidden="true"
-              />
-            </motion.div>
-          )}
-        </motion.div>
-
-        {/* Result title with enhanced text shadow and result-specific colors */}
-        <motion.h2
-          className="mb-3 text-2xl font-bold md:mb-4 md:text-3xl"
-          variants={animations.itemVariants}
-          style={{
-            color: `var(--md-color-on-${resultText}-container)`,
-            textShadow: hasEntered && shouldUseAnimations ? `0 0 12px ${withOpacity(color, 40)}` : 'none',
-          }}
-        >
-          {resultDisplayText}
-        </motion.h2>
-
-        {/* Result description with highlighted names */}
-        <motion.p className="text-on-surface-variant mb-5 md:mb-6" variants={animations.itemVariants}>
-          <motion.span
-            className="font-medium"
-            animate={nameHighlightAnimation}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            {name1}
-          </motion.span>{' '}
-          and{' '}
-          <motion.span
-            className="font-medium"
-            animate={nameHighlightAnimation}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-          >
-            {name2}
-          </motion.span>{' '}
-          are destined to be{' '}
-          <span className="font-semibold" style={{ color: onColor }}>
-            {endText || resultDisplayText.toLowerCase()}!
-          </span>
-        </motion.p>
-
-        {/* Quote with enhanced styling and subtle background */}
+    <AnimatePresence>
+      {isVisible && (
         <motion.div
-          className="bg-surface-container text-on-surface-variant mb-6 rounded-lg p-3 text-sm italic md:mb-8 md:p-4"
-          variants={animations.itemVariants}
-          style={{
-            boxShadow: `0 0 10px rgba(0,0,0,0.04)`,
-            border: `1px solid ${withOpacity(color, 20)}`,
+          initial={{ opacity: 0, y: 50, scale: 0.9 }}
+          animate={{
+            opacity: stageCompleted.entry ? 1 : 0,
+            y: stageCompleted.entry ? 0 : 50,
+            scale: stageCompleted.entry ? 1 : 0.9,
           }}
+          exit={{ opacity: 0, y: -50, scale: 0.9 }}
+          transition={{
+            type: 'spring',
+            stiffness: 300,
+            damping: 30,
+            duration: shouldAnimate ? 0.6 : 0,
+          }}
+          className="relative mx-auto mt-8 w-full max-w-md"
         >
-          <motion.span
-            initial={{ opacity: hasEntered ? 0 : 1 }}
-            animate={hasEntered && shouldUseAnimations ? { opacity: [0.5, 1, 0.5] } : { opacity: 1 }}
-            transition={{ duration: 4, repeat: Infinity, repeatType: 'reverse' }}
-            style={{ color: color }}
-          >
-            "
-          </motion.span>
-          {quote}
-          <motion.span
-            initial={{ opacity: hasEntered ? 0 : 1 }}
-            animate={hasEntered && shouldUseAnimations ? { opacity: [0.5, 1, 0.5] } : { opacity: 1 }}
-            transition={{ duration: 4, repeat: Infinity, repeatType: 'reverse' }}
-            style={{ color: color }}
-          >
-            "
-          </motion.span>
-        </motion.div>
+          {/* Result Glow Effect - with correct props */}
+          <ResultGlow result={result} isVisible={stageCompleted.entry} />
 
-        {/* Action buttons with enhanced animations */}
-        <motion.div className="grid gap-2 md:gap-3" variants={animations.itemVariants} ref={resultActionsRef}>
-          <div className="mb-2 grid grid-cols-2 gap-2 md:mb-3 md:gap-3">
-            <Button onClick={onReset} variant="secondary" icon={X} fullWidth>
-              Try Again
-            </Button>
+          {/* Confetti Effect for positive results - with correct props */}
+          {isResultPositive && stageCompleted.entry && <ConfettiEffect result={result} isActive={true} />}
 
-            <Button
-              onClick={showManualMode}
-              variant="purple"
-              icon={Wand2}
-              aria-label="Try the manual calculation mode"
-              fullWidth
-            >
-              Manual Mode
-            </Button>
+          {/* Main Card */}
+          <div className="relative overflow-hidden rounded-2xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-black/20">
+            {/* Animated gradient background */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${resultColor} opacity-5`} />
+
+            {/* Content */}
+            <div className="relative p-8 text-center">
+              {/* Icon */}
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{
+                  scale: stageCompleted.icon ? 1 : 0,
+                  rotate: stageCompleted.icon ? 0 : -180,
+                }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 200,
+                  damping: 15,
+                  duration: shouldAnimate ? 0.8 : 0,
+                }}
+                className="mx-auto mb-6"
+              >
+                <div className={`relative h-20 w-20 rounded-full bg-gradient-to-br ${resultColor} p-4 shadow-lg`}>
+                  {/* Multi-layered glow effect */}
+                  <div
+                    className={`absolute inset-0 rounded-full bg-gradient-to-br ${resultColor} opacity-50 blur-md`}
+                  />
+                  <div
+                    className={`absolute inset-1 rounded-full bg-gradient-to-br ${resultColor} opacity-30 blur-sm`}
+                  />
+
+                  <ResultIcon className="relative z-10 h-full w-full text-white" />
+                </div>
+              </motion.div>
+
+              {/* Result Title */}
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                animate={{
+                  opacity: stageCompleted.title ? 1 : 0,
+                  y: stageCompleted.title ? 0 : 20,
+                }}
+                transition={{
+                  duration: shouldAnimate ? 0.6 : 0,
+                  ease: 'easeOut',
+                }}
+                className={`mb-4 bg-gradient-to-r text-4xl font-bold ${resultColor} bg-clip-text text-transparent`}
+              >
+                {result === 'F'
+                  ? 'FRIENDSHIP'
+                  : result === 'L'
+                    ? 'LOVE'
+                    : result === 'A'
+                      ? 'AFFECTION'
+                      : result === 'M'
+                        ? 'MARRIAGE'
+                        : result === 'E'
+                          ? 'ENEMY'
+                          : result === 'S'
+                            ? 'SISTER'
+                            : result}
+              </motion.h2>
+
+              {/* Description */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{
+                  opacity: stageCompleted.description ? 1 : 0,
+                  y: stageCompleted.description ? 0 : 20,
+                }}
+                transition={{
+                  duration: shouldAnimate ? 0.6 : 0,
+                  ease: 'easeOut',
+                  delay: shouldAnimate ? 0.1 : 0,
+                }}
+                className="mb-6 leading-relaxed text-gray-700 dark:text-gray-300"
+                dangerouslySetInnerHTML={{ __html: description }}
+              />
+
+              {/* Quote */}
+              <motion.blockquote
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{
+                  opacity: stageCompleted.quote ? 1 : 0,
+                  scale: stageCompleted.quote ? 1 : 0.9,
+                }}
+                transition={{
+                  duration: shouldAnimate ? 0.6 : 0,
+                  ease: 'easeOut',
+                  delay: shouldAnimate ? 0.2 : 0,
+                }}
+                className="mb-8 rounded-lg border border-white/10 bg-white/5 p-4 text-gray-600 italic dark:border-white/5 dark:bg-black/10 dark:text-gray-400"
+              >
+                "{quote}"
+              </motion.blockquote>
+
+              {/* Action Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{
+                  opacity: stageCompleted.actions ? 1 : 0,
+                  y: stageCompleted.actions ? 0 : 30,
+                }}
+                transition={{
+                  duration: shouldAnimate ? 0.6 : 0,
+                  ease: 'easeOut',
+                  delay: shouldAnimate ? 0.3 : 0,
+                }}
+                className="flex flex-wrap justify-center gap-3"
+              >
+                {/* Try Again Button */}
+                <button
+                  onClick={onRetry}
+                  className="flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-blue-600 hover:to-purple-700 hover:shadow-lg"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Try Again
+                </button>
+
+                {/* Share Button */}
+                <button
+                  onClick={handleShare}
+                  className="flex items-center gap-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-green-600 hover:to-emerald-700 hover:shadow-lg"
+                >
+                  <Share2 className="h-4 w-4" />
+                  Share
+                </button>
+
+                {/* Manual Mode Button */}
+                {onNavigateToManual && (
+                  <button
+                    onClick={onNavigateToManual}
+                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-amber-600 hover:to-orange-700 hover:shadow-lg"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Manual Mode
+                  </button>
+                )}
+
+                {/* Global Charts Button */}
+                {onNavigateToStats && (
+                  <button
+                    onClick={onNavigateToStats}
+                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-500 to-blue-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-indigo-600 hover:to-blue-700 hover:shadow-lg"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Global Charts
+                  </button>
+                )}
+              </motion.div>
+            </div>
           </div>
-
-          {/* Using the ShareActions component */}
-          <ShareActions onShare={onShare} onCopyLink={onCopyLink} result={result} />
         </motion.div>
-      </motion.div>
-    </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 

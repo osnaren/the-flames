@@ -40,7 +40,7 @@ export interface GlobalStats {
 
 export interface ResultInfo {
   text: string;
-  icon: LucideIcon;
+  icon: typeof LucideIcon;
   color: string;
   bgColor: string;
 }

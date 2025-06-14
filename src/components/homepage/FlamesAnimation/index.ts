@@ -1,0 +1,1 @@
+export { FlamesAnimation } from './FlamesAnimation';
