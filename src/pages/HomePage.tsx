@@ -1,66 +1,56 @@
-import { FlamesResult } from '@features/flamesGame/flames.types';
-import { calculateFlamesResult, findCommonLetters, nameSchema } from '@features/flamesGame/flames.utils';
-import { getResultData } from '@features/flamesGame/resultData';
 import { useFlamesEngine } from '@features/flamesGame/useFlamesEngine';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { useShareActions } from '@hooks/useShareActions';
-import AmbientGlow from '@ui/AmbientGlow';
-import ConfettiEffect from '@ui/ConfettiEffect';
-import ParticleBackground from '@ui/ParticleBackground';
-import SharePopover from '@ui/SharePopover';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useCallback, useEffect, useRef } from 'react';
-import toast from 'react-hot-toast';
-import { useSearchParams } from 'react-router-dom';
-import { z } from 'zod';
 
-// Import modular components
+// Import new components
+import { CommonLettersStrike } from '@components/homepage/CommonLettersStrike';
+import { FlamesAnimation } from '@components/homepage/FlamesAnimation';
 import InputForm from '@components/homepage/InputForm';
-import ProcessingView from '@components/homepage/ProcessingView';
 import ResultCard from '@components/homepage/ResultCard';
+import DynamicBackground from '@components/ui/DynamicBackground';
+import ConfettiEffect from '@ui/ConfettiEffect';
+import SharePopover from '@ui/SharePopover';
 
 /**
- * Main HomePage component
- * Acts as a container/orchestrator for the FLAMES application
+ * Completely revamped HomePage with streamlined architecture
+ * Features centralized stage management, instant calculations, and enhanced animations
  */
 function HomePage() {
-  // Get URL search parameters
-  const [searchParams] = useSearchParams();
-
-  // Animation preferences using our custom hook
+  // Animation preferences
   const { shouldAnimate } = useAnimationPreferences();
 
   // References for scrolling and layout
   const resultCardRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const processingContainerRef = useRef<HTMLDivElement>(null);
 
   // FLAMES game engine state and actions
   const [
-    { name1, name2, result, stage, commonLetters, anonymous, isSlotMachineAnimating },
-    { setName1, setName2, handleSubmit, resetGame, setAnonymous },
+    { name1, name2, result, stage, commonLetters, remainingLetters, anonymous, isProcessing, stageProgress },
+    {
+      setName1,
+      setName2,
+      handleSubmit,
+      resetGame,
+      setAnonymous,
+      onCommonLettersComplete,
+      onFlamesAnimationComplete,
+      onResultReveal,
+    },
   ] = useFlamesEngine();
 
-  // Share functionality using our custom hook
+  // Share functionality
   const { isSharePopoverOpen, setIsSharePopoverOpen, handleShare, handleCopyLink } = useShareActions(
     name1,
     name2,
     result
   );
 
-  // Effect to handle timing between animations
-  useEffect(() => {
-    if (stage === 'processing' && !isSlotMachineAnimating && result) {
-      // Short delay before transitioning to result stage
-      // This is handled internally by the useFlamesEngine hook
-    }
-  }, [stage, isSlotMachineAnimating, result]);
-
-  // Scroll to results when they appear with a proper delay
+  // Scroll to results when they appear
   useEffect(() => {
     if (stage === 'result' && resultCardRef.current) {
-      // Wait for animations to complete before scrolling
-      const scrollDelay = shouldAnimate ? 1000 : 100;
+      const scrollDelay = shouldAnimate ? 1500 : 300;
       const timer = setTimeout(() => {
         resultCardRef.current?.scrollIntoView({
           behavior: 'smooth',
@@ -71,130 +61,62 @@ function HomePage() {
     }
   }, [stage, shouldAnimate]);
 
-  // Handle URL parameters on component mount
-  useEffect(() => {
-    if (stage !== 'input') {
-      // Skip if we're already past the input stage
-      return;
-    }
-
-    const urlName1 = searchParams.get('name1');
-    const urlName2 = searchParams.get('name2');
-
-    // If both names are present in the URL, process them
-    if (urlName1 && urlName2) {
-      try {
-        // Validate the names
-        const validName1 = nameSchema.parse(urlName1);
-        const validName2 = nameSchema.parse(urlName2);
-
-        // Check if names are not identical
-        if (validName1.toLowerCase() === validName2.toLowerCase()) {
-          toast.error('Names cannot be the same!');
-          return;
-        }
-
-        // Set the names in the form
-        setName1(validName1);
-        setName2(validName2);
-
-        // Calculate result and update UI
-        setAnonymous(true); // Default to anonymous for shared links
-
-        // Use a timeout to ensure the UI updates with the names first
-        setTimeout(() => {
-          // Calculate common letters
-          findCommonLetters(validName1, validName2);
-
-          // Calculate result
-          calculateFlamesResult(validName1, validName2);
-
-          // Manually trigger the result flow via handleSubmit
-          const event = new Event('submit') as unknown as React.FormEvent;
-          handleSubmit(event);
-        }, 100);
-      } catch (error) {
-        if (error instanceof z.ZodError) {
-          toast.error('Invalid names in URL');
-        } else {
-          console.error('Error processing URL parameters:', error);
-          toast.error('Something went wrong.');
-        }
-      }
-    }
-  }, [searchParams, stage, setName1, setName2, setAnonymous, handleSubmit]);
-
-  // Memoized form submission handler
+  // Handle form submission with enhanced effects
   const onSubmitForm = useCallback(
     (e: React.FormEvent) => {
-      e.preventDefault();
       handleSubmit(e);
     },
     [handleSubmit]
   );
+
+  // Determine current season for background theming
+  const getCurrentSeason = () => {
+    const month = new Date().getMonth();
+    if (month === 1) return 'valentine'; // February
+    if (month === 9) return 'halloween'; // October
+    if (month === 11) return 'christmas'; // December
+    return undefined;
+  };
 
   return (
     <div
       className="relative flex min-h-screen flex-col items-center justify-center p-4 py-8 md:py-12"
       ref={containerRef}
     >
-      {/* Enhanced ambient background effects */}
-      <AmbientGlow isVisible={stage !== 'result'} />
-      <ParticleBackground
-        enabled={stage === 'input'}
-        className="z-0"
-        particleCount={shouldAnimate ? 15 : 0}
-        color="var(--color-primary-container)"
+      {/* Dynamic background system */}
+      <DynamicBackground
+        variant={stage === 'result' ? 'result' : stage === 'processing' ? 'processing' : 'default'}
+        result={result}
+        season={getCurrentSeason()}
+        intensity="medium"
       />
 
-      {/* Confetti effect - remains active during result stage */}
+      {/* Confetti effect for results */}
       <ConfettiEffect result={result} isActive={stage === 'result'} />
 
-      <div className="w-full max-w-lg">
-        {/* Enhanced header with better visual hierarchy */}
+      <div className="w-full max-w-2xl">
+        {/* Enhanced header with magical effects */}
         <motion.div
           className="mb-8 text-center"
-          initial={shouldAnimate ? { opacity: 0, y: -20 } : { opacity: 1, y: 0 }}
+          initial={shouldAnimate ? { opacity: 0, y: -30 } : { opacity: 1, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
           <h1 className="sr-only">FLAMES - Relationship Calculator</h1>
 
-          {/* Main title with magical effects */}
+          {/* Main title with enhanced effects */}
           <motion.div
-            className="mb-4"
+            className="mb-6"
             animate={
-              shouldAnimate
+              shouldAnimate && stage === 'input'
                 ? {
                     textShadow: [
                       '0 0 20px rgba(var(--color-primary-rgb), 0.3)',
-                      '0 0 30px rgba(var(--color-primary-rgb), 0.5)',
+                      '0 0 40px rgba(var(--color-primary-rgb), 0.6)',
                       '0 0 20px rgba(var(--color-primary-rgb), 0.3)',
                     ],
                   }
                 : {}
-            }
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              repeatType: 'reverse',
-            }}
-          >
-            <h2 className="text-primary dark:text-primary text-4xl font-bold tracking-tight md:text-5xl">
-              F.L.A.M.E.S
-            </h2>
-          </motion.div>
-
-          {/* Enhanced tagline with pulsing glow */}
-          <motion.p
-            className="text-on-surface-variant dark:text-on-surface-variant text-lg font-medium"
-            animate={
-              shouldAnimate
-                ? {
-                    opacity: [0.7, 1, 0.7],
-                    scale: [1, 1.02, 1],
-                  }
-                : { opacity: 1 }
             }
             transition={{
               duration: 4,
@@ -202,45 +124,85 @@ function HomePage() {
               repeatType: 'reverse',
             }}
           >
-            Enter two names and let the sparks fly ✨
+            <h2 className="text-primary dark:text-primary text-5xl font-bold tracking-tight md:text-6xl lg:text-7xl">
+              F.L.A.M.E.S
+            </h2>
+          </motion.div>
+
+          {/* Enhanced tagline */}
+          <motion.p
+            className="text-on-surface-variant dark:text-on-surface-variant text-xl font-medium md:text-2xl"
+            animate={
+              shouldAnimate && stage === 'input'
+                ? {
+                    opacity: [0.7, 1, 0.7],
+                    scale: [1, 1.02, 1],
+                  }
+                : { opacity: 1 }
+            }
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              repeatType: 'reverse',
+            }}
+          >
+            Discover your relationship destiny ✨
           </motion.p>
 
-          {/* Subtle magic sparkle animation */}
+          {/* Floating sparkles */}
           {shouldAnimate && stage === 'input' && (
-            <motion.div
-              className="absolute -top-4 left-1/2 -translate-x-1/2"
-              animate={{
-                y: [-5, -15, -5],
-                opacity: [0, 1, 0],
-                scale: [0.8, 1.2, 0.8],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatDelay: 3,
-              }}
-            >
-              <span className="text-2xl">✨</span>
-            </motion.div>
+            <>
+              {Array.from({ length: 3 }).map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute text-3xl"
+                  style={{
+                    left: `${30 + i * 20}%`,
+                    top: `${-10 + i * 5}%`,
+                  }}
+                  animate={{
+                    y: [-10, -30, -10],
+                    opacity: [0, 1, 0],
+                    scale: [0.8, 1.2, 0.8],
+                    rotate: [0, 180, 360],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    repeatDelay: 2 + i,
+                    delay: i * 0.5,
+                  }}
+                >
+                  ✨
+                </motion.div>
+              ))}
+            </>
           )}
         </motion.div>
 
-        {/* Main content area with AnimatePresence for transitions */}
-        <AnimatePresence mode="sync">
-          {/* Input Stage - Only shown during input stage */}
+        {/* Main content area with stage-based transitions */}
+        <AnimatePresence mode="wait">
+          {/* Input Stage */}
           {stage === 'input' && (
             <motion.div
-              key="input"
-              className="bg-surface/80 border-outline/20 rounded-xl border p-6 shadow-lg backdrop-blur-sm transition-shadow duration-500 md:p-8"
-              initial={shouldAnimate ? { opacity: 0, y: 20, scale: 0.95 } : { opacity: 1, y: 0, scale: 1 }}
+              key="input-stage"
+              initial={shouldAnimate ? { opacity: 0, y: 30, scale: 0.95 } : { opacity: 1, y: 0, scale: 1 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{
-                duration: 0.6,
-                type: 'spring',
-                stiffness: 300,
-                damping: 24,
+              exit={{
+                opacity: 0,
+                y: -50,
+                scale: 0.8,
+                filter: 'blur(8px)',
+                rotateX: 45,
               }}
+              transition={{
+                duration: shouldAnimate ? 0.8 : 0,
+                ease: 'easeInOut',
+                type: 'spring',
+                stiffness: 100,
+                damping: 20,
+              }}
+              style={{ transformStyle: 'preserve-3d' }}
             >
               <InputForm
                 name1={name1}
@@ -251,84 +213,147 @@ function HomePage() {
                 shouldAnimate={shouldAnimate}
                 anonymous={anonymous}
                 setAnonymous={setAnonymous}
+                stage={stage}
+                isCollapsing={isProcessing}
               />
             </motion.div>
           )}
 
-          {/* Shared container for processing and results - This ensures layout consistency */}
-          {(stage === 'processing' || stage === 'result') && (
+          {/* Processing Stage */}
+          {stage === 'processing' && (
             <motion.div
-              key="process-result-container"
-              className="relative"
-              initial={shouldAnimate ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1 }}
+              key="processing-stage"
+              className="space-y-8"
+              initial={shouldAnimate ? { opacity: 0, scale: 0.9 } : { opacity: 1, scale: 1 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              ref={processingContainerRef}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: shouldAnimate ? 0.6 : 0 }}
             >
-              {/* Processing Stage */}
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key="processing"
-                  className="bg-surface/80 border-outline/20 rounded-xl border p-6 shadow-lg backdrop-blur-sm md:p-8"
-                  initial={shouldAnimate ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.98 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <ProcessingView stage={stage} isVisible={stage === 'processing'} />
-                </motion.div>
-              </AnimatePresence>
-
-              {/* Result Card - Positioned absolutely during transition, then normal flow */}
-              <AnimatePresence>
-                {stage === 'result' && (
-                  <motion.div
-                    key="result-card-container"
-                    className="mt-8"
-                    ref={resultCardRef}
-                    initial={shouldAnimate ? { opacity: 0, y: 50, scale: 0.9 } : { opacity: 1, y: 0, scale: 1 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{
-                      duration: 0.8,
-                      delay: 0.2,
-                      type: 'spring',
-                      stiffness: 100,
-                      damping: 15,
-                    }}
-                  >
-                    <ResultCard
+              {/* Processing container */}
+              <motion.div
+                className="bg-surface/90 dark:bg-surface-container/90 border-outline/20 overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-xl"
+                animate={
+                  shouldAnimate
+                    ? {
+                        boxShadow: [
+                          '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                          '0 0 80px rgba(var(--color-primary-rgb), 0.2)',
+                          '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                        ],
+                      }
+                    : {}
+                }
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                {/* Common Letters Strike Phase */}
+                <AnimatePresence mode="wait">
+                  {stageProgress.commonLettersRevealed && !stageProgress.flamesAnimationStarted && (
+                    <CommonLettersStrike
                       name1={name1}
                       name2={name2}
-                      result={result as FlamesResult}
-                      stage={stage}
-                      onRetry={() => {}}
-                      onNavigateToManual={() => {}}
-                      onNavigateToStats={() => {}}
+                      commonLetters={commonLetters}
+                      onComplete={onCommonLettersComplete}
+                      isVisible={true}
                     />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                  )}
+
+                  {/* FLAMES Animation Phase */}
+                  {stageProgress.flamesAnimationStarted && !stageProgress.flamesAnimationComplete && (
+                    <FlamesAnimation
+                      remainingLetters={remainingLetters}
+                      onComplete={onFlamesAnimationComplete}
+                      isVisible={true}
+                      result={result}
+                    />
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </motion.div>
+          )}
+
+          {/* Result Stage */}
+          {stage === 'result' && result && (
+            <motion.div
+              key="result-stage"
+              ref={resultCardRef}
+              initial={shouldAnimate ? { opacity: 0, y: 50, scale: 0.9 } : { opacity: 1, y: 0, scale: 1 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -30, scale: 0.9 }}
+              transition={{
+                duration: shouldAnimate ? 1 : 0,
+                ease: 'easeOut',
+                type: 'spring',
+                stiffness: 200,
+                damping: 25,
+              }}
+            >
+              <ResultCard
+                result={result}
+                name1={name1}
+                name2={name2}
+                onShare={handleShare}
+                onReset={resetGame}
+                shouldAnimate={shouldAnimate}
+                isSharePopoverOpen={isSharePopoverOpen}
+                setIsSharePopoverOpen={setIsSharePopoverOpen}
+                onCopyLink={handleCopyLink}
+              />
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
 
-      {/* Share Popover - remains outside AnimatePresence */}
-      <SharePopover
-        isOpen={isSharePopoverOpen}
-        onClose={() => setIsSharePopoverOpen(false)}
-        resultCardRef={resultCardRef}
-        shareData={{
-          name1,
-          name2,
-          result: result || '',
-          resultText: result ? getResultData(result).text : '',
-        }}
-      />
+        {/* Share popover */}
+        <SharePopover
+          isOpen={isSharePopoverOpen}
+          onClose={() => setIsSharePopoverOpen(false)}
+          result={result}
+          name1={name1}
+          name2={name2}
+          onShare={handleShare}
+          onCopyLink={handleCopyLink}
+        />
+
+        {/* Enhanced footer with tips */}
+        {stage === 'input' && (
+          <motion.div
+            className="mt-12 space-y-4 text-center"
+            initial={shouldAnimate ? { opacity: 0 } : { opacity: 1 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1, duration: 0.8 }}
+          >
+            <motion.p
+              className="text-on-surface-variant/80 dark:text-on-surface-variant/80 text-sm"
+              animate={
+                shouldAnimate
+                  ? {
+                      opacity: [0.6, 1, 0.6],
+                    }
+                  : {}
+              }
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              💡 <strong>F</strong>riends • <strong>L</strong>ove • <strong>A</strong>ffection • <strong>M</strong>
+              arriage • <strong>E</strong>nemies • <strong>S</strong>iblings
+            </motion.p>
+
+            <motion.p
+              className="text-on-surface-variant/60 dark:text-on-surface-variant/60 text-xs"
+              animate={
+                shouldAnimate
+                  ? {
+                      opacity: [0.4, 0.8, 0.4],
+                    }
+                  : {}
+              }
+              transition={{ duration: 4, repeat: Infinity, delay: 1 }}
+            >
+              ✨ Experience the magic of the classic relationship game with modern flair
+            </motion.p>
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 }
 
-// Memoize the component to prevent unnecessary re-renders
 export default memo(HomePage);

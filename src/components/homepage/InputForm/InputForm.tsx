@@ -1,10 +1,7 @@
-import { Checkbox } from '@shadcn/checkbox';
-import { Input } from '@shadcn/input';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@shadcn/tooltip';
-import Button from '@ui/Button';
-import { motion } from 'framer-motion';
-import { VenetianMask } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
+import { GameStage } from '@features/flamesGame/flames.types';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useCallback, useState } from 'react';
 
 interface InputFormProps {
   name1: string;
@@ -15,10 +12,13 @@ interface InputFormProps {
   shouldAnimate: boolean;
   anonymous: boolean;
   setAnonymous: (value: boolean) => void;
+  stage: GameStage;
+  isCollapsing?: boolean;
 }
 
 /**
- * Form component for capturing user names
+ * Enhanced input form with collapse/disintegration animation
+ * Features smooth transitions and particle effects on submission
  */
 export function InputForm({
   name1,
@@ -29,204 +29,302 @@ export function InputForm({
   shouldAnimate,
   anonymous,
   setAnonymous,
+  stage,
+  isCollapsing = false,
 }: InputFormProps) {
-  const nameInputRef = useRef<HTMLInputElement>(null);
-  const [focusedField, setFocusedField] = useState<string | null>(null);
+  const { shouldAnimate: animationPreferencesShouldAnimate } = useAnimationPreferences();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number }>>([]);
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+
+      if (isSubmitting) return;
+
+      setIsSubmitting(true);
+
+      // Create particle effect on submission
+      if (shouldAnimate) {
+        const newParticles = Array.from({ length: 12 }, (_, i) => ({
+          id: i,
+          x: Math.random() * 100,
+          y: Math.random() * 100,
+        }));
+        setParticles(newParticles);
+
+        // Clear particles after animation
+        setTimeout(() => setParticles([]), 1000);
+      }
+
+      onSubmit(e);
+    },
+    [onSubmit, isSubmitting, shouldAnimate]
+  );
+
+  // Don't render if not in input stage
+  if (stage !== 'input') return null;
 
   return (
-    <motion.form
-      onSubmit={onSubmit}
-      className="relative space-y-6 md:space-y-8"
-      initial={shouldAnimate ? { opacity: 0, y: 10 } : { opacity: 1, y: 0 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-    >
-      {/* First Name Input with Enhanced Styling */}
+    <AnimatePresence mode="wait">
       <motion.div
+        key="input-form"
         className="relative"
-        initial={shouldAnimate ? { opacity: 0, x: -20 } : { opacity: 1, x: 0 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: shouldAnimate ? 0.1 : 0, duration: 0.4 }}
+        initial={shouldAnimate ? { opacity: 0, y: 20, scale: 0.95 } : { opacity: 1, y: 0, scale: 1 }}
+        animate={
+          isCollapsing
+            ? {
+                opacity: 0,
+                scale: 0.8,
+                y: -50,
+                rotateX: 45,
+                filter: 'blur(8px)',
+              }
+            : { opacity: 1, y: 0, scale: 1, rotateX: 0, filter: 'blur(0px)' }
+        }
+        exit={{
+          opacity: 0,
+          scale: 0.6,
+          y: -100,
+          rotateX: 90,
+          filter: 'blur(12px)',
+        }}
+        transition={{
+          duration: shouldAnimate ? 0.8 : 0,
+          ease: 'easeInOut',
+          type: 'spring',
+          stiffness: 100,
+          damping: 20,
+        }}
+        style={{ transformStyle: 'preserve-3d' }}
       >
-        <label
-          htmlFor="name1"
-          className={`text-on-surface dark:text-on-surface mb-2 block text-sm font-semibold transition-colors duration-200 ${
-            focusedField === 'name1' ? 'text-primary dark:text-primary' : ''
-          }`}
-        >
-          Your name
-        </label>
-        <div className="relative">
-          <Input
-            id="name1"
-            ref={nameInputRef}
-            type="text"
-            value={name1}
-            onChange={(e) => setName1(e.target.value)}
-            onFocus={() => setFocusedField('name1')}
-            onBlur={() => setFocusedField(null)}
-            placeholder="Who are you? 💁"
-            className={`bg-surface/90 dark:bg-surface-container/90 border-outline/30 dark:border-outline-variant/30 text-on-surface dark:text-on-surface placeholder:text-on-surface-variant dark:placeholder:text-on-surface-variant hover:border-primary/50 dark:hover:border-primary/50 hover:bg-surface dark:hover:bg-surface-container focus:border-primary dark:focus:border-primary focus:ring-primary/20 dark:focus:ring-primary/20 h-14 w-full rounded-xl border-2 px-4 py-4 text-base transition-all duration-300 outline-none hover:shadow-md focus:scale-[1.02] focus:shadow-lg focus:ring-4 ${focusedField === 'name1' ? 'border-primary dark:border-primary ring-primary/20 dark:ring-primary/20 scale-[1.02] shadow-lg ring-4' : ''} `}
-            required
-            aria-label="Your name"
-            aria-describedby="name1-hint"
-          />
-          {/* Enhanced focus indicator */}
-          {focusedField === 'name1' && (
+        {/* Particle effects during submission */}
+        <AnimatePresence>
+          {particles.map((particle) => (
             <motion.div
-              className="pointer-events-none absolute inset-0 rounded-xl"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              key={particle.id}
+              className="bg-primary pointer-events-none absolute h-2 w-2 rounded-full"
               style={{
-                boxShadow:
-                  '0 0 0 3px rgba(var(--color-primary-rgb), 0.2), 0 0 20px rgba(var(--color-primary-rgb), 0.1)',
+                left: `${particle.x}%`,
+                top: `${particle.y}%`,
+                boxShadow: '0 0 8px rgba(var(--color-primary-rgb), 0.8)',
+              }}
+              initial={{ opacity: 1, scale: 1 }}
+              animate={{
+                opacity: 0,
+                scale: 0,
+                x: (Math.random() - 0.5) * 200,
+                y: (Math.random() - 0.5) * 200,
+              }}
+              exit={{ opacity: 0 }}
+              transition={{
+                duration: 1,
+                ease: 'easeOut',
               }}
             />
-          )}
-        </div>
-        <p id="name1-hint" className="sr-only">
-          Enter your first name
-        </p>
-      </motion.div>
+          ))}
+        </AnimatePresence>
 
-      {/* Second Name Input with Enhanced Styling */}
-      <motion.div
-        className="relative"
-        initial={shouldAnimate ? { opacity: 0, x: 20 } : { opacity: 1, x: 0 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: shouldAnimate ? 0.2 : 0, duration: 0.4 }}
-      >
-        <label
-          htmlFor="name2"
-          className={`text-on-surface dark:text-on-surface mb-2 block text-sm font-semibold transition-colors duration-200 ${
-            focusedField === 'name2' ? 'text-primary dark:text-primary' : ''
-          }`}
+        {/* Main form container */}
+        <motion.div
+          className="bg-surface/90 dark:bg-surface-container/90 border-outline/20 rounded-2xl border p-8 shadow-2xl backdrop-blur-xl"
+          animate={
+            isSubmitting && shouldAnimate
+              ? {
+                  boxShadow: [
+                    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                    '0 0 50px rgba(var(--color-primary-rgb), 0.3)',
+                    '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                  ],
+                }
+              : {}
+          }
+          transition={{ duration: 0.5, repeat: isSubmitting ? 2 : 0 }}
         >
-          Their name
-        </label>
-        <div className="relative">
-          <Input
-            id="name2"
-            type="text"
-            value={name2}
-            onChange={(e) => setName2(e.target.value)}
-            onFocus={() => setFocusedField('name2')}
-            onBlur={() => setFocusedField(null)}
-            placeholder="Their name? 💘"
-            className={`bg-surface/90 dark:bg-surface-container/90 border-outline/30 dark:border-outline-variant/30 text-on-surface dark:text-on-surface placeholder:text-on-surface-variant dark:placeholder:text-on-surface-variant hover:border-primary/50 dark:hover:border-primary/50 hover:bg-surface dark:hover:bg-surface-container focus:border-primary dark:focus:border-primary focus:ring-primary/20 dark:focus:ring-primary/20 h-14 w-full rounded-xl border-2 px-4 py-4 text-base transition-all duration-300 outline-none hover:shadow-md focus:scale-[1.02] focus:shadow-lg focus:ring-4 ${focusedField === 'name2' ? 'border-primary dark:border-primary ring-primary/20 dark:ring-primary/20 scale-[1.02] shadow-lg ring-4' : ''} `}
-            required
-            aria-label="Their name"
-            aria-describedby="name2-hint"
-          />
-          {/* Enhanced focus indicator */}
-          {focusedField === 'name2' && (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Header */}
             <motion.div
-              className="pointer-events-none absolute inset-0 rounded-xl"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              style={{
-                boxShadow:
-                  '0 0 0 3px rgba(var(--color-primary-rgb), 0.2), 0 0 20px rgba(var(--color-primary-rgb), 0.1)',
-              }}
-            />
-          )}
-        </div>
-        <p id="name2-hint" className="sr-only">
-          Enter their name
-        </p>
-      </motion.div>
-
-      {/* Enhanced Anonymous Play Checkbox */}
-      <motion.div
-        className="space-y-1"
-        initial={shouldAnimate ? { opacity: 0, y: 10 } : { opacity: 1, y: 0 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: shouldAnimate ? 0.3 : 0, duration: 0.4 }}
-      >
-        <div className="bg-surface-variant/20 dark:bg-surface-container-highest/20 border-outline/10 hover:bg-surface-variant/30 dark:hover:bg-surface-container-highest/30 flex items-start space-x-3 rounded-lg border p-3 transition-colors duration-200">
-          <div className="flex h-5 items-center">
-            <Checkbox
-              id="anonymous"
-              checked={anonymous}
-              onCheckedChange={(checked) => setAnonymous(!!checked)}
-              className="mt-0.5"
-              aria-describedby="anonymous-description"
-            />
-          </div>
-          <div className="flex-1">
-            <label
-              htmlFor="anonymous"
-              className="text-on-surface dark:text-on-surface flex cursor-pointer items-center text-sm font-medium"
+              className="mb-8 text-center"
+              animate={isSubmitting && shouldAnimate ? { scale: [1, 1.05, 1] } : {}}
+              transition={{ duration: 0.3 }}
             >
-              <span>Play Anonymously</span>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      type="button"
-                      className="text-on-surface-variant hover:text-primary dark:text-on-surface-variant dark:hover:text-primary focus:ring-primary/50 ml-2 rounded p-1 transition-colors focus:ring-2 focus:outline-none"
-                      aria-label="Info about anonymous play"
-                    >
-                      <VenetianMask className="h-4 w-4" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="max-w-xs">
-                    <p className="text-center text-xs">
-                      Anonymous mode: We'll only save your result, not your names. 🔒
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </label>
-            <p id="anonymous-description" className="text-on-surface-variant dark:text-on-surface-variant mt-1 text-xs">
-              Keep your names private while still contributing to our statistics
-            </p>
-          </div>
-        </div>
-      </motion.div>
+              <h2 className="text-on-surface dark:text-on-surface mb-2 text-2xl font-bold">Enter Two Names</h2>
+              <p className="text-on-surface-variant dark:text-on-surface-variant">Discover your relationship destiny</p>
+            </motion.div>
 
-      {/* Enhanced Submit Button */}
-      <motion.div
-        initial={shouldAnimate ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: shouldAnimate ? 0.4 : 0, duration: 0.4 }}
-      >
-        <Button
-          type="submit"
-          variant="primary"
-          fullWidth
-          disabled={!name1.trim() || !name2.trim() || name1.trim() === name2.trim()}
-          className="h-14 text-lg font-semibold transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]"
-        >
-          <motion.span
-            className="flex items-center justify-center gap-2"
-            whileHover={shouldAnimate ? { scale: 1.05 } : {}}
-            whileTap={shouldAnimate ? { scale: 0.95 } : {}}
-          >
-            FLAME ON! 🔥
-            <motion.span
+            {/* Name inputs */}
+            <div className="space-y-4">
+              <motion.div
+                animate={
+                  isSubmitting && shouldAnimate
+                    ? {
+                        x: [-2, 2, -2, 2, 0],
+                        scale: [1, 0.98, 1],
+                      }
+                    : {}
+                }
+                transition={{ duration: 0.4 }}
+              >
+                <label htmlFor="name1" className="text-on-surface dark:text-on-surface mb-2 block text-sm font-medium">
+                  First Name
+                </label>
+                <input
+                  id="name1"
+                  type="text"
+                  value={name1}
+                  onChange={(e) => setName1(e.target.value)}
+                  className="bg-surface-container dark:bg-surface-container-high border-outline/30 text-on-surface dark:text-on-surface placeholder-on-surface-variant/60 focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-4 py-3 transition-all duration-200 focus:ring-2 focus:outline-none"
+                  placeholder="Enter first name..."
+                  required
+                  disabled={isSubmitting}
+                  autoComplete="given-name"
+                />
+              </motion.div>
+
+              <motion.div
+                animate={
+                  isSubmitting && shouldAnimate
+                    ? {
+                        x: [2, -2, 2, -2, 0],
+                        scale: [1, 0.98, 1],
+                      }
+                    : {}
+                }
+                transition={{ duration: 0.4, delay: 0.1 }}
+              >
+                <label htmlFor="name2" className="text-on-surface dark:text-on-surface mb-2 block text-sm font-medium">
+                  Second Name
+                </label>
+                <input
+                  id="name2"
+                  type="text"
+                  value={name2}
+                  onChange={(e) => setName2(e.target.value)}
+                  className="bg-surface-container dark:bg-surface-container-high border-outline/30 text-on-surface dark:text-on-surface placeholder-on-surface-variant/60 focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-4 py-3 transition-all duration-200 focus:ring-2 focus:outline-none"
+                  placeholder="Enter second name..."
+                  required
+                  disabled={isSubmitting}
+                  autoComplete="family-name"
+                />
+              </motion.div>
+            </div>
+
+            {/* Anonymous toggle */}
+            <motion.div
+              className="bg-surface-container/50 dark:bg-surface-container-high/50 flex items-center justify-between rounded-xl p-4"
               animate={
-                shouldAnimate
+                isSubmitting && shouldAnimate
                   ? {
-                      rotate: [0, 15, -15, 0],
+                      opacity: [1, 0.7, 1],
+                      scale: [1, 0.95, 1],
                     }
                   : {}
               }
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatDelay: 3,
-              }}
+              transition={{ duration: 0.3, delay: 0.2 }}
             >
-              ✨
-            </motion.span>
-          </motion.span>
-        </Button>
+              <div>
+                <label htmlFor="anonymous" className="text-on-surface dark:text-on-surface text-sm font-medium">
+                  Anonymous Mode
+                </label>
+                <p className="text-on-surface-variant dark:text-on-surface-variant mt-1 text-xs">
+                  Your names won't be saved to our database
+                </p>
+              </div>
+              <motion.button
+                type="button"
+                id="anonymous"
+                onClick={() => setAnonymous(!anonymous)}
+                className={`focus:ring-primary relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none ${
+                  anonymous ? 'bg-primary' : 'bg-outline/30'
+                }`}
+                disabled={isSubmitting}
+                whileTap={shouldAnimate ? { scale: 0.95 } : {}}
+              >
+                <motion.span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform ${
+                    anonymous ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                  animate={{ x: anonymous ? 24 : 4 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                />
+              </motion.button>
+            </motion.div>
+
+            {/* Submit button */}
+            <motion.button
+              type="submit"
+              disabled={!name1.trim() || !name2.trim() || isSubmitting}
+              className="bg-primary hover:bg-primary/90 disabled:bg-outline/20 disabled:text-on-surface-variant text-on-primary focus:ring-primary/50 w-full rounded-xl px-6 py-4 font-semibold shadow-lg transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:shadow-none"
+              whileHover={shouldAnimate && !isSubmitting ? { scale: 1.02, y: -2 } : {}}
+              whileTap={shouldAnimate && !isSubmitting ? { scale: 0.98 } : {}}
+              animate={
+                isSubmitting && shouldAnimate
+                  ? {
+                      scale: [1, 1.05, 1],
+                      boxShadow: [
+                        '0 10px 25px -3px rgba(0, 0, 0, 0.1)',
+                        '0 0 30px rgba(var(--color-primary-rgb), 0.4)',
+                        '0 10px 25px -3px rgba(0, 0, 0, 0.1)',
+                      ],
+                    }
+                  : {}
+              }
+              transition={{ duration: 0.3, repeat: isSubmitting ? 3 : 0 }}
+            >
+              {isSubmitting ? (
+                <motion.div
+                  className="flex items-center justify-center space-x-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  <motion.div
+                    className="border-on-primary/30 border-t-on-primary h-5 w-5 rounded-full border-2"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                  />
+                  <span>Calculating...</span>
+                </motion.div>
+              ) : (
+                <span>Calculate FLAMES ✨</span>
+              )}
+            </motion.button>
+          </form>
+        </motion.div>
+
+        {/* Disintegration overlay effect */}
+        {isCollapsing && shouldAnimate && (
+          <motion.div
+            className="pointer-events-none absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            {Array.from({ length: 20 }).map((_, i) => (
+              <motion.div
+                key={i}
+                className="bg-primary/60 absolute h-1 w-1 rounded-full"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                }}
+                initial={{ opacity: 1, scale: 1 }}
+                animate={{
+                  opacity: 0,
+                  scale: 0,
+                  x: (Math.random() - 0.5) * 300,
+                  y: (Math.random() - 0.5) * 300,
+                }}
+                transition={{
+                  duration: 0.8,
+                  delay: Math.random() * 0.3,
+                  ease: 'easeOut',
+                }}
+              />
+            ))}
+          </motion.div>
+        )}
       </motion.div>
-    </motion.form>
+    </AnimatePresence>
   );
 }
 
