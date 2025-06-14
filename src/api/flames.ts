@@ -276,6 +276,7 @@ export async function flamesApi(request: FlamesApiRequest, clientId?: string): P
  * HTTP endpoint wrapper for frameworks like Express or Vercel
  */
 export function createFlamesEndpoint() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return async (req: any, res: any) => {
     try {
       const { name1, name2, anon } = req.body || req.query;

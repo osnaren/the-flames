@@ -33,7 +33,6 @@ export function InputForm({
   shouldAnimate,
   anonymous,
   setAnonymous,
-  stage,
   isCollapsing = false,
   isProcessing = false,
 }: InputFormProps) {
@@ -44,7 +43,7 @@ export function InputForm({
 
   // Auto-clear errors when processing completes
   useEffect(() => {
-    if (!isProcessing && Object.keys(errors).length > 0) {
+    if (!isProcessing) {
       setErrors({});
     }
   }, [isProcessing]);
