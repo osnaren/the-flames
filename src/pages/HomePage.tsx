@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useCallback, useEffect, useRef } from 'react';
 
 // Import new components
+import AnimatedHeader from '@/components/homepage/AnimatedHeader';
 import { CommonLettersStrike } from '@components/homepage/CommonLettersStrike';
 import { FlamesAnimation } from '@components/homepage/FlamesAnimation';
 import InputForm from '@components/homepage/InputForm';
@@ -16,7 +17,6 @@ import ConfettiEffect from '@ui/ConfettiEffect';
  * Features centralized stage management, instant calculations, and enhanced animations
  */
 function HomePage() {
-  // Animation preferences
   const { shouldAnimate } = useAnimationPreferences();
 
   // References for scrolling and layout
@@ -27,16 +27,7 @@ function HomePage() {
   // FLAMES game engine state and actions
   const [
     { name1, name2, result, stage, commonLetters, remainingLetters, anonymous, isProcessing, stageProgress },
-    {
-      setName1,
-      setName2,
-      handleSubmit,
-      resetGame,
-      setAnonymous,
-      onCommonLettersComplete,
-      onFlamesAnimationComplete,
-      onResultReveal,
-    },
+    { setName1, setName2, handleSubmit, resetGame, setAnonymous, onCommonLettersComplete, onFlamesAnimationComplete },
   ] = useFlamesEngine();
 
   // Scroll to results when they appear
@@ -88,93 +79,7 @@ function HomePage() {
 
       <div className="w-full max-w-2xl">
         {/* Enhanced header with magical effects */}
-        <motion.div
-          className="mb-8 text-center"
-          initial={shouldAnimate ? { opacity: 0, y: -30 } : { opacity: 1, y: 0 }}
-          animate={{
-            opacity: 1,
-            y: stage === 'processing' ? -20 : 0,
-            scale: stage === 'processing' ? 0.9 : 1,
-          }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-        >
-          <h1 className="sr-only">FLAMES - Relationship Calculator</h1>
-
-          {/* Main title with enhanced effects */}
-          <motion.div
-            className="mb-6"
-            animate={
-              shouldAnimate && stage === 'input'
-                ? {
-                    textShadow: [
-                      '0 0 20px rgba(var(--color-primary-rgb), 0.3)',
-                      '0 0 40px rgba(var(--color-primary-rgb), 0.6)',
-                      '0 0 20px rgba(var(--color-primary-rgb), 0.3)',
-                    ],
-                  }
-                : {}
-            }
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              repeatType: 'reverse',
-            }}
-          >
-            <h2 className="text-primary dark:text-primary text-5xl font-bold tracking-tight md:text-6xl lg:text-7xl">
-              F.L.A.M.E.S
-            </h2>
-          </motion.div>
-
-          {/* Enhanced tagline */}
-          <motion.p
-            className="text-on-surface-variant dark:text-on-surface-variant text-xl font-medium md:text-2xl"
-            animate={
-              shouldAnimate && stage === 'input'
-                ? {
-                    opacity: [0.7, 1, 0.7],
-                    scale: [1, 1.02, 1],
-                  }
-                : { opacity: 1 }
-            }
-            transition={{
-              duration: 5,
-              repeat: Infinity,
-              repeatType: 'reverse',
-            }}
-          >
-            Discover your relationship destiny ✨
-          </motion.p>
-
-          {/* Floating sparkles */}
-          {shouldAnimate && stage === 'input' && (
-            <>
-              {Array.from({ length: 3 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute text-3xl"
-                  style={{
-                    left: `${30 + i * 20}%`,
-                    top: `${-10 + i * 5}%`,
-                  }}
-                  animate={{
-                    y: [-10, -30, -10],
-                    opacity: [0, 1, 0],
-                    scale: [0.8, 1.2, 0.8],
-                    rotate: [0, 180, 360],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    repeatDelay: 2 + i,
-                    delay: i * 0.5,
-                  }}
-                >
-                  ✨
-                </motion.div>
-              ))}
-            </>
-          )}
-        </motion.div>
+        <AnimatedHeader shouldAnimate={shouldAnimate} stage={stage} />
 
         {/* Main content area with stage-based transitions */}
         <AnimatePresence mode="wait">
@@ -242,69 +147,60 @@ function HomePage() {
                 transition={{ duration: 2, repeat: Infinity }}
               >
                 {/* Common Letters Strike Phase */}
-                <AnimatePresence mode="wait">
-                  {stageProgress.commonLettersRevealed && !stageProgress.flamesAnimationStarted && (
-                    <motion.div
-                      key="common-letters-phase"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{
-                        opacity: 0,
-                        y: -100,
-                        scale: 0.8,
-                        transition: { duration: 0.5 },
-                      }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <CommonLettersStrike
-                        name1={name1}
-                        name2={name2}
-                        commonLetters={commonLetters}
-                        onComplete={onCommonLettersComplete}
-                        isVisible={true}
-                      />
-                    </motion.div>
-                  )}
+                {stageProgress.commonLettersRevealed && (
+                  <motion.div
+                    key="common-letters-phase"
+                    initial={{
+                      opacity: stageProgress.flamesAnimationStarted ? 1 : 0,
+                      y: stageProgress.flamesAnimationStarted ? -120 : 20,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      y: stageProgress.flamesAnimationStarted ? -120 : 0,
+                      scale: stageProgress.flamesAnimationStarted ? 0.8 : 1,
+                    }}
+                    transition={{ duration: 0.5 }}
+                    className={`${stageProgress.flamesAnimationStarted ? 'bg-surface-container/80 border-outline/10 absolute top-0 right-0 left-0 z-10 overflow-hidden rounded-t-2xl border-b backdrop-blur-sm' : ''}`}
+                  >
+                    <CommonLettersStrike
+                      name1={name1}
+                      name2={name2}
+                      commonLetters={commonLetters}
+                      onComplete={onCommonLettersComplete}
+                      isVisible={true}
+                    />
+                  </motion.div>
+                )}
 
-                  {/* FLAMES Animation Phase */}
-                  {stageProgress.flamesAnimationStarted && !stageProgress.flamesAnimationComplete && (
-                    <motion.div
-                      key="flames-animation-phase"
-                      initial={{ opacity: 0, y: 100, scale: 0.8 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{
-                        opacity: 0,
-                        y: -100,
-                        scale: 0.8,
-                        transition: { duration: 0.5 },
-                      }}
-                      transition={{ duration: 0.6, delay: 0.2 }}
-                    >
-                      <FlamesAnimation
-                        remainingLetters={remainingLetters}
-                        onComplete={onFlamesAnimationComplete}
-                        isVisible={true}
-                        result={result}
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {/* FLAMES Animation Phase */}
+                {stageProgress.flamesAnimationStarted && !stageProgress.flamesAnimationComplete && (
+                  <motion.div
+                    key="flames-animation-phase"
+                    initial={{ opacity: 0, y: 100, scale: 0.8 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.6, delay: stageProgress.commonLettersRevealed ? 0.5 : 0.2 }}
+                  >
+                    <FlamesAnimation
+                      remainingLetters={remainingLetters}
+                      onComplete={onFlamesAnimationComplete}
+                      isVisible={true}
+                      result={result}
+                    />
+                  </motion.div>
+                )}
               </motion.div>
 
               {/* Show processed elements moving up */}
-              {stageProgress.flamesAnimationStarted && (
+              {stageProgress.flamesAnimationStarted && stageProgress.flamesAnimationComplete && (
                 <motion.div
                   ref={processedElementsRef}
                   initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 0.6, y: -80 }}
+                  animate={{ opacity: 0.8, y: -60 }}
                   transition={{ duration: 0.8, ease: 'easeOut' }}
                   className="pointer-events-none text-center"
                 >
-                  <div className="text-on-surface-variant dark:text-on-surface-variant text-sm">
-                    Common letters processed: {commonLetters.join(', ')}
-                  </div>
-                  <div className="text-on-surface-variant/60 dark:text-on-surface-variant/60 text-xs">
-                    {remainingLetters.length} letters remaining for FLAMES
+                  <div className="text-on-surface-variant dark:text-on-surface-variant text-sm font-medium">
+                    Final result: <span className="text-primary font-bold">{result}</span>
                   </div>
                 </motion.div>
               )}
@@ -374,7 +270,7 @@ function HomePage() {
               }
               transition={{ duration: 4, repeat: Infinity, delay: 1 }}
             >
-              ✨ Experience the magic of the classic relationship game with modern flair
+              🪄 Experience the magic of the classic relationship game with modern flair 🔮
             </motion.p>
           </motion.div>
         )}
