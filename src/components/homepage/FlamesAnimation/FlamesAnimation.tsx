@@ -28,7 +28,7 @@ export function FlamesAnimation({ remainingLetters, onComplete, isVisible, resul
   const [currentPosition, setCurrentPosition] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [eliminationCount, setEliminationCount] = useState(0);
-  const [sparkPosition, setSparkPosition] = useState(0);
+  const [roundsCompleted, setRoundsCompleted] = useState(0);
 
   const letters: FlamesResult[] = ['F', 'L', 'A', 'M', 'E', 'S'];
   const countValue = remainingLetters.length;
@@ -47,38 +47,39 @@ export function FlamesAnimation({ remainingLetters, onComplete, isVisible, resul
     setFlamesLetters(initialLetters);
     setCurrentPosition(0);
     setEliminationCount(0);
-    setSparkPosition(0);
+    setRoundsCompleted(0);
     setIsAnimating(false);
   }, [isVisible]);
 
   // Start the FLAMES counting animation
   const startAnimation = useCallback(() => {
-    if (!shouldAnimate || !result) {
+    if (!shouldAnimate && result) {
       // Skip animation and show result immediately
-      if (result) {
-        const resultIndex = letters.findIndex((l) => l === result);
-        setFlamesLetters((prev) =>
-          prev.map((letter, index) => ({
-            ...letter,
-            isEliminated: index !== resultIndex,
-            isActive: index === resultIndex,
-          }))
-        );
-        setTimeout(() => onComplete(result), 100);
-      }
+      const resultIndex = letters.findIndex((l) => l === result);
+      setFlamesLetters((prev) =>
+        prev.map((letter, index) => ({
+          ...letter,
+          isEliminated: index !== resultIndex,
+          isActive: index === resultIndex,
+        }))
+      );
+      setEliminationCount(5);
+      setTimeout(() => onComplete(result), 500);
       return;
     }
 
     setIsAnimating(true);
 
-    // Simulate the traditional FLAMES counting
-    const currentLetters = [...letters];
-    let position = 0;
+    // Create a mutable reference for the animation state
+    const animationState = {
+      currentLetters: [...letters],
+      position: 0,
+    };
 
-    const animateRound = () => {
-      if (currentLetters.length === 1) {
-        // Animation complete
-        const finalResult = currentLetters[0];
+    const performRound = () => {
+      if (animationState.currentLetters.length === 1) {
+        // Animation complete - final result
+        const finalResult = animationState.currentLetters[0];
         setFlamesLetters((prev) =>
           prev.map((letter) => ({
             ...letter,
@@ -86,23 +87,43 @@ export function FlamesAnimation({ remainingLetters, onComplete, isVisible, resul
             isEliminated: letter.letter !== finalResult,
           }))
         );
+        setEliminationCount(5);
+        setIsAnimating(false);
 
         setTimeout(() => {
-          setIsAnimating(false);
           onComplete(finalResult);
         }, 1000);
         return;
       }
 
-      // Count through letters
-      let countSteps = 0;
-      const stepInterval = setInterval(() => {
-        if (countSteps >= countValue) {
-          clearInterval(stepInterval);
+      // Count through the remaining letters
+      let currentCount = 0;
+      const countingSpeed = 400; // milliseconds per count
 
-          // Eliminate the current letter
-          const eliminatedLetter = currentLetters[position];
-          currentLetters.splice(position, 1);
+      const countStep = () => {
+        if (currentCount < countValue) {
+          // Highlight current position
+          const currentLetter =
+            animationState.currentLetters[animationState.position % animationState.currentLetters.length];
+          setCurrentPosition(letters.findIndex((l) => l === currentLetter));
+
+          setFlamesLetters((prev) =>
+            prev.map((letter) => ({
+              ...letter,
+              isActive: letter.letter === currentLetter && !letter.isEliminated,
+            }))
+          );
+
+          animationState.position++;
+          currentCount++;
+          setTimeout(countStep, countingSpeed);
+        } else {
+          // Eliminate the letter we landed on
+          const eliminationPosition = (animationState.position - 1) % animationState.currentLetters.length;
+          const eliminatedLetter = animationState.currentLetters[eliminationPosition];
+
+          // Remove from current letters array
+          animationState.currentLetters.splice(eliminationPosition, 1);
 
           // Update visual state
           setFlamesLetters((prev) =>
@@ -114,45 +135,37 @@ export function FlamesAnimation({ remainingLetters, onComplete, isVisible, resul
           );
 
           setEliminationCount((prev) => prev + 1);
+          setRoundsCompleted((prev) => prev + 1);
 
           // Adjust position for next round
-          if (position >= currentLetters.length) {
-            position = 0;
+          if (eliminationPosition < animationState.currentLetters.length) {
+            animationState.position = eliminationPosition;
+          } else {
+            animationState.position = 0;
           }
 
-          // Continue to next round
-          setTimeout(() => animateRound(), 800);
-          return;
+          // Continue to next round after a pause
+          setTimeout(() => {
+            performRound();
+          }, 1200);
         }
+      };
 
-        // Move spark to next position
-        const activeLetters = letters.filter((l) => !flamesLetters.find((fl) => fl.letter === l)?.isEliminated);
-        const currentIndex = position % activeLetters.length;
-
-        setSparkPosition(letters.findIndex((l) => l === activeLetters[currentIndex]));
-        setFlamesLetters((prev) =>
-          prev.map((letter, index) => ({
-            ...letter,
-            isActive: index === letters.findIndex((l) => l === activeLetters[currentIndex]),
-          }))
-        );
-
-        position = (position + 1) % currentLetters.length;
-        countSteps++;
-      }, 300); // Speed of counting
+      // Start counting for this round
+      setTimeout(countStep, 500);
     };
 
-    // Start the animation
-    setTimeout(animateRound, 500);
-  }, [shouldAnimate, result, countValue, onComplete, flamesLetters]);
+    // Start the first round
+    setTimeout(performRound, 800);
+  }, [shouldAnimate, result, countValue, onComplete, letters]);
 
   // Auto-start animation when component becomes visible
   useEffect(() => {
-    if (isVisible && flamesLetters.length > 0) {
+    if (isVisible && flamesLetters.length > 0 && !isAnimating) {
       const timer = setTimeout(startAnimation, 1000);
       return () => clearTimeout(timer);
     }
-  }, [isVisible, flamesLetters.length, startAnimation]);
+  }, [isVisible, flamesLetters.length, isAnimating, startAnimation]);
 
   if (!isVisible) return null;
 
@@ -179,7 +192,7 @@ export function FlamesAnimation({ remainingLetters, onComplete, isVisible, resul
 
       {/* Circular FLAMES arrangement */}
       <div className="relative h-80 w-80">
-        {/* Center spark/flame indicator */}
+        {/* Center flame indicator */}
         <motion.div
           className="absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 transform"
           animate={
@@ -314,7 +327,7 @@ export function FlamesAnimation({ remainingLetters, onComplete, isVisible, resul
             transition={{ delay: 0.5 }}
           >
             <div className="bg-primary/20 text-primary rounded-full px-4 py-2 text-sm font-medium">
-              Counting: {countValue} letters remaining
+              Counting: {countValue} letters | Round {roundsCompleted + 1}
             </div>
           </motion.div>
         )}
@@ -343,14 +356,14 @@ export function FlamesAnimation({ remainingLetters, onComplete, isVisible, resul
         </div>
       </motion.div>
 
-      {/* Sound effects indicator */}
+      {/* Animation status */}
       {isAnimating && shouldAnimate && (
         <motion.div
           className="text-on-surface-variant dark:text-on-surface-variant text-center text-sm"
           animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 1, repeat: Infinity }}
+          transition={{ duration: 1.5, repeat: Infinity }}
         >
-          🎵 Listen for the counting rhythm...
+          🎵 Follow the counting rhythm...
         </motion.div>
       )}
     </motion.div>

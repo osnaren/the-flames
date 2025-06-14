@@ -1,6 +1,5 @@
 import { useFlamesEngine } from '@features/flamesGame/useFlamesEngine';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
-import { useShareActions } from '@hooks/useShareActions';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useCallback, useEffect, useRef } from 'react';
 
@@ -11,7 +10,6 @@ import InputForm from '@components/homepage/InputForm';
 import ResultCard from '@components/homepage/ResultCard';
 import DynamicBackground from '@components/ui/DynamicBackground';
 import ConfettiEffect from '@ui/ConfettiEffect';
-import SharePopover from '@ui/SharePopover';
 
 /**
  * Completely revamped HomePage with streamlined architecture
@@ -24,6 +22,7 @@ function HomePage() {
   // References for scrolling and layout
   const resultCardRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const processedElementsRef = useRef<HTMLDivElement>(null);
 
   // FLAMES game engine state and actions
   const [
@@ -39,13 +38,6 @@ function HomePage() {
       onResultReveal,
     },
   ] = useFlamesEngine();
-
-  // Share functionality
-  const { isSharePopoverOpen, setIsSharePopoverOpen, handleShare, handleCopyLink } = useShareActions(
-    name1,
-    name2,
-    result
-  );
 
   // Scroll to results when they appear
   useEffect(() => {
@@ -99,7 +91,11 @@ function HomePage() {
         <motion.div
           className="mb-8 text-center"
           initial={shouldAnimate ? { opacity: 0, y: -30 } : { opacity: 1, y: 0 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={{
+            opacity: 1,
+            y: stage === 'processing' ? -20 : 0,
+            scale: stage === 'processing' ? 0.9 : 1,
+          }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
           <h1 className="sr-only">FLAMES - Relationship Calculator</h1>
@@ -223,7 +219,7 @@ function HomePage() {
           {stage === 'processing' && (
             <motion.div
               key="processing-stage"
-              className="space-y-8"
+              className="space-y-6"
               initial={shouldAnimate ? { opacity: 0, scale: 0.9 } : { opacity: 1, scale: 1 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
@@ -248,26 +244,70 @@ function HomePage() {
                 {/* Common Letters Strike Phase */}
                 <AnimatePresence mode="wait">
                   {stageProgress.commonLettersRevealed && !stageProgress.flamesAnimationStarted && (
-                    <CommonLettersStrike
-                      name1={name1}
-                      name2={name2}
-                      commonLetters={commonLetters}
-                      onComplete={onCommonLettersComplete}
-                      isVisible={true}
-                    />
+                    <motion.div
+                      key="common-letters-phase"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{
+                        opacity: 0,
+                        y: -100,
+                        scale: 0.8,
+                        transition: { duration: 0.5 },
+                      }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <CommonLettersStrike
+                        name1={name1}
+                        name2={name2}
+                        commonLetters={commonLetters}
+                        onComplete={onCommonLettersComplete}
+                        isVisible={true}
+                      />
+                    </motion.div>
                   )}
 
                   {/* FLAMES Animation Phase */}
                   {stageProgress.flamesAnimationStarted && !stageProgress.flamesAnimationComplete && (
-                    <FlamesAnimation
-                      remainingLetters={remainingLetters}
-                      onComplete={onFlamesAnimationComplete}
-                      isVisible={true}
-                      result={result}
-                    />
+                    <motion.div
+                      key="flames-animation-phase"
+                      initial={{ opacity: 0, y: 100, scale: 0.8 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{
+                        opacity: 0,
+                        y: -100,
+                        scale: 0.8,
+                        transition: { duration: 0.5 },
+                      }}
+                      transition={{ duration: 0.6, delay: 0.2 }}
+                    >
+                      <FlamesAnimation
+                        remainingLetters={remainingLetters}
+                        onComplete={onFlamesAnimationComplete}
+                        isVisible={true}
+                        result={result}
+                      />
+                    </motion.div>
                   )}
                 </AnimatePresence>
               </motion.div>
+
+              {/* Show processed elements moving up */}
+              {stageProgress.flamesAnimationStarted && (
+                <motion.div
+                  ref={processedElementsRef}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 0.6, y: -80 }}
+                  transition={{ duration: 0.8, ease: 'easeOut' }}
+                  className="pointer-events-none text-center"
+                >
+                  <div className="text-on-surface-variant dark:text-on-surface-variant text-sm">
+                    Common letters processed: {commonLetters.join(', ')}
+                  </div>
+                  <div className="text-on-surface-variant/60 dark:text-on-surface-variant/60 text-xs">
+                    {remainingLetters.length} letters remaining for FLAMES
+                  </div>
+                </motion.div>
+              )}
             </motion.div>
           )}
 
@@ -289,29 +329,16 @@ function HomePage() {
             >
               <ResultCard
                 result={result}
+                stage={stage}
                 name1={name1}
                 name2={name2}
-                onShare={handleShare}
-                onReset={resetGame}
-                shouldAnimate={shouldAnimate}
-                isSharePopoverOpen={isSharePopoverOpen}
-                setIsSharePopoverOpen={setIsSharePopoverOpen}
-                onCopyLink={handleCopyLink}
+                onRetry={resetGame}
+                onNavigateToManual={() => window.open('/manual', '_blank')}
+                onNavigateToStats={() => window.open('/charts', '_blank')}
               />
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Share popover */}
-        <SharePopover
-          isOpen={isSharePopoverOpen}
-          onClose={() => setIsSharePopoverOpen(false)}
-          result={result}
-          name1={name1}
-          name2={name2}
-          onShare={handleShare}
-          onCopyLink={handleCopyLink}
-        />
 
         {/* Enhanced footer with tips */}
         {stage === 'input' && (
