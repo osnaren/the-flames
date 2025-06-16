@@ -1,49 +1,59 @@
-import { FlamesResult } from '../flames.types';
+export type DrawingMode = 'chalkboard' | 'pen-paper';
+export type CanvasState = 'input' | 'drawing';
 
 export interface ManualModeState {
   name1: string;
   name2: string;
-  name1Locked: boolean;
-  name2Locked: boolean;
+  mode: DrawingMode;
+  canvasState: CanvasState;
+  isDrawing: boolean;
+  isErasing: boolean;
   crossedLetters: Set<string>;
-  result: FlamesResult;
-  isChalkboard: boolean;
+  flamesCrossedLetters: Set<string>;
+  result: string | null;
 }
 
 export interface ManualModeProps {
-  onShare?: (result: FlamesResult) => void;
+  onShare?: (imageData: string) => void;
   onClose?: () => void;
 }
 
-export interface NameInputProps {
-  value: string;
-  onChange: (value: string) => void;
-  isLocked: boolean;
-  onLock: () => void;
-  onEdit: () => void;
-  placeholder: string;
-  isChalkboard?: boolean;
-  error?: string;
+export interface NameInputFormProps {
+  onNamesSubmit: (name1: string, name2: string) => void;
+  mode: DrawingMode;
+  onModeToggle: () => void;
+  initialName1?: string;
+  initialName2?: string;
 }
 
-export interface LetterGridProps {
+export interface DrawingCanvasProps {
   name1: string;
   name2: string;
-  crossedLetters: Set<string>;
-  onLetterClick: (letter: string, nameIndex: number, position: number) => void;
-  isChalkboard?: boolean;
+  mode: DrawingMode;
+  onBack: () => void;
+  onShare: (imageData: string) => void;
+  onModeToggle: () => void;
 }
 
-export interface FlamesCounterProps {
-  remainingLetters: number;
-  onResult: (result: FlamesResult) => void;
-  isChalkboard?: boolean;
+export interface LetterTileProps {
+  letter: string;
+  index: number;
+  nameIndex: 1 | 2;
+  mode: DrawingMode;
+  className?: string;
 }
 
-export interface FloatingToolsProps {
-  onReset: () => void;
-  onShare?: () => void;
-  onToggleStyle: () => void;
-  canShare: boolean;
-  isChalkboard: boolean;
+export interface FlamesLettersProps {
+  mode: DrawingMode;
+  className?: string;
+}
+
+export interface CanvasToolsProps {
+  mode: DrawingMode;
+  isErasing: boolean;
+  onErase: () => void;
+  onClear: () => void;
+  onBack: () => void;
+  onShare: () => void;
+  onModeToggle: () => void;
 }
