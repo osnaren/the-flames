@@ -1,0 +1,143 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# FLAMES Component Architecture Guidelines
+
+## Component Structure Standards
+
+### Container Components
+Main container components should follow this pattern:
+
+Reference: [HowItWorksContainer.tsx](mdc:src/features/howItWorks/HowItWorksContainer.tsx)
+
+```typescript
+export default function FeatureContainer() {
+  const { shouldAnimate } = useAnimationPreferences();
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-surface/50 to-surface-container/30">
+      <div className="px-4 py-8 md:px-6 lg:px-8">
+        <div className="mx-auto max-w-5xl">
+          {/* Content with staggered animations */}
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+### Enhanced Component Pattern
+Every enhanced component should include:
+
+1. **Animation Preferences Hook**
+2. **Intersection Observer for Performance** (`useInView`)
+3. **Enhanced Card Wrapper**
+4. **Background Decorative Elements**
+5. **Staggered Content Animations**
+
+Reference: [Step2CommonLetters.tsx](mdc:src/features/howItWorks/components/Step2CommonLetters.tsx)
+
+## Sub-Component Patterns
+
+### Animated Letter Components
+For letter-based interactions, create dedicated sub-components:
+
+```typescript
+const AnimatedLetter = ({ 
+  letter, 
+  index, 
+  isCommon, 
+  shouldAnimate 
+}: {
+  letter: string;
+  index: number;
+  isCommon: boolean;
+  shouldAnimate: boolean;
+}) => {
+  // Component logic with particles and effects
+};
+```
+
+### Button Enhancement Pattern
+Interactive buttons should include:
+- Hover scale and position animations
+- Background glow effects (conditional)
+- Icon and text transformations
+- Loading/disabled states with proper opacity
+
+Reference: [CallToAction.tsx](mdc:src/features/howItWorks/components/CallToAction.tsx)
+
+## File Organization
+
+### Component Directory Structure
+```
+features/
+  howItWorks/
+    components/
+      Header.tsx
+      Step1Names.tsx
+      Step2CommonLetters.tsx
+      Step3FlamesSimulation.tsx
+      MeaningSection.tsx
+      CallToAction.tsx
+    howItWorks.constants.ts
+    index.ts
+    HowItWorksContainer.tsx
+```
+
+### Import Organization
+Organize imports in this order:
+1. External component libraries (Button, Card)
+2. Hooks (useAnimationPreferences, useInView)
+3. Framer Motion imports
+4. Icon imports (Lucide React, React Icons)
+5. React hooks
+6. Relative imports
+
+## Naming Conventions
+
+### Component Names
+- Container components: `FeatureContainer`
+- Step components: `StepXDescription` (e.g., `Step1Names`)
+- Sub-components: `AnimatedElement` (e.g., `AnimatedLetter`, `FlamesLetter`)
+
+### Animation States
+- `shouldAnimate`: Boolean for animation preferences
+- `isInView`: Boolean for intersection observer
+- `isHighlighted`, `isEliminated`, `isFinal`: Boolean states for interactive elements
+
+## Enhanced Headers
+
+### Standard Header Pattern
+All step headers should include:
+
+```typescript
+<motion.h2 
+  className="font-heading text-on-surface mb-8 flex items-center gap-3 text-2xl font-bold md:text-3xl"
+  whileHover={{ scale: 1.02 }}
+>
+  <motion.span 
+    className="bg-primary-container/20 text-primary flex h-10 w-10 items-center justify-center rounded-full ring-2 ring-primary/20 md:h-12 md:w-12"
+    whileHover={{ rotate: 360, scale: 1.1 }}
+  >
+    {stepNumber}
+  </motion.span>
+  Header Title
+  {shouldAnimate && <AnimatedIcon />}
+</motion.h2>
+```
+
+## Memory Management
+
+### Cleanup Patterns
+- Use `AnimatePresence` for entering/exiting elements
+- Clean up particle effects with proper exit animations
+- Manage component state to prevent memory leaks
+- Use `useEffect` cleanup functions for timers
+
+### Performance Considerations
+- Lazy load heavy animation components
+- Use `React.memo` for sub-components that don't need frequent re-renders
+- Optimize particle counts based on device capabilities

@@ -1,0 +1,198 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# FLAMES Name Connector Animation Patterns
+
+## Advanced Connection Animations
+
+### Multi-Layer Animation System
+Name connectors should implement sophisticated visual connections between names using multiple animation layers:
+
+Reference: [Step1Names.tsx](mdc:src/features/howItWorks/components/Step1Names.tsx)
+
+### Core Animation Layers
+
+#### 1. Background Glow Layer
+```typescript
+<motion.div
+  className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/10 via-primary-container/30 to-secondary/10 blur-lg"
+  animate={shouldAnimate ? {
+    opacity: [0.3, 0.8, 0.3],
+    scale: [0.8, 1.2, 0.8], 
+    rotate: [0, 180, 360],
+  } : {}}
+  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+/>
+```
+
+#### 2. Energy Flow Layer
+- Base connection line with gradient backgrounds
+- Animated energy pulses flowing along the connection
+- Responsive design: vertical for mobile, horizontal for desktop
+
+```typescript
+// Base line
+<div className="from-primary/60 via-primary-container to-secondary/60 h-full w-1 rounded-full bg-gradient-to-b md:h-1 md:w-full md:bg-gradient-to-r" />
+
+// Animated energy flow
+<motion.div
+  className="absolute inset-0 rounded-full bg-gradient-to-b from-transparent via-primary to-transparent md:bg-gradient-to-r"
+  animate={shouldAnimate ? { opacity: [0, 1, 0], scale: [0.5, 1, 0.5] } : {}}
+/>
+```
+
+#### 3. Central Heart Animation
+```typescript
+<motion.div
+  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+  animate={shouldAnimate ? {
+    scale: [1, 1.3, 1],
+    rotate: [0, 5, -5, 0],
+  } : {}}
+>
+  <Heart className="h-4 w-4 fill-primary text-primary drop-shadow-sm" />
+</motion.div>
+```
+
+#### 4. Floating Particle System
+```typescript
+const [particles, setParticles] = useState<Array<{ id: number; delay: number }>>([]);
+
+useEffect(() => {
+  if (shouldAnimate) {
+    const particleArray = Array.from({ length: 8 }, (_, i) => ({
+      id: i,
+      delay: i * 0.2,
+    }));
+    setParticles(particleArray);
+  }
+}, [shouldAnimate]);
+```
+
+#### 5. Decorative Sparkles
+Strategic placement of animated icons around the connector:
+
+```typescript
+<motion.div
+  className="absolute left-2 top-2"
+  animate={{ opacity: [0, 1, 0], rotate: [0, 180, 360] }}
+  transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+>
+  <Sparkles className="h-2 w-2 text-secondary" />
+</motion.div>
+```
+
+## Name Card Enhancement Patterns
+
+### Enhanced Name Cards
+Name cards should include:
+
+#### 1. Hover Interactions
+```typescript
+<motion.div
+  className="group relative"
+  whileHover={{ scale: 1.05, y: -2 }}
+  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+>
+  <motion.div
+    className="bg-surface-container-highest/90 text-on-surface relative rounded-xl p-6 text-2xl font-medium shadow-lg backdrop-blur-sm"
+    animate={isHovered && shouldAnimate ? {
+      boxShadow: [
+        '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        '0 10px 15px -3px rgba(249, 115, 22, 0.3)',
+        '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+      ],
+    } : {}}
+  />
+</motion.div>
+```
+
+#### 2. Floating Accents
+Each name card should have unique floating decorative elements:
+
+```typescript
+{/* Floating accent */}
+{shouldAnimate && (
+  <motion.div
+    className="absolute -top-2 -right-2"
+    animate={{
+      y: [-2, 2, -2],
+      rotate: [0, 10, 0],
+    }}
+    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+  >
+    <Sparkles className="h-4 w-4 text-primary/60" />
+  </motion.div>
+)}
+```
+
+## Responsive Design Patterns
+
+### Mobile vs Desktop Animations
+Connector animations must adapt to screen orientation:
+
+#### Mobile (Vertical)
+- Connection flows top to bottom
+- Particles move in vertical patterns
+- Compact spacing for smaller screens
+
+#### Desktop (Horizontal)  
+- Connection flows left to right
+- Particles move in horizontal patterns
+- Expanded spacing for larger displays
+
+### Container Responsive Sizing
+```typescript
+<div className="relative flex h-24 w-16 items-center justify-center md:h-16 md:w-32">
+  {/* Responsive connector content */}
+</div>
+```
+
+## Performance Optimization
+
+### Conditional Rendering
+All heavy animations should be conditionally rendered:
+
+```typescript
+{shouldAnimate && (
+  <AnimatePresence>
+    {/* Complex particle systems */}
+  </AnimatePresence>
+)}
+```
+
+### Efficient Particle Management
+- Limit particle count based on device capabilities
+- Use staggered delays to prevent performance spikes
+- Proper cleanup with AnimatePresence
+- Hardware acceleration with transform3d
+
+## Integration with Educational Content
+
+### Contextual Enhancement
+Name connectors should enhance the educational message:
+- Visual metaphor for "connection" between names
+- Animated "spark" representing the FLAMES calculation
+- Progressive disclosure of complexity
+
+### Timing Coordination
+Coordinate connector animations with text animations:
+```typescript
+// Text appears first, then connector animates
+<motion.p
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.6, duration: 0.5 }}
+>
+  We start with two names, ready to{' '}
+  <motion.span
+    className="text-primary font-semibold"
+    animate={shouldAnimate ? { textShadow: glowEffect } : {}}
+  >
+    uncover the spark
+  </motion.span>
+  ✨
+</motion.p>
+```

@@ -1,0 +1,118 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# FLAMES Animation System Patterns
+
+## Core Animation Principles
+
+### Always Use Animation Preferences Hook
+Every component with animations must use the `useAnimationPreferences` hook:
+
+```typescript
+import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
+
+const { shouldAnimate, prefersReducedMotion } = useAnimationPreferences();
+```
+
+### Conditional Animation Rendering
+Heavy animations should only render when `shouldAnimate` is true:
+
+```typescript
+{shouldAnimate && (
+  <motion.div
+    animate={{ rotate: [0, 360] }}
+    transition={{ duration: 3, repeat: Infinity }}
+  >
+    <Sparkles className="h-4 w-4 text-primary" />
+  </motion.div>
+)}
+```
+
+## Component Enhancement Patterns
+
+### Enhanced Header Structure
+Headers should include:
+- Step number in circular badge with hover rotation
+- Icon animations beside the title
+- Staggered text animations
+- Background decorative elements (when animations enabled)
+
+Reference: [Step1Names.tsx](mdc:src/features/howItWorks/components/Step1Names.tsx)
+
+### Card Enhancement Template
+All cards should follow this pattern:
+- Background decorative elements (rotating icons at low opacity)
+- Enhanced shadows and hover effects
+- Content with staggered animations
+- Overflow hidden for particle effects
+
+```typescript
+<Card className="relative overflow-hidden p-8 shadow-lg transition-shadow duration-300 hover:shadow-xl">
+  {/* Background decorative elements */}
+  {shouldAnimate && (
+    <motion.div className="absolute top-4 right-4 opacity-5" animate={{ rotate: [0, 360] }}>
+      <Icon className="h-16 w-16 text-primary" />
+    </motion.div>
+  )}
+  {/* Content */}
+</Card>
+```
+
+## Animation Timing Guidelines
+
+### Staggered Children
+Use these delays for sequential animations:
+- Initial component entrance: 0.3s delay
+- Header animations: 0.2s delay after entrance
+- Content sections: 0.4s+ delay
+- Child elements: index * 0.08 + base delay
+
+### Spring Physics Settings
+Standard spring configurations:
+- Button interactions: `{ type: 'spring', stiffness: 400 }`
+- Card hover effects: `{ type: 'spring', stiffness: 300, damping: 20 }`
+- Letter animations: `{ type: 'spring', stiffness: 200, damping: 25 }`
+
+### Particle Effects
+Particle systems should:
+- Use randomized positions and delays
+- Have proper cleanup with AnimatePresence
+- Include duration between 1-3 seconds
+- Use easeOut for natural movement
+
+## Performance Optimization
+
+### Conditional Heavy Effects
+Particle systems, 3D transforms, and complex animations should be conditionally rendered:
+
+```typescript
+{shouldAnimate && (
+  <AnimatePresence>
+    {particles.map((particle) => (
+      <motion.div key={particle.id} /* particle animation */ />
+    ))}
+  </AnimatePresence>
+)}
+```
+
+### Hardware Acceleration
+Use transform3d for better performance:
+```typescript
+style={{ transformStyle: 'preserve-3d' }}
+```
+
+## Accessibility Standards
+
+### Reduced Motion Support
+All animations must respect user preferences:
+- Use `useAnimationPreferences` hook
+- Provide fallback states when animations are disabled
+- Never block functionality behind animations
+
+### Focus Management
+Enhanced components should maintain proper focus states:
+- Visible focus rings
+- Keyboard navigation support
+- ARIA labels for interactive elements

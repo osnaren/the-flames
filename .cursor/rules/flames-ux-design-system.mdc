@@ -1,0 +1,143 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# FLAMES UX Design System
+
+## Visual Hierarchy Standards
+
+### Typography Scale
+- Page titles: `text-4xl md:text-5xl lg:text-6xl` with `font-heading`
+- Section headers: `text-2xl md:text-3xl` with step number badges
+- Body text: `text-lg` for descriptions, `text-base` for secondary content
+- UI elements: `text-sm` for labels, `text-xs` for indicators
+
+### Color Usage Patterns
+
+#### Step Color Coding
+- Step 1 (Names): `primary-container` colors
+- Step 2 (Common Letters): `tertiary-container` colors  
+- Step 3 (FLAMES): `secondary-container` colors
+- Error states: `error` color family
+- Success/Final results: Gradient combinations
+
+#### Interactive States
+```typescript
+// Standard hover pattern for cards
+className={`${bgColor} ${hoverColor} transition-all duration-300 hover:-translate-y-2 hover:shadow-xl`}
+
+// Button hover effects
+className="group hover:shadow-xl transition-all duration-300"
+```
+
+## Spacing and Layout
+
+### Container Spacing
+- Main containers: `max-w-5xl mx-auto`
+- Section spacing: `space-y-24 md:space-y-28`
+- Card padding: `p-8` standard, `p-6` for smaller cards
+- Component margins: `mb-8` for headers, `mb-6` for content sections
+
+### Responsive Breakpoints
+- Mobile: Base styles
+- Tablet: `md:` prefix (768px+)
+- Desktop: `lg:` prefix (1024px+)
+- Grid layouts: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`
+
+## Interactive Element Patterns
+
+### Card Hover Effects
+Standard card interaction pattern:
+
+```typescript
+<motion.div
+  className="group relative"
+  whileHover={{ scale: shouldAnimate ? 1.05 : 1, y: -2 }}
+  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+>
+  {/* Hover background gradient */}
+  <div className="absolute inset-0 rounded-xl bg-gradient-to-br opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+</motion.div>
+```
+
+### Button Interaction Standards
+Enhanced buttons should include:
+- Scale on hover: `whileHover={{ scale: 1.05, y: -2 }}`
+- Scale on tap: `whileTap={{ scale: 0.98 }}`
+- Background glow effects for primary actions
+- Text translation effects: `group-hover:translate-x-0.5`
+
+Reference: [Step3FlamesSimulation.tsx](mdc:src/features/howItWorks/components/Step3FlamesSimulation.tsx)
+
+## Visual Feedback Patterns
+
+### Loading States
+- Processing buttons: Reduced opacity (50%) with disabled cursor
+- Loading text: Color transitions between theme colors
+- Progress indicators: Animated gradients and pulsing effects
+
+### Success States  
+- Final results: Gradient backgrounds with ring effects
+- Completion animations: Bounce effects with crown/sparkle indicators
+- Color transitions: From neutral to success color palettes
+
+### Error States
+- Strike-through effects: Red color with blur shadow layers
+- Particle explosions: Small red particles with easing out
+- Visual indicators: Target icons and error typography
+
+## Particle System Guidelines
+
+### Particle Properties
+- Count: 4-8 particles for letter effects, 6+ for major interactions
+- Duration: 1-3 seconds with staggered delays
+- Movement: Random x/y displacement within 40-60px radius
+- Easing: `easeOut` for natural physics
+
+### Particle Cleanup
+```typescript
+<AnimatePresence>
+  {showParticles && particles.map((particle) => (
+    <motion.div
+      key={particle.id}
+      initial={{ opacity: 1, scale: 1 }}
+      animate={{ opacity: 0, scale: 0, x: randomX, y: randomY }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 1.5, ease: 'easeOut' }}
+    />
+  ))}
+</AnimatePresence>
+```
+
+## Icon Usage Standards
+
+### Icon Libraries
+- Primary: Lucide React for standard UI icons
+- Decorative: React Icons (ri, gi, si) for enhanced visual elements
+- Size standards: `h-4 w-4` small, `h-5 w-5` medium, `h-6 w-6` large
+
+### Icon Animation Patterns
+- Rotation: `rotate: [0, 360]` for continuous spin
+- Scaling: `scale: [1, 1.2, 1]` for pulsing effects  
+- Position: `y: [-2, 2, -2]` for floating effects
+- Opacity: `opacity: [0.5, 1, 0.5]` for breathing effects
+
+## Accessibility Requirements
+
+### Color Contrast
+- All text must meet WCAG AA standards
+- Interactive elements need sufficient contrast ratios
+- Error states should not rely solely on color
+
+### Focus Management
+- Visible focus rings on all interactive elements
+- Logical tab order through sections
+- Skip links for keyboard navigation
+
+### Motion Sensitivity
+- All decorative animations conditional on `shouldAnimate`
+- Reduced motion alternatives for all interactions
+- Essential functionality never blocked by animations
+
+Reference: [useAnimationPreferences](mdc:src/hooks/useAnimationPreferences.tsx)
