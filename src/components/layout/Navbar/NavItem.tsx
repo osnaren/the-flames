@@ -4,7 +4,7 @@ import type { LucideIcon } from 'lucide-react';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
 
-const MotionLink = motion(Link);
+const MotionLink = motion.create(Link);
 
 interface NavItemProps {
   icon?: LucideIcon;

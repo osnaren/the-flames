@@ -3,7 +3,7 @@ import html2canvas from 'html2canvas';
 export interface ShareData {
   name1: string;
   name2: string;
-  result: string;
+  result: string | null;
   resultText: string;
   imageUrl?: string;
 }

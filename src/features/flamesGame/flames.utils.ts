@@ -109,5 +109,5 @@ export const calculateFlamesResult = (name1: string, name2: string): FlamesResul
     flames.splice(currentIndex, 1);
   }
 
-  return flames[0];
+  return flames[0] ? flames[0] : null;
 };

@@ -1,10 +1,10 @@
-export type DrawingMode = 'chalkboard' | 'pen-paper';
-export type CanvasState = 'input' | 'drawing';
+export type ExperienceMode = 'click' | 'canvas';
+export type CanvasState = 'input' | 'experience';
 
 export interface ManualModeState {
   name1: string;
   name2: string;
-  mode: DrawingMode;
+  experienceMode: ExperienceMode; // click or canvas interaction
   canvasState: CanvasState;
   isDrawing: boolean;
   isErasing: boolean;
@@ -19,41 +19,51 @@ export interface ManualModeProps {
 }
 
 export interface NameInputFormProps {
-  onNamesSubmit: (name1: string, name2: string) => void;
-  mode: DrawingMode;
-  onModeToggle: () => void;
+  onNamesSubmit: (name1: string, name2: string, experienceMode: ExperienceMode) => void;
   initialName1?: string;
   initialName2?: string;
 }
 
-export interface DrawingCanvasProps {
+export interface ClickExperienceProps {
   name1: string;
   name2: string;
-  mode: DrawingMode;
   onBack: () => void;
   onShare: (imageData: string) => void;
-  onModeToggle: () => void;
+}
+
+export interface CanvasExperienceProps {
+  name1: string;
+  name2: string;
+  onBack: () => void;
+  onShare: (imageData: string) => void;
 }
 
 export interface LetterTileProps {
   letter: string;
   index: number;
   nameIndex: 1 | 2;
-  mode: DrawingMode;
+  isCrossed?: boolean;
+  onToggle?: () => void;
   className?: string;
 }
 
 export interface FlamesLettersProps {
-  mode: DrawingMode;
+  crossedLetters?: Set<string>;
+  onLetterToggle?: (letter: string) => void;
   className?: string;
+  userResult?: string | null;
+  correctResult?: string | null;
 }
 
 export interface CanvasToolsProps {
-  mode: DrawingMode;
   isErasing: boolean;
   onErase: () => void;
   onClear: () => void;
   onBack: () => void;
   onShare: () => void;
-  onModeToggle: () => void;
+}
+
+export interface ResultValidationProps {
+  userResult: string | null;
+  correctResult: string;
 }

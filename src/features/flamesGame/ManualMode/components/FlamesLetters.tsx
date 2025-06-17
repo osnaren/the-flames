@@ -1,138 +1,247 @@
+import { cn } from '@/utils';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { Crown, Sparkles } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FlamesLettersProps } from '../types';
 
-const FLAMES_LETTERS = [
-  { letter: 'F', meaning: 'Friends', color: 'text-blue-500', bgColor: 'bg-blue-100' },
-  { letter: 'L', meaning: 'Love', color: 'text-red-500', bgColor: 'bg-red-100' },
-  { letter: 'A', meaning: 'Affection', color: 'text-pink-500', bgColor: 'bg-pink-100' },
-  { letter: 'M', meaning: 'Marriage', color: 'text-purple-500', bgColor: 'bg-purple-100' },
-  { letter: 'E', meaning: 'Enemies', color: 'text-orange-500', bgColor: 'bg-orange-100' },
-  { letter: 'S', meaning: 'Siblings', color: 'text-green-500', bgColor: 'bg-green-100' },
-];
+export default function FlamesLetters({
+  crossedLetters = new Set(),
+  onLetterToggle,
+  className = '',
+  userResult = null,
+  correctResult = null,
+}: FlamesLettersProps) {
+  const [showResultCelebration, setShowResultCelebration] = useState(false);
 
-export default function FlamesLetters({ mode, className = '' }: FlamesLettersProps) {
-  const [crossedLetters, setCrossedLetters] = useState<Set<string>>(new Set());
+  const flamesData = [
+    { letter: 'F', meaning: 'Friends', icon: '🤝🏼', color: 'friendship' },
+    { letter: 'L', meaning: 'Love', icon: '💕', color: 'love' },
+    { letter: 'A', meaning: 'Affection', icon: '🥰', color: 'affection' },
+    { letter: 'M', meaning: 'Marriage', icon: '💍', color: 'marriage' },
+    { letter: 'E', meaning: 'Enemies', icon: '⚔️', color: 'enemy' },
+    { letter: 'S', meaning: 'Siblings', icon: '👫🏼', color: 'siblings' },
+  ];
 
-  const handleLetterClick = (letter: string) => {
-    setCrossedLetters((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(letter)) {
-        newSet.delete(letter);
-      } else {
-        newSet.add(letter);
-      }
-      return newSet;
-    });
+  // Handle special celebration when user reaches the final result
+  useEffect(() => {
+    if (userResult) {
+      setShowResultCelebration(true);
+      const timer = setTimeout(() => setShowResultCelebration(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [userResult]);
+
+  // Status tracking for each FLAMES letter
+  const getLetterStatus = (letter: string) => {
+    if (userResult === letter) return 'final-result';
+    if (crossedLetters.has(letter)) return 'crossed-out';
+    return 'active';
   };
 
-  const getFlamesCardStyle = () => {
-    if (mode === 'chalkboard') {
+  const getStatusColors = (letter: string, status: string) => {
+    if (status === 'final-result') {
+      // Final result - celebration colors
       return {
-        container: 'bg-white/10 border border-white/20',
-        title: 'text-white',
-        subtitle: 'text-gray-300',
-      };
-    } else {
-      return {
-        container: 'bg-white/80 border border-gray-200',
-        title: 'text-gray-800',
-        subtitle: 'text-gray-600',
+        container: 'bg-primary border-primary ring-4 ring-primary/30 shadow-2xl',
+        text: 'text-on-primary',
+        meaning: 'text-on-primary/90',
+        icon: 'text-on-primary',
       };
     }
-  };
 
-  const getLetterStyle = (letter: string, colorClass: string, bgColorClass: string) => {
-    const isCrossed = crossedLetters.has(letter);
-
-    if (mode === 'chalkboard') {
+    if (status === 'crossed-out') {
+      // Crossed out - muted
       return {
-        base: `bg-slate-700/50 border border-white/30 text-white hover:bg-slate-600/50`,
-        crossed: `bg-red-900/50 border-red-400/50 text-red-300`,
-        meaning: 'text-gray-300',
-      };
-    } else {
-      return {
-        base: `${bgColorClass} border border-gray-300 ${colorClass} hover:opacity-80`,
-        crossed: `bg-red-100 border-red-300 text-red-600`,
-        meaning: 'text-gray-600',
+        container: 'bg-error-container/50 border-outline opacity-50',
+        text: 'text-on-error-container line-through',
+        meaning: 'text-on-error-container/70 line-through',
+        icon: 'text-on-error-container opacity-50',
       };
     }
+
+    // Active state - theme-based colors
+    const flameData = flamesData.find((f) => f.letter === letter);
+    if (flameData) {
+      return {
+        container: cn(
+          `bg-${flameData.color}-container/30 border-${flameData.color}-container hover:bg-${flameData.color}-container/40`
+        ),
+        text: `text-on-${flameData.color}-container`,
+        meaning: `text-on-${flameData.color}-container/80`,
+        icon: `text-${flameData.color}`,
+      };
+    }
+
+    // Fallback
+    return {
+      container: 'bg-surface-container border-outline hover:bg-surface-container/80',
+      text: 'text-on-surface',
+      meaning: 'text-on-surface-variant',
+      icon: 'text-on-surface',
+    };
   };
 
-  const styles = getFlamesCardStyle();
+  // Result validation display
+  const resultValidation = useMemo(() => {
+    if (!userResult || !correctResult) return null;
+
+    const isCorrect = userResult === correctResult;
+    return {
+      isCorrect,
+      message: isCorrect
+        ? `🎉 Correct! You got it!`
+        : `Not quite right. The correct answer is ${correctResult}. Check again!`,
+      bgColor: isCorrect ? 'bg-primary-container/20' : 'bg-error-container/20',
+      textColor: isCorrect ? 'text-on-primary-container' : 'text-error',
+      borderColor: isCorrect ? 'border-primary-container' : 'border-error-container',
+    };
+  }, [userResult, correctResult]);
 
   return (
-    <div className={`rounded-xl p-6 ${styles.container} ${className}`}>
-      <div className="mb-6 text-center">
-        <h3 className={`mb-2 text-2xl font-bold ${styles.title}`}>F.L.A.M.E.S</h3>
-        <p className={`text-sm ${styles.subtitle}`}>Click letters to cross them out as you count</p>
-      </div>
-
-      <div className="grid grid-cols-3 gap-4 md:grid-cols-6">
-        {FLAMES_LETTERS.map((flame, index) => {
-          const isCrossed = crossedLetters.has(flame.letter);
-          const letterStyles = getLetterStyle(flame.letter, flame.color, flame.bgColor);
+    <div className={`relative ${className}`}>
+      {/* FLAMES Letters Grid */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        {flamesData.map((flame, index) => {
+          const status = getLetterStatus(flame.letter);
+          const colors = getStatusColors(flame.letter, status);
+          const isFinalResult = status === 'final-result';
 
           return (
             <motion.button
               key={flame.letter}
-              onClick={() => handleLetterClick(flame.letter)}
-              className={`relative rounded-lg p-4 text-center font-bold transition-all duration-200 ${isCrossed ? letterStyles.crossed : letterStyles.base} `}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
+              onClick={() => onLetterToggle?.(flame.letter)}
+              className={cn(
+                'relative overflow-hidden rounded-2xl border-2 p-4 text-center transition-all duration-300',
+                colors.container,
+                isFinalResult ? 'z-10 scale-110' : 'hover:scale-105',
+                onLetterToggle ? 'cursor-pointer' : 'cursor-default'
+              )}
+              initial={{ opacity: 0, y: 20, scale: 0.8 }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                scale: isFinalResult ? 1.1 : 1,
+                rotate: isFinalResult && showResultCelebration ? [0, -5, 5, 0] : 0,
+              }}
+              transition={{
+                delay: index * 0.1,
+                type: 'spring',
+                stiffness: 300,
+                damping: 20,
+                rotate: {
+                  duration: 0.5,
+                  repeat: showResultCelebration ? 3 : 0,
+                },
+              }}
+              whileHover={onLetterToggle && !isFinalResult ? { scale: 1.05, y: -2 } : {}}
+              whileTap={onLetterToggle && !isFinalResult ? { scale: 0.95 } : {}}
             >
-              <div className="mb-1 text-2xl">{flame.letter}</div>
-              <div className={`text-xs ${letterStyles.meaning}`}>{flame.meaning}</div>
+              {/* Background Glow Effect for Final Result */}
+              {isFinalResult && (
+                <motion.div
+                  className="from-primary/20 via-primary/30 to-primary/20 absolute inset-0 rounded-2xl bg-gradient-to-r"
+                  animate={{
+                    opacity: showResultCelebration ? [0.3, 0.7, 0.3] : 0.3,
+                  }}
+                  transition={{
+                    duration: 1,
+                    repeat: showResultCelebration ? Infinity : 0,
+                  }}
+                />
+              )}
 
-              {/* Cross-out effect */}
-              {isCrossed && (
+              {/* Crown for Final Result */}
+              {isFinalResult && (
+                <motion.div
+                  className="absolute -top-2 -right-2 z-10"
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 15, delay: 0.2 }}
+                >
+                  <Crown className="h-6 w-6 fill-yellow-400 text-yellow-400" />
+                </motion.div>
+              )}
+
+              {/* Letter */}
+              <div className={cn('mb-2 text-3xl font-bold', colors.text)}>{flame.letter}</div>
+
+              {/* Icon */}
+              <div className={cn('mb-2 text-2xl', colors.icon)}>{flame.icon}</div>
+
+              {/* Meaning */}
+              <div className={cn('text-sm font-medium', colors.meaning)}>{flame.meaning}</div>
+
+              {/* Cross-out Effect */}
+              {status === 'crossed-out' && (
                 <motion.div
                   className="absolute inset-0 flex items-center justify-center"
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.2 }}
+                  initial={{ scale: 0, rotate: -45 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
                 >
-                  <div
-                    className={`h-1 w-full origin-center rotate-45 transform ${
-                      mode === 'chalkboard' ? 'bg-red-400' : 'bg-red-500'
-                    }`}
-                  />
-                  <div
-                    className={`absolute h-1 w-full origin-center -rotate-45 transform ${
-                      mode === 'chalkboard' ? 'bg-red-400' : 'bg-red-500'
-                    }`}
-                  />
+                  <div className="bg-error h-1 w-full rotate-45 rounded-full" />
+                  <div className="bg-error absolute h-1 w-full -rotate-45 rounded-full" />
                 </motion.div>
+              )}
+
+              {/* Sparkle Effect for Final Result */}
+              {isFinalResult && showResultCelebration && (
+                <>
+                  {[...Array(6)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute text-yellow-400"
+                      style={{
+                        left: `${20 + i * 12}%`,
+                        top: `${15 + (i % 2) * 30}%`,
+                      }}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{
+                        scale: [0, 1, 0],
+                        opacity: [0, 1, 0],
+                        rotate: [0, 180, 360],
+                      }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        delay: i * 0.1,
+                      }}
+                    >
+                      <Sparkles className="h-3 w-3" />
+                    </motion.div>
+                  ))}
+                </>
               )}
             </motion.button>
           );
         })}
       </div>
 
-      {/* Instructions */}
-      <div className="mt-6 text-center">
-        <p className={`text-xs ${styles.subtitle}`}>
-          💡 Count the remaining letters after crossing out common ones, then use this count to eliminate letters in
-          F.L.A.M.E.S
-        </p>
-      </div>
-
-      {/* Result hint */}
-      {crossedLetters.size > 0 && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-4 text-center">
-          <div
-            className={`inline-block rounded-full px-4 py-2 text-sm ${
-              mode === 'chalkboard' ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-700'
-            }`}
-          >
-            {crossedLetters.size} letter(s) crossed out
-          </div>
+      {/* Result Validation */}
+      {resultValidation && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`mt-6 rounded-xl border p-4 text-center ${resultValidation.bgColor} ${resultValidation.borderColor} ${resultValidation.textColor}`}
+        >
+          <p className="font-medium">{resultValidation.message}</p>
         </motion.div>
       )}
+
+      {/* Progress Indicator */}
+      <div className="mt-6 text-center">
+        <div className="bg-surface-container/50 inline-flex items-center space-x-2 rounded-full px-4 py-2">
+          <span className="text-on-surface-variant text-sm">Progress: {crossedLetters.size}/6 letters crossed</span>
+          <div className="bg-surface-variant h-2 w-16 overflow-hidden rounded-full">
+            <motion.div
+              className="bg-primary h-full rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: `${(crossedLetters.size / 6) * 100}%` }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

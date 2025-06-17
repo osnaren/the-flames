@@ -1,17 +1,23 @@
-import { z } from 'zod';
-import { nameSchema } from '../flames.utils';
-import type { DrawingMode } from './types';
+import { calculateFlamesResult } from '../flames.utils';
 
 export function validateNameInput(name: string): string | null {
-  try {
-    nameSchema.parse(name);
-    return null;
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return error.errors[0].message;
-    }
-    return 'Invalid name';
+  if (!name.trim()) {
+    return 'Name cannot be empty';
   }
+
+  if (name.trim().length < 2) {
+    return 'Name must be at least 2 characters';
+  }
+
+  if (name.trim().length > 20) {
+    return 'Name cannot exceed 20 characters';
+  }
+
+  if (!/^[a-zA-Z\s]+$/.test(name.trim())) {
+    return 'Name can only contain letters and spaces';
+  }
+
+  return null;
 }
 
 export function updateCrossedLetters(
@@ -46,17 +52,19 @@ export function updateCrossedLetters(
 }
 
 // URL parameter utilities
-export const getUrlParams = (): { name1?: string; name2?: string } => {
-  if (typeof window === 'undefined') return {};
+export const getUrlParams = () => {
+  if (typeof window === 'undefined') {
+    return { name1: '', name2: '' };
+  }
 
-  const params = new URLSearchParams(window.location.search);
+  const urlParams = new URLSearchParams(window.location.search);
   return {
-    name1: params.get('name1') || undefined,
-    name2: params.get('name2') || undefined,
+    name1: urlParams.get('name1') || '',
+    name2: urlParams.get('name2') || '',
   };
 };
 
-export const updateUrlParams = (name1: string, name2: string): void => {
+export const updateUrlParams = (name1: string, name2: string) => {
   if (typeof window === 'undefined') return;
 
   const url = new URL(window.location.href);
@@ -66,40 +74,69 @@ export const updateUrlParams = (name1: string, name2: string): void => {
 };
 
 // Canvas utilities
-export const setupCanvas = (canvas: HTMLCanvasElement, mode: DrawingMode): CanvasRenderingContext2D | null => {
-  const rect = canvas.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
-
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
-
+export const setupCanvas = (canvas: HTMLCanvasElement): CanvasRenderingContext2D | null => {
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
 
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+
+  // Set canvas dimensions
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  canvas.style.width = `${rect.width}px`;
+  canvas.style.height = `${rect.height}px`;
+
+  // Scale for high DPI displays
   ctx.scale(dpr, dpr);
+
+  // Set drawing properties based on theme
+  const isDarkMode = document.documentElement.classList.contains('dark');
+
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.strokeStyle = isDarkMode ? 'rgba(255, 255, 255, 0.8)' : '#1e40af';
+  ctx.lineWidth = isDarkMode ? 4 : 3;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-
-  if (mode === 'chalkboard') {
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.lineWidth = 3;
-    ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
-    ctx.shadowBlur = 2;
-  } else {
-    ctx.strokeStyle = '#1f2937';
-    ctx.lineWidth = 2;
-    ctx.shadowColor = 'rgba(31, 41, 55, 0.2)';
-    ctx.shadowBlur = 1;
-  }
 
   return ctx;
 };
 
-export const getCanvasPoint = (
-  canvas: HTMLCanvasElement,
-  clientX: number,
-  clientY: number
-): { x: number; y: number } => {
+export const clearCanvas = (canvas: HTMLCanvasElement) => {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+};
+
+export const eraseArea = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
+  const eraserSize = 30;
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.beginPath();
+  ctx.arc(x, y, eraserSize / 2, 0, Math.PI * 2, false);
+  ctx.fill();
+  ctx.restore();
+};
+
+// Event handling utilities
+export const getEventPoint = (e: MouseEvent | TouchEvent) => {
+  if ('touches' in e && e.touches.length > 0) {
+    return {
+      clientX: e.touches[0].clientX,
+      clientY: e.touches[0].clientY,
+    };
+  } else if ('clientX' in e) {
+    return {
+      clientX: e.clientX,
+      clientY: e.clientY,
+    };
+  }
+  return { clientX: 0, clientY: 0 };
+};
+
+export const getCanvasPoint = (canvas: HTMLCanvasElement, clientX: number, clientY: number) => {
   const rect = canvas.getBoundingClientRect();
   return {
     x: clientX - rect.left,
@@ -107,86 +144,60 @@ export const getCanvasPoint = (
   };
 };
 
-export const clearCanvas = (canvas: HTMLCanvasElement): void => {
-  const ctx = canvas.getContext('2d');
-  if (ctx) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
-};
-
-export const eraseArea = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number = 20): void => {
-  ctx.save();
-  ctx.globalCompositeOperation = 'destination-out';
-  ctx.beginPath();
-  ctx.arc(x, y, size, 0, 2 * Math.PI);
-  ctx.fill();
-  ctx.restore();
-};
-
-// Image generation with branding
+// Share utilities
 export const generateShareableImage = async (
-  canvasElement: HTMLCanvasElement,
+  canvas: HTMLCanvasElement,
   name1: string,
-  name2: string,
-  mode: DrawingMode
+  name2: string
 ): Promise<string> => {
-  const shareCanvas = document.createElement('canvas');
-  const shareCtx = shareCanvas.getContext('2d');
-  if (!shareCtx) throw new Error('Could not create share canvas context');
+  const outputCanvas = document.createElement('canvas');
+  outputCanvas.width = canvas.width;
+  outputCanvas.height = canvas.height;
 
-  // Set canvas size
-  shareCanvas.width = 1200;
-  shareCanvas.height = 800;
+  const outputCtx = outputCanvas.getContext('2d');
+  if (!outputCtx) throw new Error('Could not get canvas context');
 
-  // Background
-  if (mode === 'chalkboard') {
-    shareCtx.fillStyle = '#1f2937';
-  } else {
-    shareCtx.fillStyle = '#ffffff';
-  }
-  shareCtx.fillRect(0, 0, shareCanvas.width, shareCanvas.height);
+  // Draw background based on theme
+  const isDarkMode = document.documentElement.classList.contains('dark');
+  outputCtx.fillStyle = isDarkMode ? '#1e293b' : '#ffffff';
+  outputCtx.fillRect(0, 0, outputCanvas.width, outputCanvas.height);
+
+  // Draw the original canvas content
+  outputCtx.drawImage(canvas, 0, 0);
 
   // Add branding
-  shareCtx.font = 'bold 24px Arial';
-  shareCtx.fillStyle = mode === 'chalkboard' ? '#ffffff' : '#1f2937';
-  shareCtx.textAlign = 'center';
-  shareCtx.fillText('FLAMES Manual Mode', shareCanvas.width / 2, 40);
+  outputCtx.font = '16px Inter, sans-serif';
+  outputCtx.fillStyle = isDarkMode ? '#ffffff' : '#1e293b';
+  outputCtx.fillText(`${name1} ❤️ ${name2} - FLAMES Canvas`, 20, outputCanvas.height - 20);
 
-  // Add names
-  shareCtx.font = '18px Arial';
-  shareCtx.fillText(`${name1} ❤️ ${name2}`, shareCanvas.width / 2, 70);
-
-  // Draw the main canvas content
-  const scale = Math.min(
-    (shareCanvas.width - 100) / canvasElement.width,
-    (shareCanvas.height - 150) / canvasElement.height
-  );
-
-  const scaledWidth = canvasElement.width * scale;
-  const scaledHeight = canvasElement.height * scale;
-  const x = (shareCanvas.width - scaledWidth) / 2;
-  const y = 100;
-
-  shareCtx.drawImage(canvasElement, x, y, scaledWidth, scaledHeight);
-
-  // Add watermark
-  shareCtx.font = '14px Arial';
-  shareCtx.fillStyle = mode === 'chalkboard' ? 'rgba(255,255,255,0.7)' : 'rgba(31,41,55,0.7)';
-  shareCtx.textAlign = 'right';
-  shareCtx.fillText('Created with FLAMES Game', shareCanvas.width - 20, shareCanvas.height - 20);
-
-  return shareCanvas.toDataURL('image/png');
+  return outputCanvas.toDataURL('image/png', 0.9);
 };
 
-// Touch/Mouse event utilities
-export const isTouchEvent = (e: Event): e is TouchEvent => {
-  return 'touches' in e;
+// Result validation utilities
+export const calculateCorrectResult = (name1: string, name2: string): string => {
+  return calculateFlamesResult(name1, name2) || 'F';
 };
 
-export const getEventPoint = (e: MouseEvent | TouchEvent): { clientX: number; clientY: number } => {
-  if (isTouchEvent(e)) {
-    const touch = e.touches[0] || e.changedTouches[0];
-    return { clientX: touch.clientX, clientY: touch.clientY };
+export const getRemainingFlamesLetters = (crossedLetters: Set<string>): string[] => {
+  const flamesLetters = ['F', 'L', 'A', 'M', 'E', 'S'];
+  return flamesLetters.filter((letter) => !crossedLetters.has(letter));
+};
+
+export const shouldShowValidationHint = (
+  name1: string,
+  name2: string,
+  remainingLetters: string[]
+): { show: boolean; isCorrect: boolean; correctResult: string } => {
+  if (remainingLetters.length !== 1) {
+    return { show: false, isCorrect: false, correctResult: '' };
   }
-  return { clientX: e.clientX, clientY: e.clientY };
+
+  const userResult = remainingLetters[0];
+  const correctResult = calculateCorrectResult(name1, name2);
+
+  return {
+    show: true,
+    isCorrect: userResult === correctResult,
+    correctResult: correctResult,
+  };
 };
