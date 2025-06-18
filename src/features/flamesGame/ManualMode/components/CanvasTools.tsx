@@ -5,15 +5,15 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Download, Eraser, Share, Trash2 } from 'lucide-react';
 import type { CanvasToolsProps } from '../types';
 
-export default function CanvasTools({ 
-  isErasing, 
-  onErase, 
-  onClear, 
-  onBack, 
-  onShare, 
-  onSave, 
-  isSharing = false, 
-  isSaving = false 
+export default function CanvasTools({
+  isErasing,
+  onErase,
+  onClear,
+  onBack,
+  onShare,
+  onSave,
+  isSharing = false,
+  isSaving = false,
 }: CanvasToolsProps) {
   const deviceType = useDeviceType();
   const isMobile = deviceType === 'mobile';
@@ -25,9 +25,7 @@ export default function CanvasTools({
 
   const containerClasses = cn(
     'flex items-center justify-center transition-all duration-300',
-    isMobile
-      ? 'fixed bottom-4 left-1/2 z-50 -translate-x-1/2' // Mobile: floating dock at bottom
-      : 'w-max-content' // Desktop: full width at top
+    isMobile ? 'fixed bottom-4 left-1/2 z-50 -translate-x-1/2' : 'w-max-content'
   );
 
   const toolbarClasses = cn(
