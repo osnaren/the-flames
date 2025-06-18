@@ -1,5 +1,6 @@
 import { cn } from '@/utils';
 import { useDeviceType } from '@hooks/useDeviceType';
+import { usePreferences } from '@hooks/usePreferences';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -10,12 +11,12 @@ import CanvasTools from './CanvasTools';
 // Enhanced custom cursor system with theme support
 const getCursorConfig = () => ({
   draw: {
-    dark: 'url(/assets/chalk.png) 15 12, auto',
-    light: 'url(/assets/pen.png) 6 60, auto',
+    dark: 'url(/assets/cursor/chalk.png) 15 12, auto',
+    light: 'url(/assets/cursor/pen.png) 6 60, auto',
   },
   eraser: {
-    dark: 'url(/assets/duster.png) 30 32, auto',
-    light: 'url(/assets/eraser.png) 10 42, auto',
+    dark: 'url(/assets/cursor/duster.png) 30 32, auto',
+    light: 'url(/assets/cursor/eraser.png) 20 26, auto',
   },
 });
 
@@ -37,6 +38,8 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
   const deviceType = useDeviceType();
   const isMobile = deviceType === 'mobile';
   const isTablet = deviceType === 'tablet';
+
+  const [{ isDarkTheme: isDarkMode }] = usePreferences();
 
   // Local state for drawing logic
   const [isDrawing, setIsDrawing] = useState(false);
@@ -127,7 +130,6 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
 
       const x = xI;
       const y = yI;
-      const isDarkMode = document.documentElement.classList.contains('dark');
 
       // Adjust drawing properties for different devices and themes
       if (isDarkMode) {
@@ -187,7 +189,7 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
       ctx.restore();
       lastCoordinates.current = { x, y };
     },
-    [isMobile]
+    [isDarkMode, isMobile]
   );
 
   // Enhanced erase function with responsive sizing
@@ -355,7 +357,6 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
 
   // Enhanced cursor style with theme awareness
   const getCursorStyle = useCallback(() => {
-    const isDarkMode = document.documentElement.classList.contains('dark');
     const cursors = getCursorConfig();
     const theme = isDarkMode ? 'dark' : 'light';
 
@@ -363,7 +364,7 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
       return cursors.eraser[theme];
     }
     return cursors.draw[theme];
-  }, [isErasing]);
+  }, [isErasing, isDarkMode]);
 
   const handleShare = async () => {
     const canvas = canvasRef.current;
@@ -379,7 +380,6 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
       exportCanvas.height = canvas.height;
 
       // Set background based on theme
-      const isDarkMode = document.documentElement.classList.contains('dark');
       exportCtx.fillStyle = isDarkMode ? '#1e1e1e' : '#ffffff';
       exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
 
@@ -483,7 +483,7 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
             transition={{ duration: 0.6, delay: 0.2 }}
             className={cn(
               'relative w-full overflow-hidden rounded-xl shadow-2xl',
-              'border-outline/20 bg-surface border backdrop-blur-sm'
+              'border-outline/20 border bg-transparent backdrop-blur-sm'
             )}
             style={{
               height: canvasHeight,
@@ -492,12 +492,20 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
           >
             {/* Layer 1: Background with texture */}
             <div className="border-outline/30 bg-surface absolute inset-0 overflow-hidden rounded-xl border-2 shadow-2xl sm:rounded-2xl">
-              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(180deg,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[length:20px_20px] dark:bg-[linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.02)_1px,transparent_1px)]" />
+              {isDarkMode ? (
+                <img
+                  src="assets/blackboard.jpg"
+                  className="pointer-events-none h-full w-full select-none"
+                  alt="Blackboard background"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(180deg,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[length:20px_20px] dark:bg-[linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.02)_1px,transparent_1px)]" />
+              )}
             </div>
 
             {/* Layer 2: Letter Tiles and FLAMES Letters */}
             <div
-              className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-y-auto p-3 sm:p-6 lg:p-8"
+              className="pointer-events-none absolute inset-0 flex flex-col items-center justify-around gap-8 overflow-y-auto p-3 sm:gap-12 sm:p-6 lg:p-8"
               style={{ transform: `scale(${scaleFactor})` }}
             >
               <div className="space-y-8 sm:space-y-12">
@@ -572,43 +580,43 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
                     ))}
                   </div>
                 </motion.div>
-
-                {/* Step 3: FLAMES Letters */}
-                <motion.div
-                  className="text-center"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.7 }}
-                >
-                  <div className="mb-4 flex items-center justify-center sm:mb-6">
-                    <div className="bg-secondary-container text-on-secondary-container mr-3 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold sm:mr-4 sm:h-8 sm:w-8 sm:text-lg">
-                      3
-                    </div>
-                    <h2 className="text-on-surface text-lg font-bold sm:text-2xl md:text-3xl">F.L.A.M.E.S</h2>
-                  </div>
-
-                  <div className="mx-auto grid max-w-4xl grid-cols-3 gap-2 sm:gap-4 md:grid-cols-6">
-                    {flamesLetters.map((flame, index) => (
-                      <motion.div
-                        key={flame.id}
-                        className="bg-secondary-container/30 border-secondary-container rounded-lg border p-2 text-center transition-all duration-300 sm:rounded-xl sm:p-4"
-                        initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        transition={{
-                          delay: 0.8 + index * 0.1,
-                          type: 'spring',
-                          stiffness: 300,
-                          damping: 20,
-                        }}
-                      >
-                        <div className="text-on-surface mb-1 text-lg font-bold sm:text-2xl">{flame.letter}</div>
-                        <div className="mb-1 text-sm sm:text-xl">{flame.icon}</div>
-                        <div className="text-on-surface-variant text-xs">{flame.meaning}</div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
               </div>
+
+              {/* Step 3: FLAMES Letters */}
+              <motion.div
+                className="text-center"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.7 }}
+              >
+                <div className="mb-4 flex items-center justify-center sm:mb-6">
+                  <div className="bg-secondary-container text-on-secondary-container mr-3 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold sm:mr-4 sm:h-8 sm:w-8 sm:text-lg">
+                    3
+                  </div>
+                  <h2 className="text-on-surface text-lg font-bold sm:text-2xl md:text-3xl">F.L.A.M.E.S</h2>
+                </div>
+
+                <div className="mx-auto grid max-w-4xl grid-cols-3 gap-2 sm:gap-4 md:grid-cols-6">
+                  {flamesLetters.map((flame, index) => (
+                    <motion.div
+                      key={flame.id}
+                      className="bg-secondary-container/30 border-secondary-container rounded-lg border p-2 text-center transition-all duration-300 sm:rounded-xl sm:p-4"
+                      initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{
+                        delay: 0.8 + index * 0.1,
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 20,
+                      }}
+                    >
+                      <div className="text-on-surface mb-1 text-lg font-bold sm:text-2xl">{flame.letter}</div>
+                      <div className="mb-1 text-sm sm:text-xl">{flame.icon}</div>
+                      <div className="text-on-surface-variant text-xs">{flame.meaning}</div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
             </div>
 
             {/* Layer 3: Canvas Drawing Layer */}
