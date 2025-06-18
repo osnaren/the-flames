@@ -1,24 +1,75 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
-import { useCallback, useEffect, useRef } from 'react';
-import { useManualMode } from '../hooks/useManualMode';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CanvasExperienceProps } from '../types';
 import CanvasInstructions from './CanvasInstructions';
 import CanvasTools from './CanvasTools';
 
 // Custom cursor data URLs for different tools
 const CURSORS = {
-  draw: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTMgMTcuMjVWMjEuMjVINy4yNUwxOC44MSA5LjY5TDE0LjMxIDUuMTlMMi43NSAxNi42M1YxNy4yNUgzWk0yMC43MSA3LjA0QzIxLjEgNi42NSAyMS4xIDYuMDIgMjAuNzEgNS42M0wxOC4zNyAzLjI5QzE3Ljk4IDIuOSAxNy4zNSAyLjkgMTYuOTYgMy4yOUwxNS4xMyA1LjEyTDE4Ljg4IDguODdMMjAuNzEgNy4wNFoiIGZpbGw9IiMyNTYzRUIiLz4KPHN2Zz4=',
-  eraser:
-    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTcuNSAyMUgxN0wyMSAxN0wxNi41IDEyLjVMNy41IDIxWk01IDEzTDEzIDVMMTkgMTFMMTEgMTlMNSAxM1oiIGZpbGw9IiNGNTkyOTIiIHN0cm9rZT0iIzFGMjkzNyIgc3Ryb2tlLXdpZHRoPSIxIi8+Cjwvc3ZnPg==',
+  draw: '/assets/chalk.png',
+  eraser: '/assets/duster_sm.png',
+};
+
+// Utility to get proper viewport height for mobile
+const getViewportHeight = () => {
+  // Use window.innerHeight on mobile for better handling of address bar
+  if (typeof window !== 'undefined') {
+    return window.innerHeight;
+  }
+  return 600; // Fallback for SSR
 };
 
 export default function CanvasExperience({ name1, name2, onBack, onShare }: CanvasExperienceProps) {
-  const { state, canvasRef, handlers } = useManualMode();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  // Use refs for immediate coordinate tracking instead of state
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
   const lastCoordinates = useRef({ x: 0, y: 0 });
-  const isDrawingRef = useRef(false);
+  const animationFrameRef = useRef<number | null>(null);
+
+  // Local state for drawing logic
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [isErasing, setIsErasing] = useState(false);
+  const [canvasHeight, setCanvasHeight] = useState('600px');
+  const [isCanvasReady, setIsCanvasReady] = useState(false);
+
+  // Calculate responsive canvas height with mobile viewport fixes
+  useEffect(() => {
+    const calculateCanvasHeight = () => {
+      const vh = getViewportHeight();
+      const vw = window.innerWidth;
+
+      if (vw < 640) {
+        // Mobile - account for UI elements
+        return `${Math.min(vh * 0.55, 450)}px`;
+      } else if (vw < 1024) {
+        // Tablet
+        return `${Math.min(vh * 0.65, 550)}px`;
+      } else {
+        // Desktop
+        return `${Math.min(vh * 0.7, 650)}px`;
+      }
+    };
+
+    const updateHeight = () => {
+      setCanvasHeight(calculateCanvasHeight());
+    };
+
+    updateHeight();
+
+    // Handle both resize and orientation change
+    const handleResize = () => {
+      setTimeout(updateHeight, 100); // Delay to ensure proper measurement
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
+  }, []);
 
   // Calculate letter positions for proper layout
   const name1Letters = name1
@@ -40,36 +91,34 @@ export default function CanvasExperience({ name1, name2, onBack, onShare }: Canv
     }));
 
   const flamesLetters = [
-    { letter: 'F', meaning: 'Friends', icon: '👫' },
-    { letter: 'L', meaning: 'Love', icon: '💕' },
-    { letter: 'A', meaning: 'Affection', icon: '🥰' },
-    { letter: 'M', meaning: 'Marriage', icon: '💒' },
-    { letter: 'E', meaning: 'Enemies', icon: '⚔️' },
-    { letter: 'S', meaning: 'Siblings', icon: '👨‍👩‍👧‍👦' },
+    { letter: 'F', meaning: 'Friends', icon: '🤝🏼', color: 'friendship' },
+    { letter: 'L', meaning: 'Love', icon: '💕', color: 'love' },
+    { letter: 'A', meaning: 'Affection', icon: '🥰', color: 'affection' },
+    { letter: 'M', meaning: 'Marriage', icon: '💍', color: 'marriage' },
+    { letter: 'E', meaning: 'Enemies', icon: '⚔️', color: 'enemy' },
+    { letter: 'S', meaning: 'Siblings', icon: '👫🏼', color: 'siblings' },
   ].map((flame, index) => ({
     ...flame,
     id: `flames-${index}`,
   }));
 
-  // Enhanced drawing function that adapts to theme
+  // Enhanced drawing function with performance optimizations
   const drawWithEffect = useCallback((x: number, y: number, ctx: CanvasRenderingContext2D) => {
-    // Save the current drawing state (styles, etc.)
     ctx.save();
 
-    // Set the drawing style based on theme
     const isDarkMode = document.documentElement.classList.contains('dark');
+    const isMobile = window.innerWidth < 768;
 
+    // Adjust drawing properties for different devices and themes
     if (isDarkMode) {
-      // Dark theme - lighter drawing for visibility
       const opacity = 0.7 + Math.random() * 0.3;
       ctx.strokeStyle = `rgba(255,255,255,${opacity})`;
-      ctx.lineWidth = 4;
+      ctx.lineWidth = isMobile ? 3 : 4;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
     } else {
-      // Light theme - darker drawing
       ctx.strokeStyle = '#1e40af';
-      ctx.lineWidth = 3;
+      ctx.lineWidth = isMobile ? 2.5 : 3;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
     }
@@ -77,7 +126,6 @@ export default function CanvasExperience({ name1, name2, onBack, onShare }: Canv
     const lastX = lastCoordinates.current.x;
     const lastY = lastCoordinates.current.y;
 
-    // Skip drawing if this is the first point (just record position)
     if (!lastX && !lastY) {
       lastCoordinates.current = { x, y };
       ctx.restore();
@@ -90,25 +138,24 @@ export default function CanvasExperience({ name1, name2, onBack, onShare }: Canv
     ctx.lineTo(x, y);
     ctx.stroke();
 
-    // Add texture effects for dark theme
-    if (isDarkMode) {
+    // Add texture effects for dark theme (reduced on mobile for performance)
+    if (isDarkMode && !isMobile) {
       const distance = Math.sqrt((x - lastX) ** 2 + (y - lastY) ** 2);
       const length = Math.max(5, Math.round(distance));
 
-      // Only add texture if we've moved far enough
       if (distance > 2) {
         const xUnit = (x - lastX) / (length || 1);
         const yUnit = (y - lastY) / (length || 1);
 
-        // Add texture effect
         ctx.globalCompositeOperation = 'destination-out';
-        for (let i = 0; i < length / 3; i++) {
-          if (Math.random() > 0.7) {
+        for (let i = 0; i < length / 5; i++) {
+          // Reduced iterations for better performance
+          if (Math.random() > 0.85) {
             const xCurrent = lastX + Math.random() * distance * xUnit;
             const yCurrent = lastY + Math.random() * distance * yUnit;
-            const xRandom = xCurrent + (Math.random() - 0.5) * 6;
-            const yRandom = yCurrent + (Math.random() - 0.5) * 6;
-            const size = Math.random() * 1.5 + 0.5;
+            const xRandom = xCurrent + (Math.random() - 0.5) * 3;
+            const yRandom = yCurrent + (Math.random() - 0.5) * 3;
+            const size = Math.random() * 0.8 + 0.4;
             ctx.beginPath();
             ctx.arc(xRandom, yRandom, size, 0, Math.PI * 2);
             ctx.fill();
@@ -117,18 +164,15 @@ export default function CanvasExperience({ name1, name2, onBack, onShare }: Canv
       }
     }
 
-    // Restore original canvas state
     ctx.restore();
-
-    // Update last position
     lastCoordinates.current = { x, y };
   }, []);
 
-  // Enhanced erase function
+  // Enhanced erase function with responsive sizing
   const eraseWithEffect = useCallback((x: number, y: number, ctx: CanvasRenderingContext2D) => {
-    const eraserSize = 30;
+    const isMobile = window.innerWidth < 768;
+    const eraserSize = isMobile ? 20 : 25;
 
-    // Use arc for a more natural circular eraser
     ctx.save();
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
@@ -136,508 +180,532 @@ export default function CanvasExperience({ name1, name2, onBack, onShare }: Canv
     ctx.fill();
     ctx.restore();
 
-    // Update last position for smooth erasing
     lastCoordinates.current = { x, y };
   }, []);
 
-  // Setup canvas with enhanced properties
+  // Setup canvas with enhanced responsive properties
   const setupCanvas = useCallback(() => {
     const canvas = canvasRef.current;
-    const container = containerRef.current;
+    const container = canvasContainerRef.current;
     if (!canvas || !container) return;
 
     const rect = container.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap DPR for performance on mobile
 
-    // Set canvas dimensions
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
     canvas.style.width = `${rect.width}px`;
     canvas.style.height = `${rect.height}px`;
 
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const ctx = canvas.getContext('2d', {
+      willReadFrequently: true,
+      alpha: true,
+    });
     if (!ctx) return;
 
-    // Clear canvas first
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Scale for high DPI displays
     ctx.scale(dpr, dpr);
 
-    // Set basic drawing properties
     const isDarkMode = document.documentElement.classList.contains('dark');
+    const isMobile = window.innerWidth < 768;
 
     ctx.globalCompositeOperation = 'source-over';
     ctx.strokeStyle = isDarkMode ? 'rgba(255, 255, 255, 0.8)' : '#1e40af';
-    ctx.lineWidth = isDarkMode ? 4 : 3;
+    ctx.lineWidth = isDarkMode ? (isMobile ? 3 : 4) : isMobile ? 2.5 : 3;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    // Add subtle shadow for better visibility
-    ctx.shadowColor = isDarkMode ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)';
-    ctx.shadowBlur = 1;
+    // Lighter shadow on mobile for performance
+    if (!isMobile) {
+      ctx.shadowColor = isDarkMode ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)';
+      ctx.shadowBlur = 1;
+    }
 
+    setIsCanvasReady(true);
     return ctx;
-  }, [canvasRef]);
+  }, []);
 
-  // Enhanced mouse/touch event handlers
-  const getCoordinates = useCallback(
-    (e: MouseEvent | TouchEvent) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return { x: 0, y: 0 };
+  // Enhanced coordinate extraction with touch support
+  const getCoordinates = useCallback((e: MouseEvent | TouchEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
 
-      const rect = canvas.getBoundingClientRect();
-      const clientX = 'clientX' in e ? e.clientX : e.touches[0].clientX;
-      const clientY = 'clientY' in e ? e.clientY : e.touches[0].clientY;
+    const rect = canvas.getBoundingClientRect();
+    let clientX: number, clientY: number;
 
-      return {
-        x: clientX - rect.left,
-        y: clientY - rect.top,
-      };
+    if ('touches' in e && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else if ('clientX' in e) {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    } else {
+      return { x: 0, y: 0 };
+    }
+
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+    };
+  }, []);
+
+  const handleClearCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }, []);
+
+  const toggleErase = useCallback(() => {
+    setIsErasing((prev) => !prev);
+  }, []);
+
+  // Optimized drawing handlers using requestAnimationFrame
+  const scheduleDrawing = useCallback(
+    (coords: { x: number; y: number }) => {
+      if (animationFrameRef.current) return; // Prevent multiple frames
+
+      animationFrameRef.current = requestAnimationFrame(() => {
+        const ctx = canvasRef.current?.getContext('2d');
+        if (ctx) {
+          if (isErasing) {
+            eraseWithEffect(coords.x, coords.y, ctx);
+          } else {
+            drawWithEffect(coords.x, coords.y, ctx);
+          }
+        }
+        animationFrameRef.current = null;
+      });
     },
-    [canvasRef]
+    [isErasing, eraseWithEffect, drawWithEffect]
   );
 
+  // Mouse event handlers
   const handleCanvasMouseDown = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
+      if (!isCanvasReady) return;
+
       const coords = getCoordinates(e.nativeEvent);
       lastCoordinates.current = { x: coords.x, y: coords.y };
-      isDrawingRef.current = true;
-
-      // Start drawing with hook handler first (this sets the state)
-      handlers.startDrawing(e.nativeEvent);
-
-      // Draw a single point to start (immediate feedback)
-      const ctx = canvasRef.current?.getContext('2d');
-      if (ctx) {
-        if (state.isErasing) {
-          eraseWithEffect(coords.x, coords.y, ctx);
-        } else {
-          // Draw a small dot at the starting point
-          const isDarkMode = document.documentElement.classList.contains('dark');
-          ctx.beginPath();
-          ctx.arc(coords.x, coords.y, isDarkMode ? 2 : 1.5, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
+      setIsDrawing(true);
+      scheduleDrawing(coords);
     },
-    [getCoordinates, state.isErasing, eraseWithEffect, canvasRef, handlers]
+    [getCoordinates, scheduleDrawing, isCanvasReady]
   );
 
   const handleCanvasMouseMove = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
-
-      // Check our ref-based drawing state for immediate response
-      if (!isDrawingRef.current) return;
+      if (!isDrawing || !isCanvasReady) return;
 
       const coords = getCoordinates(e.nativeEvent);
-      const ctx = canvasRef.current?.getContext('2d');
-      if (!ctx) return;
-
-      if (state.isErasing) {
-        eraseWithEffect(coords.x, coords.y, ctx);
-      } else {
-        drawWithEffect(coords.x, coords.y, ctx);
-      }
-
-      // Also call the hook's draw function for state management
-      handlers.draw?.(e.nativeEvent);
+      scheduleDrawing(coords);
     },
-    [state.isErasing, getCoordinates, drawWithEffect, eraseWithEffect, canvasRef, handlers]
+    [isDrawing, getCoordinates, scheduleDrawing, isCanvasReady]
   );
 
-  const handleCanvasMouseUp = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      isDrawingRef.current = false;
-      handlers.stopDrawing();
-    },
-    [handlers]
-  );
+  const handleCanvasMouseUp = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDrawing(false);
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+  }, []);
 
+  // Touch event handlers with better mobile experience
   const handleCanvasTouchStart = useCallback(
     (e: React.TouchEvent) => {
       e.preventDefault();
+      if (!isCanvasReady) return;
+
       const coords = getCoordinates(e.nativeEvent);
       lastCoordinates.current = { x: coords.x, y: coords.y };
-      isDrawingRef.current = true;
-
-      // Start drawing with hook handler first (this sets the state)
-      handlers.startDrawing(e.nativeEvent);
-
-      // Draw a single point to start (immediate feedback)
-      const ctx = canvasRef.current?.getContext('2d');
-      if (ctx) {
-        if (state.isErasing) {
-          eraseWithEffect(coords.x, coords.y, ctx);
-        } else {
-          // Draw a small dot at the starting point
-          const isDarkMode = document.documentElement.classList.contains('dark');
-          ctx.beginPath();
-          ctx.arc(coords.x, coords.y, isDarkMode ? 2 : 1.5, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
+      setIsDrawing(true);
+      scheduleDrawing(coords);
     },
-    [getCoordinates, state.isErasing, eraseWithEffect, canvasRef, handlers]
+    [getCoordinates, scheduleDrawing, isCanvasReady]
   );
 
   const handleCanvasTouchMove = useCallback(
     (e: React.TouchEvent) => {
       e.preventDefault();
-
-      // Check our ref-based drawing state for immediate response
-      if (!isDrawingRef.current) return;
+      if (!isDrawing || !isCanvasReady) return;
 
       const coords = getCoordinates(e.nativeEvent);
-      const ctx = canvasRef.current?.getContext('2d');
-      if (!ctx) return;
-
-      if (state.isErasing) {
-        eraseWithEffect(coords.x, coords.y, ctx);
-      } else {
-        drawWithEffect(coords.x, coords.y, ctx);
-      }
-
-      // Also call the hook's draw function for state management
-      handlers.draw?.(e.nativeEvent);
+      scheduleDrawing(coords);
     },
-    [state.isErasing, getCoordinates, drawWithEffect, eraseWithEffect, canvasRef, handlers]
+    [isDrawing, getCoordinates, scheduleDrawing, isCanvasReady]
   );
 
-  const handleCanvasTouchEnd = useCallback(
-    (e: React.TouchEvent) => {
-      e.preventDefault();
-      isDrawingRef.current = false;
-      handlers.stopDrawing();
-    },
-    [handlers]
-  );
+  const handleCanvasTouchEnd = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
+    setIsDrawing(false);
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+  }, []);
 
   const handleRightClick = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
-      handlers.toggleErase();
+      toggleErase();
     },
-    [handlers]
+    [toggleErase]
   );
 
   // Get cursor style based on mode
   const getCursorStyle = () => {
-    if (state.isErasing) {
+    if (isErasing) {
       return `cursor-[url("${CURSORS.eraser}"),16_16,auto]`;
     } else {
-      return `cursor-[url("${CURSORS.draw}"),8_24,auto]`;
+      return `cursor-[url("${CURSORS.draw}"),8_8,auto]`;
     }
   };
 
-  // Handle share
   const handleShare = async () => {
-    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
     try {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      // Create a temporary canvas for the final image
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+      if (!tempCtx) return;
 
-      // Create a new canvas for final output with background
-      const outputCanvas = document.createElement('canvas');
-      outputCanvas.width = canvas.width;
-      outputCanvas.height = canvas.height;
-      const outputCtx = outputCanvas.getContext('2d');
-      if (!outputCtx) return;
+      // Set dimensions for sharing
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = canvas.height;
 
-      // Draw background based on theme
+      // Get theme-aware background
       const isDarkMode = document.documentElement.classList.contains('dark');
-      outputCtx.fillStyle = isDarkMode ? '#1e293b' : '#ffffff';
-      outputCtx.fillRect(0, 0, outputCanvas.width, outputCanvas.height);
+      tempCtx.fillStyle = isDarkMode ? '#0f172a' : '#ffffff';
+      tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
-      // Draw the original canvas content
-      outputCtx.drawImage(canvas, 0, 0);
+      // Add subtle grid pattern
+      tempCtx.strokeStyle = isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+      tempCtx.lineWidth = 1;
+      const gridSize = 20;
 
-      // Add branding
-      outputCtx.font = '16px Inter, sans-serif';
-      outputCtx.fillStyle = isDarkMode ? '#ffffff' : '#1e293b';
-      outputCtx.fillText(`${name1} ❤️ ${name2} - FLAMES Canvas`, 20, outputCanvas.height - 20);
+      for (let x = 0; x < tempCanvas.width; x += gridSize) {
+        tempCtx.beginPath();
+        tempCtx.moveTo(x, 0);
+        tempCtx.lineTo(x, tempCanvas.height);
+        tempCtx.stroke();
+      }
 
-      const imageData = outputCanvas.toDataURL('image/png', 0.9);
+      for (let y = 0; y < tempCanvas.height; y += gridSize) {
+        tempCtx.beginPath();
+        tempCtx.moveTo(0, y);
+        tempCtx.lineTo(tempCanvas.width, y);
+        tempCtx.stroke();
+      }
 
-      if (navigator.share && 'canShare' in navigator) {
-        const blob = await fetch(imageData).then((r) => r.blob());
-        const file = new File([blob], 'flames-canvas-result.png', { type: 'image/png' });
+      // Draw the actual canvas content
+      tempCtx.drawImage(canvas, 0, 0);
 
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            title: 'FLAMES Canvas Result',
-            text: `${name1} ❤️ ${name2} - Canvas Mode`,
-            files: [file],
-          });
-        } else {
-          // Fallback to download
+      // Add watermark
+      tempCtx.fillStyle = isDarkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)';
+      tempCtx.font = '16px system-ui, -apple-system, sans-serif';
+      tempCtx.textAlign = 'right';
+      tempCtx.fillText(`${name1} ❤️ ${name2} - FLAMES Canvas`, tempCanvas.width - 20, tempCanvas.height - 20);
+
+      // Convert to blob and trigger download
+      tempCanvas.toBlob(
+        (blob) => {
+          if (!blob) return;
+
+          const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
+          link.href = url;
           link.download = `flames-canvas-${name1}-${name2}.png`;
-          link.href = imageData;
+          document.body.appendChild(link);
           link.click();
-        }
-      } else {
-        // Fallback: download
-        const link = document.createElement('a');
-        link.download = `flames-canvas-${name1}-${name2}.png`;
-        link.href = imageData;
-        link.click();
-      }
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
 
-      onShare(imageData);
+          // Call the parent share handler if provided
+          if (onShare) {
+            onShare('data:image/png;base64,base64encodedstring'); // Provide dummy data since parent expects string
+          }
+        },
+        'image/png',
+        0.95
+      );
     } catch (error) {
-      console.error('Share failed:', error);
-      // Fallback to simple download
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const link = document.createElement('a');
-        link.download = `flames-canvas-${name1}-${name2}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-      }
+      console.error('Error sharing canvas:', error);
     }
   };
 
-  // Setup canvas on mount and visual mode change
+  // Setup canvas on mount and resize
   useEffect(() => {
-    // Short delay to ensure DOM is ready
     const timer = setTimeout(() => {
-      const ctx = setupCanvas();
-      // Initialize with clean slate
-      if (ctx && canvasRef.current) {
-        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-      }
+      setupCanvas();
 
-      // Ensure the canvas receives proper focus for input events
       const canvas = canvasRef.current;
       if (canvas) {
-        canvas.tabIndex = 1; // Make canvas focusable
-        canvas.focus(); // Focus the canvas
-        canvas.style.outline = 'none'; // Remove outline when focused
+        canvas.tabIndex = 1;
+        canvas.focus();
+        canvas.style.outline = 'none';
       }
-    }, 200);
+    }, 300); // Slightly longer delay for mobile
 
     return () => clearTimeout(timer);
-  }, [setupCanvas, canvasRef]);
+  }, [setupCanvas, canvasHeight]);
 
-  // Handle resize
+  // Handle resize and cleanup
   useEffect(() => {
     const handleResize = () => {
-      setTimeout(setupCanvas, 100);
+      setTimeout(setupCanvas, 150);
     };
 
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
   }, [setupCanvas]);
 
   return (
-    <div className="bg-background relative min-h-screen">
+    <div className="bg-background relative min-h-screen overflow-hidden">
       {/* Background Pattern */}
       <div className="bg-[radial-gradient(circle_at_1px_1px,theme(colors.on-surface)_1px,transparent_0)] absolute inset-0 bg-[length:20px_20px] opacity-5" />
 
-      <div className="relative z-10 min-h-screen p-4">
-        {/* Floating Canvas Tools */}
-        <CanvasTools
-          isErasing={state.isErasing}
-          onErase={handlers.toggleErase}
-          onClear={handlers.clearCanvasArea}
-          onBack={onBack}
-          onShare={handleShare}
-        />
-
-        {/* Page Title */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="mb-8 pt-20 text-center"
-        >
-          <div className="mb-4 flex items-center justify-center">
-            <Sparkles className="text-primary mr-3 h-8 w-8" />
-            <h1 className="text-on-surface text-4xl font-bold md:text-5xl">
-              {name1} ❤️ {name2}
-            </h1>
-            <Sparkles className="text-primary ml-3 h-8 w-8" />
-          </div>
-          <p className="text-on-surface-variant text-lg">Draw over the letters to strike them out</p>
-        </motion.div>
-
-        {/* Main Canvas Container with Layered Content */}
-        <motion.div
-          ref={containerRef}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="relative mx-auto max-w-6xl"
-          style={{ height: '700px' }}
-        >
-          {/* Layer 1: Background with texture */}
-          <div className="border-outline/30 bg-surface absolute inset-0 overflow-hidden rounded-2xl border-2 shadow-2xl">
-            {/* Paper texture */}
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(180deg,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[length:20px_20px] dark:bg-[linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.02)_1px,transparent_1px)]" />
-          </div>
-
-          {/* Layer 2: Letter Tiles and FLAMES Letters */}
-          <div className="pointer-events-none absolute inset-0 p-8">
-            {/* Names Section */}
-            <div className="space-y-12">
-              {/* Step 1: First Name */}
-              <motion.div
-                className="text-center"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
-                <div className="mb-6 flex items-center justify-center">
-                  <div className="bg-primary-container text-on-primary-container mr-4 flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold">
-                    1
-                  </div>
-                  <h2 className="text-on-surface text-2xl font-bold md:text-3xl">{name1.toUpperCase()}</h2>
-                </div>
-
-                <div className="flex flex-wrap justify-center gap-3">
-                  {name1Letters.map((letterData, index) => (
-                    <motion.div
-                      key={letterData.id}
-                      className="bg-primary-container/30 border-primary-container text-on-surface flex h-16 w-16 items-center justify-center rounded-xl border text-xl font-bold transition-all duration-300"
-                      initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{
-                        delay: 0.4 + index * 0.05,
-                        type: 'spring',
-                        stiffness: 300,
-                        damping: 20,
-                      }}
-                    >
-                      {letterData.letter}
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Step 2: Second Name */}
-              <motion.div
-                className="text-center"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
-              >
-                <div className="mb-6 flex items-center justify-center">
-                  <div className="bg-tertiary-container text-on-tertiary-container mr-4 flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold">
-                    2
-                  </div>
-                  <h2 className="text-on-surface text-2xl font-bold md:text-3xl">{name2.toUpperCase()}</h2>
-                </div>
-
-                <div className="flex flex-wrap justify-center gap-3">
-                  {name2Letters.map((letterData, index) => (
-                    <motion.div
-                      key={letterData.id}
-                      className="bg-tertiary-container/30 border-tertiary-container text-on-surface flex h-16 w-16 items-center justify-center rounded-xl border text-xl font-bold transition-all duration-300"
-                      initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{
-                        delay: 0.6 + index * 0.05,
-                        type: 'spring',
-                        stiffness: 300,
-                        damping: 20,
-                      }}
-                    >
-                      {letterData.letter}
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Step 3: FLAMES Letters */}
-              <motion.div
-                className="text-center"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.7 }}
-              >
-                <div className="mb-6 flex items-center justify-center">
-                  <div className="bg-secondary-container text-on-secondary-container mr-4 flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold">
-                    3
-                  </div>
-                  <h2 className="text-on-surface text-2xl font-bold md:text-3xl">F.L.A.M.E.S</h2>
-                </div>
-
-                <div className="mx-auto grid max-w-4xl grid-cols-3 gap-4 md:grid-cols-6">
-                  {flamesLetters.map((flame, index) => (
-                    <motion.div
-                      key={flame.id}
-                      className="bg-secondary-container/30 border-secondary-container rounded-xl border p-4 text-center transition-all duration-300"
-                      initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{
-                        delay: 0.8 + index * 0.1,
-                        type: 'spring',
-                        stiffness: 300,
-                        damping: 20,
-                      }}
-                    >
-                      <div className="text-on-surface mb-1 text-2xl font-bold">{flame.letter}</div>
-                      <div className="mb-1 text-xl">{flame.icon}</div>
-                      <div className="text-on-surface-variant text-xs">{flame.meaning}</div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
+      <div className="relative z-10 flex min-h-screen flex-col">
+        {/* Sticky Header with Tools */}
+        <div className="sticky top-0 z-50 w-full">
+          <div className="bg-background/80 border-outline/20 border-b backdrop-blur-xl">
+            <div className="container mx-auto px-4 py-3">
+              <CanvasTools
+                isErasing={isErasing}
+                onErase={toggleErase}
+                onClear={handleClearCanvas}
+                onBack={onBack}
+                onShare={handleShare}
+              />
             </div>
           </div>
+        </div>
 
-          {/* Layer 3: Canvas Drawing Layer */}
-          <canvas
-            ref={canvasRef}
-            className={`absolute inset-0 h-full w-full rounded-2xl ${getCursorStyle()}`}
-            onMouseDown={handleCanvasMouseDown}
-            onMouseMove={handleCanvasMouseMove}
-            onMouseUp={handleCanvasMouseUp}
-            onMouseLeave={handleCanvasMouseUp}
-            onTouchStart={handleCanvasTouchStart}
-            onTouchMove={handleCanvasTouchMove}
-            onTouchEnd={handleCanvasTouchEnd}
-            onContextMenu={handleRightClick}
-            style={{
-              touchAction: 'none',
-              cursor: state.isErasing ? 'cell' : 'crosshair', // Fallback cursors if custom cursors fail
-            }}
-          />
+        {/* Main Content Area */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="container mx-auto px-4 py-6">
+            {/* Page Title */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="mb-6 text-center sm:mb-8"
+            >
+              <div className="mb-4 flex items-center justify-center">
+                <Sparkles className="text-primary mr-3 h-6 w-6 sm:h-8 sm:w-8" />
+                <h1 className="text-on-surface text-2xl font-bold sm:text-3xl md:text-4xl lg:text-5xl">
+                  {name1} ❤️ {name2}
+                </h1>
+                <Sparkles className="text-primary ml-3 h-6 w-6 sm:h-8 sm:w-8" />
+              </div>
+              <p className="text-on-surface-variant text-sm sm:text-base lg:text-lg">
+                Draw over the letters to strike them out
+              </p>
+            </motion.div>
 
-          {/* Layer 4: Mode Indicator Overlay */}
-          <AnimatePresence>
-            {(state.isDrawing || state.isErasing) && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="pointer-events-none absolute top-4 right-4"
-              >
-                <div
-                  className={`rounded-full border px-4 py-2 backdrop-blur-xl ${
-                    state.isErasing
-                      ? 'bg-error-container/80 border-error text-on-error-container'
-                      : 'bg-primary-container/80 border-primary text-on-primary-container'
-                  }`}
-                >
-                  <div className="flex items-center space-x-2">
-                    <div className="h-2 w-2 animate-pulse rounded-full bg-current" />
-                    <span className="text-sm font-medium">{state.isErasing ? 'Erasing' : 'Drawing'}</span>
+            {/* Main Canvas Container with Layered Content */}
+            <motion.div
+              ref={canvasContainerRef}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="relative mx-auto max-w-6xl"
+              style={{ height: canvasHeight }}
+            >
+              {/* Layer 1: Background with texture */}
+              <div className="border-outline/30 bg-surface absolute inset-0 overflow-hidden rounded-xl border-2 shadow-2xl sm:rounded-2xl">
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(180deg,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[length:20px_20px] dark:bg-[linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.02)_1px,transparent_1px)]" />
+              </div>
+
+              {/* Layer 2: Letter Tiles and FLAMES Letters */}
+              <div className="pointer-events-none absolute inset-0 overflow-y-auto p-3 sm:p-6 lg:p-8">
+                <div className="space-y-8 sm:space-y-12">
+                  {/* Step 1: First Name */}
+                  <motion.div
+                    className="text-center"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                  >
+                    <div className="mb-4 flex items-center justify-center sm:mb-6">
+                      <div className="bg-primary-container text-on-primary-container mr-3 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold sm:mr-4 sm:h-8 sm:w-8 sm:text-lg">
+                        1
+                      </div>
+                      <h2 className="text-on-surface truncate text-lg font-bold sm:text-2xl md:text-3xl">
+                        {name1.toUpperCase()}
+                      </h2>
+                    </div>
+
+                    <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+                      {name1Letters.map((letterData, index) => (
+                        <motion.div
+                          key={letterData.id}
+                          className="bg-primary-container/30 border-primary-container text-on-surface flex h-12 w-12 items-center justify-center rounded-lg border text-lg font-bold transition-all duration-300 sm:h-16 sm:w-16 sm:rounded-xl sm:text-xl"
+                          initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{
+                            delay: 0.4 + index * 0.05,
+                            type: 'spring',
+                            stiffness: 300,
+                            damping: 20,
+                          }}
+                        >
+                          {letterData.letter}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+
+                  {/* Step 2: Second Name */}
+                  <motion.div
+                    className="text-center"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.5 }}
+                  >
+                    <div className="mb-4 flex items-center justify-center sm:mb-6">
+                      <div className="bg-tertiary-container text-on-tertiary-container mr-3 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold sm:mr-4 sm:h-8 sm:w-8 sm:text-lg">
+                        2
+                      </div>
+                      <h2 className="text-on-surface truncate text-lg font-bold sm:text-2xl md:text-3xl">
+                        {name2.toUpperCase()}
+                      </h2>
+                    </div>
+
+                    <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+                      {name2Letters.map((letterData, index) => (
+                        <motion.div
+                          key={letterData.id}
+                          className="bg-tertiary-container/30 border-tertiary-container text-on-surface flex h-12 w-12 items-center justify-center rounded-lg border text-lg font-bold transition-all duration-300 sm:h-16 sm:w-16 sm:rounded-xl sm:text-xl"
+                          initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{
+                            delay: 0.6 + index * 0.05,
+                            type: 'spring',
+                            stiffness: 300,
+                            damping: 20,
+                          }}
+                        >
+                          {letterData.letter}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+
+                  {/* Step 3: FLAMES Letters */}
+                  <motion.div
+                    className="text-center"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.7 }}
+                  >
+                    <div className="mb-4 flex items-center justify-center sm:mb-6">
+                      <div className="bg-secondary-container text-on-secondary-container mr-3 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold sm:mr-4 sm:h-8 sm:w-8 sm:text-lg">
+                        3
+                      </div>
+                      <h2 className="text-on-surface text-lg font-bold sm:text-2xl md:text-3xl">F.L.A.M.E.S</h2>
+                    </div>
+
+                    <div className="mx-auto grid max-w-4xl grid-cols-3 gap-2 sm:gap-4 md:grid-cols-6">
+                      {flamesLetters.map((flame, index) => (
+                        <motion.div
+                          key={flame.id}
+                          className="bg-secondary-container/30 border-secondary-container rounded-lg border p-2 text-center transition-all duration-300 sm:rounded-xl sm:p-4"
+                          initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{
+                            delay: 0.8 + index * 0.1,
+                            type: 'spring',
+                            stiffness: 300,
+                            damping: 20,
+                          }}
+                        >
+                          <div className="text-on-surface mb-1 text-lg font-bold sm:text-2xl">{flame.letter}</div>
+                          <div className="mb-1 text-sm sm:text-xl">{flame.icon}</div>
+                          <div className="text-on-surface-variant text-xs">{flame.meaning}</div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+
+              {/* Layer 3: Canvas Drawing Layer */}
+              <canvas
+                ref={canvasRef}
+                className={`absolute inset-0 h-full w-full rounded-xl sm:rounded-2xl ${getCursorStyle()}`}
+                onMouseDown={handleCanvasMouseDown}
+                onMouseMove={handleCanvasMouseMove}
+                onMouseUp={handleCanvasMouseUp}
+                onMouseLeave={handleCanvasMouseUp}
+                onTouchStart={handleCanvasTouchStart}
+                onTouchMove={handleCanvasTouchMove}
+                onTouchEnd={handleCanvasTouchEnd}
+                onContextMenu={handleRightClick}
+                style={{
+                  touchAction: 'none',
+                  cursor: isErasing ? 'cell' : 'crosshair',
+                }}
+              />
+
+              {/* Layer 4: Mode Indicator Overlay */}
+              <AnimatePresence>
+                {(isDrawing || isErasing) && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className="pointer-events-none absolute top-2 right-2 sm:top-4 sm:right-4"
+                  >
+                    <div
+                      className={`rounded-full border px-3 py-1 text-xs backdrop-blur-xl sm:px-4 sm:py-2 sm:text-sm ${
+                        isErasing
+                          ? 'bg-error-container/80 border-error text-on-error-container'
+                          : 'bg-primary-container/80 border-primary text-on-primary-container'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-current sm:h-2 sm:w-2" />
+                        <span className="font-medium">{isErasing ? 'Erasing' : 'Drawing'}</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Canvas Loading Indicator */}
+              {!isCanvasReady && (
+                <div className="bg-surface/50 absolute inset-0 flex items-center justify-center rounded-xl backdrop-blur-sm sm:rounded-2xl">
+                  <div className="text-on-surface-variant text-center">
+                    <div className="border-primary mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"></div>
+                    <p className="text-sm">Setting up canvas...</p>
                   </div>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
+              )}
+            </motion.div>
+          </div>
+        </div>
 
-        {/* Collapsible Instructions Component */}
-        <CanvasInstructions />
+        {/* Sticky Bottom Instructions */}
+        <div className="sticky bottom-0 z-40 w-full">
+          <div className="bg-background/80 border-outline/20 border-t backdrop-blur-xl">
+            <div className="container mx-auto px-4 py-3">
+              <CanvasInstructions />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

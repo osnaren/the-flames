@@ -143,7 +143,7 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
                     </div>
                     <p className="text-on-primary-container/80 mt-1 text-sm">Step-by-step reveal</p>
                   </div>
-                  <ArrowRight className="h-5 w-5 flex-shrink-0 transition-transform duration-200 group-hover:translate-x-1" />
+                  <ArrowRight className="h-5 w-5 flex-shrink-0 transition-transform duration-200 group-hover:translate-x-full" />
                 </Button>
 
                 {/* Canvas Experience */}
@@ -151,7 +151,7 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
                   type="button"
                   onClick={() => performSubmit('canvas')}
                   disabled={!isFormValid || isLoading}
-                  className="group bg-secondary-container text-on-secondary-container hover:bg-secondary-container/80 flex w-full items-center justify-between space-x-3 rounded-xl p-4 text-left transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50"
+                  className="group bg-secondary-container text-on-secondary-container hover:bg-secondary-container/80 hover:text-secondary hover:border-secondary flex w-full items-center justify-between space-x-3 rounded-xl p-4 text-left transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50"
                   variant="outline"
                 >
                   <div>
@@ -159,9 +159,9 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
                       <Pen className="h-5 w-5" />
                       <span className="font-semibold">Creative</span>
                     </div>
-                    <p className="text-on-secondary-container/80 mt-1 text-sm">Scratch to reveal</p>
+                    <p className="text-on-secondary-container/80 mt-1 text-sm">The old school way</p>
                   </div>
-                  <ArrowRight className="h-5 w-5 flex-shrink-0 transition-transform duration-200 group-hover:translate-x-1" />
+                  <ArrowRight className="h-5 w-5 flex-shrink-0 transition-transform duration-200 group-hover:translate-x-full" />
                 </Button>
               </div>
             </motion.div>
