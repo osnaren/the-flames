@@ -1,53 +1,53 @@
-import { useEffect } from 'react';
 import CanvasExperience from './components/CanvasExperience';
 import ClickExperience from './components/ClickExperience';
 import NameInputForm from './components/NameInputForm';
 import { useManualMode } from './hooks/useManualMode';
-import type { ExperienceMode, ManualModeProps } from './types';
-import { getUrlParams } from './utils';
 
-export default function ManualMode({ onShare }: ManualModeProps) {
+export default function ManualMode() {
   const {
-    state,
-    handlers: { handleNamesSubmit, goBackToInput, handleShare },
+    name1,
+    name2,
+    canvasState,
+    experienceMode,
+    canvasRef,
+    isSharing,
+    isSaving,
+    handleNamesSubmit,
+    goBackToInput,
+    handleShare,
+    handleSave,
+    handleResultChange,
   } = useManualMode();
 
-  // Initialize with URL params on mount
-  useEffect(() => {
-    const urlParams = getUrlParams();
-    if (urlParams.name1 && urlParams.name2) {
-      // URL params are already handled in the hook initialization
-      console.log('Loaded from URL:', urlParams);
-    }
-  }, []);
-
-  // Handle share with parent component
-  const handleShareWithParent = async (imageData: string) => {
-    await handleShare();
-    if (onShare) {
-      onShare(imageData);
-    }
-  };
-
-  // Handle names submission with experience mode
-  const handleNamesSubmitWithMode = (name1: string, name2: string, experienceMode: ExperienceMode) => {
-    handleNamesSubmit(name1, name2, experienceMode);
-  };
-
-  if (state.canvasState === 'input') {
-    return (
-      <NameInputForm onNamesSubmit={handleNamesSubmitWithMode} initialName1={state.name1} initialName2={state.name2} />
-    );
+  if (canvasState === 'input') {
+    return <NameInputForm onNamesSubmit={handleNamesSubmit} initialName1={name1} initialName2={name2} />;
   }
 
-  // Render appropriate experience based on experience mode
-  if (state.experienceMode === 'click') {
+  if (experienceMode === 'click') {
     return (
-      <ClickExperience name1={state.name1} name2={state.name2} onBack={goBackToInput} onShare={handleShareWithParent} />
+      <ClickExperience
+        name1={name1}
+        name2={name2}
+        onBack={goBackToInput}
+        onShare={handleShare}
+        onSave={handleSave}
+        onResultChange={handleResultChange}
+        isSharing={isSharing}
+        isSaving={isSaving}
+      />
     );
   }
 
   return (
-    <CanvasExperience name1={state.name1} name2={state.name2} onBack={goBackToInput} onShare={handleShareWithParent} />
+    <CanvasExperience
+      name1={name1}
+      name2={name2}
+      onBack={goBackToInput}
+      onShare={handleShare}
+      onSave={handleSave}
+      canvasRef={canvasRef}
+      isSharing={isSharing}
+      isSaving={isSaving}
+    />
   );
 }

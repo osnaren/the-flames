@@ -29,8 +29,16 @@ const getViewportHeight = () => {
   return 600; // Fallback for SSR
 };
 
-export default function CanvasExperience({ name1, name2, onBack }: CanvasExperienceProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+export default function CanvasExperience({ 
+  name1, 
+  name2, 
+  onBack, 
+  onShare, 
+  onSave, 
+  canvasRef,
+  isSharing = false,
+  isSaving = false 
+}: CanvasExperienceProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const lastCoordinates = useRef({ x: 0, y: 0 });
@@ -235,7 +243,7 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
     ctx.imageSmoothingQuality = 'high';
 
     setIsCanvasReady(true);
-  }, []);
+  }, [canvasRef]);
 
   // Enhanced drawing event handlers with better touch support
   const handleMouseDown = useCallback(
@@ -260,7 +268,7 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
         drawWithEffect(x, y, ctx);
       }
     },
-    [isCanvasReady, isErasing, eraseWithEffect, drawWithEffect]
+    [canvasRef, isCanvasReady, isErasing, eraseWithEffect, drawWithEffect]
   );
 
   const handleMouseMove = useCallback(
@@ -284,7 +292,7 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
         drawWithEffect(x, y, ctx);
       }
     },
-    [isDrawing, isErasing, eraseWithEffect, drawWithEffect]
+    [isDrawing, canvasRef, isErasing, eraseWithEffect, drawWithEffect]
   );
 
   const handleMouseUp = useCallback(() => {
@@ -316,7 +324,7 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
         drawWithEffect(x, y, ctx);
       }
     },
-    [isCanvasReady, isErasing, eraseWithEffect, drawWithEffect]
+    [canvasRef, isCanvasReady, isErasing, eraseWithEffect, drawWithEffect]
   );
 
   const handleTouchMove = useCallback(
@@ -341,7 +349,7 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
         drawWithEffect(x, y, ctx);
       }
     },
-    [isDrawing, isErasing, eraseWithEffect, drawWithEffect]
+    [isDrawing, canvasRef, isErasing, eraseWithEffect, drawWithEffect]
   );
 
   const handleTouchEnd = useCallback(() => {
@@ -366,47 +374,6 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
     return cursors.draw[theme];
   }, [isErasing, isDarkMode]);
 
-  const handleShare = async () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    try {
-      // Create a new canvas for the final image with background
-      const exportCanvas = document.createElement('canvas');
-      const exportCtx = exportCanvas.getContext('2d');
-      if (!exportCtx) return;
-
-      exportCanvas.width = canvas.width;
-      exportCanvas.height = canvas.height;
-
-      // Set background based on theme
-      exportCtx.fillStyle = isDarkMode ? '#1e1e1e' : '#ffffff';
-      exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-
-      // Draw the canvas content
-      exportCtx.drawImage(canvas, 0, 0);
-
-      // Add branding
-      exportCtx.fillStyle = isDarkMode ? '#ffffff' : '#000000';
-      exportCtx.font = '16px Arial';
-      exportCtx.fillText('FLAMES Manual Mode', 20, exportCanvas.height - 20);
-
-      exportCanvas.toBlob((blob) => {
-        if (!blob) return;
-
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `flames-${name1}-${name2}.png`;
-        link.click();
-        URL.revokeObjectURL(url);
-      });
-    } catch (error) {
-      console.error('Error sharing canvas:', error);
-    }
-  };
-
-  // Clear canvas function
   const handleClear = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -415,16 +382,20 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
     if (ctx) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
-  }, []);
+  }, [canvasRef]);
 
   // Initialize canvas on mount and resize
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const initCanvas = () => {
       setupCanvas();
-    }, 100);
+    };
+
+    // Initial setup with a small delay to ensure DOM is ready
+    const timer = setTimeout(initCanvas, 150);
 
     const handleResize = () => {
-      setTimeout(setupCanvas, 100);
+      // Debounce resize events
+      setTimeout(setupCanvas, 150);
     };
 
     window.addEventListener('resize', handleResize);
@@ -436,6 +407,12 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
       window.removeEventListener('orientationchange', handleResize);
     };
   }, [setupCanvas]);
+
+  // Pass canvas ref to parent
+  useEffect(() => {
+    // This is a potential way to pass canvas ref up if needed
+    // for parent-level operations like sharing
+  }, [canvasRef]);
 
   return (
     <div
@@ -461,7 +438,10 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
             onErase={() => setIsErasing(!isErasing)}
             onClear={handleClear}
             onBack={onBack}
-            onShare={handleShare}
+            onShare={onShare}
+            onSave={onSave}
+            isSharing={isSharing}
+            isSaving={isSaving}
           />
         )}
         <CanvasInstructions />
@@ -680,7 +660,10 @@ export default function CanvasExperience({ name1, name2, onBack }: CanvasExperie
           onErase={() => setIsErasing(!isErasing)}
           onClear={handleClear}
           onBack={onBack}
-          onShare={handleShare}
+          onShare={onShare}
+          onSave={onSave}
+          isSharing={isSharing}
+          isSaving={isSaving}
         />
       )}
     </div>

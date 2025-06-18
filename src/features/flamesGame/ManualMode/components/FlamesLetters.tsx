@@ -92,7 +92,7 @@ export default function FlamesLetters({
         ? `🎉 Correct! You got it!`
         : `Not quite right. The correct answer is ${correctResult}. Check again!`,
       bgColor: isCorrect ? 'bg-primary-container/20' : 'bg-error-container/20',
-      textColor: isCorrect ? 'text-on-primary-container' : 'text-error',
+      textColor: isCorrect ? 'text-primary' : 'text-error',
       borderColor: isCorrect ? 'border-primary-container' : 'border-error-container',
     };
   }, [userResult, correctResult]);

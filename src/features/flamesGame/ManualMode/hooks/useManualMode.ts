@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { FlamesResult } from '../../flames.types';
+import { generateCanvasImage, generateClickResultImage, saveImage, shareImage } from '../image.utils';
 import type { ExperienceMode, ManualModeState } from '../types';
 import {
   clearCanvas,
   eraseArea,
-  generateShareableImage,
   getCanvasPoint,
   getEventPoint,
   getUrlParams,
@@ -28,6 +29,10 @@ export function useManualMode() {
     flamesCrossedLetters: new Set<string>(),
     result: null,
   });
+
+  // Add loading states for operations
+  const [isSharing, setIsSharing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -198,44 +203,119 @@ export function useManualMode() {
     [state.experienceMode]
   );
 
-  // Share functionality
+  // Share and Save Functionality
   const handleShare = useCallback(async () => {
-    if (state.experienceMode === 'canvas') {
-      const canvas = canvasRef.current;
-      if (!canvas || !state.name1 || !state.name2) return;
+    const { experienceMode, name1, name2, result } = state;
+    if (!name1 || !name2) {
+      toast.error('Please enter both names first!');
+      return;
+    }
 
-      try {
-        const imageData = await generateShareableImage(canvas, state.name1, state.name2);
-
-        if (navigator.share && navigator.canShare?.({ files: [new File([imageData], 'flames.png')] })) {
-          // Convert data URL to blob
-          const response = await fetch(imageData);
-          const blob = await response.blob();
-          const file = new File([blob], 'flames-manual-mode.png', { type: 'image/png' });
-
-          await navigator.share({
-            title: 'FLAMES Manual Mode',
-            text: `${state.name1} ❤️ ${state.name2}`,
-            files: [file],
-          });
-        } else {
-          // Fallback: download image
-          const link = document.createElement('a');
-          link.download = 'flames-manual-mode.png';
-          link.href = imageData;
-          link.click();
+    if (isSharing) return; // Prevent multiple simultaneous operations
+    setIsSharing(true); // Set sharing state to true
+    try {
+      let imageDataUrl: string;
+      if (experienceMode === 'canvas') {
+        const canvas = canvasRef.current;
+        if (!canvas) {
+          toast.error('Canvas is not ready. Please wait a moment and try again.');
+          return;
         }
 
-        toast.success('Image saved/shared successfully!');
-      } catch (error) {
-        toast.error('Failed to share image');
-        console.error('Share error:', error);
+        // Check if canvas has any content
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          toast.error('Canvas context is not available.');
+          return;
+        }
+
+        imageDataUrl = await generateCanvasImage(canvas, name1, name2);
+      } else {
+        // For click experience, allow sharing even without complete result
+        // If no result yet, share the current progress
+        const resultToShare = result || 'In Progress';
+        imageDataUrl = await generateClickResultImage(name1, name2, resultToShare as FlamesResult);
       }
-    } else {
-      // For click mode, generate a screenshot or create a summary
-      toast.success('Share functionality for click mode coming soon!');
+      await shareImage(imageDataUrl, name1, name2);
+      toast.success('Result shared successfully!');
+    } catch (error) {
+      console.error('Sharing failed:', error);
+
+      // Provide more specific error messages
+      if (error instanceof Error) {
+        if (error.message.includes('oklch') || error.message.includes('unsupported color')) {
+          toast.error('Image generation failed due to color format issues. Please try again.');
+        } else if (error.message.includes('Canvas')) {
+          toast.error('Canvas not ready. Please wait a moment and try again.');
+        } else {
+          toast.error(`Share failed: ${error.message}`);
+        }
+      } else {
+        toast.error('Could not share the result. Please try again.');
+      }
+    } finally {
+      setIsSharing(false); // Reset sharing state
     }
-  }, [state.experienceMode, state.name1, state.name2]);
+  }, [state, isSharing]);
+
+  const handleSave = useCallback(async () => {
+    const { experienceMode, name1, name2, result } = state;
+    if (!name1 || !name2) {
+      toast.error('Please enter both names first!');
+      return;
+    }
+    const filename = `${name1}_${name2}-FLAMES.png`;
+
+    if (isSaving) return; // Prevent multiple simultaneous operations
+    setIsSaving(true); // Set saving state to true
+    try {
+      let imageDataUrl: string;
+      if (experienceMode === 'canvas') {
+        const canvas = canvasRef.current;
+        if (!canvas) {
+          toast.error('Canvas is not ready. Please wait a moment and try again.');
+          return;
+        }
+
+        // Check if canvas has any content
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          toast.error('Canvas context is not available.');
+          return;
+        }
+
+        imageDataUrl = await generateCanvasImage(canvas, name1, name2);
+      } else {
+        // For click experience, allow saving even without complete result
+        const resultToSave = result || 'In Progress';
+        imageDataUrl = await generateClickResultImage(name1, name2, resultToSave as FlamesResult);
+      }
+      saveImage(imageDataUrl, filename);
+      toast.success('Image saved successfully!');
+    } catch (error) {
+      console.error('Saving failed:', error);
+
+      // Provide more specific error messages
+      if (error instanceof Error) {
+        if (error.message.includes('oklch') || error.message.includes('unsupported color')) {
+          toast.error('Image generation failed due to color format issues. Please try again.');
+        } else if (error.message.includes('Canvas')) {
+          toast.error('Canvas not ready. Please wait a moment and try again.');
+        } else {
+          toast.error(`Save failed: ${error.message}`);
+        }
+      } else {
+        toast.error('Could not save the result. Please try again.');
+      }
+    } finally {
+      setIsSaving(false); // Reset saving state
+    }
+  }, [state, isSaving]);
+
+  // Callback to update result from ClickExperience
+  const handleResultChange = useCallback((newResult: string | null) => {
+    setState((prev) => ({ ...prev, result: newResult }));
+  }, []);
 
   // Reset everything
   const handleReset = useCallback(() => {
@@ -268,23 +348,29 @@ export function useManualMode() {
   }, [state.canvasState, state.experienceMode, initializeCanvas]);
 
   return {
-    state,
+    ...state,
     canvasRef,
-    handlers: {
-      handleNamesSubmit,
-      goBackToInput,
-      handleShare,
-      // Canvas mode handlers
-      startDrawing,
-      draw,
-      stopDrawing,
-      toggleErase,
-      clearCanvasArea,
-      // Click mode handlers
-      toggleLetter,
-      toggleFlamesLetter,
-      handleReset,
-    },
+    isSharing, // Expose sharing state
+    isSaving, // Expose saving state
+
+    handleNamesSubmit,
+    goBackToInput,
+    handleShare,
+    handleSave,
+    handleResultChange,
+    handleReset,
+
+    // Canvas mode handlers
+    startDrawing,
+    draw,
+    stopDrawing,
+    toggleErase,
+    clearCanvasArea,
+
+    // Click mode handlers
+    toggleLetter,
+    toggleFlamesLetter,
+
     utils: {
       initializeCanvas,
     },

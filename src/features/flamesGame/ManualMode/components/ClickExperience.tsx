@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, RotateCcw, Share, SquareArrowOutUpRight } from 'lucide-react';
+import { ArrowLeft, Download, RotateCcw, Share, SquareArrowOutUpRight } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
@@ -9,7 +9,16 @@ import type { ClickExperienceProps } from '../types';
 import FlamesLetters from './FlamesLetters';
 import LetterTile from './LetterTile';
 
-export default function ClickExperience({ name1, name2, onBack, onShare }: ClickExperienceProps) {
+export default function ClickExperience({
+  name1,
+  name2,
+  onBack,
+  onShare,
+  onSave,
+  onResultChange,
+  isSharing = false,
+  isSaving = false,
+}: ClickExperienceProps) {
   const [crossedLetters, setCrossedLetters] = useState<Set<string>>(new Set());
   const [flamesCrossedLetters, setFlamesCrossedLetters] = useState<Set<string>>(new Set());
 
@@ -67,27 +76,17 @@ export default function ClickExperience({ name1, name2, onBack, onShare }: Click
     toast.success('Reset completed!');
   }, []);
 
-  const handleShare = useCallback(async () => {
-    try {
-      // Create a summary of the current state
-      const imageData = `data:text/plain;base64,${btoa(
-        `FLAMES Result: ${name1} ❤️ ${name2}\nCorrect Answer: ${correctResult}\nUser Progress: ${flamesCrossedLetters.size}/6 FLAMES letters crossed`
-      )}`;
-
-      onShare(imageData);
-      toast.success('Shared successfully!');
-    } catch (error) {
-      toast.error('Failed to share');
-      console.error('Share error:', error);
-    }
-  }, [name1, name2, correctResult, flamesCrossedLetters.size, onShare]);
-
   // Get user's current result from FLAMES letters
   const userResult = useMemo(() => {
     const flamesOrder = ['F', 'L', 'A', 'M', 'E', 'S'];
     const remainingLetters = flamesOrder.filter((letter) => !flamesCrossedLetters.has(letter));
     return remainingLetters.length === 1 ? remainingLetters[0] : null;
   }, [flamesCrossedLetters]);
+
+  // Inform the parent component about the result change
+  useEffect(() => {
+    onResultChange(userResult);
+  }, [userResult, onResultChange]);
 
   // Determine if user has reached the correct result
   const isCorrectResult = userResult === correctResult;
@@ -138,10 +137,21 @@ export default function ClickExperience({ name1, name2, onBack, onShare }: Click
               variant="outline"
               size="sm"
               icon={Share}
-              onClick={handleShare}
-              className="text-on-surface hover:bg-surface-container/50"
+              onClick={onShare}
+              disabled={isSharing}
+              className="text-on-surface hover:bg-surface-container/50 disabled:opacity-50"
             >
-              Share
+              {isSharing ? 'Sharing...' : 'Share'}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              icon={Download}
+              onClick={onSave}
+              disabled={isSaving}
+              className="text-on-surface hover:bg-surface-container/50 disabled:opacity-50"
+            >
+              {isSaving ? 'Saving...' : 'Save'}
             </Button>
           </div>
         </motion.div>

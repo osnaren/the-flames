@@ -28,14 +28,22 @@ export interface ClickExperienceProps {
   name1: string;
   name2: string;
   onBack: () => void;
-  onShare: (imageData: string) => void;
+  onShare: () => void;
+  onSave: () => void;
+  onResultChange: (result: string | null) => void;
+  isSharing?: boolean;
+  isSaving?: boolean;
 }
 
 export interface CanvasExperienceProps {
   name1: string;
   name2: string;
   onBack: () => void;
-  onShare: (imageData: string) => void;
+  onShare: () => void;
+  onSave: () => void;
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
+  isSharing?: boolean;
+  isSaving?: boolean;
 }
 
 export interface LetterTileProps {
@@ -61,6 +69,9 @@ export interface CanvasToolsProps {
   onClear: () => void;
   onBack: () => void;
   onShare: () => void;
+  onSave: () => void;
+  isSharing?: boolean;
+  isSaving?: boolean;
 }
 
 export interface ResultValidationProps {

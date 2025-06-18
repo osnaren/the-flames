@@ -144,35 +144,6 @@ export const getCanvasPoint = (canvas: HTMLCanvasElement, clientX: number, clien
   };
 };
 
-// Share utilities
-export const generateShareableImage = async (
-  canvas: HTMLCanvasElement,
-  name1: string,
-  name2: string
-): Promise<string> => {
-  const outputCanvas = document.createElement('canvas');
-  outputCanvas.width = canvas.width;
-  outputCanvas.height = canvas.height;
-
-  const outputCtx = outputCanvas.getContext('2d');
-  if (!outputCtx) throw new Error('Could not get canvas context');
-
-  // Draw background based on theme
-  const isDarkMode = document.documentElement.classList.contains('dark');
-  outputCtx.fillStyle = isDarkMode ? '#1e293b' : '#ffffff';
-  outputCtx.fillRect(0, 0, outputCanvas.width, outputCanvas.height);
-
-  // Draw the original canvas content
-  outputCtx.drawImage(canvas, 0, 0);
-
-  // Add branding
-  outputCtx.font = '16px Inter, sans-serif';
-  outputCtx.fillStyle = isDarkMode ? '#ffffff' : '#1e293b';
-  outputCtx.fillText(`${name1} ❤️ ${name2} - FLAMES Canvas`, 20, outputCanvas.height - 20);
-
-  return outputCanvas.toDataURL('image/png', 0.9);
-};
-
 // Result validation utilities
 export const calculateCorrectResult = (name1: string, name2: string): string => {
   return calculateFlamesResult(name1, name2) || 'F';

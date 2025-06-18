@@ -2,10 +2,19 @@ import { cn } from '@/utils';
 import { useDeviceType } from '@hooks/useDeviceType';
 import Button from '@ui/Button';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Eraser, Share, Trash2 } from 'lucide-react';
+import { ArrowLeft, Download, Eraser, Share, Trash2 } from 'lucide-react';
 import type { CanvasToolsProps } from '../types';
 
-export default function CanvasTools({ isErasing, onErase, onClear, onBack, onShare }: CanvasToolsProps) {
+export default function CanvasTools({ 
+  isErasing, 
+  onErase, 
+  onClear, 
+  onBack, 
+  onShare, 
+  onSave, 
+  isSharing = false, 
+  isSaving = false 
+}: CanvasToolsProps) {
   const deviceType = useDeviceType();
   const isMobile = deviceType === 'mobile';
 
@@ -90,10 +99,24 @@ export default function CanvasTools({ isErasing, onErase, onClear, onBack, onSha
             size={isMobile ? 'sm' : 'sm'}
             icon={Share}
             onClick={onShare}
-            className="text-on-surface hover:bg-surface-container/50 flex-shrink-0 transition-all duration-200"
-            aria-label="Share or download image"
+            disabled={isSharing}
+            className="text-on-surface hover:bg-surface-container/50 flex-shrink-0 transition-all duration-200 disabled:opacity-50"
+            aria-label="Share image"
           >
-            {!isMobile && <span className="ml-1">Share</span>}
+            {!isMobile && <span className="ml-1">{isSharing ? 'Sharing...' : 'Share'}</span>}
+          </Button>
+
+          {/* Save Button */}
+          <Button
+            variant="ghost"
+            size={isMobile ? 'sm' : 'sm'}
+            icon={Download}
+            onClick={onSave}
+            disabled={isSaving}
+            className="text-on-surface hover:bg-surface-container/50 flex-shrink-0 transition-all duration-200 disabled:opacity-50"
+            aria-label="Save image"
+          >
+            {!isMobile && <span className="ml-1">{isSaving ? 'Saving...' : 'Save'}</span>}
           </Button>
         </div>
       </div>
