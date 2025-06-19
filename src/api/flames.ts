@@ -182,7 +182,7 @@ export function calculateFlames(
 
   return {
     commonLetters,
-    flamesLetters: flames,
+    flamesLetters: flamesLetters,
     finalCount: totalRemainingCount,
     result: flamesLetters[0] as 'F' | 'L' | 'A' | 'M' | 'E' | 'S',
   };
