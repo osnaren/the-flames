@@ -4,6 +4,8 @@
 import React from 'react';
 
 export type FlamesResult = 'F' | 'L' | 'A' | 'M' | 'E' | 'S' | null;
+export type NonNullFlamesResult = Exclude<FlamesResult, null>;
+
 export type GameStage = 'input' | 'processing' | 'result';
 
 export interface ResultData {

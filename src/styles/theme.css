@@ -18,6 +18,7 @@
   /* Spacing & Timing */
   --radius: 0.5rem;
   --duration: 0.3s;
+  --s-duration: 14.5s;
 
   /* Font Families */
   --font-heading: 'DM Serif Text', serif;
@@ -35,7 +36,7 @@
 
   /* Animations */
   --animate-btn-pulse: btn-pulse var(--duration) ease-out infinite;
-  --animate-shine: shine var(--duration) linear infinite;
+  --animate-shine: shine var(--s-duration) linear infinite;
   --animate-float: float 6s ease-in-out infinite;
   --animate-pulse-slow: pulseSlow var(--duration) ease-in-out infinite;
   --animate-fade-in: fade-in var(--duration) ease-out forwards;

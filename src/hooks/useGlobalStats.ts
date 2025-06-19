@@ -1,3 +1,4 @@
+import { NonNullFlamesResult } from '@/features/flamesGame';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { GlobalStats } from '../components/layout/GlobalCharts/types';
@@ -39,30 +40,45 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
   }, []);
 
   // Transform raw stats into our GlobalStats format with null checks
-  const transformStats = useCallback((rawStats: any): GlobalStats => {
-    if (!rawStats) {
+  const transformStats = useCallback((rawStats: unknown): GlobalStats => {
+    if (!rawStats || typeof rawStats !== 'object') {
       return DEFAULT_STATS;
     }
 
+    const stats = rawStats as Record<string, unknown>;
+
     return {
-      totalMatches: rawStats.total || 0,
-      todayMatches: rawStats.today || 0,
-      popularNames: (rawStats.names || []).map((name: any) => ({
-        name: name?.name || '',
-        count: name?.current_count || 0,
-        trend: Number(name?.trend_percentage || 0),
-      })),
-      resultStats: (rawStats.results || []).map((result: any) => ({
-        result: result?.result || '',
-        count: result?.current_count || 0,
-        trend: Number(result?.trend_percentage || 0),
-      })),
-      popularPairs: (rawStats.pairs || []).map((pair: any) => ({
-        name1: pair?.name1 || '',
-        name2: pair?.name2 || '',
-        result: pair?.result || '',
-        count: pair?.count || 0,
-      })),
+      totalMatches: typeof stats.total === 'number' ? stats.total : 0,
+      todayMatches: typeof stats.today === 'number' ? stats.today : 0,
+      popularNames: (Array.isArray(stats.names) ? stats.names : []).map((name: unknown) => {
+        const nameObj = name as Record<string, unknown>;
+        return {
+          name: typeof nameObj?.name === 'string' ? nameObj.name : '',
+          count: typeof nameObj?.current_count === 'number' ? nameObj.current_count : 0,
+          trend: typeof nameObj?.trend_percentage === 'number' ? Number(nameObj.trend_percentage) : 0,
+        };
+      }),
+      resultStats: (Array.isArray(stats.results) ? stats.results : []).map((result: unknown) => {
+        const resultObj = result as Record<string, unknown>;
+        return {
+          result:
+            typeof resultObj?.result === 'string'
+              ? (resultObj.result as NonNullFlamesResult)
+              : ('' as NonNullFlamesResult),
+          count: typeof resultObj?.current_count === 'number' ? resultObj.current_count : 0,
+          trend: typeof resultObj?.trend_percentage === 'number' ? Number(resultObj.trend_percentage) : 0,
+        };
+      }),
+      popularPairs: (Array.isArray(stats.pairs) ? stats.pairs : []).map((pair: unknown) => {
+        const pairObj = pair as Record<string, unknown>;
+        return {
+          name1: typeof pairObj?.name1 === 'string' ? pairObj.name1 : '',
+          name2: typeof pairObj?.name2 === 'string' ? pairObj.name2 : '',
+          result:
+            typeof pairObj?.result === 'string' ? (pairObj.result as NonNullFlamesResult) : ('' as NonNullFlamesResult),
+          count: typeof pairObj?.count === 'number' ? pairObj.count : 0,
+        };
+      }),
       regionalStats: null, // Will be populated separately if country is available
     };
   }, []);
@@ -85,30 +101,46 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
 
       // Fetch global stats
       const globalStats = await getStatsWithTrends(timeWindow);
-      let stats = transformStats(globalStats);
+      const stats = transformStats(globalStats);
 
       // If we have the user's country, fetch regional stats
       if (userCountry) {
         const regionalStats = await getStatsWithTrends(timeWindow, userCountry);
-        if (regionalStats) {
+        if (regionalStats && typeof regionalStats === 'object') {
+          const regional = regionalStats as Record<string, unknown>;
           stats.regionalStats = {
             country: userCountry,
-            names: (regionalStats.names || []).map((name: any) => ({
-              name: name?.name || '',
-              count: name?.current_count || 0,
-              trend: Number(name?.trend_percentage || 0),
-            })),
-            results: (regionalStats.results || []).map((result: any) => ({
-              result: result?.result || '',
-              count: result?.current_count || 0,
-              trend: Number(result?.trend_percentage || 0),
-            })),
-            pairs: (regionalStats.pairs || []).map((pair: any) => ({
-              name1: pair?.name1 || '',
-              name2: pair?.name2 || '',
-              result: pair?.result || '',
-              count: pair?.count || 0,
-            })),
+            names: (Array.isArray(regional.names) ? regional.names : []).map((name: unknown) => {
+              const nameObj = name as Record<string, unknown>;
+              return {
+                name: typeof nameObj?.name === 'string' ? nameObj.name : '',
+                count: typeof nameObj?.current_count === 'number' ? nameObj.current_count : 0,
+                trend: typeof nameObj?.trend_percentage === 'number' ? Number(nameObj.trend_percentage) : 0,
+              };
+            }),
+            results: (Array.isArray(regional.results) ? regional.results : []).map((result: unknown) => {
+              const resultObj = result as Record<string, unknown>;
+              return {
+                result:
+                  typeof resultObj?.result === 'string'
+                    ? (resultObj.result as NonNullFlamesResult)
+                    : ('' as NonNullFlamesResult),
+                count: typeof resultObj?.current_count === 'number' ? resultObj.current_count : 0,
+                trend: typeof resultObj?.trend_percentage === 'number' ? Number(resultObj.trend_percentage) : 0,
+              };
+            }),
+            pairs: (Array.isArray(regional.pairs) ? regional.pairs : []).map((pair: unknown) => {
+              const pairObj = pair as Record<string, unknown>;
+              return {
+                name1: typeof pairObj?.name1 === 'string' ? pairObj.name1 : '',
+                name2: typeof pairObj?.name2 === 'string' ? pairObj.name2 : '',
+                result:
+                  typeof pairObj?.result === 'string'
+                    ? (pairObj.result as NonNullFlamesResult)
+                    : ('' as NonNullFlamesResult),
+                count: typeof pairObj?.count === 'number' ? pairObj.count : 0,
+              };
+            }),
           };
         }
       }
@@ -160,7 +192,7 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
   // Fetch stats when dependencies change
   useEffect(() => {
     fetchStats();
-  }, [timeWindow, userCountry]);
+  }, [fetchStats, timeWindow, userCountry]);
 
   return {
     data,

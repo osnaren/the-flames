@@ -1,3 +1,4 @@
+import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { usePreferences } from '@hooks/usePreferences';
 import Toggle from '@ui/Toggle';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
@@ -5,12 +6,7 @@ import { ChevronUp, Flame, Moon, MousePointerClick, Settings, Sun, Volume2, Volu
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from 'src/utils';
 
-interface FloatingControlPanelProps {
-  animationsEnabled: boolean;
-  setAnimationsEnabled: (enabled: boolean) => void;
-}
-
-export default function FloatingControlPanel({ animationsEnabled, setAnimationsEnabled }: FloatingControlPanelProps) {
+export default function FloatingControlPanel() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [exitingPanel, setExitingPanel] = useState(false);
   const prefersReducedMotion = useReducedMotion();
@@ -18,12 +14,12 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
   const panelRef = useRef<HTMLDivElement>(null);
 
   const [{ isDarkTheme, isSoundEnabled }, { toggleTheme, toggleSound, toggleAnimations }] = usePreferences();
+  const { shouldAnimate } = useAnimationPreferences();
 
   // Local wrapper for toggling animations to ensure parent state is updated too
   const handleToggleAnimations = useCallback(() => {
     toggleAnimations();
-    setAnimationsEnabled(!animationsEnabled);
-  }, [animationsEnabled, toggleAnimations, setAnimationsEnabled]);
+  }, [toggleAnimations]);
 
   // Handle scroll to top with proper focus management
   const handleScrollToTop = useCallback(() => {
@@ -132,12 +128,12 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
       label: 'Animations',
       activeIcon: Flame,
       inactiveIcon: Flame,
-      active: animationsEnabled,
+      active: shouldAnimate,
       toggle: handleToggleAnimations,
       color: 'bg-gradient-to-r from-primary-container/30 to-primary/10',
       activeColor: 'text-primary text-glow-sm',
       inactiveColor: 'text-on-surface-variant',
-      ariaLabel: animationsEnabled ? 'Turn off animations' : 'Turn on animations',
+      ariaLabel: shouldAnimate ? 'Turn off animations' : 'Turn on animations',
     },
     {
       label: 'Sound',
@@ -151,9 +147,6 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
       ariaLabel: isSoundEnabled ? 'Turn off sound' : 'Turn on sound',
     },
   ];
-
-  // Only show animations if they're enabled and user doesn't prefer reduced motion
-  const shouldAnimate = animationsEnabled && !prefersReducedMotion;
 
   // Animation variants
   const panelVariants = {

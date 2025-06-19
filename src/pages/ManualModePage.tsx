@@ -1,21 +1,11 @@
-import { motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
 import { Suspense } from 'react';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
-import Button from '../components/ui/Button';
 import ManualMode from '../features/flamesGame/ManualMode';
 import ErrorBoundary from '../features/flamesGame/ManualMode/components/ErrorBoundary';
 import { FlamesResult } from '../features/flamesGame/flames.types';
 import { shareResult } from '../lib/share';
 
 export default function ManualModePage() {
-  const navigate = useNavigate();
-
-  const goBack = () => {
-    navigate('/');
-  };
-
   const handleShare = async (result: FlamesResult) => {
     try {
       await shareResult({
@@ -32,12 +22,6 @@ export default function ManualModePage() {
 
   return (
     <div className="min-h-screen">
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute top-4 left-4 z-50">
-        <Button variant="secondary" size="sm" onClick={goBack} icon={ArrowLeft}>
-          Back
-        </Button>
-      </motion.div>
-
       <ErrorBoundary>
         <Suspense
           fallback={
@@ -49,7 +33,7 @@ export default function ManualModePage() {
             </div>
           }
         >
-          <ManualMode onShare={handleShare} />
+          <ManualMode />
         </Suspense>
       </ErrorBoundary>
     </div>
