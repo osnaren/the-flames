@@ -25,7 +25,7 @@ export default function Toggle({
   label,
   activeColor = 'text-primary text-glow-sm',
   inactiveColor = 'text-on-surface-variant',
-  backgroundColor = 'bg-gradient-to-r from-primary-container/20 to-transparent dark:from-primary-container/20 dark:to-transparent',
+  backgroundColor = 'bg-linear-to-r from-primary-container/20 to-transparent dark:from-primary-container/20 dark:to-transparent',
   ariaLabel,
   tabIndex,
 }: ToggleProps) {

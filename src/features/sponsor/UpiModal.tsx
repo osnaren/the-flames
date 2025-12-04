@@ -74,8 +74,11 @@ const UpiPaymentContent: React.FC<{
 
   // Generate QR code when necessary values change
   useEffect(() => {
-    setIsLoadingQr(true);
-    setQrCodeDataUrl(null);
+    // Defer state updates to avoid synchronous setState in effect warning
+    const timer = setTimeout(() => {
+      setIsLoadingQr(true);
+      setQrCodeDataUrl(null);
+    }, 0);
 
     // Only include amount if it has a valid value
     const upiParams: UPIIntentParams = {
@@ -100,6 +103,8 @@ const UpiPaymentContent: React.FC<{
         toast.error('Could not generate QR code.');
         setIsLoadingQr(false);
       });
+
+    return () => clearTimeout(timer);
   }, [upiId, upiName, currency, note, finalAmount]);
 
   // Handle amount button click

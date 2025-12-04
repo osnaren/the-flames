@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { FlamesResult } from './flames.types';
+import { FLAMES_ORDER } from '@/constants/flames';
 
 /**
  * Schema for validating names in the FLAMES game
@@ -28,6 +29,13 @@ interface MatchedLettersResult {
 }
 
 /**
+ * Normalize a name string for consistent comparisons
+ * - Lowercases
+ * - Removes spaces
+ */
+const sanitizeName = (name: string): string => name.toLowerCase().replace(/\s+/g, '');
+
+/**
  * Find matches between two names and track matched positions
  * @param name1 First name
  * @param name2 Second name
@@ -35,8 +43,8 @@ interface MatchedLettersResult {
  * @returns Object with matched positions and optionally common letters
  */
 const findMatches = (name1: string, name2: string, trackCommonLetters: boolean = false): MatchedLettersResult => {
-  const n1 = name1.toLowerCase().replace(/\s/g, '');
-  const n2 = name2.toLowerCase().replace(/\s/g, '');
+  const n1 = sanitizeName(name1);
+  const n2 = sanitizeName(name2);
 
   // Create arrays of characters with their positions
   const chars1: CharWithIndex[] = [...n1].map((char, index) => ({ char, index }));
@@ -73,7 +81,9 @@ const findMatches = (name1: string, name2: string, trackCommonLetters: boolean =
  * @returns Array of common letters
  */
 export const findCommonLetters = (name1: string, name2: string): string[] => {
-  const { common } = findMatches(name1, name2, true);
+  const n1 = sanitizeName(name1);
+  const n2 = sanitizeName(name2);
+  const { common } = findMatches(n1, n2, true);
   return Array.from(common || []);
 };
 
@@ -84,14 +94,15 @@ export const findCommonLetters = (name1: string, name2: string): string[] => {
  * @returns The resulting FLAMES letter
  */
 export const calculateFlamesResult = (name1: string, name2: string): FlamesResult => {
-  const n1 = name1.toLowerCase().replace(/\s/g, '');
-  const n2 = name2.toLowerCase().replace(/\s/g, '');
+  const n1 = sanitizeName(name1);
+  const n2 = sanitizeName(name2);
 
-  const { matched1 } = findMatches(name1, name2);
+  const { matched1 } = findMatches(n1, n2);
 
   // Calculate the result using the FLAMES algorithm
+  // Total letters minus pairs of matched letters
   const remainingCount = n1.length + n2.length - matched1.size * 2;
-  const flames: FlamesResult[] = ['F', 'L', 'A', 'M', 'E', 'S'];
+  const flames: FlamesResult[] = [...FLAMES_ORDER];
   let currentIndex = 0;
 
   while (flames.length > 1) {
@@ -99,5 +110,5 @@ export const calculateFlamesResult = (name1: string, name2: string): FlamesResul
     flames.splice(currentIndex, 1);
   }
 
-  return flames[0];
+  return flames[0] ? flames[0] : null;
 };

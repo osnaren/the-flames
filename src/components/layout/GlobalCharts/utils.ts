@@ -1,4 +1,5 @@
 import { FlamesResult, GlobalStats } from './types';
+import { FlamesResultType } from '@/constants/flames';
 
 /**
  * Generates mock data for the GlobalCharts component
@@ -34,7 +35,7 @@ export const generateMockData = (): GlobalStats => {
   ];
 
   // Generate random popular names
-  const popularNames = Array.from({ length: 10 }, (_, i) => {
+  const popularNames = Array.from({ length: 10 }, (_, _i) => {
     const randomName = names[Math.floor(Math.random() * names.length)];
     return {
       name: randomName,
@@ -45,19 +46,50 @@ export const generateMockData = (): GlobalStats => {
 
   // Generate result statistics
   const resultStats = [
-    { result: 'F', count: Math.floor(Math.random() * 5000) + 1000, trend: Math.floor(Math.random() * 20) - 10 },
-    { result: 'L', count: Math.floor(Math.random() * 5000) + 1000, trend: Math.floor(Math.random() * 20) - 10 },
-    { result: 'A', count: Math.floor(Math.random() * 5000) + 1000, trend: Math.floor(Math.random() * 20) - 10 },
-    { result: 'M', count: Math.floor(Math.random() * 5000) + 1000, trend: Math.floor(Math.random() * 20) - 10 },
-    { result: 'E', count: Math.floor(Math.random() * 5000) + 1000, trend: Math.floor(Math.random() * 20) - 10 },
-    { result: 'S', count: Math.floor(Math.random() * 5000) + 1000, trend: Math.floor(Math.random() * 20) - 10 },
+    {
+      result: FlamesResultType.FRIEND as FlamesResult,
+      count: Math.floor(Math.random() * 5000) + 1000,
+      trend: Math.floor(Math.random() * 20) - 10,
+    },
+    {
+      result: FlamesResultType.LOVE as FlamesResult,
+      count: Math.floor(Math.random() * 5000) + 1000,
+      trend: Math.floor(Math.random() * 20) - 10,
+    },
+    {
+      result: FlamesResultType.AFFECTION as FlamesResult,
+      count: Math.floor(Math.random() * 5000) + 1000,
+      trend: Math.floor(Math.random() * 20) - 10,
+    },
+    {
+      result: FlamesResultType.MARRIAGE as FlamesResult,
+      count: Math.floor(Math.random() * 5000) + 1000,
+      trend: Math.floor(Math.random() * 20) - 10,
+    },
+    {
+      result: FlamesResultType.ENEMY as FlamesResult,
+      count: Math.floor(Math.random() * 5000) + 1000,
+      trend: Math.floor(Math.random() * 20) - 10,
+    },
+    {
+      result: FlamesResultType.SIBLING as FlamesResult,
+      count: Math.floor(Math.random() * 5000) + 1000,
+      trend: Math.floor(Math.random() * 20) - 10,
+    },
   ].sort((a, b) => b.count - a.count);
 
   // Generate popular pairs
   const popularPairs = Array.from({ length: 6 }, () => {
     const name1 = names[Math.floor(Math.random() * names.length)];
     const name2 = names[Math.floor(Math.random() * names.length)];
-    const result = ['F', 'L', 'A', 'M', 'E', 'S'][Math.floor(Math.random() * 6)] as FlamesResult;
+    const result = [
+      FlamesResultType.FRIEND,
+      FlamesResultType.LOVE,
+      FlamesResultType.AFFECTION,
+      FlamesResultType.MARRIAGE,
+      FlamesResultType.ENEMY,
+      FlamesResultType.SIBLING,
+    ][Math.floor(Math.random() * 6)] as FlamesResult;
     return {
       name1,
       name2,
@@ -72,6 +104,7 @@ export const generateMockData = (): GlobalStats => {
     popularNames,
     resultStats,
     popularPairs,
+    regionalStats: null,
   };
 };
 
@@ -80,20 +113,36 @@ export const generateMockData = (): GlobalStats => {
  */
 export const getRandomTagline = (topResult: FlamesResult): string => {
   const taglines = {
-    F: ['👯 Friendship is trending today!', "🤝 Everyone's finding their bestie!", '👋 High-fives all around!'],
-    L: ['💖 Love is in the air!', '💘 Cupid is working overtime today!', '💕 Romance is trending hard!'],
-    A: [
+    [FlamesResultType.FRIEND]: [
+      '👯 Friendship is trending today!',
+      "🤝 Everyone's finding their bestie!",
+      '👋 High-fives all around!',
+    ],
+    [FlamesResultType.LOVE]: [
+      '💖 Love is in the air!',
+      '💘 Cupid is working overtime today!',
+      '💕 Romance is trending hard!',
+    ],
+    [FlamesResultType.AFFECTION]: [
       '✨ Affection is sparkling today!',
       '🌟 Stars are aligning for sweet connections!',
       '💫 Affectionate vibes are peaking!',
     ],
-    M: [
+    [FlamesResultType.MARRIAGE]: [
       '💍 Wedding bells are ringing worldwide!',
       '👰 Time to buy wedding gifts!',
       '🎂 Marriage proposals spiking today!',
     ],
-    E: ["😬 It's a rough day for relationships...", '🔥 Enemies are being made today!', '⚔️ Rivalry is trending hard!'],
-    S: ['👪 Family vibes are strong today!', '👯‍♂️ Sibling energy is peaking!', '🧬 DNA connections trending up!'],
+    [FlamesResultType.ENEMY]: [
+      "😬 It's a rough day for relationships...",
+      '🔥 Enemies are being made today!',
+      '⚔️ Rivalry is trending hard!',
+    ],
+    [FlamesResultType.SIBLING]: [
+      '👪 Family vibes are strong today!',
+      '👯‍♂️ Sibling energy is peaking!',
+      '🧬 DNA connections trending up!',
+    ],
   };
 
   const options = taglines[topResult];

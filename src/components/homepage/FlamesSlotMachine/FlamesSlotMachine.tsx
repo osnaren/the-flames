@@ -2,7 +2,7 @@ import { FlamesResult } from '@features/flamesGame/flames.types';
 import { getResultData } from '@features/flamesGame/resultData';
 import { useFlamesEngine } from '@features/flamesGame/useFlamesEngine';
 import ConfettiEffect from '@ui/ConfettiEffect';
-import { AnimatePresence, motion, useAnimationControls } from 'framer-motion';
+import { AnimatePresence, motion, TargetAndTransition, useAnimationControls } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface FlamesSlotMachineProps {
@@ -33,7 +33,9 @@ const PHASES = {
  */
 export function FlamesSlotMachine({ result, shouldAnimate, stage }: FlamesSlotMachineProps) {
   // Get state & actions from flamesEngine hook
-  const [{ isSlotMachineAnimating }, { onSlotMachineComplete }] = useFlamesEngine();
+  const [{ stageProgress }, { onFlamesAnimationComplete }] = useFlamesEngine();
+  const isSlotMachineAnimating = stageProgress.flamesAnimationStarted && !stageProgress.flamesAnimationComplete;
+  const onSlotMachineComplete = onFlamesAnimationComplete;
 
   // Local state for animation control
   const [activeLetterIndex, setActiveLetterIndex] = useState<number>(0); // Initialize with 0 rather than null
@@ -46,15 +48,46 @@ export function FlamesSlotMachine({ result, shouldAnimate, stage }: FlamesSlotMa
   const speedRef = useRef(BASE_SPEED_MS);
   const cyclesRef = useRef(0);
   const animationStartedRef = useRef(false);
+  const animateLettersRef = useRef<(index: number) => void>(() => {});
 
   // Result letter animation controller
   const resultLetterControls = useAnimationControls();
+
+  // Particles state
+  const [particles, setParticles] = useState<
+    Array<{
+      id: number;
+      x: string;
+      y: string;
+      duration: number;
+      delay: number;
+    }>
+  >([]);
+
+  useEffect(() => {
+    if (animationFinished && result) {
+      setTimeout(() => {
+        setParticles((prev) => {
+          if (prev.length === 0) {
+            return [...Array(6)].map((_, i) => ({
+              id: i,
+              x: `${50 + (Math.random() * 100 - 50)}%`,
+              y: `${50 + (Math.random() * 100 - 50)}%`,
+              duration: 1.5 + Math.random(),
+              delay: Math.random() * 2,
+            }));
+          }
+          return prev;
+        });
+      }, 0);
+    }
+  }, [animationFinished, result]);
 
   // Get result styling based on theme
   const { color: resultColorClass, glowColor } = result ? getResultData(result) : { color: '', glowColor: '' };
 
   // Enhanced ring pulse animation for better visibility
-  const ringPulseAnimation = {
+  const ringPulseAnimation: TargetAndTransition = {
     scale: [1, 1.12, 1],
     boxShadow: [
       '0 0 0 2px rgba(var(--color-primary-rgb), 0.5), 0 0 0px rgba(var(--color-primary-rgb), 0.3)',
@@ -65,7 +98,7 @@ export function FlamesSlotMachine({ result, shouldAnimate, stage }: FlamesSlotMa
       duration: 0.5, // Slower animation for better visibility
       ease: 'easeInOut',
       repeat: Infinity,
-      repeatType: 'reverse' as const,
+      repeatType: 'reverse',
     },
   };
 
@@ -152,11 +185,16 @@ export function FlamesSlotMachine({ result, shouldAnimate, stage }: FlamesSlotMa
 
       // Schedule next animation step
       animationRef.current = setTimeout(() => {
-        animateLetters((safeIndex + 1) % letters.length);
+        animateLettersRef.current((safeIndex + 1) % letters.length);
       }, speedRef.current);
     },
     [animationPhase, result, resultLetterControls, onSlotMachineComplete]
   );
+
+  // Update ref when function changes
+  useEffect(() => {
+    animateLettersRef.current = animateLetters;
+  }, [animateLetters]);
 
   // Start animation effect - manages when animation should start
   useEffect(() => {
@@ -167,18 +205,22 @@ export function FlamesSlotMachine({ result, shouldAnimate, stage }: FlamesSlotMa
 
       // Start ring moving immediately, even before we know the result
       cleanupAnimation();
-      setAnimationPhase(PHASES.SPEED_UP);
-      setAnimationFinished(false);
-      setIsAnimating(true);
       animationStartedRef.current = true;
 
-      // Begin with the first letter immediately
-      setActiveLetterIndex(0);
+      // Defer state updates to avoid synchronous setState in effect warning
+      setTimeout(() => {
+        setAnimationPhase(PHASES.SPEED_UP);
+        setAnimationFinished(false);
+        setIsAnimating(true);
 
-      // Start animation immediately
-      animationRef.current = setTimeout(() => {
-        animateLetters(0);
-      }, 100); // Very short delay to start
+        // Begin with the first letter immediately
+        setActiveLetterIndex(0);
+
+        // Start animation immediately
+        animationRef.current = setTimeout(() => {
+          animateLetters(0);
+        }, 100); // Very short delay to start
+      }, 0);
     }
 
     // Once result is available and animation is ongoing, make sure we're targeting the right result
@@ -190,8 +232,10 @@ export function FlamesSlotMachine({ result, shouldAnimate, stage }: FlamesSlotMa
     // Handle immediate transition to result stage (non-animated case)
     if (stage === 'result' && result && !isAnimating && !animationFinished) {
       const resultIndex = letters.findIndex((l) => l === result);
-      setActiveLetterIndex(resultIndex);
-      setAnimationFinished(true);
+      setTimeout(() => {
+        setActiveLetterIndex(resultIndex);
+        setAnimationFinished(true);
+      }, 0);
     }
 
     // Cleanup on unmount or dependencies change
@@ -353,9 +397,9 @@ export function FlamesSlotMachine({ result, shouldAnimate, stage }: FlamesSlotMa
                 {/* Particle effects for result letter */}
                 {isResultFinished && (
                   <div className="absolute inset-0 overflow-hidden rounded-lg" aria-hidden="true">
-                    {[...Array(6)].map((_, i) => (
+                    {particles.map((particle) => (
                       <motion.div
-                        key={i}
+                        key={particle.id}
                         className="absolute h-1.5 w-1.5 rounded-full"
                         initial={{
                           x: '50%',
@@ -363,14 +407,14 @@ export function FlamesSlotMachine({ result, shouldAnimate, stage }: FlamesSlotMa
                           opacity: 0,
                         }}
                         animate={{
-                          x: `${50 + (Math.random() * 100 - 50)}%`,
-                          y: `${50 + (Math.random() * 100 - 50)}%`,
+                          x: particle.x,
+                          y: particle.y,
                           opacity: [0, 0.8, 0],
                         }}
                         transition={{
-                          duration: 1.5 + Math.random(),
+                          duration: particle.duration,
                           repeat: Infinity,
-                          delay: Math.random() * 2,
+                          delay: particle.delay,
                           repeatType: 'loop',
                         }}
                         style={{

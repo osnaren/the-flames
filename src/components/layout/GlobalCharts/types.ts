@@ -1,7 +1,8 @@
 import { DivideIcon as LucideIcon } from 'lucide-react';
+import { FlamesResult } from '@/constants/flames';
 
 export type TimeFilter = 'today' | 'week' | 'alltime';
-export type FlamesResult = 'F' | 'L' | 'A' | 'M' | 'E' | 'S';
+export type { FlamesResult };
 
 export interface NameStats {
   name: string;
@@ -40,7 +41,7 @@ export interface GlobalStats {
 
 export interface ResultInfo {
   text: string;
-  icon: LucideIcon;
+  icon: typeof LucideIcon;
   color: string;
   bgColor: string;
 }

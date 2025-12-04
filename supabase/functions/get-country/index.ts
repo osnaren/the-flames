@@ -1,9 +1,8 @@
-// @ts-ignore: Deno has issues with npm imports
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers':
+    'apikey, X-Client-Info, Content-Type, Authorization, Accept, Accept-Language, X-Authorization',
 };
 
 // Explicitly declare network permissions

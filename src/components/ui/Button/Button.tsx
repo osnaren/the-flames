@@ -47,7 +47,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         'hover:shadow-xl hover:shadow-primary-container/40',
         'relative overflow-hidden',
         'after:absolute after:inset-0 after:opacity-0 after:rounded-lg',
-        'after:bg-gradient-to-r after:from-primary/20 after:to-primary/10',
+        'after:bg-linear-to-r after:from-primary/20 after:to-primary/10',
         'hover:after:opacity-100 after:transition-opacity after:duration-300'
       ),
       secondary: cn(
@@ -57,7 +57,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         'hover:shadow-lg hover:shadow-secondary-container/40',
         'relative overflow-hidden',
         'after:absolute after:inset-0 after:opacity-0 after:rounded-lg',
-        'after:bg-gradient-to-r after:from-secondary/20 after:to-secondary/10',
+        'after:bg-linear-to-r after:from-secondary/20 after:to-secondary/10',
         'hover:after:opacity-100 after:transition-opacity after:duration-300'
       ),
       outline: cn(
@@ -79,7 +79,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         'hover:shadow-lg hover:shadow-tertiary-container/40',
         'relative overflow-hidden',
         'after:absolute after:inset-0 after:opacity-0 after:rounded-lg',
-        'after:bg-gradient-to-r after:from-tertiary/20 after:to-tertiary/10',
+        'after:bg-linear-to-r after:from-tertiary/20 after:to-tertiary/10',
         'hover:after:opacity-100 after:transition-opacity after:duration-300'
       ),
       green: cn(
@@ -89,7 +89,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         'hover:shadow-lg hover:shadow-green-300/40 dark:hover:shadow-green-800/50',
         'relative overflow-hidden',
         'after:absolute after:inset-0 after:opacity-0 after:rounded-lg',
-        'after:bg-gradient-to-r after:from-green-100/20 after:to-green-200/20',
+        'after:bg-linear-to-r after:from-green-100/20 after:to-green-200/20',
         'hover:after:opacity-100 after:transition-opacity after:duration-300'
       ),
       purple: cn(
@@ -99,7 +99,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         'hover:shadow-lg hover:shadow-tertiary-container/40',
         'relative overflow-hidden',
         'after:absolute after:inset-0 after:opacity-0 after:rounded-lg',
-        'after:bg-gradient-to-r after:from-tertiary/20 after:to-tertiary/10',
+        'after:bg-linear-to-r after:from-tertiary/20 after:to-tertiary/10',
         'hover:after:opacity-100 after:transition-opacity after:duration-300'
       ),
       red: cn(
@@ -109,7 +109,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         'hover:shadow-lg hover:shadow-error-container/40',
         'relative overflow-hidden',
         'after:absolute after:inset-0 after:opacity-0 after:rounded-lg',
-        'after:bg-gradient-to-r after:from-error/20 after:to-error/10',
+        'after:bg-linear-to-r after:from-error/20 after:to-error/10',
         'hover:after:opacity-100 after:transition-opacity after:duration-300'
       ),
     };
@@ -170,14 +170,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
         {Icon && iconPosition === 'left' && !isLoading && (
           <Icon
-            className={`h-5 w-5 flex-shrink-0 ${disabled || isLoading ? '' : 'group-hover:animate-pulse'}`}
+            className={`h-5 w-5 shrink-0 ${disabled || isLoading ? '' : 'group-hover:animate-pulse'}`}
             aria-hidden="true"
           />
         )}
         <span className="relative z-10">{children}</span>
         {Icon && iconPosition === 'right' && (
           <Icon
-            className={`h-5 w-5 flex-shrink-0 ${disabled || isLoading ? '' : 'group-hover:animate-pulse'}`}
+            className={`h-5 w-5 shrink-0 ${disabled || isLoading ? '' : 'group-hover:animate-pulse'}`}
             aria-hidden="true"
           />
         )}

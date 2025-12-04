@@ -22,7 +22,13 @@ interface CannonPosition {
  */
 function ConfettiEffect({ result, isActive }: ConfettiEffectProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isLowEndDevice, setIsLowEndDevice] = useState(false);
+  const [isLowEndDevice] = useState(() => {
+    if (typeof navigator === 'undefined') return false;
+    return (
+      (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    );
+  });
 
   // Use our custom hooks
   const deviceType = useDeviceType();
@@ -30,17 +36,6 @@ function ConfettiEffect({ result, isActive }: ConfettiEffectProps) {
 
   // Store a single confetti instance instead of multiple ones
   const confettiInstanceRef = useRef<confetti.CreateTypes | null>(null);
-
-  // Check device capabilities
-  useEffect(() => {
-    // Detect if likely a low-end device
-    setIsLowEndDevice(
-      // Check for CPU cores or low memory devices
-      (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
-        // Check if it's a mobile device
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    );
-  }, []);
 
   // Define cannon positions based on device type
   const cannonPositions = useCallback((): CannonPosition[] => {
@@ -176,7 +171,7 @@ function ConfettiEffect({ result, isActive }: ConfettiEffectProps) {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-[60]"
+      className="pointer-events-none fixed inset-0 z-60"
       style={{ width: '100%', height: '100%' }}
       aria-hidden="true"
     />

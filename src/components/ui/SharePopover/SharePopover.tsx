@@ -135,9 +135,9 @@ export default function SharePopover({ isOpen, onClose, resultCardRef, shareData
             }}
           >
             {/* Header with subtle gradient */}
-            <div className="flex items-center justify-between border-b border-gray-200 bg-gradient-to-r from-orange-50 to-pink-50 p-4 dark:border-gray-700 dark:from-gray-800 dark:to-gray-800">
+            <div className="flex items-center justify-between border-b border-gray-200 bg-linear-to-r from-orange-50 to-pink-50 p-4 dark:border-gray-700 dark:from-gray-800 dark:to-gray-800">
               <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-800 dark:text-white">
-                <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
                   Share Result
                 </span>
                 <span className="text-base">✨</span>

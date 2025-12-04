@@ -4,12 +4,18 @@ interface PreferencesState {
   isDarkTheme: boolean;
   animationsEnabled: boolean;
   isSoundEnabled: boolean;
+  isHapticEnabled: boolean;
+  volume: number;
+  seasonalTheme: 'auto' | 'valentine' | 'halloween' | 'christmas' | 'default';
 }
 
 interface PreferencesActions {
   toggleTheme: () => void;
   toggleAnimations: () => void;
   toggleSound: () => void;
+  toggleHaptic: () => void;
+  setVolume: (volume: number) => void;
+  setSeasonalTheme: (theme: PreferencesState['seasonalTheme']) => void;
   init: () => void;
 }
 
@@ -17,6 +23,9 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
   isDarkTheme: false,
   animationsEnabled: true,
   isSoundEnabled: true,
+  isHapticEnabled: true,
+  volume: 0.7,
+  seasonalTheme: 'auto',
   toggleTheme: () =>
     set((s) => {
       const newTheme = !s.isDarkTheme;
@@ -42,10 +51,30 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
       localStorage.setItem('sound', String(value));
       return { isSoundEnabled: value };
     }),
+  toggleHaptic: () =>
+    set((s) => {
+      const value = !s.isHapticEnabled;
+      localStorage.setItem('haptic', String(value));
+      return { isHapticEnabled: value };
+    }),
+  setVolume: (volume: number) =>
+    set(() => {
+      const clampedVolume = Math.max(0, Math.min(1, volume));
+      localStorage.setItem('volume', String(clampedVolume));
+      return { volume: clampedVolume };
+    }),
+  setSeasonalTheme: (theme: PreferencesState['seasonalTheme']) =>
+    set(() => {
+      localStorage.setItem('seasonalTheme', theme);
+      return { seasonalTheme: theme };
+    }),
   init: () => {
     const storedTheme = localStorage.getItem('theme');
     const storedAnimations = localStorage.getItem('animations');
     const storedSound = localStorage.getItem('sound');
+    const storedHaptic = localStorage.getItem('haptic');
+    const storedVolume = localStorage.getItem('volume');
+    const storedSeasonalTheme = localStorage.getItem('seasonalTheme');
 
     if (storedTheme === 'dark') {
       document.documentElement.classList.add('dark');
@@ -57,6 +86,9 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
       isDarkTheme: storedTheme === 'dark',
       animationsEnabled: storedAnimations !== 'false',
       isSoundEnabled: storedSound !== 'false',
+      isHapticEnabled: storedHaptic !== 'false',
+      volume: storedVolume ? parseFloat(storedVolume) : 0.7,
+      seasonalTheme: (storedSeasonalTheme as PreferencesState['seasonalTheme']) || 'auto',
     });
   },
 }));
