@@ -6,6 +6,8 @@ interface Particle {
   id: number;
   x: number;
   y: number;
+  targetX: number;
+  targetY: number;
 }
 
 export default function LetterTile({
@@ -29,6 +31,8 @@ export default function LetterTile({
           id: Date.now() + i,
           x: 50 + (Math.random() - 0.5) * 40, // centered with limited spread
           y: 50 + (Math.random() - 0.5) * 40,
+          targetX: (Math.random() - 0.5) * 40,
+          targetY: (Math.random() - 0.5) * 40,
         }));
         setParticles(newParticles);
         setTimeout(() => setParticles([]), 1200);
@@ -65,8 +69,8 @@ export default function LetterTile({
               animate={{
                 opacity: 0,
                 scale: 0,
-                x: (Math.random() - 0.5) * 40, // smaller travel distance
-                y: (Math.random() - 0.5) * 40,
+                x: particle.targetX,
+                y: particle.targetY,
               }}
               exit={{ opacity: 0 }}
               transition={{
@@ -100,7 +104,7 @@ export default function LetterTile({
       >
         {/* Background gradient effect */}
         <div
-          className={`absolute inset-0 rounded-xl bg-gradient-to-br opacity-0 transition-opacity duration-300 group-hover:opacity-20 ${
+          className={`absolute inset-0 rounded-xl bg-linear-to-br opacity-0 transition-opacity duration-300 group-hover:opacity-20 ${
             !isCrossed ? `from-${stepColor} to-${stepColor}/70` : ''
           }`}
         />

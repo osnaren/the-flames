@@ -1,6 +1,6 @@
 import Card from '@components/ui/Card';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, Variants } from 'framer-motion';
 import { BellRing, Handshake, Heart, Smile, Sparkles, Star, Sword } from 'lucide-react';
 import { useRef } from 'react';
 import { GiSparkles } from 'react-icons/gi';
@@ -89,7 +89,7 @@ const meaningCards = [
 ];
 
 // Animation variants for staggered children
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -100,7 +100,7 @@ const containerVariants = {
   },
 };
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: {
     opacity: 0,
     y: 30,
@@ -241,7 +241,7 @@ export default function MeaningSection() {
                 >
                   {/* Card background gradient on hover */}
                   <div
-                    className={`absolute inset-0 rounded-xl bg-gradient-to-br ${gradientFrom} ${gradientTo} opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
+                    className={`absolute inset-0 rounded-xl bg-linear-to-br ${gradientFrom} ${gradientTo} opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
                   />
 
                   {/* Card content */}
@@ -249,7 +249,7 @@ export default function MeaningSection() {
                     <div className="mb-3 flex items-center gap-4">
                       {/* Enhanced Icon Container */}
                       <motion.div
-                        className={`relative flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full ${bgColor} ${color} ring-2 ${ringColor} transition-all duration-300 group-hover:ring-4`}
+                        className={`relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full ${bgColor} ${color} ring-2 ${ringColor} transition-all duration-300 group-hover:ring-4`}
                         whileHover={{ rotate: shouldAnimate ? 360 : 0 }}
                         transition={{ duration: 0.6 }}
                       >

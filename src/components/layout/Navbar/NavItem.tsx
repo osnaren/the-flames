@@ -1,5 +1,5 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
@@ -16,11 +16,53 @@ interface NavItemProps {
   className?: string;
 }
 
-const bgMotionSpanVariants = {
+const bgMotionSpanVariants: Variants = {
   initial: { opacity: 0, scale: 0.8 },
   animate: { opacity: 0, scale: 0.8 },
   hover: { opacity: 1, scale: 1, transition: { duration: 0.2, ease: 'easeOut' } },
 };
+
+const BackgroundElement = ({ isActive, shouldAnimate }: { isActive: boolean; shouldAnimate: boolean }) => (
+  <>
+    {!isActive && (
+      <motion.span
+        className="from-secondary/15 via-primary/10 to-tertiary/15 absolute inset-0 rounded-xl bg-linear-to-r"
+        variants={bgMotionSpanVariants}
+      />
+    )}
+
+    {isActive && shouldAnimate && (
+      <motion.span
+        className="from-primary/5 via-primary-container/30 to-primary/5 absolute inset-0 rounded-xl bg-linear-to-r"
+        animate={{
+          opacity: [0.8, 1, 0.8],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      />
+    )}
+
+    <motion.span
+      className="absolute inset-0 rounded-xl"
+      initial={{ scale: 0, opacity: 0 }}
+      whileTap={
+        shouldAnimate
+          ? {
+              scale: 1.5,
+              opacity: [0, 0.3, 0],
+              transition: { duration: 0.4 },
+            }
+          : {}
+      }
+      style={{
+        background: 'radial-gradient(circle, rgba(var(--primary-rgb), 0.3) 0%, transparent 70%)',
+      }}
+    />
+  </>
+);
 
 function NavItem({
   icon: Icon,
@@ -85,7 +127,7 @@ function NavItem({
 
         {isActive && (
           <motion.div
-            className="from-primary to-secondary absolute -bottom-1 left-0 h-0.5 rounded-full bg-gradient-to-r"
+            className="from-primary to-secondary absolute -bottom-1 left-0 h-0.5 rounded-full bg-linear-to-r"
             initial={{ width: 0 }}
             animate={{ width: '100%' }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
@@ -109,7 +151,7 @@ function NavItem({
     ${className}
   `;
 
-  const motionVariants = {
+  const motionVariants: Variants = {
     hover: {
       scale: shouldAnimate ? 1.02 : 1,
       y: shouldAnimate ? -1 : 0,
@@ -142,53 +184,11 @@ function NavItem({
     },
   };
 
-  const BackgroundElement = () => (
-    <>
-      {!isActive && (
-        <motion.span
-          className="from-secondary/15 via-primary/10 to-tertiary/15 absolute inset-0 rounded-xl bg-gradient-to-r"
-          variants={bgMotionSpanVariants}
-        />
-      )}
-
-      {isActive && shouldAnimate && (
-        <motion.span
-          className="from-primary/5 via-primary-container/30 to-primary/5 absolute inset-0 rounded-xl bg-gradient-to-r"
-          animate={{
-            opacity: [0.8, 1, 0.8],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-      )}
-
-      <motion.span
-        className="absolute inset-0 rounded-xl"
-        initial={{ scale: 0, opacity: 0 }}
-        whileTap={
-          shouldAnimate
-            ? {
-                scale: 1.5,
-                opacity: [0, 0.3, 0],
-                transition: { duration: 0.4 },
-              }
-            : {}
-        }
-        style={{
-          background: 'radial-gradient(circle, rgba(var(--primary-rgb), 0.3) 0%, transparent 70%)',
-        }}
-      />
-    </>
-  );
-
   if (to) {
     return (
       <motion.div variants={motionVariants} initial="initial" animate="animate" whileHover="hover" whileTap="tap">
         <MotionLink to={to} className={baseClasses} aria-current={isActive ? 'page' : undefined}>
-          <BackgroundElement />
+          <BackgroundElement isActive={isActive} shouldAnimate={shouldAnimate} />
           <span className="relative z-10 flex items-center">{content}</span>
         </MotionLink>
       </motion.div>
@@ -206,7 +206,7 @@ function NavItem({
       whileTap="tap"
       aria-pressed={isActive}
     >
-      <BackgroundElement />
+      <BackgroundElement isActive={isActive} shouldAnimate={shouldAnimate} />
       <span className="relative z-10 flex items-center">{content}</span>
     </motion.button>
   );

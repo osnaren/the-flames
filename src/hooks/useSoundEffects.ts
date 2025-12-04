@@ -118,9 +118,11 @@ export function useSoundEffects() {
       }
     });
 
+    const currentCache = audioCache.current;
+
     return () => {
       // Cleanup audio objects
-      audioCache.current.forEach((audio) => {
+      currentCache.forEach((audio) => {
         audio.pause();
         audio.currentTime = 0;
       });

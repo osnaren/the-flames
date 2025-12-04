@@ -8,6 +8,7 @@ alwaysApply: false
 ## Component Structure Standards
 
 ### Container Components
+
 Main container components should follow this pattern:
 
 Reference: [HowItWorksContainer.tsx](mdc:src/features/howItWorks/HowItWorksContainer.tsx)
@@ -17,7 +18,7 @@ export default function FeatureContainer() {
   const { shouldAnimate } = useAnimationPreferences();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-surface/50 to-surface-container/30">
+    <div className="min-h-screen bg-linear-to-b from-surface/50 to-surface-container/30">
       <div className="px-4 py-8 md:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
           {/* Content with staggered animations */}
@@ -29,6 +30,7 @@ export default function FeatureContainer() {
 ```
 
 ### Enhanced Component Pattern
+
 Every enhanced component should include:
 
 1. **Animation Preferences Hook**
@@ -42,6 +44,7 @@ Reference: [Step2CommonLetters.tsx](mdc:src/features/howItWorks/components/Step2
 ## Sub-Component Patterns
 
 ### Animated Letter Components
+
 For letter-based interactions, create dedicated sub-components:
 
 ```typescript
@@ -61,7 +64,9 @@ const AnimatedLetter = ({
 ```
 
 ### Button Enhancement Pattern
+
 Interactive buttons should include:
+
 - Hover scale and position animations
 - Background glow effects (conditional)
 - Icon and text transformations
@@ -72,6 +77,7 @@ Reference: [CallToAction.tsx](mdc:src/features/howItWorks/components/CallToActio
 ## File Organization
 
 ### Component Directory Structure
+
 ```
 features/
   howItWorks/
@@ -88,7 +94,9 @@ features/
 ```
 
 ### Import Organization
+
 Organize imports in this order:
+
 1. External component libraries (Button, Card)
 2. Hooks (useAnimationPreferences, useInView)
 3. Framer Motion imports
@@ -99,11 +107,13 @@ Organize imports in this order:
 ## Naming Conventions
 
 ### Component Names
+
 - Container components: `FeatureContainer`
 - Step components: `StepXDescription` (e.g., `Step1Names`)
 - Sub-components: `AnimatedElement` (e.g., `AnimatedLetter`, `FlamesLetter`)
 
 ### Animation States
+
 - `shouldAnimate`: Boolean for animation preferences
 - `isInView`: Boolean for intersection observer
 - `isHighlighted`, `isEliminated`, `isFinal`: Boolean states for interactive elements
@@ -111,6 +121,7 @@ Organize imports in this order:
 ## Enhanced Headers
 
 ### Standard Header Pattern
+
 All step headers should include:
 
 ```typescript
@@ -132,12 +143,14 @@ All step headers should include:
 ## Memory Management
 
 ### Cleanup Patterns
+
 - Use `AnimatePresence` for entering/exiting elements
 - Clean up particle effects with proper exit animations
 - Manage component state to prevent memory leaks
 - Use `useEffect` cleanup functions for timers
 
 ### Performance Considerations
+
 - Lazy load heavy animation components
 - Use `React.memo` for sub-components that don't need frequent re-renders
 - Optimize particle counts based on device capabilities

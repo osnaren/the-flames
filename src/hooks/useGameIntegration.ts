@@ -22,7 +22,7 @@ export function useGameIntegration() {
 
   // Letter striking animation with feedback
   const handleLetterStrike = useCallback(
-    async (letterIndex: number, totalLetters: number) => {
+    async (letterIndex: number, _totalLetters: number) => {
       const delay = letterIndex * 100; // Stagger the feedback
 
       await Promise.all([playSound('letterStrike', { delay }), hapticFeedback.letterStrike()]);
@@ -73,12 +73,12 @@ export function useGameIntegration() {
         { pattern: celebrationType, delay: 300 },
       ]);
     },
-    [playSound, playSoundSequence, triggerHapticSequence]
+    [playSoundSequence, triggerHapticSequence]
   );
 
   // Badge unlock celebration
   const handleBadgeUnlock = useCallback(
-    async (badgeId: string) => {
+    async (_badgeId: string) => {
       // Extra special feedback for badge unlocks
       await playSoundSequence([
         { effect: 'badgeUnlock', delay: 0 },

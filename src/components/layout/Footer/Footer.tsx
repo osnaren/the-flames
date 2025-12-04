@@ -1,6 +1,6 @@
 import Logo from '@components/ui/Logo';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, Variants } from 'framer-motion';
 import { ExternalLink, Heart, Sparkles, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FOOTER_CONFIG } from './config';
@@ -15,7 +15,7 @@ export default function Footer() {
   const footerY = useTransform(scrollYProgress, [0.8, 1], [50, 0]);
 
   // Animation variants
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -27,7 +27,7 @@ export default function Footer() {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
@@ -40,7 +40,7 @@ export default function Footer() {
     },
   };
 
-  const statsVariants = {
+  const statsVariants: Variants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: {
       opacity: 1,
@@ -79,7 +79,7 @@ export default function Footer() {
           {children}
           {/* Animated underline */}
           <motion.span
-            className="from-primary to-secondary absolute -bottom-0.5 left-0 h-0.5 rounded-full bg-gradient-to-r"
+            className="from-primary to-secondary absolute -bottom-0.5 left-0 h-0.5 rounded-full bg-linear-to-r"
             initial={{ width: 0 }}
             whileHover={{ width: '100%' }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
@@ -117,14 +117,14 @@ export default function Footer() {
         opacity: prefersReducedMotion ? 1 : footerOpacity,
         y: prefersReducedMotion ? 0 : footerY,
       }}
-      className="border-outline/10 from-surface-container-lowest/80 via-surface/50 relative mt-auto overflow-hidden border-t bg-gradient-to-t to-transparent"
+      className="border-outline/10 from-surface-container-lowest/80 via-surface/50 relative mt-auto overflow-hidden border-t bg-linear-to-t to-transparent"
       role="contentinfo"
     >
       {/* Enhanced background elements */}
       {shouldAnimate && (
         <>
           {/* Subtle gradient overlay */}
-          <div className="from-primary/5 to-secondary/5 absolute inset-0 bg-gradient-to-br via-transparent" />
+          <div className="from-primary/5 to-secondary/5 absolute inset-0 bg-linear-to-br via-transparent" />
 
           {/* Floating particles effect */}
           <motion.div
@@ -313,7 +313,7 @@ export default function Footer() {
       {/* Decorative bottom accent */}
       {shouldAnimate && (
         <motion.div
-          className="from-primary via-secondary to-tertiary absolute right-0 bottom-0 left-0 h-1 bg-gradient-to-r opacity-60"
+          className="from-primary via-secondary to-tertiary absolute right-0 bottom-0 left-0 h-1 bg-linear-to-r opacity-60"
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}

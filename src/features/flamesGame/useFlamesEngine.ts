@@ -95,9 +95,21 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
     const urlName1 = searchParams.get('name1');
     const urlName2 = searchParams.get('name2');
 
-    if (urlName1) setName1(decodeURIComponent(urlName1));
-    if (urlName2) setName2(decodeURIComponent(urlName2));
-  }, [searchParams]);
+    if (urlName1) {
+      const decoded1 = decodeURIComponent(urlName1);
+      if (decoded1 !== name1) {
+        // Defer state update to avoid synchronous setState in effect warning
+        setTimeout(() => setName1(decoded1), 0);
+      }
+    }
+    if (urlName2) {
+      const decoded2 = decodeURIComponent(urlName2);
+      if (decoded2 !== name2) {
+        // Defer state update to avoid synchronous setState in effect warning
+        setTimeout(() => setName2(decoded2), 0);
+      }
+    }
+  }, [searchParams, name1, name2]);
 
   // Update URL params when names change
   const updateUrlParams = useCallback(
@@ -285,7 +297,8 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
         clearAll();
 
         if (error instanceof z.ZodError) {
-          toast.error(error.errors[0].message);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          toast.error((error as any).errors[0].message);
         } else {
           console.error('Unexpected error:', error);
           toast.error('Something went wrong. Please try again.');

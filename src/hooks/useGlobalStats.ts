@@ -2,6 +2,7 @@ import { NonNullFlamesResult } from '@/features/flamesGame';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { GlobalStats } from '../components/layout/GlobalCharts/types';
+import { generateMockData } from '../components/layout/GlobalCharts/utils';
 import { getStatsWithTrends, getUserCountry, StatsError, TimeWindow } from '../lib/supabase';
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
@@ -98,6 +99,14 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
 
       setIsLoading(true);
       setError(null);
+
+      // Check for mock data flag
+      if (import.meta.env.VITE_USE_MOCK_DATA === 'true') {
+        const mockData = generateMockData();
+        setData(mockData);
+        setIsLoading(false);
+        return;
+      }
 
       // Fetch global stats
       const globalStats = await getStatsWithTrends(timeWindow);

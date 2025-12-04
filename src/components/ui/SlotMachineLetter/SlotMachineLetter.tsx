@@ -1,5 +1,5 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { memo, useMemo } from 'react'; // Removed unused useEffect, useState
 import { FlamesResult } from '../../../features/flamesGame/flames.types';
 import { resultData } from '../../../features/flamesGame/resultData';
@@ -39,7 +39,7 @@ function SlotMachineLetter({ letter, index, slotStopIndex, result }: SlotMachine
   }, [letter, hasStopped, isResult]);
 
   // Optimize animation variants
-  const animationVariants = useMemo(
+  const animationVariants: Variants = useMemo(
     () => ({
       stopped: { y: 0, opacity: 1 },
       initial: { y: 20, opacity: 0 },

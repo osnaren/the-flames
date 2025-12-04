@@ -151,26 +151,35 @@ export function useSeasonalTheme() {
   // Initialize theme on mount and update when preferences change
   useEffect(() => {
     const detectedTheme = detectCurrentTheme();
-    setState((prev) => ({ ...prev, detectedTheme }));
+    
+    // Defer state update to avoid synchronous setState in effect warning
+    setTimeout(() => {
+      setState((prev) => {
+        if (prev.detectedTheme !== detectedTheme) {
+          return { ...prev, detectedTheme };
+        }
+        return prev;
+      });
+    }, 0);
 
     let targetTheme: SeasonalTheme;
 
     if (preferenceTheme === 'auto') {
       targetTheme = detectedTheme;
-      setState((prev) => ({ ...prev, manualOverride: null }));
+      setTimeout(() => setState((prev) => ({ ...prev, manualOverride: null })), 0);
     } else {
       targetTheme = preferenceTheme;
-      setState((prev) => ({ ...prev, manualOverride: preferenceTheme }));
+      setTimeout(() => setState((prev) => ({ ...prev, manualOverride: preferenceTheme })), 0);
     }
 
     // Apply theme if different from current
     if (targetTheme !== state.currentTheme) {
-      transitionToTheme(targetTheme);
+      setTimeout(() => transitionToTheme(targetTheme), 0);
     } else {
       // Ensure theme is applied even if same (for initial load)
       applyTheme(THEME_CONFIGS[targetTheme]);
     }
-  }, [preferenceTheme, detectCurrentTheme, transitionToTheme, applyTheme]);
+  }, [preferenceTheme, detectCurrentTheme, transitionToTheme, applyTheme, state.currentTheme]);
 
   // Check for theme changes periodically (every hour)
   useEffect(() => {

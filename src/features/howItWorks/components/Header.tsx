@@ -228,7 +228,7 @@ export default function Header() {
           animate={{ opacity: 1, scaleX: 1 }}
           transition={{ duration: 0.8, delay: 1, ease: 'easeOut' }}
         >
-          <div className="via-outline/30 h-px w-24 bg-gradient-to-r from-transparent to-transparent" />
+          <div className="via-outline/30 h-px w-24 bg-linear-to-r from-transparent to-transparent" />
         </motion.div>
       </motion.div>
     </>

@@ -1,7 +1,7 @@
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import Logo from '@components/ui/Logo';
 import FloatingControlPanel from '@layout/FloatingControlPanel';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, Variants } from 'framer-motion';
 import { BarChart3, BookOpen, Menu, Wand2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -82,15 +82,16 @@ export default function Navbar() {
 
   // Reset visibility when pathname changes with smooth transition
   useEffect(() => {
-    setIsVisible(true);
     // Smooth scroll to top on navigation
     if (!prefersReducedMotion) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'auto' });
     }
   }, [pathname, prefersReducedMotion]);
 
   // Enhanced navbar variants with micro-interactions
-  const navbarVariants = {
+  const navbarVariants: Variants = {
     visible: {
       y: 0,
       opacity: 1,
@@ -116,7 +117,7 @@ export default function Navbar() {
     },
   };
 
-  const contentVariants = {
+  const contentVariants: Variants = {
     visible: {
       y: 0,
       opacity: 1,
@@ -156,7 +157,7 @@ export default function Navbar() {
 
         {/* Dynamic border with scroll-based opacity */}
         <motion.div
-          className="via-outline/30 absolute right-0 bottom-0 left-0 h-px bg-gradient-to-r from-transparent to-transparent"
+          className="via-outline/30 absolute right-0 bottom-0 left-0 h-px bg-linear-to-r from-transparent to-transparent"
           style={{
             opacity: prefersReducedMotion ? (isScrolled ? 0.3 : 0) : borderOpacity,
           }}
@@ -165,7 +166,7 @@ export default function Navbar() {
         {/* Enhanced glow effect for modern look */}
         {isScrolled && !prefersReducedMotion && (
           <motion.div
-            className="from-primary/5 to-secondary/5 absolute inset-0 bg-gradient-to-r via-transparent"
+            className="from-primary/5 to-secondary/5 absolute inset-0 bg-linear-to-r via-transparent"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
@@ -242,7 +243,7 @@ export default function Navbar() {
         {/* Subtle animated accent line */}
         {!prefersReducedMotion && (
           <motion.div
-            className="from-primary via-secondary to-tertiary absolute bottom-0 left-0 h-0.5 bg-gradient-to-r"
+            className="from-primary via-secondary to-tertiary absolute bottom-0 left-0 h-0.5 bg-linear-to-r"
             initial={{ scaleX: 0, originX: 0 }}
             animate={{
               scaleX: isScrolled ? 1 : 0,

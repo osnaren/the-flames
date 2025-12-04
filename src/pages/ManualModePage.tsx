@@ -1,25 +1,8 @@
 import { Suspense } from 'react';
-import toast from 'react-hot-toast';
 import ManualMode from '../features/flamesGame/ManualMode';
 import ErrorBoundary from '../features/flamesGame/ManualMode/components/ErrorBoundary';
-import { FlamesResult } from '../features/flamesGame/flames.types';
-import { shareResult } from '../lib/share';
 
 export default function ManualModePage() {
-  const handleShare = async (result: FlamesResult) => {
-    try {
-      await shareResult({
-        name1: 'Your Name',
-        name2: 'Their Name',
-        result,
-        resultText: 'Manual Mode Result',
-      });
-    } catch (error) {
-      console.error('Share failed:', error);
-      toast.error('Failed to share result');
-    }
-  };
-
   return (
     <div className="min-h-screen">
       <ErrorBoundary>

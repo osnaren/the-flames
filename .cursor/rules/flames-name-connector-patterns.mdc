@@ -8,6 +8,7 @@ alwaysApply: false
 ## Advanced Connection Animations
 
 ### Multi-Layer Animation System
+
 Name connectors should implement sophisticated visual connections between names using multiple animation layers:
 
 Reference: [Step1Names.tsx](mdc:src/features/howItWorks/components/Step1Names.tsx)
@@ -15,9 +16,10 @@ Reference: [Step1Names.tsx](mdc:src/features/howItWorks/components/Step1Names.ts
 ### Core Animation Layers
 
 #### 1. Background Glow Layer
+
 ```typescript
 <motion.div
-  className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/10 via-primary-container/30 to-secondary/10 blur-lg"
+  className="absolute inset-0 rounded-full bg-linear-to-r from-primary/10 via-primary-container/30 to-secondary/10 blur-lg"
   animate={shouldAnimate ? {
     opacity: [0.3, 0.8, 0.3],
     scale: [0.8, 1.2, 0.8], 
@@ -28,22 +30,24 @@ Reference: [Step1Names.tsx](mdc:src/features/howItWorks/components/Step1Names.ts
 ```
 
 #### 2. Energy Flow Layer
+
 - Base connection line with gradient backgrounds
 - Animated energy pulses flowing along the connection
 - Responsive design: vertical for mobile, horizontal for desktop
 
 ```typescript
 // Base line
-<div className="from-primary/60 via-primary-container to-secondary/60 h-full w-1 rounded-full bg-gradient-to-b md:h-1 md:w-full md:bg-gradient-to-r" />
+<div className="from-primary/60 via-primary-container to-secondary/60 h-full w-1 rounded-full bg-linear-to-b md:h-1 md:w-full md:bg-linear-to-r" />
 
 // Animated energy flow
 <motion.div
-  className="absolute inset-0 rounded-full bg-gradient-to-b from-transparent via-primary to-transparent md:bg-gradient-to-r"
+  className="absolute inset-0 rounded-full bg-linear-to-b from-transparent via-primary to-transparent md:bg-linear-to-r"
   animate={shouldAnimate ? { opacity: [0, 1, 0], scale: [0.5, 1, 0.5] } : {}}
 />
 ```
 
 #### 3. Central Heart Animation
+
 ```typescript
 <motion.div
   className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
@@ -57,6 +61,7 @@ Reference: [Step1Names.tsx](mdc:src/features/howItWorks/components/Step1Names.ts
 ```
 
 #### 4. Floating Particle System
+
 ```typescript
 const [particles, setParticles] = useState<Array<{ id: number; delay: number }>>([]);
 
@@ -72,6 +77,7 @@ useEffect(() => {
 ```
 
 #### 5. Decorative Sparkles
+
 Strategic placement of animated icons around the connector:
 
 ```typescript
@@ -87,9 +93,11 @@ Strategic placement of animated icons around the connector:
 ## Name Card Enhancement Patterns
 
 ### Enhanced Name Cards
+
 Name cards should include:
 
 #### 1. Hover Interactions
+
 ```typescript
 <motion.div
   className="group relative"
@@ -110,6 +118,7 @@ Name cards should include:
 ```
 
 #### 2. Floating Accents
+
 Each name card should have unique floating decorative elements:
 
 ```typescript
@@ -131,19 +140,23 @@ Each name card should have unique floating decorative elements:
 ## Responsive Design Patterns
 
 ### Mobile vs Desktop Animations
+
 Connector animations must adapt to screen orientation:
 
 #### Mobile (Vertical)
+
 - Connection flows top to bottom
 - Particles move in vertical patterns
 - Compact spacing for smaller screens
 
 #### Desktop (Horizontal)  
+
 - Connection flows left to right
 - Particles move in horizontal patterns
 - Expanded spacing for larger displays
 
 ### Container Responsive Sizing
+
 ```typescript
 <div className="relative flex h-24 w-16 items-center justify-center md:h-16 md:w-32">
   {/* Responsive connector content */}
@@ -153,6 +166,7 @@ Connector animations must adapt to screen orientation:
 ## Performance Optimization
 
 ### Conditional Rendering
+
 All heavy animations should be conditionally rendered:
 
 ```typescript
@@ -164,6 +178,7 @@ All heavy animations should be conditionally rendered:
 ```
 
 ### Efficient Particle Management
+
 - Limit particle count based on device capabilities
 - Use staggered delays to prevent performance spikes
 - Proper cleanup with AnimatePresence
@@ -172,13 +187,17 @@ All heavy animations should be conditionally rendered:
 ## Integration with Educational Content
 
 ### Contextual Enhancement
+
 Name connectors should enhance the educational message:
+
 - Visual metaphor for "connection" between names
 - Animated "spark" representing the FLAMES calculation
 - Progressive disclosure of complexity
 
 ### Timing Coordination
+
 Coordinate connector animations with text animations:
+
 ```typescript
 // Text appears first, then connector animates
 <motion.p

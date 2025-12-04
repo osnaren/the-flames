@@ -1,7 +1,7 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { useSeasonalTheme } from '@/themes/seasonal/useSeasonalTheme';
 import { motion } from 'framer-motion';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface Particle {
   id: number;
@@ -20,185 +20,6 @@ interface SeasonalBackgroundProps {
   intensity?: 'low' | 'medium' | 'high';
   className?: string;
 }
-
-export function SeasonalBackground({ intensity = 'medium', className = '' }: SeasonalBackgroundProps) {
-  const { currentThemeConfig } = useSeasonalTheme();
-  const { shouldAnimate } = useAnimationPreferences();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
-  const particlesRef = useRef<Particle[]>([]);
-
-  const intensityMultiplier = {
-    low: 0.5,
-    medium: 1,
-    high: 1.5,
-  }[intensity];
-
-  const config = currentThemeConfig.backgroundEffects;
-
-  // Generate particles
-  const particles = useMemo(() => {
-    if (!config.particleEffects.enabled || !shouldAnimate) return [];
-
-    const count = Math.floor(config.particleEffects.count * intensityMultiplier);
-    const newParticles: Particle[] = [];
-
-    for (let i = 0; i < count; i++) {
-      newParticles.push({
-        id: i,
-        x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1920),
-        y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1080),
-        size:
-          Math.random() * (config.particleEffects.size.max - config.particleEffects.size.min) +
-          config.particleEffects.size.min,
-        speed:
-          Math.random() * (config.particleEffects.speed.max - config.particleEffects.speed.min) +
-          config.particleEffects.speed.min,
-        opacity:
-          Math.random() * (config.particleEffects.opacity.max - config.particleEffects.opacity.min) +
-          config.particleEffects.opacity.min,
-        shape: config.particleEffects.shapes[Math.floor(Math.random() * config.particleEffects.shapes.length)],
-        color: config.particleEffects.colors[Math.floor(Math.random() * config.particleEffects.colors.length)],
-        rotation: Math.random() * 360,
-        rotationSpeed: (Math.random() - 0.5) * 2,
-      });
-    }
-
-    return newParticles;
-  }, [config, intensityMultiplier, shouldAnimate]);
-
-  // Initialize particles
-  useEffect(() => {
-    particlesRef.current = particles;
-  }, [particles]);
-
-  // Animation loop
-  useEffect(() => {
-    if (!shouldAnimate || !config.particleEffects.enabled) return;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const updateParticles = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      particlesRef.current.forEach((particle) => {
-        // Update position based on direction
-        switch (config.particleEffects.direction) {
-          case 'down':
-            particle.y += particle.speed;
-            if (particle.y > canvas.height + particle.size) {
-              particle.y = -particle.size;
-              particle.x = Math.random() * canvas.width;
-            }
-            break;
-          case 'up':
-            particle.y -= particle.speed;
-            if (particle.y < -particle.size) {
-              particle.y = canvas.height + particle.size;
-              particle.x = Math.random() * canvas.width;
-            }
-            break;
-          case 'swirl':
-            particle.rotation += particle.rotationSpeed;
-            particle.x += Math.cos(particle.rotation * 0.1) * particle.speed * 0.5;
-            particle.y += Math.sin(particle.rotation * 0.1) * particle.speed * 0.5;
-            break;
-          case 'random':
-          default:
-            particle.x += (Math.random() - 0.5) * particle.speed;
-            particle.y += (Math.random() - 0.5) * particle.speed;
-            break;
-        }
-
-        // Wrap around screen
-        if (particle.x < -particle.size) particle.x = canvas.width + particle.size;
-        if (particle.x > canvas.width + particle.size) particle.x = -particle.size;
-        if (particle.y < -particle.size) particle.y = canvas.height + particle.size;
-        if (particle.y > canvas.height + particle.size) particle.y = -particle.size;
-
-        // Update rotation
-        particle.rotation += particle.rotationSpeed;
-
-        // Update opacity for sparkle animation
-        if (config.particleEffects.animation === 'sparkle') {
-          particle.opacity = Math.abs(Math.sin(Date.now() * 0.001 + particle.id)) * 0.8 + 0.2;
-        }
-
-        // Draw particle
-        ctx.save();
-        ctx.translate(particle.x, particle.y);
-        ctx.rotate((particle.rotation * Math.PI) / 180);
-        ctx.globalAlpha = particle.opacity;
-
-        drawParticle(ctx, particle);
-
-        ctx.restore();
-      });
-
-      animationRef.current = requestAnimationFrame(updateParticles);
-    };
-
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    updateParticles();
-
-    return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, [config, shouldAnimate]);
-
-  // Draw individual particle based on shape
-  const drawParticle = (ctx: CanvasRenderingContext2D, particle: Particle) => {
-    ctx.fillStyle = particle.color;
-    ctx.strokeStyle = particle.color;
-
-    switch (particle.shape) {
-      case 'circle':
-        ctx.beginPath();
-        ctx.arc(0, 0, particle.size / 2, 0, Math.PI * 2);
-        ctx.fill();
-        break;
-
-      case 'heart':
-        drawHeart(ctx, particle.size);
-        break;
-
-      case 'star':
-        drawStar(ctx, particle.size, 5);
-        break;
-
-      case 'snowflake':
-        drawSnowflake(ctx, particle.size);
-        break;
-
-      case 'pumpkin':
-        drawPumpkin(ctx, particle.size);
-        break;
-
-      case 'bat':
-        drawBat(ctx, particle.size);
-        break;
-
-      default:
-        // Default to circle
-        ctx.beginPath();
-        ctx.arc(0, 0, particle.size / 2, 0, Math.PI * 2);
-        ctx.fill();
-        break;
-    }
-  };
 
   // Shape drawing functions
   const drawHeart = (ctx: CanvasRenderingContext2D, size: number) => {
@@ -317,6 +138,183 @@ export function SeasonalBackground({ intensity = 'medium', className = '' }: Sea
     ctx.quadraticCurveTo(width / 3, height / 4, width / 8, 0);
     ctx.fill();
   };
+
+  // Draw individual particle based on shape
+  const drawParticle = (ctx: CanvasRenderingContext2D, particle: Particle) => {
+    ctx.fillStyle = particle.color;
+    ctx.strokeStyle = particle.color;
+
+    switch (particle.shape) {
+      case 'circle':
+        ctx.beginPath();
+        ctx.arc(0, 0, particle.size / 2, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+
+      case 'heart':
+        drawHeart(ctx, particle.size);
+        break;
+
+      case 'star':
+        drawStar(ctx, particle.size, 5);
+        break;
+
+      case 'snowflake':
+        drawSnowflake(ctx, particle.size);
+        break;
+
+      case 'pumpkin':
+        drawPumpkin(ctx, particle.size);
+        break;
+
+      case 'bat':
+        drawBat(ctx, particle.size);
+        break;
+
+      default:
+        // Default to circle
+        ctx.beginPath();
+        ctx.arc(0, 0, particle.size / 2, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+    }
+  };
+
+export function SeasonalBackground({ intensity = 'medium', className = '' }: SeasonalBackgroundProps) {
+  const { currentThemeConfig } = useSeasonalTheme();
+  const { shouldAnimate } = useAnimationPreferences();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number>(0);
+  const particlesRef = useRef<Particle[]>([]);
+
+  const intensityMultiplier = {
+    low: 0.5,
+    medium: 1,
+    high: 1.5,
+  }[intensity];
+
+  const config = currentThemeConfig.backgroundEffects;
+
+  // Generate and initialize particles
+  useEffect(() => {
+    if (!config.particleEffects.enabled || !shouldAnimate) {
+      particlesRef.current = [];
+      return;
+    }
+
+    const count = Math.floor(config.particleEffects.count * intensityMultiplier);
+    const newParticles: Particle[] = [];
+
+    for (let i = 0; i < count; i++) {
+      newParticles.push({
+        id: i,
+        x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1920),
+        y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1080),
+        size:
+          Math.random() * (config.particleEffects.size.max - config.particleEffects.size.min) +
+          config.particleEffects.size.min,
+        speed:
+          Math.random() * (config.particleEffects.speed.max - config.particleEffects.speed.min) +
+          config.particleEffects.speed.min,
+        opacity:
+          Math.random() * (config.particleEffects.opacity.max - config.particleEffects.opacity.min) +
+          config.particleEffects.opacity.min,
+        shape: config.particleEffects.shapes[Math.floor(Math.random() * config.particleEffects.shapes.length)],
+        color: config.particleEffects.colors[Math.floor(Math.random() * config.particleEffects.colors.length)],
+        rotation: Math.random() * 360,
+        rotationSpeed: (Math.random() - 0.5) * 2,
+      });
+    }
+
+    particlesRef.current = newParticles;
+  }, [config, intensityMultiplier, shouldAnimate]);
+
+  // Animation loop
+  useEffect(() => {
+    if (!shouldAnimate || !config.particleEffects.enabled) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const updateParticles = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particlesRef.current.forEach((particle) => {
+        // Update position based on direction
+        switch (config.particleEffects.direction) {
+          case 'down':
+            particle.y += particle.speed;
+            if (particle.y > canvas.height + particle.size) {
+              particle.y = -particle.size;
+              particle.x = Math.random() * canvas.width;
+            }
+            break;
+          case 'up':
+            particle.y -= particle.speed;
+            if (particle.y < -particle.size) {
+              particle.y = canvas.height + particle.size;
+              particle.x = Math.random() * canvas.width;
+            }
+            break;
+          case 'swirl':
+            particle.rotation += particle.rotationSpeed;
+            particle.x += Math.cos(particle.rotation * 0.1) * particle.speed * 0.5;
+            particle.y += Math.sin(particle.rotation * 0.1) * particle.speed * 0.5;
+            break;
+          case 'random':
+          default:
+            particle.x += (Math.random() - 0.5) * particle.speed;
+            particle.y += (Math.random() - 0.5) * particle.speed;
+            break;
+        }
+
+        // Wrap around screen
+        if (particle.x < -particle.size) particle.x = canvas.width + particle.size;
+        if (particle.x > canvas.width + particle.size) particle.x = -particle.size;
+        if (particle.y < -particle.size) particle.y = canvas.height + particle.size;
+        if (particle.y > canvas.height + particle.size) particle.y = -particle.size;
+
+        // Update rotation
+        particle.rotation += particle.rotationSpeed;
+
+        // Update opacity for sparkle animation
+        if (config.particleEffects.animation === 'sparkle') {
+          particle.opacity = Math.abs(Math.sin(Date.now() * 0.001 + particle.id)) * 0.8 + 0.2;
+        }
+
+        // Draw particle
+        ctx.save();
+        ctx.translate(particle.x, particle.y);
+        ctx.rotate((particle.rotation * Math.PI) / 180);
+        ctx.globalAlpha = particle.opacity;
+
+        drawParticle(ctx, particle);
+
+        ctx.restore();
+      });
+
+      animationRef.current = requestAnimationFrame(updateParticles);
+    };
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    updateParticles();
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [config, shouldAnimate]);
 
   return (
     <div className={`fixed inset-0 -z-10 overflow-hidden ${className}`}>

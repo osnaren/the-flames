@@ -1,6 +1,6 @@
 import Logo from '@components/ui/Logo';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { BarChart3, BookOpen, Flame, Wand2, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -67,7 +67,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
   }, [isOpen, onClose]);
 
   // Enhanced animation variants with smoother transitions
-  const backdropVariants = {
+  const backdropVariants: Variants = {
     hidden: {
       opacity: 0,
       transition: { duration: prefersReducedMotion ? 0.1 : 0.2 },
@@ -78,7 +78,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
     },
   };
 
-  const menuVariants = {
+  const menuVariants: Variants = {
     hidden: {
       x: '100%',
       transition: {
@@ -100,7 +100,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
   };
 
   // Enhanced container variants for staggered children animations
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: {
       opacity: 0,
       transition: {
@@ -119,7 +119,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: {
       opacity: 0,
       x: 30,
@@ -198,7 +198,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
             variants={menuVariants}
           >
             {/* Enhanced gradient overlay for depth */}
-            <div className="from-surface/90 via-surface/95 to-surface-container/90 absolute inset-0 bg-gradient-to-b" />
+            <div className="from-surface/90 via-surface/95 to-surface-container/90 absolute inset-0 bg-linear-to-b" />
 
             {/* Header with better visual hierarchy */}
             <div className="border-outline/10 relative border-b">
@@ -238,7 +238,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
 
               {/* Decorative accent line */}
               <motion.div
-                className="via-primary/30 absolute right-6 bottom-0 left-6 h-px bg-gradient-to-r from-transparent to-transparent"
+                className="via-primary/30 absolute right-6 bottom-0 left-6 h-px bg-linear-to-r from-transparent to-transparent"
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ delay: 0.3, duration: 0.5 }}
@@ -276,7 +276,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
 
                 {/* Enhanced settings note */}
                 <motion.div variants={itemVariants} className="pt-6">
-                  <div className="via-outline/20 mb-4 h-px w-full bg-gradient-to-r from-transparent to-transparent" />
+                  <div className="via-outline/20 mb-4 h-px w-full bg-linear-to-r from-transparent to-transparent" />
                   <div className="bg-surface-container/50 border-outline/10 rounded-xl border p-4">
                     <motion.div
                       initial={{ scale: 0.95, opacity: 0 }}
@@ -295,7 +295,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
 
             {/* Enhanced footer with brand info and subtle animation */}
             <motion.div
-              className="from-surface-container/80 via-surface/50 absolute right-0 bottom-0 left-0 bg-gradient-to-t to-transparent p-6 text-center"
+              className="from-surface-container/80 via-surface/50 absolute right-0 bottom-0 left-0 bg-linear-to-t to-transparent p-6 text-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.4 }}

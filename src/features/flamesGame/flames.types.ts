@@ -2,9 +2,10 @@
  * FLAMES Game Type Definitions
  */
 import React from 'react';
+import { FlamesResult as StrictFlamesResult } from '@/constants/flames';
 
-export type FlamesResult = 'F' | 'L' | 'A' | 'M' | 'E' | 'S' | null;
-export type NonNullFlamesResult = Exclude<FlamesResult, null>;
+export type FlamesResult = StrictFlamesResult | null;
+export type NonNullFlamesResult = StrictFlamesResult;
 
 export type GameStage = 'input' | 'processing' | 'result';
 

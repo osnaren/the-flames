@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { FlamesResult } from './flames.types';
+import { FLAMES_ORDER } from '@/constants/flames';
 
 /**
  * Schema for validating names in the FLAMES game
@@ -101,7 +102,7 @@ export const calculateFlamesResult = (name1: string, name2: string): FlamesResul
   // Calculate the result using the FLAMES algorithm
   // Total letters minus pairs of matched letters
   const remainingCount = n1.length + n2.length - matched1.size * 2;
-  const flames: FlamesResult[] = ['F', 'L', 'A', 'M', 'E', 'S'];
+  const flames: FlamesResult[] = [...FLAMES_ORDER];
   let currentIndex = 0;
 
   while (flames.length > 1) {

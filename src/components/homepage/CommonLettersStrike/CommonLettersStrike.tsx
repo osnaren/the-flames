@@ -131,7 +131,7 @@ export function CommonLettersStrike({ name1, name2, commonLetters, onComplete, i
       {/* Names display */}
       <div className="space-y-6">
         {/* Name 1 */}
-        <NameDisplay name={name1} letters={name1Letters} label="First Name" shouldAnimate={shouldAnimate} />
+        <NameDisplay letters={name1Letters} label="First Name" shouldAnimate={shouldAnimate} />
 
         {/* Striking indicator */}
         <motion.div
@@ -145,7 +145,7 @@ export function CommonLettersStrike({ name1, name2, commonLetters, onComplete, i
         </motion.div>
 
         {/* Name 2 */}
-        <NameDisplay name={name2} letters={name2Letters} label="Second Name" shouldAnimate={shouldAnimate} />
+        <NameDisplay letters={name2Letters} label="Second Name" shouldAnimate={shouldAnimate} />
       </div>
 
       {/* Progress indicator */}
@@ -177,12 +177,10 @@ export function CommonLettersStrike({ name1, name2, commonLetters, onComplete, i
 
 // Individual name display component
 function NameDisplay({
-  name,
   letters,
   label,
   shouldAnimate,
 }: {
-  name: string;
   letters: LetterState[];
   label: string;
   shouldAnimate: boolean;

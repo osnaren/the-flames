@@ -6,12 +6,15 @@ import toast from 'react-hot-toast';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { usePreferencesStore } from '@/store/usePreferencesStore';
+import { SeasonalTheme } from '@/themes/seasonal/types';
 import { useSeasonalTheme } from '@/themes/seasonal/useSeasonalTheme';
 
 interface SettingsPanelProps {
   isVisible: boolean;
   onClose: () => void;
 }
+
+type TabId = 'general' | 'audio' | 'themes' | 'gamification';
 
 export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
   const {
@@ -26,14 +29,13 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
     toggleSound,
     toggleHaptic,
     setVolume,
-    setSeasonalTheme,
   } = usePreferencesStore();
 
   const { playSound } = useSoundEffects();
-  const { hapticFeedback, capabilities, testHaptic: testHapticFunction } = useHapticFeedback();
-  const { getAvailableThemes, setManualTheme, currentTheme } = useSeasonalTheme();
+  const { hapticFeedback, capabilities, testHaptic: testHapticFunction, isSupported } = useHapticFeedback();
+  const { getAvailableThemes, setManualTheme } = useSeasonalTheme();
 
-  const [activeTab, setActiveTab] = useState<'general' | 'audio' | 'themes' | 'gamification'>('general');
+  const [activeTab, setActiveTab] = useState<TabId>('general');
 
   const handleVolumeChange = useCallback(
     async (newVolume: number) => {
@@ -46,14 +48,14 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
   );
 
   const handleThemeChange = useCallback(
-    async (theme: string) => {
+    async (theme: SeasonalTheme | 'auto') => {
       await playSound('click');
       hapticFeedback.tap();
 
       if (theme === 'auto') {
         setManualTheme(null);
       } else {
-        setManualTheme(theme as any);
+        setManualTheme(theme);
       }
     },
     [playSound, hapticFeedback, setManualTheme]
@@ -95,7 +97,7 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b bg-gradient-to-r from-blue-500 to-purple-500 p-6 text-white">
+          <div className="flex items-center justify-between border-b bg-linear-to-r from-blue-500 to-purple-500 p-6 text-white">
             <div className="flex items-center gap-3">
               <Settings className="h-6 w-6" />
               <div>
@@ -106,6 +108,7 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
             <button
               onClick={onClose}
               className="rounded-full p-2 text-white/80 transition-colors hover:bg-white/20 hover:text-white"
+              aria-label="Close settings"
             >
               <X className="h-6 w-6" />
             </button>
@@ -122,12 +125,14 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
               ].map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}
-                  onClick={() => setActiveTab(id as any)}
+                  onClick={() => setActiveTab(id as TabId)}
                   className={`flex flex-1 items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
                     activeTab === id
                       ? 'border-b-2 border-blue-500 bg-white text-blue-600 dark:bg-gray-900 dark:text-blue-400'
                       : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
                   }`}
+                  aria-label={`Switch to ${label} tab`}
+                  aria-current={activeTab === id ? 'page' : undefined}
                 >
                   <Icon className="h-4 w-4" />
                   <span className="hidden sm:inline">{label}</span>
@@ -149,7 +154,7 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
                     <div className="flex items-center gap-3">
                       {isDarkTheme ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
                       <div>
-                        <label className="font-medium text-gray-900 dark:text-white">Theme</label>
+                        <span className="font-medium text-gray-900 dark:text-white">Theme</span>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           {isDarkTheme ? 'Dark mode' : 'Light mode'}
                         </p>
@@ -160,6 +165,7 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                         isDarkTheme ? 'bg-blue-600' : 'bg-gray-200'
                       }`}
+                      aria-label={isDarkTheme ? 'Switch to light mode' : 'Switch to dark mode'}
                     >
                       <span
                         className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -174,7 +180,7 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
                     <div className="flex items-center gap-3">
                       <Calendar className="h-5 w-5" />
                       <div>
-                        <label className="font-medium text-gray-900 dark:text-white">Animations</label>
+                        <span className="font-medium text-gray-900 dark:text-white">Animations</span>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           Enable smooth animations and transitions
                         </p>
@@ -185,6 +191,7 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                         animationsEnabled ? 'bg-blue-600' : 'bg-gray-200'
                       }`}
+                      aria-label={animationsEnabled ? 'Disable animations' : 'Enable animations'}
                     >
                       <span
                         className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -208,7 +215,7 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
                     <div className="flex items-center gap-3">
                       {isSoundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
                       <div>
-                        <label className="font-medium text-gray-900 dark:text-white">Sound Effects</label>
+                        <span className="font-medium text-gray-900 dark:text-white">Sound Effects</span>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           Play sounds for interactions and game events
                         </p>
@@ -219,6 +226,7 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                         isSoundEnabled ? 'bg-blue-600' : 'bg-gray-200'
                       }`}
+                      aria-label={isSoundEnabled ? 'Disable sound effects' : 'Enable sound effects'}
                     >
                       <span
                         className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -231,10 +239,11 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
                   {/* Volume Slider */}
                   {isSoundEnabled && (
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                      <label htmlFor="volume-slider" className="block text-sm font-medium text-gray-900 dark:text-white">
                         Volume: {Math.round(volume * 100)}%
                       </label>
                       <input
+                        id="volume-slider"
                         type="range"
                         min="0"
                         max="1"
@@ -242,6 +251,7 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
                         value={volume}
                         onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
                         className="w-full accent-blue-600"
+                        aria-label="Volume control"
                       />
                       <button
                         onClick={handleTestSound}
@@ -261,9 +271,9 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
                     <div className="flex items-center gap-3">
                       <Vibrate className="h-5 w-5" />
                       <div>
-                        <label className="font-medium text-gray-900 dark:text-white">Vibration</label>
+                        <span className="font-medium text-gray-900 dark:text-white">Vibration</span>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {capabilities.isSupported
+                          {isSupported
                             ? 'Provide haptic feedback for interactions'
                             : 'Not supported on this device'}
                         </p>
@@ -271,21 +281,22 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
                     </div>
                     <button
                       onClick={toggleHaptic}
-                      disabled={!capabilities.isSupported}
+                      disabled={!isSupported}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        isHapticEnabled && capabilities.isSupported ? 'bg-blue-600' : 'bg-gray-200'
-                      } ${!capabilities.isSupported ? 'opacity-50' : ''}`}
+                        isHapticEnabled && isSupported ? 'bg-blue-600' : 'bg-gray-200'
+                      } ${!isSupported ? 'opacity-50' : ''}`}
+                      aria-label={isHapticEnabled ? 'Disable haptic feedback' : 'Enable haptic feedback'}
                     >
                       <span
                         className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                          isHapticEnabled && capabilities.isSupported ? 'translate-x-6' : 'translate-x-1'
+                          isHapticEnabled && isSupported ? 'translate-x-6' : 'translate-x-1'
                         }`}
                       />
                     </button>
                   </div>
 
                   {/* Haptic Test */}
-                  {isHapticEnabled && capabilities.isSupported && (
+                  {isHapticEnabled && isSupported && (
                     <button
                       onClick={handleTestHaptic}
                       className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
@@ -325,6 +336,8 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
                           ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                           : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600'
                       }`}
+                      aria-label="Select auto theme"
+                      aria-pressed={seasonalTheme === 'auto'}
                     >
                       <div className="flex items-center gap-3">
                         <Calendar className="h-5 w-5 text-blue-600" />
@@ -345,6 +358,8 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
                             ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                             : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600'
                         }`}
+                        aria-label={`Select ${theme.name} theme`}
+                        aria-pressed={seasonalTheme === theme.id}
                       >
                         <div className="flex items-center gap-3">
                           <Palette className="h-5 w-5 text-purple-600" />

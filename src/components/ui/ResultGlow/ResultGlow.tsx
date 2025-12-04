@@ -2,7 +2,7 @@ import { FlamesResult } from '@features/flamesGame/flames.types';
 import { getResultData } from '@features/flamesGame/resultData';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { AnimatePresence, motion } from 'framer-motion';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useMemo } from 'react';
 
 interface ResultGlowProps {
   result: FlamesResult;
@@ -14,26 +14,8 @@ interface ResultGlowProps {
  * Optimized with better performance and visual consistency
  */
 function ResultGlow({ result, isVisible }: ResultGlowProps) {
-  const [isVisibleState, setIsVisibleState] = useState(false);
   const { shouldAnimate } = useAnimationPreferences();
-
-  useEffect(() => {
-    // Synchronize visibility with parent component
-    if (!shouldAnimate) {
-      setIsVisibleState(false);
-      return;
-    }
-
-    // Use setTimeout to ensure proper transition when visibility changes
-    if (isVisible) {
-      const timer = setTimeout(() => {
-        setIsVisibleState(true);
-      }, 100); // Small delay for smoother entrance
-      return () => clearTimeout(timer);
-    } else {
-      setIsVisibleState(false);
-    }
-  }, [isVisible, shouldAnimate]);
+  const isVisibleState = shouldAnimate && isVisible;
 
   // Get the appropriate colors based on the result
   const visualConfig = useMemo(() => {
@@ -76,7 +58,7 @@ function ResultGlow({ result, isVisible }: ResultGlowProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
+          transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
           aria-hidden="true"
           role="presentation"
           aria-label={accessibilityLabel}

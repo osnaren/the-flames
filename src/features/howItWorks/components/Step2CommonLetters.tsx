@@ -26,9 +26,31 @@ const AnimatedLetter = ({
   shouldAnimate: boolean;
 }) => {
   const [showParticles, setShowParticles] = useState(false);
+  const [particles, setParticles] = useState<
+    Array<{
+      id: number;
+      targetX: number;
+      targetY: number;
+      delay: number;
+    }>
+  >([]);
 
   useEffect(() => {
     if (isCommon && shouldAnimate) {
+      setTimeout(() => {
+        setParticles((prev) => {
+          if (prev.length === 0) {
+            return Array.from({ length: 6 }).map((_, i) => ({
+              id: i,
+              targetX: (Math.random() - 0.5) * 60,
+              targetY: (Math.random() - 0.5) * 60,
+              delay: Math.random() * 0.3,
+            }));
+          }
+          return prev;
+        });
+      }, 0);
+
       const timer = setTimeout(
         () => {
           setShowParticles(true);
@@ -119,9 +141,9 @@ const AnimatedLetter = ({
       <AnimatePresence>
         {showParticles && isCommon && shouldAnimate && (
           <>
-            {Array.from({ length: 6 }).map((_, i) => (
+            {particles.map((particle) => (
               <motion.div
-                key={i}
+                key={particle.id}
                 className="bg-error absolute h-1 w-1 rounded-full"
                 style={{
                   left: '50%',
@@ -131,13 +153,13 @@ const AnimatedLetter = ({
                 animate={{
                   opacity: 0,
                   scale: 0,
-                  x: (Math.random() - 0.5) * 60,
-                  y: (Math.random() - 0.5) * 60,
+                  x: particle.targetX,
+                  y: particle.targetY,
                 }}
                 exit={{ opacity: 0 }}
                 transition={{
                   duration: 1.5,
-                  delay: Math.random() * 0.3,
+                  delay: particle.delay,
                   ease: 'easeOut',
                 }}
               />
@@ -307,7 +329,7 @@ export default function Step2CommonLetters({ name1, name2, commonLetters, remain
 
           {/* Enhanced Summary */}
           <motion.div
-            className="from-surface-container/50 to-surface-container-high/50 border-outline/10 rounded-xl border bg-gradient-to-r p-6 text-center"
+            className="from-surface-container/50 to-surface-container-high/50 border-outline/10 rounded-xl border bg-linear-to-r p-6 text-center"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.8 }}
@@ -371,7 +393,7 @@ export default function Step2CommonLetters({ name1, name2, commonLetters, remain
                 transition={{ duration: 0.8, delay: 1 }}
               >
                 <motion.div
-                  className="via-primary/40 h-px w-32 bg-gradient-to-r from-transparent to-transparent"
+                  className="via-primary/40 h-px w-32 bg-linear-to-r from-transparent to-transparent"
                   animate={{
                     opacity: [0.3, 0.8, 0.3],
                   }}

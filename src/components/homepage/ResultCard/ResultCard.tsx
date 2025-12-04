@@ -89,25 +89,18 @@ export function ResultCard({
 
   // Start animation when component becomes visible
   useEffect(() => {
-    if (stage === 'result' && result && !hasStarted) {
-      setIsVisible(true);
+    const shouldShow = stage === 'result' && !!result;
+
+    if (shouldShow && !hasStarted) {
+      setTimeout(() => setIsVisible(true), 0);
       startAnimation();
-    } else if (stage !== 'result') {
-      setIsVisible(false);
+    } else if (!shouldShow) {
+      setTimeout(() => setIsVisible(false), 0);
       resetAnimation();
     }
   }, [stage, result, hasStarted, startAnimation, resetAnimation]);
 
-  const getResultIcon = useCallback(() => {
-    switch (result) {
-      case 'L':
-        return Heart;
-      case 'M':
-        return Heart;
-      default:
-        return Sparkles;
-    }
-  }, [result]);
+  const ResultIcon = result === 'L' || result === 'M' ? Heart : Sparkles;
 
   const getResultColor = useCallback(() => {
     switch (result) {
@@ -156,7 +149,6 @@ export function ResultCard({
   const isResultPositive = result === 'L' || result === 'A' || result === 'M';
   const description = getFlamesDescription(result, name1, name2);
   const quote = getFlamesQuote(result);
-  const ResultIcon = getResultIcon();
   const resultColor = getResultColor();
 
   return (
@@ -187,7 +179,7 @@ export function ResultCard({
           {/* Main Card */}
           <div className="relative overflow-hidden rounded-2xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-black/20">
             {/* Animated gradient background */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${resultColor} opacity-5`} />
+            <div className={`absolute inset-0 bg-linear-to-br ${resultColor} opacity-5`} />
 
             {/* Content */}
             <div className="relative p-8 text-center">
@@ -206,14 +198,10 @@ export function ResultCard({
                 }}
                 className="mx-auto mb-6"
               >
-                <div className={`relative h-20 w-20 rounded-full bg-gradient-to-br ${resultColor} p-4 shadow-lg`}>
+                <div className={`relative h-20 w-20 rounded-full bg-linear-to-br ${resultColor} p-4 shadow-lg`}>
                   {/* Multi-layered glow effect */}
-                  <div
-                    className={`absolute inset-0 rounded-full bg-gradient-to-br ${resultColor} opacity-50 blur-md`}
-                  />
-                  <div
-                    className={`absolute inset-1 rounded-full bg-gradient-to-br ${resultColor} opacity-30 blur-sm`}
-                  />
+                  <div className={`absolute inset-0 rounded-full bg-linear-to-br ${resultColor} opacity-50 blur-md`} />
+                  <div className={`absolute inset-1 rounded-full bg-linear-to-br ${resultColor} opacity-30 blur-sm`} />
 
                   <ResultIcon className="relative z-10 h-full w-full text-white" />
                 </div>
@@ -230,7 +218,7 @@ export function ResultCard({
                   duration: shouldAnimate ? 0.6 : 0,
                   ease: 'easeOut',
                 }}
-                className={`mb-4 bg-gradient-to-r text-4xl font-bold ${resultColor} bg-clip-text text-transparent`}
+                className={`mb-4 bg-linear-to-r text-4xl font-bold ${resultColor} bg-clip-text text-transparent`}
               >
                 {result === 'F'
                   ? 'FRIENDSHIP'
@@ -297,7 +285,7 @@ export function ResultCard({
                 {/* Try Again Button */}
                 <button
                   onClick={onRetry}
-                  className="flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-blue-600 hover:to-purple-700 hover:shadow-lg"
+                  className="flex items-center gap-2 rounded-full bg-linear-to-r from-blue-500 to-purple-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-blue-600 hover:to-purple-700 hover:shadow-lg"
                 >
                   <RotateCcw className="h-4 w-4" />
                   Try Again
@@ -306,7 +294,7 @@ export function ResultCard({
                 {/* Share Button */}
                 <button
                   onClick={handleShare}
-                  className="flex items-center gap-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-green-600 hover:to-emerald-700 hover:shadow-lg"
+                  className="flex items-center gap-2 rounded-full bg-linear-to-r from-green-500 to-emerald-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-green-600 hover:to-emerald-700 hover:shadow-lg"
                 >
                   <Share2 className="h-4 w-4" />
                   Share
@@ -316,7 +304,7 @@ export function ResultCard({
                 {onNavigateToManual && (
                   <button
                     onClick={onNavigateToManual}
-                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-amber-600 hover:to-orange-700 hover:shadow-lg"
+                    className="flex items-center gap-2 rounded-full bg-linear-to-r from-amber-500 to-orange-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-amber-600 hover:to-orange-700 hover:shadow-lg"
                   >
                     <Sparkles className="h-4 w-4" />
                     Manual Mode
@@ -327,7 +315,7 @@ export function ResultCard({
                 {onNavigateToStats && (
                   <button
                     onClick={onNavigateToStats}
-                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-500 to-blue-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-indigo-600 hover:to-blue-700 hover:shadow-lg"
+                    className="flex items-center gap-2 rounded-full bg-linear-to-r from-indigo-500 to-blue-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-indigo-600 hover:to-blue-700 hover:shadow-lg"
                   >
                     <ArrowLeft className="h-4 w-4" />
                     Global Charts

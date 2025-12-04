@@ -83,7 +83,7 @@ export const nameSchema = z
   .refine((str) => str.length > 0, 'Name cannot be empty after trimming');
 ```
 
-### Features:
+### Features
 
 - **Unicode Support**: Handles international characters
 - **Special Characters**: Allows apostrophes, hyphens, and dots

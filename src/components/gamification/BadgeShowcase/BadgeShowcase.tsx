@@ -164,9 +164,10 @@ export function BadgeShowcase({ isVisible, onClose }: BadgeShowcaseProps) {
             return (b.unlockedAt || 0) - (a.unlockedAt || 0);
           }
           return a.unlocked === b.unlocked ? 0 : a.unlocked ? -1 : 1;
-        case 'rarity':
+        case 'rarity': {
           const rarityOrder = ['common', 'rare', 'epic', 'legendary'];
           return rarityOrder.indexOf(b.rarity) - rarityOrder.indexOf(a.rarity);
+        }
         case 'category':
           return a.category.localeCompare(b.category);
         default:
@@ -201,7 +202,7 @@ export function BadgeShowcase({ isVisible, onClose }: BadgeShowcaseProps) {
       streak_unlocked: counts.streak_unlocked || 0,
       discovery: counts.discovery || 0,
       discovery_unlocked: counts.discovery_unlocked || 0,
-    };
+    } as Record<string, number>;
   }, [enhancedBadges]);
 
   const handleBadgeClick = useCallback(
@@ -278,7 +279,7 @@ export function BadgeShowcase({ isVisible, onClose }: BadgeShowcaseProps) {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b bg-gradient-to-r from-purple-500 to-pink-500 p-6 text-white">
+          <div className="flex items-center justify-between border-b bg-linear-to-r from-purple-500 to-pink-500 p-6 text-white">
             <div className="flex items-center gap-3">
               <Trophy className="h-6 w-6" />
               <div>
@@ -302,8 +303,8 @@ export function BadgeShowcase({ isVisible, onClose }: BadgeShowcaseProps) {
           <div className="border-b bg-gray-50 p-4 dark:bg-gray-800">
             <div className="mb-4 flex flex-wrap gap-2">
               {['all', 'achievement', 'milestone', 'streak', 'discovery'].map((category) => {
-                const count = (categoryCounts as any)[category];
-                const unlockedCount = (categoryCounts as any)[`${category}_unlocked`];
+                const count = categoryCounts[category];
+                const unlockedCount = categoryCounts[`${category}_unlocked`];
                 const Icon = category === 'all' ? Award : CATEGORY_ICONS[category as keyof typeof CATEGORY_ICONS];
 
                 return (
@@ -407,7 +408,7 @@ export function BadgeShowcase({ isVisible, onClose }: BadgeShowcaseProps) {
                           </div>
                           <div className="h-2 rounded-full bg-gray-200 dark:bg-gray-700">
                             <div
-                              className="h-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
+                              className="h-2 rounded-full bg-linear-to-r from-purple-500 to-pink-500 transition-all duration-500"
                               style={{ width: `${(badge.progress / badge.maxProgress) * 100}%` }}
                             />
                           </div>

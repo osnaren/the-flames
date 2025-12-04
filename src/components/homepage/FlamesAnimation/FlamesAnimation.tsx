@@ -18,6 +18,8 @@ interface FlamesLetter {
   position: number;
 }
 
+const FLAMES_LETTERS: FlamesResult[] = ['F', 'L', 'A', 'M', 'E', 'S'];
+
 /**
  * Enhanced FLAMES animation with circular arrangement and spark indicator
  * Mimics the traditional counting game with visual flair
@@ -25,19 +27,17 @@ interface FlamesLetter {
 export function FlamesAnimation({ remainingLetters, onComplete, isVisible, result }: FlamesAnimationProps) {
   const { shouldAnimate } = useAnimationPreferences();
   const [flamesLetters, setFlamesLetters] = useState<FlamesLetter[]>([]);
-  const [currentPosition, setCurrentPosition] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [eliminationCount, setEliminationCount] = useState(0);
   const [roundsCompleted, setRoundsCompleted] = useState(0);
 
-  const letters: FlamesResult[] = ['F', 'L', 'A', 'M', 'E', 'S'];
   const countValue = remainingLetters.length;
 
   // Initialize FLAMES letters
   useEffect(() => {
     if (!isVisible) return;
 
-    const initialLetters = letters.map((letter, index) => ({
+    const initialLetters = FLAMES_LETTERS.map((letter, index) => ({
       letter,
       isActive: false,
       isEliminated: false,
@@ -45,7 +45,6 @@ export function FlamesAnimation({ remainingLetters, onComplete, isVisible, resul
     }));
 
     setFlamesLetters(initialLetters);
-    setCurrentPosition(0);
     setEliminationCount(0);
     setRoundsCompleted(0);
     setIsAnimating(false);
@@ -55,7 +54,7 @@ export function FlamesAnimation({ remainingLetters, onComplete, isVisible, resul
   const startAnimation = useCallback(() => {
     if (!shouldAnimate && result) {
       // Skip animation and show result immediately
-      const resultIndex = letters.findIndex((l) => l === result);
+      const resultIndex = FLAMES_LETTERS.findIndex((l) => l === result);
       setFlamesLetters((prev) =>
         prev.map((letter, index) => ({
           ...letter,
@@ -72,7 +71,7 @@ export function FlamesAnimation({ remainingLetters, onComplete, isVisible, resul
 
     // Create a mutable reference for the animation state
     const animationState = {
-      currentLetters: [...letters],
+      currentLetters: [...FLAMES_LETTERS],
       position: 0,
     };
 
@@ -105,7 +104,6 @@ export function FlamesAnimation({ remainingLetters, onComplete, isVisible, resul
           // Highlight current position
           const currentLetter =
             animationState.currentLetters[animationState.position % animationState.currentLetters.length];
-          setCurrentPosition(letters.findIndex((l) => l === currentLetter));
 
           setFlamesLetters((prev) =>
             prev.map((letter) => ({
@@ -157,7 +155,7 @@ export function FlamesAnimation({ remainingLetters, onComplete, isVisible, resul
 
     // Start the first round
     setTimeout(performRound, 800);
-  }, [shouldAnimate, result, countValue, onComplete, letters]);
+  }, [shouldAnimate, result, countValue, onComplete]);
 
   // Auto-start animation when component becomes visible
   useEffect(() => {

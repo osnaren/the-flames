@@ -2,7 +2,7 @@ import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { FlamesResult } from '@features/flamesGame/flames.types';
 import { getResultData } from '@features/flamesGame/resultData';
 import { motion } from 'framer-motion';
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 
 interface DynamicBackgroundProps {
   variant: 'default' | 'processing' | 'result';
@@ -145,11 +145,52 @@ function DynamicBackground({ variant = 'default', result, season, intensity = 'm
     return baseConfig;
   }, [variant, result, resultData, season, intensity]);
 
+  // Generate stable random values for particles
+  const [particles, setParticles] = useState<
+    Array<{
+      id: number;
+      color: string;
+      shape: string;
+      left: string;
+      top: string;
+      x: number;
+      y: number;
+      duration: number;
+      repeatDelay: number;
+    }>
+  >([]);
+
+  useEffect(() => {
+    if (!shouldAnimate || !backgroundConfig.effects.floating) {
+      setTimeout(() => setParticles((prev) => (prev.length > 0 ? [] : prev)), 0);
+      return;
+    }
+
+    setTimeout(() => {
+      setParticles((prev) => {
+        if (prev.length !== backgroundConfig.particles.count) {
+          return Array.from({ length: backgroundConfig.particles.count }).map((_, index) => ({
+            id: index,
+            color: backgroundConfig.particles.colors[index % backgroundConfig.particles.colors.length],
+            shape: backgroundConfig.particles.shapes[index % backgroundConfig.particles.shapes.length],
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            x: (Math.random() - 0.5) * 100,
+            y: (Math.random() - 0.5) * 100,
+            duration: 4 + Math.random() * 3,
+            repeatDelay: Math.random() * 5,
+          }));
+        }
+        return prev;
+      });
+    }, 0);
+  }, [shouldAnimate, backgroundConfig.effects.floating, backgroundConfig.particles]);
+
   // Don't render if animations are disabled and it's not a result background
   if (!shouldAnimate && variant !== 'result') {
     return (
       <div className="fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800" />
+        <div className="absolute inset-0 bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800" />
       </div>
     );
   }
@@ -212,36 +253,31 @@ function DynamicBackground({ variant = 'default', result, season, intensity = 'm
       {/* Animated particles */}
       {shouldAnimate && backgroundConfig.effects.floating && (
         <>
-          {Array.from({ length: backgroundConfig.particles.count }).map((_, index) => {
-            const color = backgroundConfig.particles.colors[index % backgroundConfig.particles.colors.length];
-            const shape = backgroundConfig.particles.shapes[index % backgroundConfig.particles.shapes.length];
-
-            return (
-              <motion.div
-                key={`particle-${index}`}
-                className="absolute"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                }}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{
-                  opacity: [0, 0.8, 0],
-                  scale: [0, 1, 0],
-                  x: [0, (Math.random() - 0.5) * 100],
-                  y: [0, (Math.random() - 0.5) * 100],
-                }}
-                transition={{
-                  duration: 4 + Math.random() * 3,
-                  repeat: Infinity,
-                  repeatDelay: Math.random() * 5,
-                  ease: 'easeOut',
-                }}
-              >
-                <ParticleShape shape={shape} color={color} />
-              </motion.div>
-            );
-          })}
+          {particles.map((particle) => (
+            <motion.div
+              key={`particle-${particle.id}`}
+              className="absolute"
+              style={{
+                left: particle.left,
+                top: particle.top,
+              }}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{
+                opacity: [0, 0.8, 0],
+                scale: [0, 1, 0],
+                x: [0, particle.x],
+                y: [0, particle.y],
+              }}
+              transition={{
+                duration: particle.duration,
+                repeat: Infinity,
+                repeatDelay: particle.repeatDelay,
+                ease: 'easeOut',
+              }}
+            >
+              <ParticleShape shape={particle.shape} color={particle.color} />
+            </motion.div>
+          ))}
         </>
       )}
 

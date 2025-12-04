@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "tailwind": "tailwindcss -o output.css",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@lottiefiles/dotlottie-react": "^0.17.8",

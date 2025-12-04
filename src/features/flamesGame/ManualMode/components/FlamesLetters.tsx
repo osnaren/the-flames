@@ -139,7 +139,7 @@ export default function FlamesLetters({
               {/* Background Glow Effect for Final Result */}
               {isFinalResult && (
                 <motion.div
-                  className="from-primary/20 via-primary/30 to-primary/20 absolute inset-0 rounded-2xl bg-gradient-to-r"
+                  className="from-primary/20 via-primary/30 to-primary/20 absolute inset-0 rounded-2xl bg-linear-to-r"
                   animate={{
                     opacity: showResultCelebration ? [0.3, 0.7, 0.3] : 0.3,
                   }}

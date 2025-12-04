@@ -96,33 +96,6 @@ export function usePairingHistory() {
     resultCounts: { F: 0, L: 0, A: 0, M: 0, E: 0, S: 0 },
   });
 
-  // Load data from localStorage on mount
-  useEffect(() => {
-    try {
-      const savedHistory = localStorage.getItem(STORAGE_KEY);
-      const savedBadges = localStorage.getItem(BADGES_KEY);
-
-      if (savedHistory) {
-        const parsedHistory = JSON.parse(savedHistory);
-        setHistory(parsedHistory);
-        calculateStats(parsedHistory);
-      }
-
-      if (savedBadges) {
-        setBadges(JSON.parse(savedBadges));
-      } else {
-        // Initialize badges
-        const initialBadges = BADGE_DEFINITIONS.map((badge) => ({
-          ...badge,
-          unlocked: false,
-        }));
-        setBadges(initialBadges);
-      }
-    } catch (error) {
-      console.error('Error loading pairing history:', error);
-    }
-  }, []);
-
   // Calculate statistics from history
   const calculateStats = useCallback((historyData: PairingEntry[]) => {
     const resultCounts = { F: 0, L: 0, A: 0, M: 0, E: 0, S: 0 };
@@ -133,7 +106,7 @@ export function usePairingHistory() {
     // Sort by timestamp to get correct order
     const sortedHistory = [...historyData].sort((a, b) => a.timestamp - b.timestamp);
 
-    sortedHistory.forEach((entry, index) => {
+    sortedHistory.forEach((entry) => {
       if (entry.result) {
         resultCounts[entry.result]++;
         uniqueResults.add(entry.result);
@@ -157,38 +130,9 @@ export function usePairingHistory() {
     });
   }, []);
 
-  // Add a new pairing to history
-  const addPairing = useCallback(
-    (name1: string, name2: string, result: FlamesResult, anonymous: boolean = false) => {
-      const newEntry: PairingEntry = {
-        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        name1: anonymous ? '' : name1,
-        name2: anonymous ? '' : name2,
-        result,
-        timestamp: Date.now(),
-        anonymous,
-      };
-
-      const updatedHistory = [newEntry, ...history].slice(0, 100); // Keep only last 100 entries
-      setHistory(updatedHistory);
-      calculateStats(updatedHistory);
-
-      // Save to localStorage
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
-      } catch (error) {
-        console.error('Error saving pairing history:', error);
-      }
-
-      // Check for new badges
-      checkBadges(updatedHistory, newEntry);
-    },
-    [history, calculateStats]
-  );
-
   // Check and unlock badges
   const checkBadges = useCallback(
-    (historyData: PairingEntry[], latestEntry: PairingEntry) => {
+    (historyData: PairingEntry[], _latestEntry: PairingEntry) => {
       const updatedBadges = [...badges];
       let hasNewBadges = false;
 
@@ -276,6 +220,62 @@ export function usePairingHistory() {
       }
     },
     [badges]
+  );
+
+  // Load data from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedHistory = localStorage.getItem(STORAGE_KEY);
+      const savedBadges = localStorage.getItem(BADGES_KEY);
+
+      if (savedHistory) {
+        const parsedHistory = JSON.parse(savedHistory);
+        setHistory(parsedHistory);
+        calculateStats(parsedHistory);
+      }
+
+      if (savedBadges) {
+        setBadges(JSON.parse(savedBadges));
+      } else {
+        // Initialize badges
+        const initialBadges = BADGE_DEFINITIONS.map((badge) => ({
+          ...badge,
+          unlocked: false,
+        }));
+        setBadges(initialBadges);
+      }
+    } catch (error) {
+      console.error('Error loading pairing history:', error);
+    }
+  }, [calculateStats]);
+
+  // Add a new pairing to history
+  const addPairing = useCallback(
+    (name1: string, name2: string, result: FlamesResult, anonymous: boolean = false) => {
+      const newEntry: PairingEntry = {
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name1: anonymous ? '' : name1,
+        name2: anonymous ? '' : name2,
+        result,
+        timestamp: Date.now(),
+        anonymous,
+      };
+
+      const updatedHistory = [newEntry, ...history].slice(0, 100); // Keep only last 100 entries
+      setHistory(updatedHistory);
+      calculateStats(updatedHistory);
+
+      // Save to localStorage
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
+      } catch (error) {
+        console.error('Error saving pairing history:', error);
+      }
+
+      // Check for new badges
+      checkBadges(updatedHistory, newEntry);
+    },
+    [history, calculateStats, checkBadges]
   );
 
   // Clear all history

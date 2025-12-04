@@ -12,7 +12,7 @@ const ManualModePage = lazy(() => import('@pages/ManualModePage'));
 
 function App() {
   return (
-    <div className="from-customBg-1 to-customBg-2 relative flex min-h-screen flex-col bg-gradient-to-br transition-colors duration-500">
+    <div className="from-customBg-1 to-customBg-2 relative flex min-h-screen flex-col bg-linear-to-br transition-colors duration-500">
       <FlameBackground />
       <Navbar />
 

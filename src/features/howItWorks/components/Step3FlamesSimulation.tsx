@@ -3,7 +3,7 @@ import Card from '@components/ui/Card';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { AnimatePresence, motion, useInView } from 'framer-motion';
 import { Flame, Play, RefreshCcw, Sparkles, Target, Zap } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Step3Props {
   remainingLettersCount: number;
@@ -25,6 +25,33 @@ const FlamesLetter = ({
   isFinal: boolean;
   shouldAnimate: boolean;
 }) => {
+  const [particles, setParticles] = useState<
+    Array<{
+      id: number;
+      targetX: number;
+      targetY: number;
+      delay: number;
+    }>
+  >([]);
+
+  useEffect(() => {
+    if (isEliminated && shouldAnimate) {
+      setTimeout(() => {
+        setParticles((prev) => {
+          if (prev.length === 0) {
+            return Array.from({ length: 4 }).map((_, i) => ({
+              id: i,
+              targetX: (Math.random() - 0.5) * 40,
+              targetY: (Math.random() - 0.5) * 40,
+              delay: Math.random() * 0.2,
+            }));
+          }
+          return prev;
+        });
+      }, 0);
+    }
+  }, [isEliminated, shouldAnimate]);
+
   return (
     <motion.div
       key={`flames-${letter}-${index}`}
@@ -55,7 +82,7 @@ const FlamesLetter = ({
       exit={{ opacity: 0, scale: 0.5, rotateY: 90, transition: { duration: 0.4 } }}
       className={`group relative flex h-14 w-14 items-center justify-center rounded-xl font-mono text-xl font-bold shadow-lg transition-all duration-300 md:h-16 md:w-16 ${
         isFinal
-          ? 'from-secondary via-primary-container to-tertiary text-on-secondary ring-primary/40 bg-gradient-to-br shadow-2xl ring-4'
+          ? 'from-secondary via-primary-container to-tertiary text-on-secondary ring-primary/40 bg-linear-to-br shadow-2xl ring-4'
           : isHighlighted
             ? 'bg-primary-container text-on-primary-container ring-primary/30 shadow-xl ring-4'
             : 'bg-surface-container-high text-on-surface hover:bg-surface-container-highest border-outline/20 border'
@@ -109,9 +136,9 @@ const FlamesLetter = ({
             {/* Strike effect particles */}
             {shouldAnimate && (
               <AnimatePresence>
-                {Array.from({ length: 4 }).map((_, i) => (
+                {particles.map((particle) => (
                   <motion.div
-                    key={i}
+                    key={particle.id}
                     className="bg-error absolute h-1 w-1 rounded-full"
                     style={{
                       left: '50%',
@@ -121,13 +148,13 @@ const FlamesLetter = ({
                     animate={{
                       opacity: 0,
                       scale: 0,
-                      x: (Math.random() - 0.5) * 40,
-                      y: (Math.random() - 0.5) * 40,
+                      x: particle.targetX,
+                      y: particle.targetY,
                     }}
                     exit={{ opacity: 0 }}
                     transition={{
                       duration: 1,
-                      delay: Math.random() * 0.2,
+                      delay: particle.delay,
                       ease: 'easeOut',
                     }}
                   />
@@ -359,7 +386,7 @@ export default function Step3FlamesSimulation({ remainingLettersCount }: Step3Pr
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <AnimatePresence mode="wait">
+            <AnimatePresence>
               {flamesLetters.map((letter, i) => (
                 <FlamesLetter
                   key={`${letter}-${i}`}
@@ -442,7 +469,7 @@ export default function Step3FlamesSimulation({ remainingLettersCount }: Step3Pr
                 {/* Button glow effect */}
                 {shouldAnimate && !isCounting && remainingLettersCount > 0 && (
                   <motion.div
-                    className="from-primary/20 via-primary-container/30 to-secondary/20 absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100"
+                    className="from-primary/20 via-primary-container/30 to-secondary/20 absolute inset-0 bg-linear-to-r opacity-0 group-hover:opacity-100"
                     animate={{
                       backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
                     }}

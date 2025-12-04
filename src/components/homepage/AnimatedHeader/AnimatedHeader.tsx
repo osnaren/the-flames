@@ -1,5 +1,5 @@
 import { GameStage } from '@features/flamesGame/flames.types';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { useState } from 'react';
 
 interface AnimatedHeaderProps {
@@ -21,7 +21,7 @@ const flamesLetters = [
   { char: 'S', emoji: '👫🏼', full: 'Siblings' },
 ];
 
-const letterContainerVariants = {
+const letterContainerVariants: Variants = {
   hidden: {},
   visible: {
     transition: {
@@ -31,7 +31,7 @@ const letterContainerVariants = {
   },
 };
 
-const letterVariants = {
+const letterVariants: Variants = {
   hidden: { opacity: 0, y: 20, scale: 0.9 },
   visible: {
     opacity: 1,

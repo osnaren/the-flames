@@ -30,7 +30,7 @@ export function MobileOptimizedSeasonalBackground({
   intensity = 'medium',
 }: MobileOptimizedSeasonalBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number>(0);
   const particlesRef = useRef<Particle[]>([]);
   const lastTimeRef = useRef<number>(0);
   const touchRef = useRef<{ x: number; y: number } | null>(null);
@@ -118,7 +118,7 @@ export function MobileOptimizedSeasonalBackground({
       const canvas = canvasRef.current;
       if (!canvas) return;
 
-      const { width, height } = canvas;
+      const { width } = canvas;
       const particles = particlesRef.current;
 
       // Update existing particles
@@ -169,6 +169,8 @@ export function MobileOptimizedSeasonalBackground({
   }, []);
 
   // Animation loop
+  const animateRef = useRef<(currentTime: number) => void>(() => {});
+
   const animate = useCallback(
     (currentTime: number) => {
       const canvas = canvasRef.current;
@@ -185,10 +187,14 @@ export function MobileOptimizedSeasonalBackground({
       updateParticles(deltaTime);
       renderParticles(ctx);
 
-      animationRef.current = requestAnimationFrame(animate);
+      animationRef.current = requestAnimationFrame(animateRef.current);
     },
     [updateParticles, renderParticles]
   );
+
+  useEffect(() => {
+    animateRef.current = animate;
+  }, [animate]);
 
   // Setup canvas and start animation
   useEffect(() => {

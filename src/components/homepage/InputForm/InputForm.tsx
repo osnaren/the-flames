@@ -37,16 +37,53 @@ export function InputForm({
   isProcessing = false,
 }: InputFormProps) {
   // Component state
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number }>>([]);
+  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; targetX: number; targetY: number }>>([]);
+  const [collapsingParticles, setCollapsingParticles] = useState<
+    Array<{
+      id: number;
+      left: number;
+      top: number;
+      targetX: number;
+      targetY: number;
+      delay: number;
+    }>
+  >([]);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
   // Auto-clear errors when processing completes
   useEffect(() => {
     if (!isProcessing) {
-      setErrors({});
+      setTimeout(() => {
+        setErrors((prev) => (Object.keys(prev).length > 0 ? {} : prev));
+      }, 0);
     }
   }, [isProcessing]);
+
+  // Generate collapsing particles when needed
+  useEffect(() => {
+    if (isCollapsing && shouldAnimate) {
+      setTimeout(() => {
+        setCollapsingParticles((prev) => {
+          if (prev.length === 0) {
+            return Array.from({ length: 20 }).map((_, i) => ({
+              id: i,
+              left: Math.random() * 100,
+              top: Math.random() * 100,
+              targetX: (Math.random() - 0.5) * 300,
+              targetY: (Math.random() - 0.5) * 300,
+              delay: Math.random() * 0.3,
+            }));
+          }
+          return prev;
+        });
+      }, 0);
+    } else if (!isCollapsing) {
+      setTimeout(() => {
+        setCollapsingParticles((prev) => (prev.length > 0 ? [] : prev));
+      }, 0);
+    }
+  }, [isCollapsing, shouldAnimate]);
 
   // Individual field validation
   const validateField = useCallback((fieldName: 'name1' | 'name2', value: string) => {
@@ -191,6 +228,8 @@ export function InputForm({
             id: i,
             x: Math.random() * 100,
             y: Math.random() * 100,
+            targetX: (Math.random() - 0.5) * 200,
+            targetY: (Math.random() - 0.5) * 200,
           }));
           setParticles(newParticles);
           setTimeout(() => setParticles([]), 1000);
@@ -241,8 +280,8 @@ export function InputForm({
             animate={{
               opacity: 0,
               scale: 0,
-              x: (Math.random() - 0.5) * 200,
-              y: (Math.random() - 0.5) * 200,
+              x: particle.targetX,
+              y: particle.targetY,
             }}
             exit={{ opacity: 0 }}
             transition={{
@@ -471,24 +510,24 @@ export function InputForm({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {Array.from({ length: 20 }).map((_, i) => (
+          {collapsingParticles.map((particle) => (
             <motion.div
-              key={i}
+              key={particle.id}
               className="bg-primary/60 absolute h-1 w-1 rounded-full"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
+                left: `${particle.left}%`,
+                top: `${particle.top}%`,
               }}
               initial={{ opacity: 1, scale: 1 }}
               animate={{
                 opacity: 0,
                 scale: 0,
-                x: (Math.random() - 0.5) * 300,
-                y: (Math.random() - 0.5) * 300,
+                x: particle.targetX,
+                y: particle.targetY,
               }}
               transition={{
                 duration: 0.8,
-                delay: Math.random() * 0.3,
+                delay: particle.delay,
                 ease: 'easeOut',
               }}
             />

@@ -221,7 +221,7 @@ export default function CallToAction() {
               {/* Button background glow effect */}
               {shouldAnimate && (
                 <motion.div
-                  className="from-primary/20 via-primary-container/30 to-secondary/20 absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100"
+                  className="from-primary/20 via-primary-container/30 to-secondary/20 absolute inset-0 bg-linear-to-r opacity-0 group-hover:opacity-100"
                   animate={{
                     backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
                   }}

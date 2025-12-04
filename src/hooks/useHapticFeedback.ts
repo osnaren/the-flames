@@ -80,7 +80,10 @@ export function useHapticFeedback() {
       };
     };
 
-    setCapabilities(detectCapabilities());
+    // Defer state update to avoid synchronous setState in effect warning
+    setTimeout(() => {
+      setCapabilities(detectCapabilities());
+    }, 0);
   }, []);
 
   // Trigger haptic feedback

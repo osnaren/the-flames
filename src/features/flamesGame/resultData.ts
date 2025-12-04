@@ -1,8 +1,9 @@
 import { BellRing, Heart, Star, Sword, Users } from 'lucide-react';
 import { FlamesResult, NonNullFlamesResult, ResultData } from './flames.types';
+import { FlamesResultType } from '@/constants/flames';
 
 export const resultData: Record<NonNullFlamesResult, ResultData> = {
-  F: {
+  [FlamesResultType.FRIEND]: {
     text: 'Friendship',
     icon: Users,
     color: 'var(--color-friendship-container)',
@@ -21,7 +22,7 @@ export const resultData: Record<NonNullFlamesResult, ResultData> = {
     quote: 'Best friends are the siblings we choose! 🤝',
     endText: 'friends',
   },
-  L: {
+  [FlamesResultType.LOVE]: {
     text: 'Love',
     icon: Heart,
     color: 'var(--color-love-container)',
@@ -40,7 +41,7 @@ export const resultData: Record<NonNullFlamesResult, ResultData> = {
     quote: 'When two hearts beat as one! 💘',
     endText: 'lovers',
   },
-  A: {
+  [FlamesResultType.AFFECTION]: {
     text: 'Affection',
     icon: Star,
     color: 'var(--color-affection-container)',
@@ -59,7 +60,7 @@ export const resultData: Record<NonNullFlamesResult, ResultData> = {
     quote: 'The spark that keeps the flame alive! ✨',
     endText: 'affectionate',
   },
-  M: {
+  [FlamesResultType.MARRIAGE]: {
     text: 'Marriage',
     icon: BellRing,
     color: 'var(--color-marriage-container)',
@@ -78,7 +79,7 @@ export const resultData: Record<NonNullFlamesResult, ResultData> = {
     quote: 'Destined for a lifetime together! 💍',
     endText: 'married',
   },
-  E: {
+  [FlamesResultType.ENEMY]: {
     text: 'Enemy',
     icon: Sword,
     color: 'var(--color-enemy-container)',
@@ -97,7 +98,7 @@ export const resultData: Record<NonNullFlamesResult, ResultData> = {
     quote: 'That escalated quickly... 😅',
     endText: 'enemies',
   },
-  S: {
+  [FlamesResultType.SIBLING]: {
     text: 'Siblings',
     icon: Users,
     color: 'var(--color-siblings-container)',
@@ -119,5 +120,5 @@ export const resultData: Record<NonNullFlamesResult, ResultData> = {
 };
 
 export function getResultData(result: FlamesResult): ResultData {
-  return result ? resultData[result] : resultData.F;
+  return result ? resultData[result] : resultData[FlamesResultType.FRIEND];
 }

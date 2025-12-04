@@ -11,15 +11,34 @@ interface Step1Props {
 
 // Enhanced Name Connector Component
 const NameConnector = ({ shouldAnimate }: { shouldAnimate: boolean }) => {
-  const [particles, setParticles] = useState<Array<{ id: number; delay: number }>>([]);
+  const [particles, setParticles] = useState<
+    Array<{
+      id: number;
+      delay: number;
+      initialX: number;
+      initialY: number;
+      targetX: number;
+      targetY: number;
+    }>
+  >([]);
 
   useEffect(() => {
     if (shouldAnimate) {
-      const particleArray = Array.from({ length: 8 }, (_, i) => ({
-        id: i,
-        delay: i * 0.2,
-      }));
-      setParticles(particleArray);
+      setTimeout(() => {
+        setParticles((prev) => {
+          if (prev.length === 0) {
+            return Array.from({ length: 8 }, (_, i) => ({
+              id: i,
+              delay: i * 0.2,
+              initialX: Math.random() * 20 - 10,
+              initialY: Math.random() * 20 - 10,
+              targetX: Math.random() * 40 - 20,
+              targetY: Math.random() * 40 - 20,
+            }));
+          }
+          return prev;
+        });
+      }, 0);
     }
   }, [shouldAnimate]);
 
@@ -27,7 +46,7 @@ const NameConnector = ({ shouldAnimate }: { shouldAnimate: boolean }) => {
     <div className="relative flex h-24 w-16 items-center justify-center md:h-16 md:w-32">
       {/* Enhanced Background Glow */}
       <motion.div
-        className="from-primary/10 via-primary-container/30 to-secondary/10 absolute inset-0 rounded-full bg-gradient-to-r blur-lg"
+        className="from-primary/10 via-primary-container/30 to-secondary/10 absolute inset-0 rounded-full bg-linear-to-r blur-lg"
         animate={
           shouldAnimate
             ? {
@@ -47,11 +66,11 @@ const NameConnector = ({ shouldAnimate }: { shouldAnimate: boolean }) => {
       {/* Main Connection Line */}
       <div className="relative h-full w-1 md:h-1 md:w-full">
         {/* Base Line */}
-        <div className="from-primary/60 via-primary-container to-secondary/60 absolute inset-0 rounded-full bg-gradient-to-b md:bg-gradient-to-r" />
+        <div className="from-primary/60 via-primary-container to-secondary/60 absolute inset-0 rounded-full bg-linear-to-b md:bg-linear-to-r" />
 
         {/* Animated Energy Flow */}
         <motion.div
-          className="via-primary absolute inset-0 rounded-full bg-gradient-to-b from-transparent to-transparent md:bg-gradient-to-r"
+          className="via-primary absolute inset-0 rounded-full bg-linear-to-b from-transparent to-transparent md:bg-linear-to-r"
           animate={
             shouldAnimate
               ? {
@@ -96,13 +115,13 @@ const NameConnector = ({ shouldAnimate }: { shouldAnimate: boolean }) => {
               key={particle.id}
               className="bg-primary/80 absolute h-1 w-1 rounded-full"
               initial={{
-                x: Math.random() * 20 - 10,
-                y: Math.random() * 20 - 10,
+                x: particle.initialX,
+                y: particle.initialY,
                 opacity: 0,
               }}
               animate={{
-                x: Math.random() * 40 - 20,
-                y: Math.random() * 40 - 20,
+                x: particle.targetX,
+                y: particle.targetY,
                 opacity: [0, 1, 0],
                 scale: [0, 1.5, 0],
               }}
@@ -215,7 +234,7 @@ export default function Step1Names({ name1, name2 }: Step1Props) {
               >
                 {name1}
                 {/* Subtle glow effect */}
-                <div className="from-primary/10 absolute inset-0 rounded-xl bg-gradient-to-r to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                <div className="from-primary/10 absolute inset-0 rounded-xl bg-linear-to-r to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
               </motion.div>
 
               {/* Floating accent */}
@@ -263,7 +282,7 @@ export default function Step1Names({ name1, name2 }: Step1Props) {
               >
                 {name2}
                 {/* Subtle glow effect */}
-                <div className="from-secondary/10 absolute inset-0 rounded-xl bg-gradient-to-l to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                <div className="from-secondary/10 absolute inset-0 rounded-xl bg-linear-to-l to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
               </motion.div>
 
               {/* Floating accent */}

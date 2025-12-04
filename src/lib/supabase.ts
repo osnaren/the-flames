@@ -34,7 +34,7 @@ const RETRY_DELAY = 1000; // ms
 
 // Helper function for exponential backoff retry
 async function withRetry<T>(
-  operation: () => Promise<T>,
+  operation: () => PromiseLike<T>,
   attempts: number = RETRY_ATTEMPTS,
   delay: number = RETRY_DELAY
 ): Promise<T> {
@@ -74,13 +74,6 @@ export const getUserCountry = async (): Promise<string | null> => {
 // Get statistics with trends
 export const getStatsWithTrends = async (window: TimeWindow = 'today', country?: string) => {
   try {
-    // Add query timeout
-    const QUERY_TIMEOUT = 10000; // 10 seconds
-
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new StatsError('Query timed out', 'QUERY_TIMEOUT')), QUERY_TIMEOUT);
-    });
-
     const { data, error } = await withRetry(() =>
       supabase.rpc('get_stats_with_trends', {
         time_window: window,
@@ -88,14 +81,11 @@ export const getStatsWithTrends = async (window: TimeWindow = 'today', country?:
       })
     );
 
-    // Race between query and timeout
-    const result = await Promise.race([data, timeoutPromise]);
-
     if (error) {
       throw new StatsError('Failed to fetch statistics', 'STATS_FETCH_FAILED');
     }
 
-    return result;
+    return data;
   } catch (error) {
     if (error instanceof StatsError) throw error;
     throw new StatsError('An unexpected error occurred', 'UNEXPECTED_ERROR');

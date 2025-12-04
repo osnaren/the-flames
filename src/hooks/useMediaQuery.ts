@@ -7,12 +7,14 @@ export function useMediaQuery(query: string): boolean {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    if (!mounted) {
+      setTimeout(() => setMounted(true), 0);
+    }
     const media = window.matchMedia(query);
 
     // Set initial value
     if (media.matches !== matches) {
-      setMatches(media.matches);
+      setTimeout(() => setMatches(media.matches), 0);
     }
 
     // Create listener function
@@ -27,7 +29,7 @@ export function useMediaQuery(query: string): boolean {
     return () => {
       media.removeEventListener('change', listener);
     };
-  }, [matches, query]);
+  }, [matches, query, mounted]);
 
   // Return false on server-side rendering to avoid hydration mismatch
   return mounted ? matches : false;

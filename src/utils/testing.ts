@@ -237,7 +237,7 @@ export function benchmarkValidation(testLevel: keyof typeof PERFORMANCE_TESTS = 
     totalTime,
     averageTime,
     minTime,
-    maxTime: maximumAllowedTime,
+    maxTime,
     passed: totalTime <= maximumAllowedTime,
   };
 }
@@ -282,7 +282,7 @@ export function benchmarkFlamesCalculation(testLevel: keyof typeof PERFORMANCE_T
     totalTime,
     averageTime,
     minTime,
-    maxTime: maximumAllowedTime,
+    maxTime,
     passed: totalTime <= maximumAllowedTime,
   };
 }

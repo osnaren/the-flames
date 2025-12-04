@@ -1,6 +1,6 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { motion } from 'framer-motion';
-import { memo, useEffect, useState } from 'react';
+import { memo } from 'react';
 
 interface AmbientGlowProps {
   isVisible: boolean;
@@ -13,18 +13,8 @@ interface AmbientGlowProps {
  * Memoized to prevent unnecessary re-renders
  */
 function AmbientGlow({ isVisible }: AmbientGlowProps) {
-  const [isVisibleState, setIsVisibleState] = useState(false);
   const { shouldAnimate } = useAnimationPreferences();
-
-  useEffect(() => {
-    // Only show glow if animations are enabled
-    if (!shouldAnimate) {
-      setIsVisibleState(false);
-      return;
-    }
-    // Set internal visibility based on prop
-    setIsVisibleState(isVisible);
-  }, [isVisible, shouldAnimate]);
+  const isVisibleState = shouldAnimate && isVisible;
 
   if (!isVisibleState) return null;
 
@@ -38,7 +28,7 @@ function AmbientGlow({ isVisible }: AmbientGlowProps) {
       >
         {/* Enhanced gradient layers for more depth */}
         <div className="from-primary/25 via-secondary/20 to-tertiary/25 bg-gradient-radial absolute inset-0" />
-        <div className="from-primary-container/30 to-error-container/20 absolute inset-0 bg-gradient-to-br" />
+        <div className="from-primary-container/30 to-error-container/20 absolute inset-0 bg-linear-to-br" />
 
         {/* Enhanced central glow */}
         <div
@@ -88,7 +78,7 @@ function AmbientGlow({ isVisible }: AmbientGlowProps) {
 
       {/* Secondary gradient overlay with diagonal movement */}
       <motion.div
-        className="from-primary-container/25 to-error-container/20 dark:from-primary-container/30 dark:to-error-container/25 absolute inset-0 bg-gradient-to-br via-transparent"
+        className="from-primary-container/25 to-error-container/20 dark:from-primary-container/30 dark:to-error-container/25 absolute inset-0 bg-linear-to-br via-transparent"
         animate={{
           opacity: [0.3, 0.6, 0.3],
           backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'],
