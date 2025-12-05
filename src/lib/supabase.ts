@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize the Supabase client
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 if (!supabaseUrl || !supabaseKey || supabaseUrl === 'undefined' || supabaseKey === 'undefined') {
   console.error('Supabase URL or Anon Key missing:', {
@@ -52,9 +52,9 @@ async function withRetry<T>(
 export const getUserCountry = async (): Promise<string | null> => {
   try {
     const response = await withRetry(() =>
-      fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-country`, {
+      fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-country`, {
         headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
         },
       })
     );

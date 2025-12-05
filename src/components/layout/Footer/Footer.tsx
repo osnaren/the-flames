@@ -1,8 +1,10 @@
+'use client';
+
 import Logo from '@components/ui/Logo';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { motion, useScroll, useTransform, Variants } from 'framer-motion';
 import { ExternalLink, Heart, Sparkles, TrendingUp } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { FOOTER_CONFIG } from './config';
 import type { FooterLinkProps } from './types';
 
@@ -91,7 +93,7 @@ export default function Footer() {
 
     if (to) {
       return (
-        <Link to={to} className={linkClass} title={description} {...props}>
+        <Link href={to} className={linkClass} title={description} {...props}>
           {content}
         </Link>
       );

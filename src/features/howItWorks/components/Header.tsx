@@ -1,16 +1,18 @@
+'use client';
+
 import Button from '@components/ui/Button';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowLeft, Flame, Zap } from 'lucide-react';
 import { GiSparkyBomb } from 'react-icons/gi';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 /**
  * Enhanced Header component for How It Works page
  * Includes navigation back button and animated page title with floating elements
  */
 export default function Header() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { shouldAnimate } = useAnimationPreferences();
   const { scrollY } = useScroll();
 
@@ -19,7 +21,7 @@ export default function Header() {
   const y2 = useTransform(scrollY, [0, 300], [0, -30]);
 
   const goBack = () => {
-    navigate('/');
+    router.push('/');
   };
 
   return (

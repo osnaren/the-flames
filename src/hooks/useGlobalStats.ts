@@ -101,7 +101,7 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
       setError(null);
 
       // Check for mock data flag
-      if (import.meta.env.VITE_USE_MOCK_DATA === 'true') {
+      if (process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true') {
         const mockData = generateMockData();
         setData(mockData);
         setIsLoading(false);

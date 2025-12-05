@@ -4,7 +4,7 @@ import { useTimers } from '@/hooks/useTimers';
 import { insertMatch } from '@lib/supabase';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { FlamesResult, GameStage } from './flames.types';
 import { calculateFlamesResult, findCommonLetters, nameSchema } from './flames.utils';
@@ -55,7 +55,8 @@ const STAGE_TIMINGS = {
  * Handles all game logic, timing, and state transitions
  */
 export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   // Core game state
   const [name1, setName1] = useState<string>('');
@@ -92,6 +93,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
 
   // Initialize from URL params
   useEffect(() => {
+    if (!searchParams) return;
     const urlName1 = searchParams.get('name1');
     const urlName2 = searchParams.get('name2');
 
@@ -114,12 +116,14 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
   // Update URL params when names change
   const updateUrlParams = useCallback(
     (newName1: string, newName2: string) => {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams(searchParams?.toString() || '');
       if (newName1.trim()) params.set('name1', encodeURIComponent(newName1.trim()));
+      else params.delete('name1');
       if (newName2.trim()) params.set('name2', encodeURIComponent(newName2.trim()));
-      setSearchParams(params, { replace: true });
+      else params.delete('name2');
+      router.replace(`?${params.toString()}`);
     },
-    [setSearchParams]
+    [searchParams, router]
   );
 
   // Memoized name setters
@@ -343,8 +347,8 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
     });
 
     // Clear URL params
-    setSearchParams({}, { replace: true });
-  }, [clearAll, setSearchParams]);
+    router.replace('?');
+  }, [clearAll, router]);
 
   /**
    * Force reset processing state - useful for when form validation fails

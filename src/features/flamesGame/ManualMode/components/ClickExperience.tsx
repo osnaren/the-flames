@@ -1,8 +1,10 @@
+'use client';
+
 import { motion } from 'framer-motion';
 import { ArrowLeft, Download, RotateCcw, Share, SquareArrowOutUpRight } from 'lucide-react';
+import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
 import Button from '../../../../components/ui/Button';
 import { calculateFlamesResult } from '../../flames.utils';
 import type { ClickExperienceProps } from '../types';
@@ -103,7 +105,7 @@ export default function ClickExperience({
   return (
     <div className="bg-background min-h-screen p-4">
       {/* Background Pattern */}
-      <div className="bg-[radial-gradient(circle_at_1px_1px,theme(colors.on-surface)_1px,transparent_0)] absolute inset-0 bg-[length:20px_20px] opacity-5" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,var(--color-on-surface)_1px,transparent_0)] bg-size-[20px_20px] opacity-5" />
 
       <div className="relative z-10 mx-auto max-w-6xl">
         {/* Header Navigation */}
@@ -258,7 +260,7 @@ export default function ClickExperience({
           >
             <h3 className="text-on-surface mb-4 flex gap-1 text-lg font-semibold">
               How to Play
-              <Link to="/how-it-works">
+              <Link href="/how-it-works">
                 <SquareArrowOutUpRight className="text-on-surface-variant w-4 cursor-pointer" />
               </Link>
             </h3>

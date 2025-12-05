@@ -1,10 +1,12 @@
+'use client';
+
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import Logo from '@components/ui/Logo';
 import FloatingControlPanel from '@layout/FloatingControlPanel';
 import { motion, useScroll, useTransform, Variants } from 'framer-motion';
 import { BarChart3, BookOpen, Menu, Wand2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { usePathname } from 'next/navigation';
 import MobileMenu from './MobileMenu';
 import NavItem from './NavItem';
 
@@ -12,7 +14,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const { pathname } = useLocation();
+  const pathname = usePathname();
   const { prefersReducedMotion } = useAnimationPreferences();
 
   // For scroll direction detection
@@ -262,7 +264,7 @@ export default function Navbar() {
       />
 
       {/* Mobile menu */}
-      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} pathname={pathname} />
+      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} pathname={pathname || ''} />
 
       {/* Floating Control Panel - now positioned independently outside the navbar */}
       <FloatingControlPanel />

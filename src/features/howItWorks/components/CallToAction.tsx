@@ -1,10 +1,12 @@
+'use client';
+
 import Button from '@components/ui/Button';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { motion, useInView } from 'framer-motion';
 import { ArrowRight, Heart, Sparkles } from 'lucide-react';
 import { useRef } from 'react';
 import { RiSparklingLine } from 'react-icons/ri';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 /**
  * Enhanced Call To Action component at the bottom of the How It Works page
@@ -205,7 +207,7 @@ export default function CallToAction() {
           delay: 0.6,
         }}
       >
-        <Link to="/">
+        <Link href="/">
           <motion.div
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}

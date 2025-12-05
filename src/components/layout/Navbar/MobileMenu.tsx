@@ -1,9 +1,11 @@
+'use client';
+
 import Logo from '@components/ui/Logo';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { BarChart3, BookOpen, Flame, Wand2, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import NavItem from './NavItem';
 
 interface MobileMenuProps {
@@ -13,14 +15,14 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProps) {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { prefersReducedMotion } = useAnimationPreferences();
   const menuRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   // Handle navigation and close menu with enhanced feedback
   const handleNavigation = (path: string) => {
-    navigate(path);
+    router.push(path);
     onClose();
   };
 

@@ -1,3 +1,5 @@
+'use client';
+
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences'; // Import hook
 import { colorToRgbaPrefix } from '@utils/colorUtils'; // Import the function
 import { motion } from 'framer-motion';

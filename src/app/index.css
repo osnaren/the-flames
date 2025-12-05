@@ -10,15 +10,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@import '@styles/custom.css';
+@import '../styles/custom.css';
 
-@import '@styles/theme/light.css';
-@import '@styles/theme/dark.css';
+@import '../styles/theme/light.css';
+@import '../styles/theme/dark.css';
 
-@import '@styles/theme.css';
+@import '../styles/theme.css';
 
 /* Import seasonal theme styles */
-@import './styles/seasonal-themes.css';
+@import '../styles/seasonal-themes.css';
 
 /* Layout Adjustments */
 @layer base {

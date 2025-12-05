@@ -1,14 +1,16 @@
+'use client';
+
 import { motion } from 'framer-motion';
 import { ArrowLeft, Flame } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import GlobalCharts from '../components/layout/GlobalCharts/GlobalCharts';
 import Button from '../components/ui/Button';
 
 export default function ChartsPage() {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const goBack = () => {
-    navigate('/');
+    router.push('/');
   };
 
   return (
