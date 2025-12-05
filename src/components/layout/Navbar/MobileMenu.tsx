@@ -196,7 +196,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
           {/* Enhanced menu panel with modern styling */}
           <motion.div
             ref={menuRef}
-            className="bg-surface/95 border-outline/20 absolute top-0 right-0 h-full w-80 overflow-hidden border-l shadow-2xl backdrop-blur-xl"
+            className="bg-surface/95 border-outline/20 absolute top-0 right-0 h-full w-80 overflow-hidden border-l shadow-2xl backdrop-blur-xl will-change-transform"
             variants={menuVariants}
           >
             {/* Enhanced gradient overlay for depth */}

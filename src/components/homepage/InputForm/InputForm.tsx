@@ -294,7 +294,7 @@ export function InputForm({
 
       {/* Main Form Container */}
       <motion.div
-        className="bg-surface/90 border-outline/20 rounded-2xl border p-8 shadow-2xl backdrop-blur-xl"
+        className="bg-surface/90 border-outline/20 rounded-2xl border p-8 shadow-2xl backdrop-blur-xl will-change-transform"
         animate={{
           boxShadow: isProcessing ? submittingBoxShadowKeyframes : initialBoxShadow,
         }}

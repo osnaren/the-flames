@@ -1,3 +1,5 @@
+'use client';
+
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { DotLottie, DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, Variants } from 'framer-motion';

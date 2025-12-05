@@ -1,7 +1,7 @@
 import { useFlamesEngine } from '@features/flamesGame/useFlamesEngine';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { AnimatePresence, motion } from 'framer-motion';
-import { memo, useCallback, useEffect, useRef } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
 // Import new components
 import AnimatedHeader from '@/components/homepage/AnimatedHeader';
@@ -53,13 +53,16 @@ function HomePage() {
   );
 
   // Determine current season for background theming
-  const getCurrentSeason = () => {
+  const [currentSeason, setCurrentSeason] = useState<'valentine' | 'halloween' | 'christmas' | undefined>(undefined);
+
+  useEffect(() => {
     const month = new Date().getMonth();
-    if (month === 1) return 'valentine'; // February
-    if (month === 9) return 'halloween'; // October
-    if (month === 11) return 'christmas'; // December
-    return undefined;
-  };
+    if (month === 1)
+      setCurrentSeason('valentine'); // February
+    else if (month === 9)
+      setCurrentSeason('halloween'); // October
+    else if (month === 11) setCurrentSeason('christmas'); // December
+  }, []);
 
   return (
     <div
@@ -70,7 +73,7 @@ function HomePage() {
       <DynamicBackground
         variant={stage === 'result' ? 'result' : stage === 'processing' ? 'processing' : 'default'}
         result={result}
-        season={getCurrentSeason()}
+        season={currentSeason}
         intensity="medium"
       />
 

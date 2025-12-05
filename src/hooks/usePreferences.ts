@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect } from 'react';
 import { usePreferencesStore } from '../store/usePreferencesStore';
 
@@ -5,6 +7,7 @@ interface Preferences {
   isDarkTheme: boolean;
   animationsEnabled: boolean;
   isSoundEnabled: boolean;
+  hydrated: boolean;
 }
 
 interface PreferenceActions {
@@ -17,7 +20,7 @@ interface PreferenceActions {
  * Custom hook for managing user preferences with localStorage persistence
  */
 export function usePreferences(): [Preferences, PreferenceActions] {
-  const { isDarkTheme, animationsEnabled, isSoundEnabled, toggleTheme, toggleAnimations, toggleSound, init } =
+  const { isDarkTheme, animationsEnabled, isSoundEnabled, hydrated, toggleTheme, toggleAnimations, toggleSound, init } =
     usePreferencesStore();
 
   // Load preferences from localStorage on mount
@@ -26,7 +29,7 @@ export function usePreferences(): [Preferences, PreferenceActions] {
   }, [init]);
 
   return [
-    { isDarkTheme, animationsEnabled, isSoundEnabled },
+    { isDarkTheme, animationsEnabled, isSoundEnabled, hydrated },
     { toggleTheme, toggleAnimations, toggleSound },
   ];
 }

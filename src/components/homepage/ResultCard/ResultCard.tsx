@@ -168,7 +168,7 @@ export function ResultCard({
             damping: 30,
             duration: shouldAnimate ? 0.6 : 0,
           }}
-          className="relative mx-auto mt-8 w-full max-w-md"
+          className="relative mx-auto mt-8 w-full max-w-md will-change-transform"
         >
           {/* Result Glow Effect - with correct props */}
           <ResultGlow result={result} isVisible={stageCompleted.entry} />
@@ -196,7 +196,7 @@ export function ResultCard({
                   damping: 15,
                   duration: shouldAnimate ? 0.8 : 0,
                 }}
-                className="mx-auto mb-6"
+                className="mx-auto mb-6 will-change-transform"
               >
                 <div className={`relative h-20 w-20 rounded-full bg-linear-to-br ${resultColor} p-4 shadow-lg`}>
                   {/* Multi-layered glow effect */}
@@ -283,43 +283,51 @@ export function ResultCard({
                 className="flex flex-wrap justify-center gap-3"
               >
                 {/* Try Again Button */}
-                <button
+                <motion.button
                   onClick={onRetry}
-                  className="flex items-center gap-2 rounded-full bg-linear-to-r from-blue-500 to-purple-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-blue-600 hover:to-purple-700 hover:shadow-lg"
+                  className="flex items-center gap-2 rounded-full bg-linear-to-r from-blue-500 to-purple-600 px-6 py-3 font-medium text-white shadow-md"
+                  whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <RotateCcw className="h-4 w-4" />
                   Try Again
-                </button>
+                </motion.button>
 
                 {/* Share Button */}
-                <button
+                <motion.button
                   onClick={handleShare}
-                  className="flex items-center gap-2 rounded-full bg-linear-to-r from-green-500 to-emerald-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-green-600 hover:to-emerald-700 hover:shadow-lg"
+                  className="flex items-center gap-2 rounded-full bg-linear-to-r from-green-500 to-emerald-600 px-6 py-3 font-medium text-white shadow-md"
+                  whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <Share2 className="h-4 w-4" />
                   Share
-                </button>
+                </motion.button>
 
                 {/* Manual Mode Button */}
                 {onNavigateToManual && (
-                  <button
+                  <motion.button
                     onClick={onNavigateToManual}
-                    className="flex items-center gap-2 rounded-full bg-linear-to-r from-amber-500 to-orange-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-amber-600 hover:to-orange-700 hover:shadow-lg"
+                    className="flex items-center gap-2 rounded-full bg-linear-to-r from-amber-500 to-orange-600 px-6 py-3 font-medium text-white shadow-md"
+                    whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     <Sparkles className="h-4 w-4" />
                     Manual Mode
-                  </button>
+                  </motion.button>
                 )}
 
                 {/* Global Charts Button */}
                 {onNavigateToStats && (
-                  <button
+                  <motion.button
                     onClick={onNavigateToStats}
-                    className="flex items-center gap-2 rounded-full bg-linear-to-r from-indigo-500 to-blue-600 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-indigo-600 hover:to-blue-700 hover:shadow-lg"
+                    className="flex items-center gap-2 rounded-full bg-linear-to-r from-indigo-500 to-blue-600 px-6 py-3 font-medium text-white shadow-md"
+                    whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     <ArrowLeft className="h-4 w-4" />
                     Global Charts
-                  </button>
+                  </motion.button>
                 )}
               </motion.div>
             </div>

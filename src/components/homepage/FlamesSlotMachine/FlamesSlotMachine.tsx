@@ -309,7 +309,7 @@ export function FlamesSlotMachine({ result, shouldAnimate, stage }: FlamesSlotMa
               {/* Animated ring/halo around active letter - ALWAYS show when there's an activeLetterIndex */}
               {isActive && (
                 <motion.div
-                  className="pointer-events-none absolute inset-0 z-10"
+                  className="pointer-events-none absolute inset-0 z-10 will-change-transform"
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={
                     isAnimating
@@ -349,7 +349,7 @@ export function FlamesSlotMachine({ result, shouldAnimate, stage }: FlamesSlotMa
 
               {/* Letter box with animations */}
               <motion.div
-                className={`bg-surface dark:bg-surface-container-high relative flex h-12 w-12 items-center justify-center rounded-lg text-xl font-bold shadow-md transition-colors md:h-16 md:w-16 md:text-2xl ${
+                className={`bg-surface dark:bg-surface-container-high relative flex h-12 w-12 items-center justify-center rounded-lg text-xl font-bold shadow-md transition-colors will-change-transform md:h-16 md:w-16 md:text-2xl ${
                   isResultFinished
                     ? resultColorClass
                     : isActive

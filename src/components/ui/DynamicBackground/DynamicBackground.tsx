@@ -1,7 +1,7 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { FlamesResult } from '@features/flamesGame/flames.types';
 import { getResultData } from '@features/flamesGame/resultData';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useEffect, useMemo, useState } from 'react';
 
 interface DynamicBackgroundProps {
@@ -34,6 +34,166 @@ interface BackgroundConfig {
  * Dynamic background system that adapts to game state, results, and seasons
  * Highly configurable and scalable for future enhancements
  */
+function BackgroundLayer({ config, shouldAnimate }: { config: BackgroundConfig; shouldAnimate: boolean }) {
+  const [particles, setParticles] = useState<
+    Array<{
+      id: number;
+      color: string;
+      shape: string;
+      left: string;
+      top: string;
+      x: number;
+      y: number;
+      duration: number;
+      repeatDelay: number;
+    }>
+  >([]);
+
+  useEffect(() => {
+    if (!shouldAnimate || !config.effects.floating) {
+      setParticles([]);
+      return;
+    }
+
+    setParticles(
+      Array.from({ length: config.particles.count }).map((_, index) => ({
+        id: index,
+        color: config.particles.colors[index % config.particles.colors.length],
+        shape: config.particles.shapes[index % config.particles.shapes.length],
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        x: (Math.random() - 0.5) * 100,
+        y: (Math.random() - 0.5) * 100,
+        duration: 4 + Math.random() * 3,
+        repeatDelay: Math.random() * 5,
+      }))
+    );
+  }, [shouldAnimate, config.effects.floating, config.particles]);
+
+  return (
+    <motion.div
+      className="absolute inset-0"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 1.5, ease: 'easeInOut' }}
+    >
+      {/* Base gradient layers */}
+      {config.gradients.map((gradient, index) => (
+        <motion.div
+          key={`gradient-${index}`}
+          className="absolute inset-0"
+          style={{ background: gradient }}
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: shouldAnimate ? [0.3, 0.6, 0.3] : 0.4,
+            scale: shouldAnimate ? [1, 1.05, 1] : 1,
+          }}
+          transition={{
+            duration: 8 + index * 2,
+            repeat: shouldAnimate ? Infinity : 0,
+            repeatType: 'reverse',
+            ease: 'easeInOut',
+            delay: index * 0.5,
+          }}
+        />
+      ))}
+
+      {/* Floating orbs */}
+      {config.orbs.colors.map((color, index) => (
+        <motion.div
+          key={`orb-${index}`}
+          className="absolute rounded-full blur-3xl"
+          style={{
+            background: color,
+            width: config.orbs.sizes[index] || 150,
+            height: config.orbs.sizes[index] || 150,
+            left: `${20 + ((index * 25) % 60)}%`,
+            top: `${15 + ((index * 30) % 70)}%`,
+          }}
+          animate={
+            shouldAnimate
+              ? {
+                  x: [0, 30, -20, 0],
+                  y: [0, -20, 30, 0],
+                  scale: [1, 1.2, 0.8, 1],
+                  opacity: [0.3, 0.6, 0.4, 0.3],
+                }
+              : {}
+          }
+          transition={{
+            duration: 12 + index * 2,
+            repeat: shouldAnimate ? Infinity : 0,
+            repeatType: 'reverse',
+            ease: 'easeInOut',
+            delay: index * 1.5,
+          }}
+        />
+      ))}
+
+      {/* Animated particles */}
+      {shouldAnimate && config.effects.floating && (
+        <>
+          {particles.map((particle) => (
+            <motion.div
+              key={`particle-${particle.id}`}
+              className="absolute"
+              style={{
+                left: particle.left,
+                top: particle.top,
+              }}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{
+                opacity: [0, 0.8, 0],
+                scale: [0, 1, 0],
+                x: [0, particle.x],
+                y: [0, particle.y],
+              }}
+              transition={{
+                duration: particle.duration,
+                repeat: Infinity,
+                repeatDelay: particle.repeatDelay,
+                ease: 'easeOut',
+              }}
+            >
+              <ParticleShape shape={particle.shape} color={particle.color} />
+            </motion.div>
+          ))}
+        </>
+      )}
+
+      {/* Sparkle effects */}
+      {shouldAnimate && config.effects.sparkles && (
+        <>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <motion.div
+              key={`sparkle-${index}`}
+              className="absolute text-2xl"
+              style={{
+                left: `${20 + ((index * 15) % 80)}%`,
+                top: `${10 + ((index * 20) % 80)}%`,
+              }}
+              animate={{
+                opacity: [0, 1, 0],
+                scale: [0.5, 1.2, 0.5],
+                rotate: [0, 180, 360],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                repeatDelay: 2 + index * 0.5,
+                ease: 'easeInOut',
+              }}
+            >
+              ✨
+            </motion.div>
+          ))}
+        </>
+      )}
+    </motion.div>
+  );
+}
+
 function DynamicBackground({ variant = 'default', result, season, intensity = 'medium' }: DynamicBackgroundProps) {
   const { shouldAnimate } = useAnimationPreferences();
 
@@ -145,47 +305,6 @@ function DynamicBackground({ variant = 'default', result, season, intensity = 'm
     return baseConfig;
   }, [variant, result, resultData, season, intensity]);
 
-  // Generate stable random values for particles
-  const [particles, setParticles] = useState<
-    Array<{
-      id: number;
-      color: string;
-      shape: string;
-      left: string;
-      top: string;
-      x: number;
-      y: number;
-      duration: number;
-      repeatDelay: number;
-    }>
-  >([]);
-
-  useEffect(() => {
-    if (!shouldAnimate || !backgroundConfig.effects.floating) {
-      setTimeout(() => setParticles((prev) => (prev.length > 0 ? [] : prev)), 0);
-      return;
-    }
-
-    setTimeout(() => {
-      setParticles((prev) => {
-        if (prev.length !== backgroundConfig.particles.count) {
-          return Array.from({ length: backgroundConfig.particles.count }).map((_, index) => ({
-            id: index,
-            color: backgroundConfig.particles.colors[index % backgroundConfig.particles.colors.length],
-            shape: backgroundConfig.particles.shapes[index % backgroundConfig.particles.shapes.length],
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            x: (Math.random() - 0.5) * 100,
-            y: (Math.random() - 0.5) * 100,
-            duration: 4 + Math.random() * 3,
-            repeatDelay: Math.random() * 5,
-          }));
-        }
-        return prev;
-      });
-    }, 0);
-  }, [shouldAnimate, backgroundConfig.effects.floating, backgroundConfig.particles]);
-
   // Don't render if animations are disabled and it's not a result background
   if (!shouldAnimate && variant !== 'result') {
     return (
@@ -197,118 +316,9 @@ function DynamicBackground({ variant = 'default', result, season, intensity = 'm
 
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
-      {/* Base gradient layers */}
-      {backgroundConfig.gradients.map((gradient, index) => (
-        <motion.div
-          key={`gradient-${index}`}
-          className="absolute inset-0"
-          style={{ background: gradient }}
-          initial={{ opacity: 0 }}
-          animate={{
-            opacity: shouldAnimate ? [0.3, 0.6, 0.3] : 0.4,
-            scale: shouldAnimate ? [1, 1.05, 1] : 1,
-          }}
-          transition={{
-            duration: 8 + index * 2,
-            repeat: shouldAnimate ? Infinity : 0,
-            repeatType: 'reverse',
-            ease: 'easeInOut',
-            delay: index * 0.5,
-          }}
-        />
-      ))}
-
-      {/* Floating orbs */}
-      {backgroundConfig.orbs.colors.map((color, index) => (
-        <motion.div
-          key={`orb-${index}`}
-          className="absolute rounded-full blur-3xl"
-          style={{
-            background: color,
-            width: backgroundConfig.orbs.sizes[index] || 150,
-            height: backgroundConfig.orbs.sizes[index] || 150,
-            left: `${20 + ((index * 25) % 60)}%`,
-            top: `${15 + ((index * 30) % 70)}%`,
-          }}
-          animate={
-            shouldAnimate
-              ? {
-                  x: [0, 30, -20, 0],
-                  y: [0, -20, 30, 0],
-                  scale: [1, 1.2, 0.8, 1],
-                  opacity: [0.3, 0.6, 0.4, 0.3],
-                }
-              : {}
-          }
-          transition={{
-            duration: 12 + index * 2,
-            repeat: shouldAnimate ? Infinity : 0,
-            repeatType: 'reverse',
-            ease: 'easeInOut',
-            delay: index * 1.5,
-          }}
-        />
-      ))}
-
-      {/* Animated particles */}
-      {shouldAnimate && backgroundConfig.effects.floating && (
-        <>
-          {particles.map((particle) => (
-            <motion.div
-              key={`particle-${particle.id}`}
-              className="absolute"
-              style={{
-                left: particle.left,
-                top: particle.top,
-              }}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{
-                opacity: [0, 0.8, 0],
-                scale: [0, 1, 0],
-                x: [0, particle.x],
-                y: [0, particle.y],
-              }}
-              transition={{
-                duration: particle.duration,
-                repeat: Infinity,
-                repeatDelay: particle.repeatDelay,
-                ease: 'easeOut',
-              }}
-            >
-              <ParticleShape shape={particle.shape} color={particle.color} />
-            </motion.div>
-          ))}
-        </>
-      )}
-
-      {/* Sparkle effects */}
-      {shouldAnimate && backgroundConfig.effects.sparkles && (
-        <>
-          {Array.from({ length: 6 }).map((_, index) => (
-            <motion.div
-              key={`sparkle-${index}`}
-              className="absolute text-2xl"
-              style={{
-                left: `${20 + ((index * 15) % 80)}%`,
-                top: `${10 + ((index * 20) % 80)}%`,
-              }}
-              animate={{
-                opacity: [0, 1, 0],
-                scale: [0.5, 1.2, 0.5],
-                rotate: [0, 180, 360],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                repeatDelay: 2 + index * 0.5,
-                ease: 'easeInOut',
-              }}
-            >
-              ✨
-            </motion.div>
-          ))}
-        </>
-      )}
+      <AnimatePresence mode="popLayout">
+        <BackgroundLayer key={variant} config={backgroundConfig} shouldAnimate={shouldAnimate} />
+      </AnimatePresence>
 
       {/* Noise texture overlay */}
       <div

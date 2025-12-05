@@ -236,7 +236,7 @@ export function FlamesAnimation({ remainingLetters, onComplete, isVisible, resul
               transition={{ delay: index * 0.1, duration: 0.5 }}
             >
               <motion.div
-                className={`relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-4 text-xl font-bold transition-all duration-300 ${
+                className={`relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-4 text-xl font-bold transition-all duration-300 will-change-transform ${
                   flamesLetter.isActive && !flamesLetter.isEliminated
                     ? `${resultData.color} border-primary shadow-lg`
                     : flamesLetter.isEliminated

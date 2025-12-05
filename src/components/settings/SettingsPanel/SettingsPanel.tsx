@@ -93,7 +93,7 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           transition={{ type: 'spring', duration: 0.5 }}
-          className="relative mx-4 h-[80vh] w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900"
+          className="relative mx-4 h-[80vh] w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900 will-change-transform"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}

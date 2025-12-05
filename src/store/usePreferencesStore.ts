@@ -7,6 +7,7 @@ interface PreferencesState {
   isHapticEnabled: boolean;
   volume: number;
   seasonalTheme: 'auto' | 'valentine' | 'halloween' | 'christmas' | 'default';
+  hydrated: boolean;
 }
 
 interface PreferencesActions {
@@ -26,6 +27,7 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
   isHapticEnabled: true,
   volume: 0.7,
   seasonalTheme: 'auto',
+  hydrated: false,
   toggleTheme: () =>
     set((s) => {
       const newTheme = !s.isDarkTheme;
@@ -89,6 +91,7 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
       isHapticEnabled: storedHaptic !== 'false',
       volume: storedVolume ? parseFloat(storedVolume) : 0.7,
       seasonalTheme: (storedSeasonalTheme as PreferencesState['seasonalTheme']) || 'auto',
+      hydrated: true,
     });
   },
 }));

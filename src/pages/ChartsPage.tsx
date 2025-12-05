@@ -24,7 +24,7 @@ export default function ChartsPage() {
 
         <div className="mb-6 flex flex-col items-center justify-center">
           <motion.div
-            className="mb-2 flex justify-center"
+            className="mb-2 flex justify-center will-change-transform"
             animate={{
               scale: [1, 1.1, 1],
             }}

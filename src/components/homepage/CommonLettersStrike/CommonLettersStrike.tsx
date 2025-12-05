@@ -199,7 +199,7 @@ function NameDisplay({
               transition={{ delay: index * 0.1 }}
             >
               <motion.div
-                className={`flex h-12 w-12 items-center justify-center rounded-lg text-lg font-bold transition-all duration-300 ${
+                className={`flex h-12 w-12 items-center justify-center rounded-lg text-lg font-bold transition-all duration-300 will-change-transform ${
                   letterState.isCommon
                     ? letterState.isStruck
                       ? 'bg-error/20 text-error border-error/50 border-2'

@@ -136,7 +136,7 @@ export default function Navbar() {
     <>
       <motion.header
         ref={navbarRef}
-        className="fixed top-0 right-0 left-0 z-30 overflow-hidden transition-all duration-300"
+        className="fixed top-0 right-0 left-0 z-30 overflow-hidden transition-all duration-300 will-change-transform"
         style={{
           backdropFilter: prefersReducedMotion ? 'blur(12px)' : `blur(${blur}px)`,
           WebkitBackdropFilter: prefersReducedMotion ? 'blur(12px)' : `blur(${blur}px)`,

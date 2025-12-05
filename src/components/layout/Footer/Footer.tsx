@@ -130,7 +130,7 @@ export default function Footer() {
 
           {/* Floating particles effect */}
           <motion.div
-            className="bg-primary/30 absolute top-4 right-1/4 h-2 w-2 rounded-full blur-sm"
+            className="bg-primary/30 absolute top-4 right-1/4 h-2 w-2 rounded-full blur-sm will-change-transform"
             animate={{
               y: [0, -20, 0],
               opacity: [0.3, 0.8, 0.3],
@@ -142,7 +142,7 @@ export default function Footer() {
             }}
           />
           <motion.div
-            className="bg-secondary/40 absolute top-8 left-1/3 h-1.5 w-1.5 rounded-full blur-sm"
+            className="bg-secondary/40 absolute top-8 left-1/3 h-1.5 w-1.5 rounded-full blur-sm will-change-transform"
             animate={{
               y: [0, -15, 0],
               x: [0, 10, 0],
