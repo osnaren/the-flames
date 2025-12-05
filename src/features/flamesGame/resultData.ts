@@ -1,6 +1,6 @@
+import { FlamesResultType } from '@/constants/flames';
 import { BellRing, Heart, Star, Sword, Users } from 'lucide-react';
 import { FlamesResult, NonNullFlamesResult, ResultData } from './flames.types';
-import { FlamesResultType } from '@/constants/flames';
 
 export const resultData: Record<NonNullFlamesResult, ResultData> = {
   [FlamesResultType.FRIEND]: {

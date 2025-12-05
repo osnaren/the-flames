@@ -29,15 +29,15 @@ const getViewportHeight = () => {
   return 600; // Fallback for SSR
 };
 
-export default function CanvasExperience({ 
-  name1, 
-  name2, 
-  onBack, 
-  onShare, 
-  onSave, 
+export default function CanvasExperience({
+  name1,
+  name2,
+  onBack,
+  onShare,
+  onSave,
   canvasRef,
   isSharing = false,
-  isSaving = false 
+  isSaving = false,
 }: CanvasExperienceProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);

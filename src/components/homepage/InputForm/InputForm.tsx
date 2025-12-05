@@ -32,7 +32,9 @@ export function InputForm({
   isProcessing = false,
 }: InputFormProps) {
   // Component state
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; targetX: number; targetY: number }>>([]);
+  const [particles, setParticles] = useState<
+    Array<{ id: number; x: number; y: number; targetX: number; targetY: number }>
+  >([]);
   const [collapsingParticles, setCollapsingParticles] = useState<
     Array<{
       id: number;

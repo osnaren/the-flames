@@ -3,8 +3,8 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { motion, Variants } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
-import { memo } from 'react';
 import Link from 'next/link';
+import { memo } from 'react';
 
 const MotionLink = motion.create(Link);
 

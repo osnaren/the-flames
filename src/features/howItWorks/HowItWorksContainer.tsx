@@ -23,7 +23,7 @@ export default function HowItWorksContainer() {
 
           {/* Tutorial sections with enhanced spacing and staggered animations */}
           <motion.div
-            className="space-y-24 md:space-y-28 will-change-opacity"
+            className="will-change-opacity space-y-24 md:space-y-28"
             initial={shouldAnimate ? { opacity: 0 } : { opacity: 1 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}

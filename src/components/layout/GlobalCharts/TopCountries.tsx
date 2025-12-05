@@ -52,11 +52,7 @@ export default function TopCountries({ countries }: TopCountriesProps) {
                   {isTop3 && (
                     <Trophy
                       className={`h-3.5 w-3.5 ${
-                        index === 0
-                          ? 'text-yellow-500'
-                          : index === 1
-                            ? 'text-gray-400'
-                            : 'text-amber-600'
+                        index === 0 ? 'text-yellow-500' : index === 1 ? 'text-gray-400' : 'text-amber-600'
                       }`}
                     />
                   )}

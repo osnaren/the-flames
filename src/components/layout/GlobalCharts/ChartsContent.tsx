@@ -121,7 +121,7 @@ export default function ChartsContent({
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-linear-to-br from-orange-500 to-red-600 dark:from-orange-600 dark:to-red-700">
           <div className="absolute inset-0 bg-[url('/assets/noise.webp')] opacity-10 mix-blend-overlay"></div>
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+          <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
           <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-yellow-500/20 blur-3xl"></div>
         </div>
 

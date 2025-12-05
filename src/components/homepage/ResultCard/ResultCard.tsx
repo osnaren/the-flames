@@ -286,7 +286,7 @@ export function ResultCard({
                 <motion.button
                   onClick={onRetry}
                   className="flex items-center gap-2 rounded-full bg-linear-to-r from-blue-500 to-purple-600 px-6 py-3 font-medium text-white shadow-md"
-                  whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
+                  whileHover={{ scale: 1.05, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <RotateCcw className="h-4 w-4" />
@@ -297,7 +297,7 @@ export function ResultCard({
                 <motion.button
                   onClick={handleShare}
                   className="flex items-center gap-2 rounded-full bg-linear-to-r from-green-500 to-emerald-600 px-6 py-3 font-medium text-white shadow-md"
-                  whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
+                  whileHover={{ scale: 1.05, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <Share2 className="h-4 w-4" />
@@ -309,7 +309,7 @@ export function ResultCard({
                   <motion.button
                     onClick={onNavigateToManual}
                     className="flex items-center gap-2 rounded-full bg-linear-to-r from-amber-500 to-orange-600 px-6 py-3 font-medium text-white shadow-md"
-                    whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
+                    whileHover={{ scale: 1.05, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
                     whileTap={{ scale: 0.95 }}
                   >
                     <Sparkles className="h-4 w-4" />
@@ -322,7 +322,7 @@ export function ResultCard({
                   <motion.button
                     onClick={onNavigateToStats}
                     className="flex items-center gap-2 rounded-full bg-linear-to-r from-indigo-500 to-blue-600 px-6 py-3 font-medium text-white shadow-md"
-                    whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
+                    whileHover={{ scale: 1.05, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
                     whileTap={{ scale: 0.95 }}
                   >
                     <ArrowLeft className="h-4 w-4" />

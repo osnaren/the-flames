@@ -1,5 +1,5 @@
-import { FlamesResult, GlobalStats } from './types';
 import { FlamesResultType } from '@/constants/flames';
+import { FlamesResult, GlobalStats } from './types';
 
 /**
  * Generates mock data for the GlobalCharts component

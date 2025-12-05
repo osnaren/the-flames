@@ -4,8 +4,8 @@ import Button from '@components/ui/Button';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowLeft, Flame, Zap } from 'lucide-react';
-import { GiSparkyBomb } from 'react-icons/gi';
 import { useRouter } from 'next/navigation';
+import { GiSparkyBomb } from 'react-icons/gi';
 
 /**
  * Enhanced Header component for How It Works page

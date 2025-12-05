@@ -1,8 +1,8 @@
 /**
  * FLAMES Game Type Definitions
  */
-import React from 'react';
 import { FlamesResult as StrictFlamesResult } from '@/constants/flames';
+import React from 'react';
 
 export type FlamesResult = StrictFlamesResult | null;
 export type NonNullFlamesResult = StrictFlamesResult;

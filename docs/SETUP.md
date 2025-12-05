@@ -338,13 +338,11 @@ import { useDeviceCapabilities } from './src/hooks/useDeviceCapabilities';
 ### Best Practices
 
 1. **Component Optimization**
-
    - Use React.memo for expensive components
    - Implement proper dependency arrays
    - Avoid unnecessary re-renders
 
 2. **Asset Optimization**
-
    - Lazy load non-critical components
    - Optimize images and audio files
    - Use appropriate bundle splitting

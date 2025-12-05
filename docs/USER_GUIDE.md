@@ -38,7 +38,6 @@ The game automatically changes themes based on the date:
 Enhance your experience with:
 
 - **Sound Effects**:
-
   - Form submission sounds
   - Letter striking effects
   - FLAMES counting audio

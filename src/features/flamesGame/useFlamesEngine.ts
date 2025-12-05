@@ -2,9 +2,9 @@ import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { usePairingHistory } from '@/hooks/usePairingHistory';
 import { useTimers } from '@/hooks/useTimers';
 import { insertMatch } from '@lib/supabase';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useSearchParams, useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { FlamesResult, GameStage } from './flames.types';
 import { calculateFlamesResult, findCommonLetters, nameSchema } from './flames.utils';
@@ -382,17 +382,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       stageProgress,
       newlyUnlockedBadges: getNewlyUnlockedBadges(),
     }),
-    [
-      name1,
-      name2,
-      result,
-      stage,
-      commonLetters,
-      remainingLetters,
-      isProcessing,
-      stageProgress,
-      getNewlyUnlockedBadges,
-    ]
+    [name1, name2, result, stage, commonLetters, remainingLetters, isProcessing, stageProgress, getNewlyUnlockedBadges]
   );
 
   const actions = useMemo(

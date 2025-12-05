@@ -1,12 +1,12 @@
 'use client';
 
-import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import Logo from '@components/ui/Logo';
+import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import FloatingControlPanel from '@layout/FloatingControlPanel';
 import { motion, useScroll, useTransform, Variants } from 'framer-motion';
 import { BarChart3, BookOpen, Menu, Wand2 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import MobileMenu from './MobileMenu';
 import NavItem from './NavItem';
 

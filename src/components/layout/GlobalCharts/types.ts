@@ -1,5 +1,5 @@
-import { DivideIcon as LucideIcon } from 'lucide-react';
 import { FlamesResult } from '@/constants/flames';
+import { DivideIcon as LucideIcon } from 'lucide-react';
 
 export type TimeFilter = 'today' | 'week' | 'alltime';
 export type { FlamesResult };

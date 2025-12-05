@@ -52,7 +52,8 @@ export const shareImage = async (imageDataUrl: string, name1: string, name2: str
 
     // Fallback: Copy link to clipboard or show share options
     if (navigator.clipboard && window.isSecureContext) {
-      const shareUrl = window.location.origin + `/manual?name1=${encodeURIComponent(name1)}&name2=${encodeURIComponent(name2)}`;
+      const shareUrl =
+        window.location.origin + `/manual?name1=${encodeURIComponent(name1)}&name2=${encodeURIComponent(name2)}`;
       await navigator.clipboard.writeText(shareUrl);
       toast.success('Share link copied to clipboard!');
     } else {
@@ -81,7 +82,7 @@ export const generateCanvasImage = async (canvas: HTMLCanvasElement, name1: stri
   }
 
   const outputCanvas = document.createElement('canvas');
-  
+
   // Use the actual canvas dimensions
   outputCanvas.width = canvas.width;
   outputCanvas.height = canvas.height;
@@ -92,8 +93,8 @@ export const generateCanvasImage = async (canvas: HTMLCanvasElement, name1: stri
   }
 
   // Check if dark mode is active
-  const isDarkMode = document.documentElement.classList.contains('dark') || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDarkMode =
+    document.documentElement.classList.contains('dark') || window.matchMedia('(prefers-color-scheme: dark)').matches;
 
   // Draw background based on theme
   outputCtx.fillStyle = isDarkMode ? '#1e293b' : '#ffffff';
@@ -105,27 +106,19 @@ export const generateCanvasImage = async (canvas: HTMLCanvasElement, name1: stri
   // Add branding at the bottom
   const scaleFactor = outputCanvas.width / 800; // Adjust for different canvas sizes
   outputCtx.scale(1, 1); // Reset scale for text
-  
+
   // Set font size based on canvas size
   const fontSize = Math.max(12, 16 * scaleFactor);
   const titleFontSize = Math.max(16, 20 * scaleFactor);
-  
+
   outputCtx.font = `${fontSize}px Inter, -apple-system, BlinkMacSystemFont, sans-serif`;
   outputCtx.fillStyle = isDarkMode ? '#94a3b8' : '#475569';
   outputCtx.textAlign = 'center';
-  outputCtx.fillText(
-    'the-flames.com', 
-    outputCanvas.width / 2, 
-    outputCanvas.height - 50 * scaleFactor
-  );
-  
+  outputCtx.fillText('the-flames.com', outputCanvas.width / 2, outputCanvas.height - 50 * scaleFactor);
+
   outputCtx.font = `bold ${titleFontSize}px Inter, -apple-system, BlinkMacSystemFont, sans-serif`;
   outputCtx.fillStyle = isDarkMode ? '#ffffff' : '#1e293b';
-  outputCtx.fillText(
-    `${name1} ❤️ ${name2}`, 
-    outputCanvas.width / 2, 
-    outputCanvas.height - 20 * scaleFactor
-  );
+  outputCtx.fillText(`${name1} ❤️ ${name2}`, outputCanvas.width / 2, outputCanvas.height - 20 * scaleFactor);
 
   return outputCanvas.toDataURL('image/png', 0.9);
 };
@@ -137,9 +130,13 @@ export const generateCanvasImage = async (canvas: HTMLCanvasElement, name1: stri
  * @param result - The FLAMES result or "In Progress".
  * @returns A promise that resolves with the data URL of the image.
  */
-export const generateClickResultImage = async (name1: string, name2: string, result: FlamesResult | string): Promise<string> => {
-  const isDarkMode = document.documentElement.classList.contains('dark') || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
+export const generateClickResultImage = async (
+  name1: string,
+  name2: string,
+  result: FlamesResult | string
+): Promise<string> => {
+  const isDarkMode =
+    document.documentElement.classList.contains('dark') || window.matchMedia('(prefers-color-scheme: dark)').matches;
 
   // Create a completely isolated container to avoid CSS inheritance
   const container = document.createElement('div');
@@ -149,17 +146,17 @@ export const generateClickResultImage = async (name1: string, name2: string, res
   container.style.width = '600px';
   container.style.height = 'auto';
   container.style.backgroundColor = isDarkMode ? '#1e293b' : '#ffffff';
-  
+
   // Reset all CSS properties to avoid oklch inheritance
   container.style.color = isDarkMode ? '#f8fafc' : '#1e293b';
   container.style.fontFamily = 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
   container.style.fontSize = '16px';
   container.style.lineHeight = '1.5';
   container.style.boxSizing = 'border-box';
-  
+
   // Remove any inherited CSS classes that might contain oklch
   container.className = '';
-  
+
   document.body.appendChild(container);
 
   // Render the component
@@ -181,21 +178,23 @@ export const generateClickResultImage = async (name1: string, name2: string, res
       ignoreElements: (element) => {
         // Ignore elements that might have problematic CSS
         const classList = element.classList;
-        return classList.contains('toast') || 
-               classList.contains('portal') || 
-               element.tagName === 'SCRIPT' ||
-               element.tagName === 'STYLE';
+        return (
+          classList.contains('toast') ||
+          classList.contains('portal') ||
+          element.tagName === 'SCRIPT' ||
+          element.tagName === 'STYLE'
+        );
       },
       onclone: (clonedDoc) => {
         // Remove any style elements that might contain oklch
         const styleElements = clonedDoc.querySelectorAll('style, link[rel="stylesheet"]');
-        styleElements.forEach(el => {
+        styleElements.forEach((el) => {
           const content = el.textContent || '';
           if (content.includes('oklch') || content.includes('oklab')) {
             el.remove();
           }
         });
-        
+
         // Ensure the cloned container has explicit styles
         const clonedContainer = clonedDoc.querySelector('div');
         if (clonedContainer) {
@@ -203,7 +202,7 @@ export const generateClickResultImage = async (name1: string, name2: string, res
           clonedContainer.style.color = isDarkMode ? '#f8fafc' : '#1e293b';
           clonedContainer.style.fontFamily = 'Inter, -apple-system, BlinkMacSystemFont, sans-serif';
         }
-      }
+      },
     });
 
     // Cleanup
@@ -219,10 +218,10 @@ export const generateClickResultImage = async (name1: string, name2: string, res
     } catch {
       // Ignore cleanup errors
     }
-    
+
     // If html2canvas fails due to oklch or other issues, use fallback
     console.warn('html2canvas failed, using fallback image generation:', error);
-    
+
     try {
       return await generateFallbackClickResultImage(name1, name2, result);
     } catch (fallbackError) {
@@ -235,14 +234,18 @@ export const generateClickResultImage = async (name1: string, name2: string, res
 /**
  * Fallback image generation using pure canvas API (no html2canvas)
  * @param name1 - First name
- * @param name2 - Second name  
+ * @param name2 - Second name
  * @param result - The FLAMES result or "In Progress"
  * @returns A promise that resolves with the data URL of the image
  */
-export const generateFallbackClickResultImage = async (name1: string, name2: string, result: FlamesResult | string): Promise<string> => {
+export const generateFallbackClickResultImage = async (
+  name1: string,
+  name2: string,
+  result: FlamesResult | string
+): Promise<string> => {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  
+
   if (!ctx) {
     throw new Error('Canvas context not available');
   }
@@ -251,8 +254,8 @@ export const generateFallbackClickResultImage = async (name1: string, name2: str
   canvas.width = 1200; // 2x for high DPI
   canvas.height = 800;
 
-  const isDarkMode = document.documentElement.classList.contains('dark') || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDarkMode =
+    document.documentElement.classList.contains('dark') || window.matchMedia('(prefers-color-scheme: dark)').matches;
 
   // Colors
   const bgColor = isDarkMode ? '#1e293b' : '#ffffff';
@@ -283,10 +286,10 @@ export const generateFallbackClickResultImage = async (name1: string, name2: str
   const boxY = 300;
   const boxWidth = 400;
   const boxHeight = 200;
-  
+
   ctx.fillStyle = isDarkMode ? 'rgba(251, 146, 60, 0.2)' : 'rgba(251, 146, 60, 0.2)';
   ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
-  
+
   // Result box border
   ctx.strokeStyle = isDarkMode ? 'rgba(251, 146, 60, 0.4)' : 'rgba(251, 146, 60, 0.4)';
   ctx.lineWidth = 4;

@@ -35,12 +35,7 @@ export function usePerformanceMonitor(settings: Partial<PerformanceSettings> = {
       autoAdjustQuality: settings.autoAdjustQuality ?? DEFAULT_SETTINGS.autoAdjustQuality,
       minFramesForAdjustment: settings.minFramesForAdjustment ?? DEFAULT_SETTINGS.minFramesForAdjustment,
     }),
-    [
-      settings.targetFPS,
-      settings.memoryThreshold,
-      settings.autoAdjustQuality,
-      settings.minFramesForAdjustment,
-    ]
+    [settings.targetFPS, settings.memoryThreshold, settings.autoAdjustQuality, settings.minFramesForAdjustment]
   );
   const deviceCapabilities = useDeviceCapabilities();
 

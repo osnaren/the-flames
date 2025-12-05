@@ -80,21 +80,34 @@ ManualMode/
 ```typescript
 const {
   // Core state
-  name1, name2, experienceMode, canvasState, result,
-  
+  name1,
+  name2,
+  experienceMode,
+  canvasState,
+  result,
+
   // Loading states
-  isSharing, isSaving,
-  
+  isSharing,
+  isSaving,
+
   // Handlers
-  handleNamesSubmit, goBackToInput,
-  handleShare, handleSave, handleResultChange,
-  
+  handleNamesSubmit,
+  goBackToInput,
+  handleShare,
+  handleSave,
+  handleResultChange,
+
   // Canvas-specific
-  canvasRef, startDrawing, draw, stopDrawing,
-  toggleErase, clearCanvasArea,
-  
-  // Click-specific  
-  toggleLetter, toggleFlamesLetter
+  canvasRef,
+  startDrawing,
+  draw,
+  stopDrawing,
+  toggleErase,
+  clearCanvasArea,
+
+  // Click-specific
+  toggleLetter,
+  toggleFlamesLetter,
 } = useManualMode();
 ```
 

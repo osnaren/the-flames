@@ -78,7 +78,7 @@ export function AnimatedHeader({ shouldAnimate, stage }: AnimatedHeaderProps) {
           <motion.div
             key={index}
             variants={letterVariants}
-            className={`text-primary relative text-5xl font-bold tracking-tight md:text-6xl lg:text-7xl will-change-transform ${
+            className={`text-primary relative text-5xl font-bold tracking-tight will-change-transform md:text-6xl lg:text-7xl ${
               item.char !== '.' ? 'cursor-pointer p-1 md:p-2' : ''
             }`}
             onHoverStart={() => item.char !== '.' && shouldAnimate && setHoveredLetterIndex(index)}

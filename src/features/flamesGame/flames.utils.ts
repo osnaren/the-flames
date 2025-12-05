@@ -1,6 +1,6 @@
+import { FLAMES_ORDER } from '@/constants/flames';
 import { z } from 'zod';
 import { FlamesResult } from './flames.types';
-import { FLAMES_ORDER } from '@/constants/flames';
 
 /**
  * Schema for validating names in the FLAMES game

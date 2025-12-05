@@ -151,7 +151,7 @@ export function useSeasonalTheme() {
   // Initialize theme on mount and update when preferences change
   useEffect(() => {
     const detectedTheme = detectCurrentTheme();
-    
+
     // Defer state update to avoid synchronous setState in effect warning
     setTimeout(() => {
       setState((prev) => {

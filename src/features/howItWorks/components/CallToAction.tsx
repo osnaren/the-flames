@@ -4,9 +4,9 @@ import Button from '@components/ui/Button';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { motion, useInView } from 'framer-motion';
 import { ArrowRight, Heart, Sparkles } from 'lucide-react';
+import Link from 'next/link';
 import { useRef } from 'react';
 import { RiSparklingLine } from 'react-icons/ri';
-import Link from 'next/link';
 
 /**
  * Enhanced Call To Action component at the bottom of the How It Works page

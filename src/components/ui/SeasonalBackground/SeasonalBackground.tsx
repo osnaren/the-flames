@@ -21,164 +21,164 @@ interface SeasonalBackgroundProps {
   className?: string;
 }
 
-  // Shape drawing functions
-  const drawHeart = (ctx: CanvasRenderingContext2D, size: number) => {
-    const width = size;
-    const height = size;
+// Shape drawing functions
+const drawHeart = (ctx: CanvasRenderingContext2D, size: number) => {
+  const width = size;
+  const height = size;
 
-    ctx.beginPath();
-    const topCurveHeight = height * 0.3;
-    ctx.moveTo(0, topCurveHeight);
-    ctx.bezierCurveTo(0, 0, -width / 2, 0, -width / 2, topCurveHeight);
-    ctx.bezierCurveTo(-width / 2, (height + topCurveHeight) / 2, 0, (height + topCurveHeight) / 2, 0, height);
-    ctx.bezierCurveTo(
-      0,
-      (height + topCurveHeight) / 2,
-      width / 2,
-      (height + topCurveHeight) / 2,
-      width / 2,
-      topCurveHeight
-    );
-    ctx.bezierCurveTo(width / 2, 0, 0, 0, 0, topCurveHeight);
-    ctx.fill();
-  };
+  ctx.beginPath();
+  const topCurveHeight = height * 0.3;
+  ctx.moveTo(0, topCurveHeight);
+  ctx.bezierCurveTo(0, 0, -width / 2, 0, -width / 2, topCurveHeight);
+  ctx.bezierCurveTo(-width / 2, (height + topCurveHeight) / 2, 0, (height + topCurveHeight) / 2, 0, height);
+  ctx.bezierCurveTo(
+    0,
+    (height + topCurveHeight) / 2,
+    width / 2,
+    (height + topCurveHeight) / 2,
+    width / 2,
+    topCurveHeight
+  );
+  ctx.bezierCurveTo(width / 2, 0, 0, 0, 0, topCurveHeight);
+  ctx.fill();
+};
 
-  const drawStar = (ctx: CanvasRenderingContext2D, size: number, points: number) => {
-    const outerRadius = size / 2;
-    const innerRadius = outerRadius * 0.4;
+const drawStar = (ctx: CanvasRenderingContext2D, size: number, points: number) => {
+  const outerRadius = size / 2;
+  const innerRadius = outerRadius * 0.4;
 
-    ctx.beginPath();
-    for (let i = 0; i < points * 2; i++) {
-      const angle = (i * Math.PI) / points;
-      const radius = i % 2 === 0 ? outerRadius : innerRadius;
-      const x = Math.cos(angle) * radius;
-      const y = Math.sin(angle) * radius;
+  ctx.beginPath();
+  for (let i = 0; i < points * 2; i++) {
+    const angle = (i * Math.PI) / points;
+    const radius = i % 2 === 0 ? outerRadius : innerRadius;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
 
-      if (i === 0) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
-      }
-    }
-    ctx.closePath();
-    ctx.fill();
-  };
-
-  const drawSnowflake = (ctx: CanvasRenderingContext2D, size: number) => {
-    const radius = size / 2;
-    ctx.lineWidth = 1;
-
-    for (let i = 0; i < 6; i++) {
-      const angle = (i * Math.PI) / 3;
-      const x = Math.cos(angle) * radius;
-      const y = Math.sin(angle) * radius;
-
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
       ctx.lineTo(x, y);
-      ctx.stroke();
-
-      // Add small branches
-      const branchLength = radius * 0.3;
-      const branchAngle1 = angle + Math.PI / 6;
-      const branchAngle2 = angle - Math.PI / 6;
-
-      ctx.beginPath();
-      ctx.moveTo(x * 0.7, y * 0.7);
-      ctx.lineTo(x * 0.7 + Math.cos(branchAngle1) * branchLength, y * 0.7 + Math.sin(branchAngle1) * branchLength);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(x * 0.7, y * 0.7);
-      ctx.lineTo(x * 0.7 + Math.cos(branchAngle2) * branchLength, y * 0.7 + Math.sin(branchAngle2) * branchLength);
-      ctx.stroke();
     }
-  };
+  }
+  ctx.closePath();
+  ctx.fill();
+};
 
-  const drawPumpkin = (ctx: CanvasRenderingContext2D, size: number) => {
-    const width = size;
-    const height = size;
+const drawSnowflake = (ctx: CanvasRenderingContext2D, size: number) => {
+  const radius = size / 2;
+  ctx.lineWidth = 1;
 
-    // Pumpkin body
+  for (let i = 0; i < 6; i++) {
+    const angle = (i * Math.PI) / 3;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+
     ctx.beginPath();
-    ctx.ellipse(0, 0, width / 2, height / 2, 0, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(x, y);
+    ctx.stroke();
 
-    // Vertical lines
-    ctx.strokeStyle = ctx.fillStyle;
-    ctx.lineWidth = 1;
-    for (let i = -2; i <= 2; i++) {
+    // Add small branches
+    const branchLength = radius * 0.3;
+    const branchAngle1 = angle + Math.PI / 6;
+    const branchAngle2 = angle - Math.PI / 6;
+
+    ctx.beginPath();
+    ctx.moveTo(x * 0.7, y * 0.7);
+    ctx.lineTo(x * 0.7 + Math.cos(branchAngle1) * branchLength, y * 0.7 + Math.sin(branchAngle1) * branchLength);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(x * 0.7, y * 0.7);
+    ctx.lineTo(x * 0.7 + Math.cos(branchAngle2) * branchLength, y * 0.7 + Math.sin(branchAngle2) * branchLength);
+    ctx.stroke();
+  }
+};
+
+const drawPumpkin = (ctx: CanvasRenderingContext2D, size: number) => {
+  const width = size;
+  const height = size;
+
+  // Pumpkin body
+  ctx.beginPath();
+  ctx.ellipse(0, 0, width / 2, height / 2, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Vertical lines
+  ctx.strokeStyle = ctx.fillStyle;
+  ctx.lineWidth = 1;
+  for (let i = -2; i <= 2; i++) {
+    ctx.beginPath();
+    ctx.moveTo((i * width) / 6, -height / 2);
+    ctx.lineTo((i * width) / 6, height / 2);
+    ctx.stroke();
+  }
+};
+
+const drawBat = (ctx: CanvasRenderingContext2D, size: number) => {
+  const width = size;
+  const height = size * 0.6;
+
+  // Bat body
+  ctx.beginPath();
+  ctx.ellipse(0, 0, width / 8, height / 3, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Left wing
+  ctx.beginPath();
+  ctx.moveTo(-width / 8, 0);
+  ctx.quadraticCurveTo(-width / 3, -height / 3, -width / 2, 0);
+  ctx.quadraticCurveTo(-width / 3, height / 4, -width / 8, 0);
+  ctx.fill();
+
+  // Right wing
+  ctx.beginPath();
+  ctx.moveTo(width / 8, 0);
+  ctx.quadraticCurveTo(width / 3, -height / 3, width / 2, 0);
+  ctx.quadraticCurveTo(width / 3, height / 4, width / 8, 0);
+  ctx.fill();
+};
+
+// Draw individual particle based on shape
+const drawParticle = (ctx: CanvasRenderingContext2D, particle: Particle) => {
+  ctx.fillStyle = particle.color;
+  ctx.strokeStyle = particle.color;
+
+  switch (particle.shape) {
+    case 'circle':
       ctx.beginPath();
-      ctx.moveTo((i * width) / 6, -height / 2);
-      ctx.lineTo((i * width) / 6, height / 2);
-      ctx.stroke();
-    }
-  };
+      ctx.arc(0, 0, particle.size / 2, 0, Math.PI * 2);
+      ctx.fill();
+      break;
 
-  const drawBat = (ctx: CanvasRenderingContext2D, size: number) => {
-    const width = size;
-    const height = size * 0.6;
+    case 'heart':
+      drawHeart(ctx, particle.size);
+      break;
 
-    // Bat body
-    ctx.beginPath();
-    ctx.ellipse(0, 0, width / 8, height / 3, 0, 0, Math.PI * 2);
-    ctx.fill();
+    case 'star':
+      drawStar(ctx, particle.size, 5);
+      break;
 
-    // Left wing
-    ctx.beginPath();
-    ctx.moveTo(-width / 8, 0);
-    ctx.quadraticCurveTo(-width / 3, -height / 3, -width / 2, 0);
-    ctx.quadraticCurveTo(-width / 3, height / 4, -width / 8, 0);
-    ctx.fill();
+    case 'snowflake':
+      drawSnowflake(ctx, particle.size);
+      break;
 
-    // Right wing
-    ctx.beginPath();
-    ctx.moveTo(width / 8, 0);
-    ctx.quadraticCurveTo(width / 3, -height / 3, width / 2, 0);
-    ctx.quadraticCurveTo(width / 3, height / 4, width / 8, 0);
-    ctx.fill();
-  };
+    case 'pumpkin':
+      drawPumpkin(ctx, particle.size);
+      break;
 
-  // Draw individual particle based on shape
-  const drawParticle = (ctx: CanvasRenderingContext2D, particle: Particle) => {
-    ctx.fillStyle = particle.color;
-    ctx.strokeStyle = particle.color;
+    case 'bat':
+      drawBat(ctx, particle.size);
+      break;
 
-    switch (particle.shape) {
-      case 'circle':
-        ctx.beginPath();
-        ctx.arc(0, 0, particle.size / 2, 0, Math.PI * 2);
-        ctx.fill();
-        break;
-
-      case 'heart':
-        drawHeart(ctx, particle.size);
-        break;
-
-      case 'star':
-        drawStar(ctx, particle.size, 5);
-        break;
-
-      case 'snowflake':
-        drawSnowflake(ctx, particle.size);
-        break;
-
-      case 'pumpkin':
-        drawPumpkin(ctx, particle.size);
-        break;
-
-      case 'bat':
-        drawBat(ctx, particle.size);
-        break;
-
-      default:
-        // Default to circle
-        ctx.beginPath();
-        ctx.arc(0, 0, particle.size / 2, 0, Math.PI * 2);
-        ctx.fill();
-        break;
-    }
-  };
+    default:
+      // Default to circle
+      ctx.beginPath();
+      ctx.arc(0, 0, particle.size / 2, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+  }
+};
 
 export function SeasonalBackground({ intensity = 'medium', className = '' }: SeasonalBackgroundProps) {
   const { currentThemeConfig } = useSeasonalTheme();

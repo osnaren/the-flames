@@ -12,11 +12,11 @@ export default function ClickResultImage({ name1, name2, result }: ClickResultIm
   const isInProgress = result === 'In Progress';
   const resultData = isInProgress ? null : getResultData(result as FlamesResult);
   const IconComponent = resultData?.icon;
-  const isDarkMode = document.documentElement.classList.contains('dark') || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDarkMode =
+    document.documentElement.classList.contains('dark') || window.matchMedia('(prefers-color-scheme: dark)').matches;
 
   const displayText = isInProgress ? 'Work in Progress' : resultData?.text || result;
-  const displayIcon = isInProgress ? '⏳' : (IconComponent ? null : '❤️');
+  const displayIcon = isInProgress ? '⏳' : IconComponent ? null : '❤️';
 
   // Define colors that html2canvas can parse
   const colors = {
@@ -58,21 +58,25 @@ export default function ClickResultImage({ name1, name2, result }: ClickResultIm
         boxSizing: 'border-box',
       }}
     >
-      <div style={{ 
-        fontSize: '36px', 
-        fontWeight: 'bold', 
-        marginBottom: '10px', 
-        color: themeColors.text,
-        textAlign: 'center' as const,
-      }}>
+      <div
+        style={{
+          fontSize: '36px',
+          fontWeight: 'bold',
+          marginBottom: '10px',
+          color: themeColors.text,
+          textAlign: 'center' as const,
+        }}
+      >
         {name1} ❤️ {name2}
       </div>
-      <div style={{ 
-        fontSize: '24px', 
-        color: themeColors.textSubtle, 
-        marginBottom: '40px',
-        textAlign: 'center' as const,
-      }}>
+      <div
+        style={{
+          fontSize: '24px',
+          color: themeColors.textSubtle,
+          marginBottom: '40px',
+          textAlign: 'center' as const,
+        }}
+      >
         Your FLAMES Result
       </div>
 
@@ -90,41 +94,49 @@ export default function ClickResultImage({ name1, name2, result }: ClickResultIm
           justifyContent: 'center',
         }}
       >
-        <div style={{ 
-          fontSize: '48px', 
-          lineHeight: 1,
-          marginBottom: '10px',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-          {isInProgress ? displayIcon : (IconComponent && <IconComponent color={themeColors.brand} />)}
+        <div
+          style={{
+            fontSize: '48px',
+            lineHeight: 1,
+            marginBottom: '10px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          {isInProgress ? displayIcon : IconComponent && <IconComponent color={themeColors.brand} />}
         </div>
-        <div style={{ 
-          fontSize: '60px', 
-          fontWeight: 'bold', 
-          color: themeColors.brand,
-          marginBottom: '10px',
-          lineHeight: 1,
-        }}>
+        <div
+          style={{
+            fontSize: '60px',
+            fontWeight: 'bold',
+            color: themeColors.brand,
+            marginBottom: '10px',
+            lineHeight: 1,
+          }}
+        >
           {isInProgress ? '?' : result}
         </div>
-        <div style={{ 
-          fontSize: '28px', 
-          fontWeight: '500', 
-          color: themeColors.text,
-          lineHeight: 1.2,
-        }}>
+        <div
+          style={{
+            fontSize: '28px',
+            fontWeight: '500',
+            color: themeColors.text,
+            lineHeight: 1.2,
+          }}
+        >
           {displayText}
         </div>
       </div>
 
-      <div style={{ 
-        marginTop: '40px', 
-        fontSize: '16px', 
-        color: themeColors.textSubtle,
-        textAlign: 'center' as const,
-      }}>
+      <div
+        style={{
+          marginTop: '40px',
+          fontSize: '16px',
+          color: themeColors.textSubtle,
+          textAlign: 'center' as const,
+        }}
+      >
         the-flames.com
       </div>
     </div>

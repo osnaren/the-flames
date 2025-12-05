@@ -4,8 +4,8 @@ import Logo from '@components/ui/Logo';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { BarChart3, BookOpen, Flame, Wand2, X } from 'lucide-react';
-import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 import NavItem from './NavItem';
 
 interface MobileMenuProps {
