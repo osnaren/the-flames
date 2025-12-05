@@ -1,7 +1,6 @@
 import { validateFlamesInput, validateName } from '@/utils/validation';
 import { GameStage } from '@features/flamesGame/flames.types';
 import { AnimatePresence, motion } from 'framer-motion';
-import { VenetianMask } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface InputFormProps {
@@ -11,8 +10,6 @@ interface InputFormProps {
   setName2: (name: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   shouldAnimate: boolean;
-  anonymous: boolean;
-  setAnonymous: (value: boolean) => void;
   stage: GameStage;
   isCollapsing?: boolean;
   isProcessing?: boolean; // Single source of truth for form processing state
@@ -31,8 +28,6 @@ export function InputForm({
   setName2,
   onSubmit,
   shouldAnimate,
-  anonymous,
-  setAnonymous,
   isCollapsing = false,
   isProcessing = false,
 }: InputFormProps) {
@@ -416,46 +411,6 @@ export function InputForm({
               </motion.div>
             )}
           </div>
-
-          {/* Anonymous Mode Toggle */}
-          <motion.div
-            className="bg-surface-container/50 border-outline/20 flex items-center justify-between rounded-xl border p-4"
-            animate={
-              isProcessing
-                ? {
-                    opacity: [1, 0.7, 1],
-                    scale: [1, 0.95, 1],
-                  }
-                : {}
-            }
-            transition={{ duration: 0.3, delay: 0.2 }}
-          >
-            <div>
-              <label htmlFor="anonymous" className="text-on-surface flex items-center gap-1 text-sm font-medium">
-                Anonymous Mode
-                <VenetianMask className="h-4 w-4" />
-              </label>
-              <p className="text-on-surface-variant mt-1 text-xs">
-                Keep your names private while still contributing to our statistics
-              </p>
-            </div>
-            <motion.button
-              type="button"
-              id="anonymous"
-              onClick={() => setAnonymous(!anonymous)}
-              className={`focus:ring-primary relative inline-flex h-6 w-11 items-center rounded-full border border-transparent transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none ${
-                anonymous ? 'bg-primary' : 'bg-surface-variant border-outline'
-              }`}
-              disabled={isProcessing}
-              whileTap={shouldAnimate ? { scale: 0.95 } : {}}
-            >
-              <motion.span
-                className="inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform"
-                animate={{ x: anonymous ? 22 : 2 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-              />
-            </motion.button>
-          </motion.div>
 
           {/* Submit Button */}
           <motion.button

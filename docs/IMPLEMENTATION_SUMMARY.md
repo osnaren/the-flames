@@ -104,7 +104,6 @@ This document summarizes the comprehensive enhancements made to the FLAMES game,
 #### API Features
 
 - **Detailed Results**: Common letters, positions, elimination process
-- **Anonymous Mode**: Privacy-focused calculation option
 - **Error Handling**: Comprehensive error codes and messages
 - **Performance**: Sub-50ms response times
 
@@ -211,7 +210,6 @@ src/
 
 ### Privacy Features
 
-- **Anonymous Mode**: Privacy-focused calculation option
 - **Local Storage**: Settings stored locally only
 - **No Tracking**: No personal data collection
 - **GDPR Compliant**: European privacy regulation compliance

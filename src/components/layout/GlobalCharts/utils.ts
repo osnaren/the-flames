@@ -5,45 +5,6 @@ import { FlamesResultType } from '@/constants/flames';
  * Generates mock data for the GlobalCharts component
  */
 export const generateMockData = (): GlobalStats => {
-  // Popular names with realistic names from different cultures
-  const names = [
-    'Olivia',
-    'Emma',
-    'Ava',
-    'Sophia',
-    'Isabella',
-    'Liam',
-    'Noah',
-    'Oliver',
-    'Elijah',
-    'William',
-    'Aarav',
-    'Arjun',
-    'Reyansh',
-    'Aanya',
-    'Anaya',
-    'Santiago',
-    'Mateo',
-    'Sofía',
-    'Valentina',
-    'Luna',
-    'Mohammed',
-    'Amir',
-    'Yusuf',
-    'Zahra',
-    'Fatima',
-  ];
-
-  // Generate random popular names
-  const popularNames = Array.from({ length: 10 }, (_, _i) => {
-    const randomName = names[Math.floor(Math.random() * names.length)];
-    return {
-      name: randomName,
-      count: Math.floor(Math.random() * 1000) + 100,
-      trend: Math.random() > 0.5 ? Math.floor(Math.random() * 30) : -Math.floor(Math.random() * 15),
-    };
-  }).sort((a, b) => b.count - a.count);
-
   // Generate result statistics
   const resultStats = [
     {
@@ -78,10 +39,8 @@ export const generateMockData = (): GlobalStats => {
     },
   ].sort((a, b) => b.count - a.count);
 
-  // Generate popular pairs
-  const popularPairs = Array.from({ length: 6 }, () => {
-    const name1 = names[Math.floor(Math.random() * names.length)];
-    const name2 = names[Math.floor(Math.random() * names.length)];
+  // Generate recent matches
+  const recentMatches = Array.from({ length: 10 }, () => {
     const result = [
       FlamesResultType.FRIEND,
       FlamesResultType.LOVE,
@@ -90,20 +49,29 @@ export const generateMockData = (): GlobalStats => {
       FlamesResultType.ENEMY,
       FlamesResultType.SIBLING,
     ][Math.floor(Math.random() * 6)] as FlamesResult;
+    const countries = ['USA', 'India', 'UK', 'Canada', 'Australia', 'Germany', 'France', 'Japan', 'Brazil'];
     return {
-      name1,
-      name2,
       result,
-      count: Math.floor(Math.random() * 500) + 50,
+      country: countries[Math.floor(Math.random() * countries.length)],
+      created_at: new Date(Date.now() - Math.floor(Math.random() * 3600000)).toISOString(),
     };
-  }).sort((a, b) => b.count - a.count);
+  });
+
+  // Generate top countries
+  const topCountries = [
+    { country: 'India', count: Math.floor(Math.random() * 5000) + 1000 },
+    { country: 'USA', count: Math.floor(Math.random() * 4000) + 800 },
+    { country: 'UK', count: Math.floor(Math.random() * 3000) + 600 },
+    { country: 'Canada', count: Math.floor(Math.random() * 2000) + 400 },
+    { country: 'Australia', count: Math.floor(Math.random() * 1000) + 200 },
+  ];
 
   return {
     totalMatches: Math.floor(Math.random() * 100000) + 50000,
     todayMatches: Math.floor(Math.random() * 5000) + 1000,
-    popularNames,
     resultStats,
-    popularPairs,
+    recentMatches,
+    topCountries,
     regionalStats: null,
   };
 };

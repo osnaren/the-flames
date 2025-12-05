@@ -93,8 +93,8 @@ export const getStatsWithTrends = async (window: TimeWindow = 'today', country?:
 };
 
 // Insert a new match with retry and validation
-export const insertMatch = async (name1: string | null, name2: string | null, result: string, country?: string) => {
-  // Validate only the result field as required since names can now be null
+export const insertMatch = async (result: string, country?: string) => {
+  // Validate only the result field as required
   if (!result?.trim()) {
     throw new StatsError('Invalid match data provided', 'INVALID_MATCH_DATA');
   }
@@ -105,8 +105,6 @@ export const insertMatch = async (name1: string | null, name2: string | null, re
         .from('flames_matches')
         .insert([
           {
-            name1: name1,
-            name2: name2,
             result: result.trim(),
             country,
           },

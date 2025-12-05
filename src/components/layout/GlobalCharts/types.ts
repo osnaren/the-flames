@@ -4,38 +4,34 @@ import { FlamesResult } from '@/constants/flames';
 export type TimeFilter = 'today' | 'week' | 'alltime';
 export type { FlamesResult };
 
-export interface NameStats {
-  name: string;
-  count: number;
-  trend: number; // percentage change
-}
-
 export interface ResultStats {
   result: FlamesResult;
   count: number;
   trend: number; // percentage change
 }
 
-export interface PairStats {
-  name1: string;
-  name2: string;
+export interface RecentMatch {
   result: FlamesResult;
+  country: string | null;
+  created_at: string;
+}
+
+export interface TopCountry {
+  country: string;
   count: number;
 }
 
 export interface RegionalStats {
   country: string;
-  names: NameStats[];
   results: ResultStats[];
-  pairs: PairStats[];
 }
 
 export interface GlobalStats {
   totalMatches: number;
   todayMatches: number;
-  popularNames: NameStats[];
   resultStats: ResultStats[];
-  popularPairs: PairStats[];
+  recentMatches: RecentMatch[];
+  topCountries: TopCountry[];
   regionalStats: RegionalStats | null;
 }
 

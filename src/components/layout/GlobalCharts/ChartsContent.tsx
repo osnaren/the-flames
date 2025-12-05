@@ -15,10 +15,10 @@ import {
   X,
 } from 'lucide-react';
 import ChartStats from './ChartStats';
-import NameLeaderboard from './NameLeaderboard';
-import PairingsGrid from './PairingsGrid';
+import RecentMatches from './RecentMatches';
 import RegionalStats from './RegionalStats';
 import ResultTrendBars from './ResultTrendBars';
+import TopCountries from './TopCountries';
 import { GlobalStats, ResultStats, TimeFilter } from './types';
 
 // Mapping of result letters to meanings and icons
@@ -198,14 +198,14 @@ export default function ChartsContent({
             </div>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {/* Popular Names */}
-              <NameLeaderboard names={data.popularNames} />
-
               {/* Result Stats */}
               <ResultTrendBars results={data.resultStats} resultInfo={resultInfo} />
 
-              {/* Popular Pairings */}
-              <PairingsGrid pairs={data.popularPairs} resultInfo={resultInfo} />
+              {/* Recent Matches */}
+              <RecentMatches matches={data.recentMatches} resultInfo={resultInfo} />
+
+              {/* Top Countries */}
+              <TopCountries countries={data.topCountries} />
 
               {/* Regional Stats */}
               {data.regionalStats && <RegionalStats stats={data.regionalStats} resultInfo={resultInfo} />}

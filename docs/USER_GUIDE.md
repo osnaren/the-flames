@@ -177,7 +177,6 @@ A: Haptic feedback requires a supported device and browser. iPhone users need Sa
 - **No Personal Data Storage**: Names are not permanently stored
 - **Local Preferences**: Settings saved only on your device
 - **No Tracking**: We don't track your personal information
-- **Anonymous Usage**: API calls can be made anonymously
 
 ### 📊 What We Collect
 

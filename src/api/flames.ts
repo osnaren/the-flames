@@ -6,7 +6,6 @@ const rateLimiter = new RateLimiter(20, 60000); // 20 requests per minute
 export interface FlamesApiRequest {
   name1: string;
   name2: string;
-  anon?: boolean;
 }
 
 export interface CommonLetter {
@@ -27,7 +26,6 @@ export interface FlamesApiResponse {
     result: 'F' | 'L' | 'A' | 'M' | 'E' | 'S';
     resultMeaning: string;
     tagline: string;
-    anonymous: boolean;
   };
   error?: {
     code: string;
@@ -228,15 +226,14 @@ export async function flamesApi(request: FlamesApiRequest, clientId?: string): P
     return {
       success: true,
       data: {
-        name1: request.anon ? '***' : sanitizedData.name1,
-        name2: request.anon ? '***' : sanitizedData.name2,
+        name1: sanitizedData.name1,
+        name2: sanitizedData.name2,
         commonLetters: result.commonLetters,
         flamesLetters: result.flamesLetters,
         finalCount: result.finalCount,
         result: result.result,
         resultMeaning: flamesMeaning.meaning,
         tagline: randomTagline,
-        anonymous: request.anon || false,
       },
     };
   } catch (error) {
@@ -279,7 +276,7 @@ export function createFlamesEndpoint() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return async (req: any, res: any) => {
     try {
-      const { name1, name2, anon } = req.body || req.query;
+      const { name1, name2 } = req.body || req.query;
       const clientId = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
       if (!name1 || !name2) {
@@ -292,7 +289,7 @@ export function createFlamesEndpoint() {
         });
       }
 
-      const result = await flamesApi({ name1, name2, anon }, clientId);
+      const result = await flamesApi({ name1, name2 }, clientId);
 
       if (!result.success && result.error?.code === 'RATE_LIMIT_EXCEEDED') {
         res.status(429);

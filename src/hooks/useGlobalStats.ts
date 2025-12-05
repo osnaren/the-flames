@@ -12,9 +12,9 @@ const statsCache = new Map<string, { data: GlobalStats; timestamp: number }>();
 const DEFAULT_STATS: GlobalStats = {
   totalMatches: 0,
   todayMatches: 0,
-  popularNames: [],
   resultStats: [],
-  popularPairs: [],
+  recentMatches: [],
+  topCountries: [],
   regionalStats: null,
 };
 
@@ -51,14 +51,6 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
     return {
       totalMatches: typeof stats.total === 'number' ? stats.total : 0,
       todayMatches: typeof stats.today === 'number' ? stats.today : 0,
-      popularNames: (Array.isArray(stats.names) ? stats.names : []).map((name: unknown) => {
-        const nameObj = name as Record<string, unknown>;
-        return {
-          name: typeof nameObj?.name === 'string' ? nameObj.name : '',
-          count: typeof nameObj?.current_count === 'number' ? nameObj.current_count : 0,
-          trend: typeof nameObj?.trend_percentage === 'number' ? Number(nameObj.trend_percentage) : 0,
-        };
-      }),
       resultStats: (Array.isArray(stats.results) ? stats.results : []).map((result: unknown) => {
         const resultObj = result as Record<string, unknown>;
         return {
@@ -70,14 +62,22 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
           trend: typeof resultObj?.trend_percentage === 'number' ? Number(resultObj.trend_percentage) : 0,
         };
       }),
-      popularPairs: (Array.isArray(stats.pairs) ? stats.pairs : []).map((pair: unknown) => {
-        const pairObj = pair as Record<string, unknown>;
+      recentMatches: (Array.isArray(stats.recent) ? stats.recent : []).map((match: unknown) => {
+        const matchObj = match as Record<string, unknown>;
         return {
-          name1: typeof pairObj?.name1 === 'string' ? pairObj.name1 : '',
-          name2: typeof pairObj?.name2 === 'string' ? pairObj.name2 : '',
           result:
-            typeof pairObj?.result === 'string' ? (pairObj.result as NonNullFlamesResult) : ('' as NonNullFlamesResult),
-          count: typeof pairObj?.count === 'number' ? pairObj.count : 0,
+            typeof matchObj?.result === 'string'
+              ? (matchObj.result as NonNullFlamesResult)
+              : ('' as NonNullFlamesResult),
+          country: typeof matchObj?.country === 'string' ? matchObj.country : null,
+          created_at: typeof matchObj?.created_at === 'string' ? matchObj.created_at : '',
+        };
+      }),
+      topCountries: (Array.isArray(stats.top_countries) ? stats.top_countries : []).map((country: unknown) => {
+        const countryObj = country as Record<string, unknown>;
+        return {
+          country: typeof countryObj?.country === 'string' ? countryObj.country : '',
+          count: typeof countryObj?.count === 'number' ? countryObj.count : 0,
         };
       }),
       regionalStats: null, // Will be populated separately if country is available
@@ -119,14 +119,6 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
           const regional = regionalStats as Record<string, unknown>;
           stats.regionalStats = {
             country: userCountry,
-            names: (Array.isArray(regional.names) ? regional.names : []).map((name: unknown) => {
-              const nameObj = name as Record<string, unknown>;
-              return {
-                name: typeof nameObj?.name === 'string' ? nameObj.name : '',
-                count: typeof nameObj?.current_count === 'number' ? nameObj.current_count : 0,
-                trend: typeof nameObj?.trend_percentage === 'number' ? Number(nameObj.trend_percentage) : 0,
-              };
-            }),
             results: (Array.isArray(regional.results) ? regional.results : []).map((result: unknown) => {
               const resultObj = result as Record<string, unknown>;
               return {
@@ -136,18 +128,6 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
                     : ('' as NonNullFlamesResult),
                 count: typeof resultObj?.current_count === 'number' ? resultObj.current_count : 0,
                 trend: typeof resultObj?.trend_percentage === 'number' ? Number(resultObj.trend_percentage) : 0,
-              };
-            }),
-            pairs: (Array.isArray(regional.pairs) ? regional.pairs : []).map((pair: unknown) => {
-              const pairObj = pair as Record<string, unknown>;
-              return {
-                name1: typeof pairObj?.name1 === 'string' ? pairObj.name1 : '',
-                name2: typeof pairObj?.name2 === 'string' ? pairObj.name2 : '',
-                result:
-                  typeof pairObj?.result === 'string'
-                    ? (pairObj.result as NonNullFlamesResult)
-                    : ('' as NonNullFlamesResult),
-                count: typeof pairObj?.count === 'number' ? pairObj.count : 0,
               };
             }),
           };

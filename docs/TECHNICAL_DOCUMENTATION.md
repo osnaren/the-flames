@@ -116,7 +116,6 @@ export class RateLimitError extends Error {
 interface FlamesApiRequest {
   name1: string;
   name2: string;
-  anon?: boolean;
 }
 ```
 
@@ -134,7 +133,6 @@ interface FlamesApiResponse {
     result: 'F' | 'L' | 'A' | 'M' | 'E' | 'S';
     resultMeaning: string;
     tagline: string;
-    anonymous: boolean;
   };
   error?: {
     code: string;

@@ -31,18 +31,16 @@ POST /flames
 ```json
 {
   "name1": "string",
-  "name2": "string",
-  "anon": boolean (optional)
+  "name2": "string"
 }
 ```
 
 #### Parameters
 
-| Parameter | Type    | Required | Description                              |
-| --------- | ------- | -------- | ---------------------------------------- |
-| `name1`   | string  | Yes      | First name (1-50 characters)             |
-| `name2`   | string  | Yes      | Second name (1-50 characters)            |
-| `anon`    | boolean | No       | Return anonymized names (default: false) |
+| Parameter | Type   | Required | Description                   |
+| --------- | ------ | -------- | ----------------------------- |
+| `name1`   | string | Yes      | First name (1-50 characters)  |
+| `name2`   | string | Yes      | Second name (1-50 characters) |
 
 #### Example Request
 
@@ -51,8 +49,7 @@ curl -X POST https://your-domain.com/api/flames \
   -H "Content-Type: application/json" \
   -d '{
     "name1": "John",
-    "name2": "Jane",
-    "anon": false
+    "name2": "Jane"
   }'
 ```
 
@@ -78,8 +75,7 @@ curl -X POST https://your-domain.com/api/flames \
     "finalCount": 6,
     "result": "L",
     "resultMeaning": "Love",
-    "tagline": "Love is in the air! 💕",
-    "anonymous": false
+    "tagline": "Love is in the air! 💕"
   }
 }
 ```
@@ -128,7 +124,6 @@ interface FlamesApiResponse {
     result: 'F' | 'L' | 'A' | 'M' | 'E' | 'S'; // Final result
     resultMeaning: string; // Human-readable meaning
     tagline: string; // Random motivational tagline
-    anonymous: boolean; // Whether names were anonymized
   };
 }
 ```
@@ -256,14 +251,14 @@ X-RateLimit-Reset: 1640995200
 ### JavaScript (Fetch API)
 
 ```javascript
-async function calculateFlames(name1, name2, anon = false) {
+async function calculateFlames(name1, name2) {
   try {
     const response = await fetch('/api/flames', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name1, name2, anon }),
+      body: JSON.stringify({ name1, name2 }),
     });
 
     const data = await response.json();
@@ -295,12 +290,11 @@ calculateFlames('John', 'Jane')
 ```python
 import requests
 
-def calculate_flames(name1, name2, anon=False):
+def calculate_flames(name1, name2):
     url = 'https://your-domain.com/api/flames'
     payload = {
         'name1': name1,
-        'name2': name2,
-        'anon': anon
+        'name2': name2
     }
 
     try:
@@ -337,14 +331,6 @@ curl -X POST https://your-domain.com/api/flames \
   -d '{"name1": "John", "name2": "Jane"}'
 ```
 
-#### Anonymous Request
-
-```bash
-curl -X POST https://your-domain.com/api/flames \
-  -H "Content-Type: application/json" \
-  -d '{"name1": "John", "name2": "Jane", "anon": true}'
-```
-
 #### With Verbose Output
 
 ```bash
@@ -374,11 +360,6 @@ curl -X POST localhost:3000/api/flames \
 curl -X POST localhost:3000/api/flames \
   -H "Content-Type: application/json" \
   -d '{"name1": "Alice"}'
-
-# Anonymous request
-curl -X POST localhost:3000/api/flames \
-  -H "Content-Type: application/json" \
-  -d '{"name1": "Alice", "name2": "Bob", "anon": true}'
 ```
 
 ## Integration Examples
@@ -450,7 +431,6 @@ export default createFlamesEndpoint();
 
 - No data persistence
 - No logging of names
-- Anonymous usage supported
 
 ## Monitoring
 
@@ -503,7 +483,7 @@ Response:
 
 - **GitHub Issues**: Report bugs and request features
 - **Documentation**: Comprehensive guides available
-- **Email**: api-support@your-domain.com
+- **Email**: <api-support@your-domain.com>
 
 ### Contributing
 

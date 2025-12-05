@@ -16,7 +16,6 @@ interface FlamesEngineState {
   stage: GameStage;
   commonLetters: string[];
   remainingLetters: string[];
-  anonymous: boolean;
   isProcessing: boolean;
   stageProgress: {
     commonLettersRevealed: boolean;
@@ -34,7 +33,6 @@ interface FlamesEngineActions {
   handleSubmit: (e: React.FormEvent) => void;
   resetGame: () => void;
   resetProcessingState: () => void;
-  setAnonymous: (value: boolean) => void;
   onCommonLettersComplete: () => void;
   onFlamesAnimationComplete: () => void;
   onResultReveal: () => void;
@@ -65,7 +63,6 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
   const [stage, setStage] = useState<GameStage>('input');
   const [commonLetters, setCommonLetters] = useState<string[]>([]);
   const [remainingLetters, setRemainingLetters] = useState<string[]>([]);
-  const [anonymous, setAnonymous] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   // Stage progress tracking
@@ -196,7 +193,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
 
       // Add to pairing history and check for badges
       if (gameResult) {
-        addPairing(name1, name2, gameResult, anonymous);
+        addPairing(name1, name2, gameResult);
       }
 
       // Give some time to see the final FLAMES letter before moving to result stage
@@ -211,7 +208,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
 
       return;
     }
-  }, [stageProgress, shouldAnimate, addTimeout, name1, name2, anonymous, addPairing]);
+  }, [stageProgress, shouldAnimate, addTimeout, name1, name2, addPairing]);
 
   /**
    * Stage completion callbacks
@@ -267,10 +264,8 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
 
         // Record match in background (non-blocking)
         if (gameData.result) {
-          const nameToSave1 = anonymous ? null : validName1;
-          const nameToSave2 = anonymous ? null : validName2;
-          insertMatch(nameToSave1, nameToSave2, gameData.result).catch((error) => {
-            console.error(`Failed to record ${anonymous ? 'anonymous ' : ''}match:`, error);
+          insertMatch(gameData.result).catch((error) => {
+            console.error('Failed to record match:', error);
           });
         }
 
@@ -312,7 +307,6 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
     [
       name1,
       name2,
-      anonymous,
       shouldAnimate,
       isProcessing,
       clearAll,
@@ -338,7 +332,6 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
     setCommonLetters([]);
     setRemainingLetters([]);
     setIsProcessing(false);
-    setAnonymous(false);
     setStageProgress({
       commonLettersRevealed: false,
       flamesAnimationStarted: false,
@@ -385,7 +378,6 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       stage,
       commonLetters,
       remainingLetters,
-      anonymous,
       isProcessing,
       stageProgress,
       newlyUnlockedBadges: getNewlyUnlockedBadges(),
@@ -397,7 +389,6 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       stage,
       commonLetters,
       remainingLetters,
-      anonymous,
       isProcessing,
       stageProgress,
       getNewlyUnlockedBadges,
@@ -411,7 +402,6 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       handleSubmit,
       resetGame,
       resetProcessingState,
-      setAnonymous,
       onCommonLettersComplete,
       onFlamesAnimationComplete,
       onResultReveal,
@@ -422,7 +412,6 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       handleSubmit,
       resetGame,
       resetProcessingState,
-      setAnonymous,
       onCommonLettersComplete,
       onFlamesAnimationComplete,
       onResultReveal,

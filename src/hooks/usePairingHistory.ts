@@ -7,7 +7,6 @@ interface PairingEntry {
   name2: string;
   result: FlamesResult;
   timestamp: number;
-  anonymous: boolean;
 }
 
 interface Badge {
@@ -251,14 +250,13 @@ export function usePairingHistory() {
 
   // Add a new pairing to history
   const addPairing = useCallback(
-    (name1: string, name2: string, result: FlamesResult, anonymous: boolean = false) => {
+    (name1: string, name2: string, result: FlamesResult) => {
       const newEntry: PairingEntry = {
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        name1: anonymous ? '' : name1,
-        name2: anonymous ? '' : name2,
+        name1,
+        name2,
         result,
         timestamp: Date.now(),
-        anonymous,
       };
 
       const updatedHistory = [newEntry, ...history].slice(0, 100); // Keep only last 100 entries

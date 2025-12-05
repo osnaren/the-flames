@@ -26,8 +26,8 @@ function HomePage() {
 
   // FLAMES game engine state and actions
   const [
-    { name1, name2, result, stage, commonLetters, remainingLetters, anonymous, isProcessing, stageProgress },
-    { setName1, setName2, handleSubmit, resetGame, setAnonymous, onCommonLettersComplete, onFlamesAnimationComplete },
+    { name1, name2, result, stage, commonLetters, remainingLetters, isProcessing, stageProgress },
+    { setName1, setName2, handleSubmit, resetGame, onCommonLettersComplete, onFlamesAnimationComplete },
   ] = useFlamesEngine();
 
   // Scroll to results when they appear
@@ -115,8 +115,6 @@ function HomePage() {
                 setName2={setName2}
                 onSubmit={onSubmitForm}
                 shouldAnimate={shouldAnimate}
-                anonymous={anonymous}
-                setAnonymous={setAnonymous}
                 stage={stage}
                 isCollapsing={isProcessing}
                 isProcessing={isProcessing}

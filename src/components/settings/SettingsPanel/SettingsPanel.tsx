@@ -93,7 +93,7 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           transition={{ type: 'spring', duration: 0.5 }}
-          className="relative mx-4 h-[80vh] w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900 will-change-transform"
+          className="relative mx-4 h-[80vh] w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl will-change-transform dark:bg-gray-900"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -239,7 +239,10 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
                   {/* Volume Slider */}
                   {isSoundEnabled && (
                     <div className="space-y-2">
-                      <label htmlFor="volume-slider" className="block text-sm font-medium text-gray-900 dark:text-white">
+                      <label
+                        htmlFor="volume-slider"
+                        className="block text-sm font-medium text-gray-900 dark:text-white"
+                      >
                         Volume: {Math.round(volume * 100)}%
                       </label>
                       <input
@@ -273,9 +276,7 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
                       <div>
                         <span className="font-medium text-gray-900 dark:text-white">Vibration</span>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {isSupported
-                            ? 'Provide haptic feedback for interactions'
-                            : 'Not supported on this device'}
+                          {isSupported ? 'Provide haptic feedback for interactions' : 'Not supported on this device'}
                         </p>
                       </div>
                     </div>
@@ -422,10 +423,6 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
                       <label className="flex items-center gap-2">
                         <input type="checkbox" defaultChecked className="rounded" />
                         <span className="text-sm">Track streaks and patterns</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
-                        <span className="text-sm">Enable anonymous mode</span>
                       </label>
                     </div>
                   </div>
