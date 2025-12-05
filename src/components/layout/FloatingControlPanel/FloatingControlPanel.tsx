@@ -4,7 +4,7 @@ import Toggle from '@ui/Toggle';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ChevronUp, Flame, Moon, MousePointerClick, Settings, Sun, Volume2, VolumeX } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { cn } from 'src/utils';
+import { cn } from '@/utils';
 
 export default function FloatingControlPanel() {
   const [isExpanded, setIsExpanded] = useState(false);

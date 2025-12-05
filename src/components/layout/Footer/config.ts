@@ -4,8 +4,8 @@ import type { FooterConfig } from './types';
 // Centralized Footer configuration for easy maintenance
 export const FOOTER_CONFIG: FooterConfig = {
   brand: {
-    name: 'OSLabs',
-    tagline: 'Cooked up with ❤️ at OSLabs 🇮🇳',
+    name: 'osLabs',
+    tagline: 'Cooked up with ❤️ at osLabs',
     description: 'Creating fun and engaging web experiences that bring people together.',
     year: new Date().getFullYear(),
   },
