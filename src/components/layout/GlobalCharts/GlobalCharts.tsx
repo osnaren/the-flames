@@ -15,7 +15,7 @@ export default function GlobalCharts({ onClose, isVisible = true, isStandalone =
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('today');
 
   // Use the custom hook to fetch stats with retry and error handling
-  const { data, isLoading, error, refetch } = useGlobalStats(timeFilter);
+  const { data, isLoading, error, refetch, lastUpdate } = useGlobalStats(timeFilter);
 
   // Update tagline when data changes
   const tagline = useMemo(() => {
@@ -40,6 +40,7 @@ export default function GlobalCharts({ onClose, isVisible = true, isStandalone =
     timeFilter,
     setTimeFilter,
     refetch,
+    lastUpdate,
   };
 
   // For standalone page version

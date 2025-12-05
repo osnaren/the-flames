@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import {
   Award,
   BarChart3,
+  Calendar,
   Clock,
   Heart,
   Loader2,
@@ -72,27 +73,30 @@ interface ChartsContentProps {
   timeFilter: TimeFilter;
   setTimeFilter: (filter: TimeFilter) => void;
   refetch: () => void;
+  lastUpdate?: number;
 }
 
 // Loading state component
 const LoadingState = () => (
-  <div className="flex flex-col items-center justify-center py-12">
-    <Loader2 className="mb-4 h-8 w-8 animate-spin text-orange-500" />
-    <p className="text-gray-600 dark:text-gray-400">Loading global stats...</p>
+  <div className="flex flex-col items-center justify-center py-20">
+    <Loader2 className="mb-4 h-10 w-10 animate-spin text-orange-500" />
+    <p className="text-lg font-medium text-gray-600 dark:text-gray-300">Loading global stats...</p>
+    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Gathering data from around the world</p>
   </div>
 );
 
 // Error state component
 const ErrorState = () => (
-  <div className="flex flex-col items-center justify-center py-12">
-    <div className="mb-4 text-red-500">⚠️</div>
-    <p className="text-center text-gray-600 dark:text-gray-400">
-      Oops! Something went wrong while loading the stats.
-      <br />
-      Please try again later.
+  <div className="flex flex-col items-center justify-center py-20">
+    <div className="mb-4 rounded-full bg-red-100 p-4 dark:bg-red-900/30">
+      <div className="text-3xl">⚠️</div>
+    </div>
+    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Unable to load stats</h3>
+    <p className="mt-2 max-w-xs text-center text-gray-600 dark:text-gray-400">
+      We couldn't fetch the latest data. Please check your connection and try again.
     </p>
-    <Button variant="secondary" onClick={() => window.location.reload()} className="mt-4">
-      Retry
+    <Button variant="secondary" onClick={() => window.location.reload()} className="mt-6">
+      Retry Connection
     </Button>
   </div>
 );
@@ -108,20 +112,30 @@ export default function ChartsContent({
   timeFilter,
   setTimeFilter,
   refetch,
+  lastUpdate,
 }: ChartsContentProps) {
   return (
     <>
       {/* Header */}
-      <div className="relative">
-        <div className="rounded-t-xl bg-linear-to-r from-orange-500 to-red-500 p-6 dark:from-orange-600 dark:to-red-600">
+      <div className="relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-linear-to-br from-orange-500 to-red-600 dark:from-orange-600 dark:to-red-700">
+          <div className="absolute inset-0 bg-[url('/assets/noise.webp')] opacity-10 mix-blend-overlay"></div>
+          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+          <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-yellow-500/20 blur-3xl"></div>
+        </div>
+
+        <div className="relative p-6 sm:p-8">
           <div className="flex items-start justify-between">
             <div>
-              <h2 className="mb-1 flex items-center text-2xl font-bold text-white">
-                <BarChart3 className="mr-2 h-5 w-5" />
-                Global FLAMES Charts
-              </h2>
+              <div className="flex items-center gap-2">
+                <div className="rounded-lg bg-white/20 p-2 backdrop-blur-sm">
+                  <BarChart3 className="h-6 w-6 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold text-white sm:text-3xl">Global Charts</h2>
+              </div>
               <motion.p
-                className="text-sm text-white/90"
+                className="mt-2 text-sm font-medium text-white/90 sm:text-base"
                 animate={{ opacity: [0.8, 1, 0.8] }}
                 transition={{ duration: 3, repeat: Infinity }}
               >
@@ -131,7 +145,7 @@ export default function ChartsContent({
             {!isStandalone && onClose && (
               <button
                 onClick={onClose}
-                className="rounded-full p-1 text-white/80 transition hover:text-white"
+                className="rounded-full bg-white/10 p-2 text-white/80 backdrop-blur-sm transition hover:bg-white/20 hover:text-white"
                 aria-label="Close global charts"
               >
                 <X className="h-5 w-5" />
@@ -145,60 +159,55 @@ export default function ChartsContent({
       </div>
 
       {/* Main Content */}
-      <div className="max-h-[70vh] overflow-y-auto p-6">
+      <div className="max-h-[70vh] overflow-y-auto bg-gray-50/50 p-4 sm:p-6 dark:bg-gray-900/50">
         {isLoading ? (
           <LoadingState />
         ) : error ? (
           <ErrorState />
         ) : data ? (
           <>
-            {/* Filters */}
-            <div className="mb-6 flex space-x-2">
-              <button
-                onClick={() => setTimeFilter('today')}
-                className={`flex items-center rounded-full px-3 py-1.5 text-sm font-medium ${
-                  timeFilter === 'today'
-                    ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200'
-                    : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
-                } transition-colors duration-200 hover:brightness-95`}
-                aria-pressed={timeFilter === 'today'}
-              >
-                <Clock className="mr-1 h-3.5 w-3.5" /> Today
-              </button>
-              <button
-                onClick={() => setTimeFilter('week')}
-                className={`flex items-center rounded-full px-3 py-1.5 text-sm font-medium ${
-                  timeFilter === 'week'
-                    ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200'
-                    : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
-                }`}
-              >
-                <Clock className="mr-1 h-3.5 w-3.5" /> This Week
-              </button>
-              <button
-                onClick={() => setTimeFilter('alltime')}
-                className={`flex items-center rounded-full px-3 py-1.5 text-sm font-medium ${
-                  timeFilter === 'alltime'
-                    ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200'
-                    : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
-                }`}
-              >
-                <Award className="mr-1 h-3.5 w-3.5" /> All Time
-              </button>
-              <motion.button
-                className="ml-auto flex items-center rounded-full bg-blue-100 px-3 py-1.5 text-sm font-medium text-blue-700 transition-colors duration-200 hover:brightness-95 dark:bg-blue-900 dark:text-blue-200"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95, rotate: 180 }}
-                transition={{ duration: 0.4 }}
-                onClick={refetch}
-                aria-label="Refresh statistics"
-              >
-                <RefreshCcw className="mr-1 h-3.5 w-3.5" /> Refresh
-              </motion.button>
+            {/* Filters & Controls */}
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-wrap gap-2 rounded-xl bg-white p-1 shadow-sm ring-1 ring-gray-900/5 dark:bg-gray-800 dark:ring-white/10">
+                {(['today', 'week', 'alltime'] as const).map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => setTimeFilter(filter)}
+                    className={`flex items-center rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200 ${
+                      timeFilter === filter
+                        ? 'bg-orange-100 text-orange-700 shadow-sm dark:bg-orange-900/50 dark:text-orange-200'
+                        : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-700/50'
+                    }`}
+                  >
+                    {filter === 'today' && <Clock className="mr-1.5 h-3.5 w-3.5" />}
+                    {filter === 'week' && <Calendar className="mr-1.5 h-3.5 w-3.5" />}
+                    {filter === 'alltime' && <Award className="mr-1.5 h-3.5 w-3.5" />}
+                    {filter === 'today' ? 'Today' : filter === 'week' ? 'This Week' : 'All Time'}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between gap-4 sm:justify-end">
+                {lastUpdate && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    Updated {new Date(lastUpdate).toLocaleTimeString()}
+                  </span>
+                )}
+                <motion.button
+                  className="flex items-center rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-gray-900/5 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:bg-gray-800 dark:text-gray-300 dark:ring-white/10 dark:hover:bg-gray-700"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={refetch}
+                  aria-label="Refresh statistics"
+                >
+                  <RefreshCcw className="mr-1.5 h-3.5 w-3.5" />
+                  Refresh
+                </motion.button>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {/* Result Stats */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              {/* Result Stats - Full width on mobile, half on large screens */}
               <ResultTrendBars results={data.resultStats} resultInfo={resultInfo} />
 
               {/* Recent Matches */}
@@ -216,8 +225,11 @@ export default function ChartsContent({
 
       {/* Footer */}
       {!isStandalone && (
-        <div className="flex items-center justify-between border-t border-gray-200 p-4 dark:border-gray-700">
-          <div className="text-xs text-gray-500 italic dark:text-gray-400">Data refreshes every few minutes</div>
+        <div className="flex items-center justify-between border-t border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <div className="h-2 w-2 rounded-full bg-green-500"></div>
+            Live updates enabled
+          </div>
           {onClose && (
             <Button variant="primary" onClick={onClose} size="md">
               Play FLAMES
