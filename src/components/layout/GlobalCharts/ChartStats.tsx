@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Activity, Calendar, TrendingUp } from 'lucide-react';
-import { GlobalStats } from './types';
+import { GlobalStats, ResultInfo } from './types';
 
 interface ChartStatsProps {
   data: GlobalStats;
@@ -8,12 +8,13 @@ interface ChartStatsProps {
     result: string;
     trend: number;
   } | null;
+  resultInfo: Record<string, ResultInfo>;
 }
 
 /**
  * Header statistics shown at the top of the GlobalCharts component
  */
-export default function ChartStats({ data, hottestTrend }: ChartStatsProps) {
+export default function ChartStats({ data, hottestTrend, resultInfo }: ChartStatsProps) {
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -38,6 +39,7 @@ export default function ChartStats({ data, hottestTrend }: ChartStatsProps) {
     >
       <motion.div
         variants={item}
+        whileHover={{ scale: 1.02 }}
         className="relative overflow-hidden rounded-xl border border-white/10 bg-white/10 p-4 backdrop-blur-md transition-colors hover:bg-white/20"
       >
         <div className="flex items-start justify-between">
@@ -54,6 +56,7 @@ export default function ChartStats({ data, hottestTrend }: ChartStatsProps) {
 
       <motion.div
         variants={item}
+        whileHover={{ scale: 1.02 }}
         className="relative overflow-hidden rounded-xl border border-white/10 bg-white/10 p-4 backdrop-blur-md transition-colors hover:bg-white/20"
       >
         <div className="flex items-start justify-between">
@@ -70,12 +73,17 @@ export default function ChartStats({ data, hottestTrend }: ChartStatsProps) {
 
       <motion.div
         variants={item}
+        whileHover={{ scale: 1.02 }}
         className="relative overflow-hidden rounded-xl border border-white/10 bg-white/10 p-4 backdrop-blur-md transition-colors hover:bg-white/20"
       >
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs font-medium tracking-wider text-white/80 uppercase">Trending</p>
-            <h3 className="mt-1 text-2xl font-bold text-white">{hottestTrend?.result || 'N/A'}</h3>
+            <h3 className="mt-1 text-2xl font-bold text-white">
+              {hottestTrend && resultInfo[hottestTrend.result]
+                ? resultInfo[hottestTrend.result].text
+                : hottestTrend?.result || 'N/A'}
+            </h3>
           </div>
           <div className="rounded-lg bg-white/20 p-2 text-white">
             <TrendingUp className="h-5 w-5" />

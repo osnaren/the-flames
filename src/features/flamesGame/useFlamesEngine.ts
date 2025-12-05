@@ -1,7 +1,7 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { usePairingHistory } from '@/hooks/usePairingHistory';
 import { useTimers } from '@/hooks/useTimers';
-import { insertMatch } from '@lib/supabase';
+import { getUserCountry, insertMatch } from '@lib/supabase';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -64,6 +64,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
   const [commonLetters, setCommonLetters] = useState<string[]>([]);
   const [remainingLetters, setRemainingLetters] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [userCountry, setUserCountry] = useState<string | null>(null);
 
   // Stage progress tracking
   const [stageProgress, setStageProgress] = useState({
@@ -87,6 +88,19 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
 
   // Pairing history and badges
   const { addPairing, getNewlyUnlockedBadges } = usePairingHistory();
+
+  // Fetch user country on mount
+  useEffect(() => {
+    const fetchCountry = async () => {
+      try {
+        const country = await getUserCountry();
+        setUserCountry(country);
+      } catch (error) {
+        console.warn('Failed to fetch user country:', error);
+      }
+    };
+    fetchCountry();
+  }, []);
 
   // Initialize from URL params
   useEffect(() => {
@@ -264,7 +278,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
 
         // Record match in background (non-blocking)
         if (gameData.result) {
-          insertMatch(gameData.result).catch((error) => {
+          insertMatch(gameData.result, userCountry || undefined).catch((error) => {
             console.error('Failed to record match:', error);
           });
         }
@@ -305,14 +319,15 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       }
     },
     [
+      isProcessing,
       name1,
       name2,
-      shouldAnimate,
-      isProcessing,
       clearAll,
-      addTimeout,
       updateUrlParams,
       calculateGameData,
+      addTimeout,
+      shouldAnimate,
+      userCountry,
       progressToNextStage,
     ]
   );

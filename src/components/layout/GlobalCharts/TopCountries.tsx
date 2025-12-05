@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Globe, Trophy } from 'lucide-react';
 import { TopCountry } from './types';
+import { getCountryFlag, getCountryName } from './utils';
 
 interface TopCountriesProps {
   countries: TopCountry[];
@@ -48,7 +49,16 @@ export default function TopCountries({ countries }: TopCountriesProps) {
                   >
                     {index + 1}
                   </div>
-                  <span className="font-medium text-gray-900 dark:text-white">{country.country}</span>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="font-emoji text-lg leading-none"
+                      role="img"
+                      aria-label={getCountryName(country.country)}
+                    >
+                      {getCountryFlag(country.country)}
+                    </span>
+                    <span className="font-medium text-gray-900 dark:text-white">{getCountryName(country.country)}</span>
+                  </div>
                   {isTop3 && (
                     <Trophy
                       className={`h-3.5 w-3.5 ${
@@ -76,7 +86,10 @@ export default function TopCountries({ countries }: TopCountriesProps) {
                   initial={{ width: 0 }}
                   animate={{ width: `${percentage}%` }}
                   transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
-                />
+                >
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-linear-to-r from-transparent via-white/30 to-transparent" />
+                </motion.div>
               </div>
             </motion.div>
           );

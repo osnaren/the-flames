@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Clock, Globe } from 'lucide-react';
 import { RecentMatch, ResultInfo } from './types';
+import { getCountryFlag, getCountryName } from './utils';
 
 interface RecentMatchesProps {
   matches: RecentMatch[];
@@ -45,7 +46,7 @@ export default function RecentMatches({ matches, resultInfo }: RecentMatchesProp
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="group flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-700/30 dark:hover:bg-gray-700/50"
+              className={`group flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3 transition-all hover:bg-white hover:shadow-md dark:border-gray-700 dark:bg-gray-700/30 dark:hover:bg-gray-700/50 ${info.color.replace('text-', 'hover:border-')}`}
             >
               <div className="flex items-center space-x-3">
                 <div className={`flex h-10 w-10 items-center justify-center rounded-full ${info.bgColor} shadow-xs`}>
@@ -56,11 +57,20 @@ export default function RecentMatches({ matches, resultInfo }: RecentMatchesProp
                   <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
                     {match.country ? (
                       <>
-                        <Globe className="mr-1 h-3 w-3" />
-                        <span className="mr-2 font-medium">{match.country}</span>
+                        <span
+                          className="font-emoji mr-1.5 text-base leading-none"
+                          role="img"
+                          aria-label={getCountryName(match.country)}
+                        >
+                          {getCountryFlag(match.country)}
+                        </span>
+                        <span className="mr-2 font-medium">{getCountryName(match.country)}</span>
                       </>
                     ) : (
-                      <span className="mr-2 italic">Global</span>
+                      <>
+                        <Globe className="mr-1 h-3 w-3" />
+                        <span className="mr-2 italic">Global</span>
+                      </>
                     )}
                   </div>
                 </div>

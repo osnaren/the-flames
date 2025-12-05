@@ -7,11 +7,12 @@ import {
   Calendar,
   Clock,
   Heart,
+  HeartHandshake,
   Loader2,
   RefreshCcw,
   BellRing as Ring,
-  Star,
   Sword,
+  UserPlus,
   Users,
   X,
 } from 'lucide-react';
@@ -28,37 +29,43 @@ const resultInfo = {
     text: 'Friendship',
     icon: Users,
     color: 'text-blue-500',
-    bgColor: 'bg-blue-100 dark:bg-blue-900',
+    bgColor: 'bg-blue-100 dark:bg-blue-900/30',
+    barColor: 'bg-blue-500',
   },
   [FlamesResultType.LOVE]: {
     text: 'Love',
     icon: Heart,
-    color: 'text-red-500',
-    bgColor: 'bg-red-100 dark:bg-red-900',
+    color: 'text-rose-500',
+    bgColor: 'bg-rose-100 dark:bg-rose-900/30',
+    barColor: 'bg-rose-500',
   },
   [FlamesResultType.AFFECTION]: {
     text: 'Affection',
-    icon: Star,
-    color: 'text-yellow-500',
-    bgColor: 'bg-yellow-100 dark:bg-yellow-900',
+    icon: HeartHandshake,
+    color: 'text-amber-500',
+    bgColor: 'bg-amber-100 dark:bg-amber-900/30',
+    barColor: 'bg-amber-500',
   },
   [FlamesResultType.MARRIAGE]: {
     text: 'Marriage',
     icon: Ring,
     color: 'text-purple-500',
-    bgColor: 'bg-purple-100 dark:bg-purple-900',
+    bgColor: 'bg-purple-100 dark:bg-purple-900/30',
+    barColor: 'bg-purple-500',
   },
   [FlamesResultType.ENEMY]: {
     text: 'Enemy',
     icon: Sword,
-    color: 'text-orange-500',
-    bgColor: 'bg-orange-100 dark:bg-orange-900',
+    color: 'text-orange-600',
+    bgColor: 'bg-orange-100 dark:bg-orange-900/30',
+    barColor: 'bg-orange-600',
   },
   [FlamesResultType.SIBLING]: {
     text: 'Siblings',
-    icon: Users,
-    color: 'text-green-500',
-    bgColor: 'bg-green-100 dark:bg-green-900',
+    icon: UserPlus,
+    color: 'text-emerald-500',
+    bgColor: 'bg-emerald-100 dark:bg-emerald-900/30',
+    barColor: 'bg-emerald-500',
   },
 };
 
@@ -154,7 +161,7 @@ export default function ChartsContent({
           </div>
 
           {/* Stats Overview */}
-          {data && <ChartStats data={data} hottestTrend={hottestTrend} />}
+          {data && <ChartStats data={data} hottestTrend={hottestTrend} resultInfo={resultInfo} />}
         </div>
       </div>
 
@@ -188,11 +195,12 @@ export default function ChartsContent({
               </div>
 
               <div className="flex items-center justify-between gap-4 sm:justify-end">
-                {lastUpdate && (
+                {lastUpdate ? (
                   <span className="text-xs text-gray-500 dark:text-gray-400">
                     Updated {new Date(lastUpdate).toLocaleTimeString()}
                   </span>
-                )}
+                ) : null}
+
                 <motion.button
                   className="flex items-center rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-gray-900/5 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:bg-gray-800 dark:text-gray-300 dark:ring-white/10 dark:hover:bg-gray-700"
                   whileHover={{ scale: 1.02 }}

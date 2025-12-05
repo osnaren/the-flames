@@ -181,6 +181,15 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
   // Fetch stats when dependencies change
   useEffect(() => {
     fetchStats();
+
+    // Set up polling for live updates (every 30 seconds)
+    const intervalId = setInterval(() => {
+      if (!document.hidden) {
+        fetchStats();
+      }
+    }, 30000);
+
+    return () => clearInterval(intervalId);
   }, [fetchStats, timeWindow, userCountry]);
 
   return {

@@ -50,11 +50,14 @@ export default function ResultTrendBars({ results, resultInfo }: ResultTrendBars
 
               <div className="relative h-2.5 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
                 <motion.div
-                  className={`absolute inset-y-0 left-0 rounded-full ${resultData.color.replace('text-', 'bg-')}`}
+                  className={`absolute inset-y-0 left-0 rounded-full ${resultData.barColor}`}
                   initial={{ width: 0 }}
                   animate={{ width: `${percentage}%` }}
                   transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
-                />
+                >
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-linear-to-r from-transparent via-white/30 to-transparent" />
+                </motion.div>
               </div>
 
               {/* Trend indicator */}

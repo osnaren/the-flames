@@ -51,6 +51,19 @@ async function withRetry<T>(
 // Get user's country code
 export const getUserCountry = async (): Promise<string | null> => {
   try {
+    // 1. Try our local optimized API route (fastest, uses Vercel headers)
+    try {
+      const localResponse = await fetch('/api/geo');
+      if (localResponse.ok) {
+        const { country } = await localResponse.json();
+        if (country) return country;
+      }
+    } catch (e) {
+      // Ignore local API errors and fall back to Edge Function
+      console.warn('Local geo API failed, falling back to Edge Function', e);
+    }
+
+    // 2. Fallback to Supabase Edge Function (uses IP geolocation)
     const response = await withRetry(() =>
       fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-country`, {
         headers: {

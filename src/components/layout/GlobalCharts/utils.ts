@@ -49,7 +49,7 @@ export const generateMockData = (): GlobalStats => {
       FlamesResultType.ENEMY,
       FlamesResultType.SIBLING,
     ][Math.floor(Math.random() * 6)] as FlamesResult;
-    const countries = ['USA', 'India', 'UK', 'Canada', 'Australia', 'Germany', 'France', 'Japan', 'Brazil'];
+    const countries = ['US', 'IN', 'GB', 'CA', 'AU', 'DE', 'FR', 'JP', 'BR'];
     return {
       result,
       country: countries[Math.floor(Math.random() * countries.length)],
@@ -59,11 +59,11 @@ export const generateMockData = (): GlobalStats => {
 
   // Generate top countries
   const topCountries = [
-    { country: 'India', count: Math.floor(Math.random() * 5000) + 1000 },
-    { country: 'USA', count: Math.floor(Math.random() * 4000) + 800 },
-    { country: 'UK', count: Math.floor(Math.random() * 3000) + 600 },
-    { country: 'Canada', count: Math.floor(Math.random() * 2000) + 400 },
-    { country: 'Australia', count: Math.floor(Math.random() * 1000) + 200 },
+    { country: 'IN', count: Math.floor(Math.random() * 5000) + 1000 },
+    { country: 'US', count: Math.floor(Math.random() * 4000) + 800 },
+    { country: 'GB', count: Math.floor(Math.random() * 3000) + 600 },
+    { country: 'CA', count: Math.floor(Math.random() * 2000) + 400 },
+    { country: 'AU', count: Math.floor(Math.random() * 1000) + 200 },
   ];
 
   return {
@@ -115,4 +115,31 @@ export const getRandomTagline = (topResult: FlamesResult): string => {
 
   const options = taglines[topResult];
   return options[Math.floor(Math.random() * options.length)];
+};
+
+/**
+ * Converts a country code to a flag emoji
+ */
+export const getCountryFlag = (countryCode: string): string => {
+  if (!countryCode || countryCode.length !== 2) return '🌐';
+
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map((char) => 127397 + char.charCodeAt(0));
+
+  return String.fromCodePoint(...codePoints);
+};
+
+/**
+ * Gets the full country name from a country code
+ */
+export const getCountryName = (countryCode: string): string => {
+  if (!countryCode) return 'Global';
+  try {
+    const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+    return regionNames.of(countryCode) || countryCode;
+  } catch (_error) {
+    return countryCode;
+  }
 };

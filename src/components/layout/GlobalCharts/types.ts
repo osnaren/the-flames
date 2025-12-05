@@ -40,4 +40,5 @@ export interface ResultInfo {
   icon: typeof LucideIcon;
   color: string;
   bgColor: string;
+  barColor: string;
 }
