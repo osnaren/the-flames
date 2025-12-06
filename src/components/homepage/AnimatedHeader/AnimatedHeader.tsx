@@ -1,102 +1,130 @@
 import { GameStage } from '@features/flamesGame/flames.types';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 
 interface AnimatedHeaderProps {
   shouldAnimate: boolean;
   stage: GameStage;
 }
 
+// FLAMES letters without dots for cleaner design
 const flamesLetters = [
-  { char: 'F', emoji: '🤝', full: 'Friends' },
-  { char: '.', emoji: '' },
-  { char: 'L', emoji: '❤️', full: 'Love' },
-  { char: '.', emoji: '' },
-  { char: 'A', emoji: '🥰', full: 'Affection' },
-  { char: '.', emoji: '' },
-  { char: 'M', emoji: '💍', full: 'Marriage' },
-  { char: '.', emoji: '' },
-  { char: 'E', emoji: '😠', full: 'Enemies' },
-  { char: '.', emoji: '' },
-  { char: 'S', emoji: '👫🏼', full: 'Siblings' },
+  { char: 'F', emoji: '🤝', full: 'Friends', color: 'from-blue-500 to-cyan-500' },
+  { char: 'L', emoji: '❤️', full: 'Love', color: 'from-pink-500 to-rose-500' },
+  { char: 'A', emoji: '🥰', full: 'Affection', color: 'from-amber-500 to-orange-500' },
+  { char: 'M', emoji: '💍', full: 'Marriage', color: 'from-emerald-500 to-green-500' },
+  { char: 'E', emoji: '😤', full: 'Enemies', color: 'from-red-500 to-red-600' },
+  { char: 'S', emoji: '👫', full: 'Siblings', color: 'from-purple-500 to-violet-500' },
 ];
 
 const letterContainerVariants: Variants = {
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.2,
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
     },
   },
 };
 
 const letterVariants: Variants = {
-  hidden: { opacity: 0, y: 20, scale: 0.9 },
+  hidden: { opacity: 0, y: 30, scale: 0.8, rotateX: -90 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { type: 'spring', stiffness: 120, damping: 12 },
+    rotateX: 0,
+    transition: {
+      type: 'spring',
+      stiffness: 150,
+      damping: 12,
+      duration: 0.6,
+    },
   },
 };
 
-export function AnimatedHeader({ shouldAnimate, stage }: AnimatedHeaderProps) {
-  const [hoveredLetterIndex, setHoveredLetterIndex] = useState<number | null>(null);
+function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  const isCompact = stage === 'processing' || stage === 'result';
 
   return (
-    <motion.div
-      className="mb-8 text-center"
-      initial={shouldAnimate ? { opacity: 0, y: -30 } : { opacity: 1, y: 0 }}
+    <motion.header
+      className="relative mb-8 text-center md:mb-12"
+      initial={shouldAnimate ? { opacity: 0, y: -20 } : { opacity: 1, y: 0 }}
       animate={{
         opacity: 1,
-        y: stage === 'processing' ? -20 : 0,
-        scale: stage === 'processing' ? 0.9 : 1,
+        y: 0,
+        scale: isCompact ? 0.85 : 1,
       }}
-      transition={{ duration: 0.8, ease: 'easeOut' }}
+      transition={{
+        duration: 0.5,
+        ease: [0.25, 0.46, 0.45, 0.94],
+      }}
     >
       <h1 className="sr-only">FLAMES - Relationship Calculator</h1>
 
+      {/* Main FLAMES Title */}
       <motion.div
-        className="relative mb-6 flex items-center justify-center"
+        className="relative mb-4 flex items-center justify-center gap-1 md:gap-2"
         variants={letterContainerVariants}
-        initial={shouldAnimate && stage === 'input' ? 'hidden' : false}
-        animate={shouldAnimate && stage === 'input' ? 'visible' : false}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          repeatType: 'reverse',
-        }}
-        style={{
-          textShadow:
-            shouldAnimate && stage === 'input'
-              ? '0 0 20px rgba(var(--color-primary-rgb), 0.3), 0 0 40px rgba(var(--color-primary-rgb), 0.6), 0 0 20px rgba(var(--color-primary-rgb), 0.3)'
-              : 'none',
-        }}
+        initial={shouldAnimate ? 'hidden' : 'visible'}
+        animate="visible"
+        style={{ perspective: '1000px' }}
       >
         {flamesLetters.map((item, index) => (
           <motion.div
-            key={index}
+            key={item.char}
             variants={letterVariants}
-            className={`text-primary relative text-5xl font-bold tracking-tight will-change-transform md:text-6xl lg:text-7xl ${
-              item.char !== '.' ? 'cursor-pointer p-1 md:p-2' : ''
-            }`}
-            onHoverStart={() => item.char !== '.' && shouldAnimate && setHoveredLetterIndex(index)}
-            onHoverEnd={() => item.char !== '.' && shouldAnimate && setHoveredLetterIndex(null)}
-            whileHover={shouldAnimate && item.char !== '.' ? { scale: 1.1, y: -5 } : {}}
-            transition={{ type: 'spring', stiffness: 300, damping: 10 }}
+            className="group relative cursor-pointer"
+            onHoverStart={() => shouldAnimate && setHoveredIndex(index)}
+            onHoverEnd={() => shouldAnimate && setHoveredIndex(null)}
+            whileHover={
+              shouldAnimate
+                ? {
+                    scale: 1.15,
+                    y: -8,
+                    rotateY: 15,
+                    transition: { type: 'spring', stiffness: 400, damping: 15 },
+                  }
+                : {}
+            }
           >
-            {item.char}
+            {/* Letter with gradient */}
+            <span
+              className={`relative inline-block bg-linear-to-br ${item.color} bg-clip-text text-5xl font-black text-transparent drop-shadow-lg md:text-6xl lg:text-7xl xl:text-8xl`}
+              style={{
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              {item.char}
+            </span>
+
+            {/* Glow effect on hover */}
+            {shouldAnimate && hoveredIndex === index && (
+              <motion.div
+                className={`absolute inset-0 -z-10 bg-linear-to-br ${item.color} opacity-30 blur-xl`}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 0.4, scale: 1.2 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+              />
+            )}
+
+            {/* Emoji tooltip on hover */}
             <AnimatePresence>
-              {shouldAnimate && hoveredLetterIndex === index && item.emoji && (
+              {shouldAnimate && hoveredIndex === index && (
                 <motion.div
-                  className="absolute -top-10 left-1/2 -translate-x-1/2 text-3xl md:text-4xl"
-                  initial={{ opacity: 0, y: 10, scale: 0.5 }}
+                  className="pointer-events-none absolute -top-12 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center md:-top-16"
+                  initial={{ opacity: 0, y: 8, scale: 0.5 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -10, scale: 0.5, transition: { duration: 0.2 } }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.5, transition: { duration: 0.15 } }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 20 }}
                 >
-                  {item.emoji}
+                  <span className="text-3xl md:text-4xl">{item.emoji}</span>
+                  <span className="mt-1 rounded-full bg-black/70 px-2 py-0.5 text-xs font-medium text-white backdrop-blur-sm">
+                    {item.full}
+                  </span>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -104,55 +132,67 @@ export function AnimatedHeader({ shouldAnimate, stage }: AnimatedHeaderProps) {
         ))}
       </motion.div>
 
+      {/* Subtitle */}
       <motion.p
-        className="text-on-surface-variant text-xl font-medium md:text-2xl"
-        animate={
-          shouldAnimate && stage === 'input'
-            ? {
-                opacity: [0.7, 1, 0.7],
-                scale: [1, 1.02, 1],
-              }
-            : { opacity: 1 }
-        }
-        transition={{
-          duration: 5,
-          repeat: Infinity,
-          repeatType: 'reverse',
-        }}
+        className="text-on-surface-variant mx-auto max-w-md text-lg font-medium md:text-xl lg:text-2xl"
+        initial={shouldAnimate ? { opacity: 0, y: 10 } : { opacity: 1 }}
+        animate={{ opacity: isCompact ? 0.7 : 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
       >
-        Discover your relationship destiny ✨
+        <span className="inline-block">Discover your relationship destiny</span>
+        <motion.span
+          className="ml-2 inline-block"
+          animate={
+            shouldAnimate && !isCompact
+              ? {
+                  rotate: [0, 15, -15, 0],
+                  scale: [1, 1.2, 1.2, 1],
+                }
+              : {}
+          }
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            repeatDelay: 3,
+            ease: 'easeInOut',
+          }}
+        >
+          ✨
+        </motion.span>
       </motion.p>
 
-      {shouldAnimate && stage === 'input' && (
-        <>
-          {Array.from({ length: 3 }).map((_, i) => (
+      {/* Floating decorative elements */}
+      {shouldAnimate && !isCompact && (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          {[...Array(5)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute text-3xl"
+              className="absolute text-2xl opacity-60"
               style={{
-                left: `${30 + i * 20}%`,
-                top: `${10 + i * 5}%`,
+                left: `${15 + i * 18}%`,
+                top: `${20 + (i % 3) * 25}%`,
               }}
               animate={{
-                y: [-10, -30, -10],
-                opacity: [0, 1, 0],
-                scale: [0.8, 1.2, 0.8],
-                rotate: [0, 180, 360],
+                y: [0, -20, 0],
+                opacity: [0.3, 0.7, 0.3],
+                scale: [0.9, 1.1, 0.9],
               }}
               transition={{
-                duration: 3,
+                duration: 3 + i * 0.5,
                 repeat: Infinity,
-                repeatDelay: 2 + i,
-                delay: i * 0.5,
+                delay: i * 0.4,
+                ease: 'easeInOut',
               }}
             >
-              ✨
+              {['💖', '💕', '✨', '💫', '💝'][i]}
             </motion.div>
           ))}
-        </>
+        </div>
       )}
-    </motion.div>
+    </motion.header>
   );
 }
+
+export const AnimatedHeader = memo(AnimatedHeaderComponent);
 
 export default AnimatedHeader;

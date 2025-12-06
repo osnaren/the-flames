@@ -1,7 +1,8 @@
 import { validateFlamesInput, validateName } from '@/utils/validation';
 import { GameStage } from '@features/flamesGame/flames.types';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
+import { Heart, Sparkles } from 'lucide-react';
+import { memo, useCallback, useMemo, useState } from 'react';
 
 interface InputFormProps {
   name1: string;
@@ -12,7 +13,7 @@ interface InputFormProps {
   shouldAnimate: boolean;
   stage: GameStage;
   isCollapsing?: boolean;
-  isProcessing?: boolean; // Single source of truth for form processing state
+  isProcessing?: boolean;
 }
 
 interface FormErrors {
@@ -21,77 +22,26 @@ interface FormErrors {
   general?: string[];
 }
 
-export function InputForm({
+function InputFormComponent({
   name1,
   name2,
   setName1,
   setName2,
   onSubmit,
   shouldAnimate,
-  isCollapsing = false,
   isProcessing = false,
 }: InputFormProps) {
-  // Component state
-  const [particles, setParticles] = useState<
-    Array<{ id: number; x: number; y: number; targetX: number; targetY: number }>
-  >([]);
-  const [collapsingParticles, setCollapsingParticles] = useState<
-    Array<{
-      id: number;
-      left: number;
-      top: number;
-      targetX: number;
-      targetY: number;
-      delay: number;
-    }>
-  >([]);
-  const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
-
-  // Auto-clear errors when processing completes
-  useEffect(() => {
-    if (!isProcessing) {
-      setTimeout(() => {
-        setErrors((prev) => (Object.keys(prev).length > 0 ? {} : prev));
-      }, 0);
-    }
-  }, [isProcessing]);
-
-  // Generate collapsing particles when needed
-  useEffect(() => {
-    if (isCollapsing && shouldAnimate) {
-      setTimeout(() => {
-        setCollapsingParticles((prev) => {
-          if (prev.length === 0) {
-            return Array.from({ length: 20 }).map((_, i) => ({
-              id: i,
-              left: Math.random() * 100,
-              top: Math.random() * 100,
-              targetX: (Math.random() - 0.5) * 300,
-              targetY: (Math.random() - 0.5) * 300,
-              delay: Math.random() * 0.3,
-            }));
-          }
-          return prev;
-        });
-      }, 0);
-    } else if (!isCollapsing) {
-      setTimeout(() => {
-        setCollapsingParticles((prev) => (prev.length > 0 ? [] : prev));
-      }, 0);
-    }
-  }, [isCollapsing, shouldAnimate]);
+  const [focusedField, setFocusedField] = useState<'name1' | 'name2' | null>(null);
 
   // Individual field validation
   const validateField = useCallback((fieldName: 'name1' | 'name2', value: string) => {
-    // Skip validation for empty fields unless it's a form submission
     if (!value.trim()) {
       setErrors((prev) => ({ ...prev, [fieldName]: undefined }));
       return;
     }
 
     const result = validateName(value);
-
     if (!result.isValid) {
       setErrors((prev) => ({ ...prev, [fieldName]: result.errors }));
     } else {
@@ -99,92 +49,48 @@ export function InputForm({
     }
   }, []);
 
-  // Cross-field validation (e.g., names being the same)
+  // Cross-field validation
   const validateCrossFields = useCallback(() => {
-    // Only validate if both fields have values
     if (!name1.trim() || !name2.trim()) {
-      // Clear general errors if either field is empty
       setErrors((prev) => ({ ...prev, general: undefined }));
       return;
     }
 
     const result = validateFlamesInput(name1, name2);
-
-    if (result.errors.general && result.errors.general.length > 0) {
+    if (result.errors.general?.length) {
       setErrors((prev) => ({ ...prev, general: result.errors.general }));
     } else {
       setErrors((prev) => ({ ...prev, general: undefined }));
     }
   }, [name1, name2]);
 
-  // Input change handlers
+  // Input handlers
   const handleName1Change = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setName1(value);
-
-      // Clear errors when user starts typing
-      setErrors((prev) => ({
-        ...prev,
-        name1: undefined,
-        general: undefined,
-      }));
+      setName1(e.target.value);
+      setErrors((prev) => ({ ...prev, name1: undefined, general: undefined }));
     },
     [setName1]
   );
 
   const handleName2Change = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setName2(value);
-
-      // Clear errors when user starts typing
-      setErrors((prev) => ({
-        ...prev,
-        name2: undefined,
-        general: undefined,
-      }));
+      setName2(e.target.value);
+      setErrors((prev) => ({ ...prev, name2: undefined, general: undefined }));
     },
     [setName2]
   );
 
-  // Blur validation handlers
-  const handleName1Blur = useCallback(
-    (e: React.FocusEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-
-      try {
-        // Validate this field
-        validateField('name1', value);
-
-        // Run cross-validation if both fields have values
-        if (value.trim() && name2.trim()) {
-          setTimeout(() => validateCrossFields(), 100);
-        }
-      } catch (error) {
-        console.error('Error during name1 blur validation:', error);
+  const handleBlur = useCallback(
+    (field: 'name1' | 'name2') => {
+      setFocusedField(null);
+      const value = field === 'name1' ? name1 : name2;
+      validateField(field, value);
+      if (name1.trim() && name2.trim()) {
+        setTimeout(() => validateCrossFields(), 50);
       }
     },
-    [validateField, validateCrossFields, name2]
-  );
-
-  const handleName2Blur = useCallback(
-    (e: React.FocusEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-
-      try {
-        // Validate this field
-        validateField('name2', value);
-
-        // Run cross-validation if both fields have values
-        if (value.trim() && name1.trim()) {
-          setTimeout(() => validateCrossFields(), 100);
-        }
-      } catch (error) {
-        console.error('Error during name2 blur validation:', error);
-      }
-    },
-    [validateField, validateCrossFields, name1]
+    [name1, name2, validateField, validateCrossFields]
   );
 
   // Form validation state
@@ -193,20 +99,16 @@ export function InputForm({
     return name1.trim() && name2.trim() && !hasErrors;
   }, [name1, name2, errors]);
 
-  // Form submission handler
+  // Form submission
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-
-      // Prevent submission if already processing
       if (isProcessing) return;
 
-      // Perform complete validation before submission
       const name1Result = validateName(name1);
       const name2Result = validateName(name2);
       const combinedResult = validateFlamesInput(name1, name2);
 
-      // Collect all validation errors
       const validationErrors: FormErrors = {
         name1: name1Result.isValid ? undefined : name1Result.errors,
         name2: name2Result.isValid ? undefined : name2Result.errors,
@@ -215,199 +117,173 @@ export function InputForm({
 
       setErrors(validationErrors);
 
-      // Only proceed if all validation passes
-      const isValid = name1Result.isValid && name2Result.isValid && combinedResult.isValid;
-
-      if (isValid) {
-        // Create particle effect for successful submission
-        if (shouldAnimate) {
-          const newParticles = Array.from({ length: 12 }, (_, i) => ({
-            id: i,
-            x: Math.random() * 100,
-            y: Math.random() * 100,
-            targetX: (Math.random() - 0.5) * 200,
-            targetY: (Math.random() - 0.5) * 200,
-          }));
-          setParticles(newParticles);
-          setTimeout(() => setParticles([]), 1000);
-        }
-
-        // Submit the form
+      if (name1Result.isValid && name2Result.isValid && combinedResult.isValid) {
         onSubmit(e);
       }
     },
-    [onSubmit, isProcessing, shouldAnimate, name1, name2]
+    [onSubmit, isProcessing, name1, name2]
   );
-
-  // Animation constants
-  const initialBoxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.25)';
-  const submittingBoxShadowKeyframes = [
-    initialBoxShadow,
-    '0 0 50px rgba(var(--color-primary-rgb), 0.3)',
-    initialBoxShadow,
-  ];
 
   return (
     <motion.div
-      key="input-form-content"
-      className="relative"
-      initial={shouldAnimate ? { opacity: 0, y: 20, scale: 0.95 } : { opacity: 1, y: 0, scale: 1 }}
-      animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0, filter: 'blur(0px)' }}
-      transition={{
-        duration: shouldAnimate ? 0.8 : 0,
-        ease: 'easeInOut',
-        type: 'spring',
-        stiffness: 100,
-        damping: 20,
+      className="relative mx-auto w-full max-w-lg"
+      initial={shouldAnimate ? { opacity: 0, y: 30, scale: 0.95 } : false}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ 
+        opacity: 0, 
+        scale: 0.9, 
+        y: -20,
+        filter: 'blur(8px)',
+        transition: { duration: 0.4, ease: 'easeInOut' }
       }}
-      style={{ transformStyle: 'preserve-3d' }}
+      transition={{
+        duration: 0.6,
+        ease: [0.25, 0.46, 0.45, 0.94],
+      }}
     >
-      {/* Particle Effects */}
-      <AnimatePresence>
-        {particles.map((particle) => (
-          <motion.div
-            key={particle.id}
-            className="bg-primary pointer-events-none absolute h-2 w-2 rounded-full"
-            style={{
-              left: `${particle.x}%`,
-              top: `${particle.y}%`,
-              boxShadow: '0 0 8px rgba(var(--color-primary-rgb), 0.8)',
-            }}
-            initial={{ opacity: 1, scale: 1 }}
-            animate={{
-              opacity: 0,
-              scale: 0,
-              x: particle.targetX,
-              y: particle.targetY,
-            }}
-            exit={{ opacity: 0 }}
-            transition={{
-              duration: 1,
-              ease: 'easeOut',
-            }}
-          />
-        ))}
-      </AnimatePresence>
-
-      {/* Main Form Container */}
+      {/* Glass Card */}
       <motion.div
-        className="bg-surface/90 border-outline/20 rounded-2xl border p-8 shadow-2xl backdrop-blur-xl will-change-transform"
-        animate={{
-          boxShadow: isProcessing ? submittingBoxShadowKeyframes : initialBoxShadow,
-        }}
-        transition={{
-          duration: isButtonHovered ? 1.5 : isProcessing ? 0.5 : 0.3,
-          repeat: isButtonHovered || isProcessing ? Infinity : isProcessing ? 2 : 0,
-          repeatType: isButtonHovered ? 'mirror' : 'loop',
-          ease: 'easeInOut',
+        className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/80 p-6 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-black/40 md:p-8"
+        whileHover={shouldAnimate && !isProcessing ? { 
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255,255,255,0.1)',
+        } : {}}
+        style={{ 
+          transformStyle: 'preserve-3d',
         }}
       >
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Form Header */}
-          <motion.div
-            className="mb-8 text-center"
-            animate={isProcessing ? { scale: [1, 1.05, 1] } : {}}
-            transition={{ duration: 0.3 }}
-          >
-            <h2 className="text-on-surface mb-2 text-2xl font-bold">Enter Two Names</h2>
-            <p className="text-on-surface-variant">Discover your relationship destiny</p>
-          </motion.div>
+        {/* Decorative gradient blob */}
+        <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-linear-to-br from-pink-500/20 to-purple-500/20 blur-3xl" />
+        <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-linear-to-br from-blue-500/20 to-cyan-500/20 blur-3xl" />
+
+        <form onSubmit={handleSubmit} className="relative space-y-6">
+          {/* Header */}
+          <div className="mb-6 text-center">
+            <motion.div 
+              className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-pink-500 to-rose-500 shadow-lg"
+              animate={shouldAnimate ? { 
+                scale: [1, 1.05, 1],
+                rotate: [0, 5, -5, 0]
+              } : {}}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <Heart className="h-6 w-6 text-white" fill="currentColor" />
+            </motion.div>
+            <h2 className="text-on-surface text-xl font-bold md:text-2xl">Enter Two Names</h2>
+            <p className="text-on-surface-variant mt-1 text-sm">Find out what destiny has in store</p>
+          </div>
 
           {/* Input Fields */}
           <div className="space-y-4">
-            {/* Name 1 Input */}
-            <motion.div
-              animate={
-                isProcessing
-                  ? {
-                      x: [-2, 2, -2, 2, 0],
-                      scale: [1, 0.98, 1],
-                    }
-                  : {}
-              }
-              transition={{ duration: 0.4 }}
-            >
-              <label htmlFor="name1" className="text-on-surface mb-2 block text-sm font-medium">
+            {/* Name 1 */}
+            <div className="group">
+              <label htmlFor="name1" className="text-on-surface mb-2 block text-sm font-semibold">
                 First Name
               </label>
-              <input
-                id="name1"
-                type="text"
-                value={name1}
-                onChange={handleName1Change}
-                onBlur={handleName1Blur}
-                className={`bg-surface-container border-outline/30 text-on-surface placeholder-on-surface-variant/60 w-full rounded-xl border px-4 py-3 transition-all duration-200 focus:outline-none ${
-                  errors.name1?.length
-                    ? 'border-error focus:border-error focus:ring-error/20'
-                    : 'focus:border-primary focus:ring-primary/20'
-                } ${errors.name1?.length ? 'ring-error/20 ring-2' : 'focus:ring-2'}`}
-                placeholder="Who are you? 💁"
-                required
-                disabled={isProcessing}
-                autoComplete="given-name"
-              />
-              {errors.name1 && errors.name1.length > 0 && (
-                <motion.div
-                  className="text-error mt-1 text-sm"
+              <div className="relative">
+                <input
+                  id="name1"
+                  type="text"
+                  value={name1}
+                  onChange={handleName1Change}
+                  onFocus={() => setFocusedField('name1')}
+                  onBlur={() => handleBlur('name1')}
+                  className={`w-full rounded-xl border-2 bg-white/50 px-4 py-3.5 text-base font-medium transition-all duration-200 placeholder:text-gray-400 focus:outline-none dark:bg-white/5 ${
+                    errors.name1?.length
+                      ? 'border-red-400 focus:border-red-500 focus:ring-4 focus:ring-red-500/20'
+                      : focusedField === 'name1'
+                        ? 'border-primary focus:ring-primary/20 focus:ring-4'
+                        : 'border-gray-200 hover:border-gray-300 dark:border-gray-700'
+                  }`}
+                  placeholder="Your name..."
+                  required
+                  disabled={isProcessing}
+                  autoComplete="off"
+                />
+                {/* Focus glow effect */}
+                {focusedField === 'name1' && shouldAnimate && (
+                  <motion.div
+                    className="absolute inset-0 -z-10 rounded-xl bg-linear-to-r from-pink-500/20 to-purple-500/20 blur-md"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  />
+                )}
+              </div>
+              {errors.name1?.[0] && (
+                <motion.p
+                  className="mt-1.5 text-sm text-red-500"
                   initial={{ opacity: 0, y: -5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2 }}
                 >
                   {errors.name1[0]}
-                </motion.div>
+                </motion.p>
               )}
-            </motion.div>
+            </div>
 
-            {/* Name 2 Input */}
-            <motion.div
-              animate={
-                isProcessing
-                  ? {
-                      x: [2, -2, 2, -2, 0],
-                      scale: [1, 0.98, 1],
-                    }
-                  : {}
-              }
-              transition={{ duration: 0.4, delay: 0.1 }}
-            >
-              <label htmlFor="name2" className="text-on-surface mb-2 block text-sm font-medium">
+            {/* Heart divider */}
+            <div className="flex items-center justify-center py-1">
+              <div className="h-px flex-1 bg-linear-to-r from-transparent via-gray-300 to-transparent dark:via-gray-600" />
+              <motion.span 
+                className="mx-4 text-2xl"
+                animate={shouldAnimate && name1 && name2 ? { scale: [1, 1.2, 1] } : {}}
+                transition={{ duration: 1, repeat: Infinity }}
+              >
+                💕
+              </motion.span>
+              <div className="h-px flex-1 bg-linear-to-r from-transparent via-gray-300 to-transparent dark:via-gray-600" />
+            </div>
+
+            {/* Name 2 */}
+            <div className="group">
+              <label htmlFor="name2" className="text-on-surface mb-2 block text-sm font-semibold">
                 Second Name
               </label>
-              <input
-                id="name2"
-                type="text"
-                value={name2}
-                onChange={handleName2Change}
-                onBlur={handleName2Blur}
-                className={`bg-surface-container border-outline/30 text-on-surface placeholder-on-surface-variant/60 w-full rounded-xl border px-4 py-3 transition-all duration-200 focus:outline-none ${
-                  errors.name2?.length
-                    ? 'border-error focus:border-error focus:ring-error/20'
-                    : 'focus:border-primary focus:ring-primary/20'
-                } ${errors.name2?.length ? 'ring-error/20 ring-2' : 'focus:ring-2'}`}
-                placeholder="Their name? 💘"
-                required
-                disabled={isProcessing}
-                autoComplete="family-name"
-              />
-              {errors.name2 && errors.name2.length > 0 && (
-                <motion.div
-                  className="text-error mt-1 text-sm"
+              <div className="relative">
+                <input
+                  id="name2"
+                  type="text"
+                  value={name2}
+                  onChange={handleName2Change}
+                  onFocus={() => setFocusedField('name2')}
+                  onBlur={() => handleBlur('name2')}
+                  className={`w-full rounded-xl border-2 bg-white/50 px-4 py-3.5 text-base font-medium transition-all duration-200 placeholder:text-gray-400 focus:outline-none dark:bg-white/5 ${
+                    errors.name2?.length
+                      ? 'border-red-400 focus:border-red-500 focus:ring-4 focus:ring-red-500/20'
+                      : focusedField === 'name2'
+                        ? 'border-primary focus:ring-primary/20 focus:ring-4'
+                        : 'border-gray-200 hover:border-gray-300 dark:border-gray-700'
+                  }`}
+                  placeholder="Their name..."
+                  required
+                  disabled={isProcessing}
+                  autoComplete="off"
+                />
+                {focusedField === 'name2' && shouldAnimate && (
+                  <motion.div
+                    className="absolute inset-0 -z-10 rounded-xl bg-linear-to-r from-blue-500/20 to-cyan-500/20 blur-md"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  />
+                )}
+              </div>
+              {errors.name2?.[0] && (
+                <motion.p
+                  className="mt-1.5 text-sm text-red-500"
                   initial={{ opacity: 0, y: -5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2 }}
                 >
                   {errors.name2[0]}
-                </motion.div>
+                </motion.p>
               )}
-            </motion.div>
+            </div>
 
-            {/* General Errors (e.g., same names) */}
-            {errors.general && errors.general.length > 0 && (
+            {/* General Errors */}
+            {errors.general?.[0] && (
               <motion.div
-                className="text-error bg-error/10 rounded-lg p-3"
+                className="rounded-xl bg-red-50 p-3 text-center text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
               >
                 {errors.general[0]}
               </motion.div>
@@ -418,81 +294,52 @@ export function InputForm({
           <motion.button
             type="submit"
             disabled={!isFormValid || isProcessing}
-            className="bg-primary hover:bg-primary/90 disabled:bg-outline/20 disabled:text-on-surface-variant text-on-primary ring-primary/50 w-full cursor-pointer rounded-xl px-6 py-4 font-semibold shadow-lg transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:shadow-none"
-            whileHover={shouldAnimate && !isProcessing && isFormValid ? { scale: 1.02, y: -2 } : {}}
-            whileTap={shouldAnimate && !isProcessing && isFormValid ? { scale: 0.98 } : {}}
-            onHoverStart={() => {
-              if (shouldAnimate && !isProcessing && isFormValid) setIsButtonHovered(true);
-            }}
-            onHoverEnd={() => setIsButtonHovered(false)}
-            animate={
-              isProcessing
-                ? {
-                    scale: [1, 1.05, 1],
-                    boxShadow: [
-                      '0 10px 25px -3px rgba(0, 0, 0, 0.1)',
-                      '0 0 30px rgba(var(--color-primary-rgb), 0.4)',
-                      '0 10px 25px -3px rgba(0, 0, 0, 0.1)',
-                    ],
-                  }
-                : {}
-            }
-            transition={{ duration: 0.3, repeat: isProcessing ? 3 : 0 }}
+            className="group relative w-full overflow-hidden rounded-xl bg-linear-to-r from-pink-500 via-rose-500 to-red-500 px-6 py-4 font-bold text-white shadow-lg transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale"
+            whileHover={shouldAnimate && isFormValid && !isProcessing ? { 
+              scale: 1.02, 
+              boxShadow: '0 20px 40px -10px rgba(236, 72, 153, 0.5)' 
+            } : {}}
+            whileTap={shouldAnimate && isFormValid && !isProcessing ? { scale: 0.98 } : {}}
           >
-            {isProcessing ? (
-              <motion.div
-                className="flex items-center justify-center space-x-2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                <motion.div
-                  className="border-on-primary/30 border-t-on-primary h-5 w-5 rounded-full border-2"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                />
-                <span>Calculating...</span>
-              </motion.div>
-            ) : (
-              <span>Calculate FLAMES 🔥</span>
-            )}
+            {/* Shine effect */}
+            <motion.div
+              className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/30 to-transparent"
+              animate={shouldAnimate && isFormValid && !isProcessing ? { 
+                translateX: ['-100%', '100%'] 
+              } : {}}
+              transition={{ 
+                duration: 2, 
+                repeat: Infinity, 
+                repeatDelay: 3,
+                ease: 'easeInOut'
+              }}
+            />
+            
+            <span className="relative flex items-center justify-center gap-2">
+              {isProcessing ? (
+                <>
+                  <motion.div
+                    className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
+                  />
+                  <span>Finding destiny...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-5 w-5" />
+                  <span>Reveal Your FLAMES</span>
+                  <span className="text-lg">🔥</span>
+                </>
+              )}
+            </span>
           </motion.button>
         </form>
       </motion.div>
-
-      {/* Collapse Animation Effect */}
-      {isCollapsing && shouldAnimate && (
-        <motion.div
-          className="pointer-events-none absolute inset-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          {collapsingParticles.map((particle) => (
-            <motion.div
-              key={particle.id}
-              className="bg-primary/60 absolute h-1 w-1 rounded-full"
-              style={{
-                left: `${particle.left}%`,
-                top: `${particle.top}%`,
-              }}
-              initial={{ opacity: 1, scale: 1 }}
-              animate={{
-                opacity: 0,
-                scale: 0,
-                x: particle.targetX,
-                y: particle.targetY,
-              }}
-              transition={{
-                duration: 0.8,
-                delay: particle.delay,
-                ease: 'easeOut',
-              }}
-            />
-          ))}
-        </motion.div>
-      )}
     </motion.div>
   );
 }
+
+export const InputForm = memo(InputFormComponent);
 
 export default InputForm;

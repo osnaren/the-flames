@@ -1,10 +1,10 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, Heart, RotateCcw, Share2, Sparkles } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { BarChart3, Heart, RotateCcw, Share2, Sparkles } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import ConfettiEffect from '@/components/ui/ConfettiEffect/ConfettiEffect';
 import ResultGlow from '@/components/ui/ResultGlow/ResultGlow';
-import { FlamesResult, GameStage } from '@features/flamesGame/flames.types';
+import { FlamesResult, GameStage, NonNullFlamesResult } from '@features/flamesGame/flames.types';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { useStaggeredAnimation } from '@hooks/useStaggeredAnimation';
 
@@ -18,49 +18,47 @@ interface ResultCardProps {
   onNavigateToStats?: () => void;
 }
 
-// Animation stages configuration
+// Animation stages configuration - faster timing for snappier feel
 const ANIMATION_STAGES = ['entry', 'icon', 'title', 'description', 'quote', 'actions'];
-const ANIMATION_DELAYS = [300, 600, 900, 1200, 1500, 1800];
+const ANIMATION_DELAYS = [100, 250, 400, 550, 700, 850]; // ~40% faster
 
-// Utility functions for result data
-const getFlamesDescription = (result: FlamesResult, name1?: string, name2?: string): string => {
-  const names = name1 && name2 ? `<strong>${name1}</strong> and <strong>${name2}</strong>` : 'You two';
-
-  switch (result) {
-    case 'F':
-      return `${names} are destined to be great friends! Your connection is built on trust, understanding, and mutual respect.`;
-    case 'L':
-      return `${names} share a deep romantic love! Your hearts beat as one, creating a beautiful love story.`;
-    case 'A':
-      return `${names} have a warm affection for each other! There's a special fondness and care in your relationship.`;
-    case 'M':
-      return `${names} are meant for marriage! Your souls are perfectly aligned for a lifetime of happiness together.`;
-    case 'E':
-      return `${names} have some conflicts to resolve. But remember, even enemies can become friends with understanding.`;
-    case 'S':
-      return `${names} share a sibling-like bond! Your relationship is filled with care, protection, and family-like love.`;
-    default:
-      return `${names} have a special connection that's unique and wonderful in its own way.`;
-  }
+// Result configuration for colors and labels
+const RESULT_CONFIG: Record<NonNullFlamesResult, { label: string; gradient: string; icon: 'heart' | 'sparkles' }> = {
+  F: { label: 'FRIENDSHIP', gradient: 'from-blue-500 to-indigo-600', icon: 'sparkles' },
+  L: { label: 'LOVE', gradient: 'from-pink-500 to-rose-500', icon: 'heart' },
+  A: { label: 'AFFECTION', gradient: 'from-amber-500 to-orange-500', icon: 'heart' },
+  M: { label: 'MARRIAGE', gradient: 'from-emerald-500 to-green-600', icon: 'heart' },
+  E: { label: 'ENEMY', gradient: 'from-red-500 to-red-600', icon: 'sparkles' },
+  S: { label: 'SIBLING', gradient: 'from-purple-500 to-violet-600', icon: 'sparkles' },
 };
 
-const getFlamesQuote = (result: FlamesResult): string => {
-  switch (result) {
-    case 'F':
-      return 'Friendship is the only cement that will ever hold the world together.';
-    case 'L':
-      return 'Love is not about how many days, months, or years you have been together. It is about how much you love each other every single day.';
-    case 'A':
-      return 'Affection is responsible for nine-tenths of whatever solid and durable happiness there is in our lives.';
-    case 'M':
-      return 'A successful marriage requires falling in love many times, always with the same person.';
-    case 'E':
-      return 'The best way to destroy an enemy is to make him a friend.';
-    case 'S':
-      return 'Siblings are the people we practice on, the people who teach us about fairness and cooperation.';
-    default:
-      return 'Every relationship teaches us something valuable about life and love.';
-  }
+// Get description based on result
+const getFlamesDescription = (result: NonNullFlamesResult, name1?: string, name2?: string): string => {
+  const names = name1 && name2 ? `**${name1}** and **${name2}**` : 'You two';
+
+  const descriptions: Record<NonNullFlamesResult, string> = {
+    F: `${names} are destined to be great friends! Your connection is built on trust and mutual respect.`,
+    L: `${names} share a deep romantic love! Your hearts beat as one in a beautiful love story.`,
+    A: `${names} have a warm affection! There's a special fondness and care in your relationship.`,
+    M: `${names} are meant for marriage! Your souls are perfectly aligned for a lifetime together.`,
+    E: `${names} have some conflicts to resolve. But enemies can become friends with understanding.`,
+    S: `${names} share a sibling-like bond! Your relationship is filled with care and family-like love.`,
+  };
+  
+  return descriptions[result];
+};
+
+const getFlamesQuote = (result: NonNullFlamesResult): string => {
+  const quotes: Record<NonNullFlamesResult, string> = {
+    F: 'Friendship is the only cement that will ever hold the world together.',
+    L: 'Love is about how much you love each other every single day.',
+    A: 'Affection is responsible for nine-tenths of our solid happiness.',
+    M: 'A successful marriage requires falling in love many times, always with the same person.',
+    E: 'The best way to destroy an enemy is to make them a friend.',
+    S: 'Siblings teach us about fairness, cooperation, and unconditional love.',
+  };
+  
+  return quotes[result];
 };
 
 /**
@@ -87,42 +85,39 @@ export function ResultCard({
   // Track the visible state for the container
   const [isVisible, setIsVisible] = useState(false);
 
+  // Early return if not in result stage or no result
+  const isValidResult = stage === 'result' && result !== null;
+
+  // Cast to strict type after null check for type safety
+  const strictResult = result as NonNullFlamesResult;
+
+  // Memoize result configuration (use F as fallback, but we only render if result is valid)
+  const config = useMemo(
+    () => (result ? RESULT_CONFIG[strictResult] : RESULT_CONFIG.F),
+    [result, strictResult]
+  );
+  const description = useMemo(
+    () => (result ? getFlamesDescription(strictResult, name1, name2) : ''),
+    [result, strictResult, name1, name2]
+  );
+  const quote = useMemo(() => (result ? getFlamesQuote(strictResult) : ''), [result, strictResult]);
+  const isResultPositive = result === 'L' || result === 'A' || result === 'M';
+
   // Start animation when component becomes visible
   useEffect(() => {
-    const shouldShow = stage === 'result' && !!result;
-
-    if (shouldShow && !hasStarted) {
-      setTimeout(() => setIsVisible(true), 0);
+    if (isValidResult && !hasStarted) {
+      setIsVisible(true);
       startAnimation();
-    } else if (!shouldShow) {
-      setTimeout(() => setIsVisible(false), 0);
+    } else if (!isValidResult) {
+      setIsVisible(false);
       resetAnimation();
     }
-  }, [stage, result, hasStarted, startAnimation, resetAnimation]);
+  }, [isValidResult, hasStarted, startAnimation, resetAnimation]);
 
-  const ResultIcon = result === 'L' || result === 'M' ? Heart : Sparkles;
-
-  const getResultColor = useCallback(() => {
-    switch (result) {
-      case 'L':
-        return 'from-pink-500 to-rose-500';
-      case 'A':
-        return 'from-amber-500 to-orange-500';
-      case 'M':
-        return 'from-emerald-500 to-green-500';
-      case 'E':
-        return 'from-red-500 to-red-600';
-      case 'F':
-        return 'from-blue-500 to-indigo-500';
-      case 'S':
-        return 'from-purple-500 to-violet-500';
-      default:
-        return 'from-gray-500 to-gray-600';
-    }
-  }, [result]);
+  const ResultIcon = config.icon === 'heart' ? Heart : Sparkles;
 
   const handleShare = useCallback(() => {
-    const text = name1 && name2 ? `${name1} + ${name2} = ${result}! 💕` : `My FLAMES result is ${result}! 💕`;
+    const text = name1 && name2 ? `${name1} + ${name2} = ${config.label}! 💕` : `My FLAMES result is ${config.label}! 💕`;
 
     if (navigator.share) {
       navigator
@@ -132,57 +127,50 @@ export function ResultCard({
           url: window.location.href,
         })
         .catch(() => {
-          // Fallback for browsers that don't support Web Share API
           navigator.clipboard?.writeText(`${text} ${window.location.href}`);
         });
     } else {
-      // Fallback for browsers that don't support Web Share API
       navigator.clipboard?.writeText(`${text} ${window.location.href}`);
     }
-  }, [result, name1, name2]);
+  }, [config.label, name1, name2]);
 
-  // Early return if not in result stage or no result
-  if (stage !== 'result' || !result) {
+  // Don't render if no valid result
+  if (!isValidResult) {
     return null;
   }
-
-  const isResultPositive = result === 'L' || result === 'A' || result === 'M';
-  const description = getFlamesDescription(result, name1, name2);
-  const quote = getFlamesQuote(result);
-  const resultColor = getResultColor();
 
   return (
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ opacity: 0, y: 50, scale: 0.9 }}
+          initial={{ opacity: 0, y: 40, scale: 0.95 }}
           animate={{
             opacity: stageCompleted.entry ? 1 : 0,
-            y: stageCompleted.entry ? 0 : 50,
-            scale: stageCompleted.entry ? 1 : 0.9,
+            y: stageCompleted.entry ? 0 : 40,
+            scale: stageCompleted.entry ? 1 : 0.95,
           }}
-          exit={{ opacity: 0, y: -50, scale: 0.9 }}
+          exit={{ opacity: 0, y: -30, scale: 0.95 }}
           transition={{
             type: 'spring',
-            stiffness: 300,
+            stiffness: 400,
             damping: 30,
-            duration: shouldAnimate ? 0.6 : 0,
+            duration: shouldAnimate ? 0.4 : 0,
           }}
-          className="relative mx-auto mt-8 w-full max-w-md will-change-transform"
+          className="relative mx-auto mt-6 w-full max-w-md will-change-transform"
         >
-          {/* Result Glow Effect - with correct props */}
+          {/* Result Glow Effect */}
           <ResultGlow result={result} isVisible={stageCompleted.entry} />
 
-          {/* Confetti Effect for positive results - with correct props */}
+          {/* Confetti Effect for positive results */}
           {isResultPositive && stageCompleted.entry && <ConfettiEffect result={result} isActive={true} />}
 
           {/* Main Card */}
           <div className="relative overflow-hidden rounded-2xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-black/20">
             {/* Animated gradient background */}
-            <div className={`absolute inset-0 bg-linear-to-br ${resultColor} opacity-5`} />
+            <div className={`absolute inset-0 bg-linear-to-br ${config.gradient} opacity-5`} />
 
             {/* Content */}
-            <div className="relative p-8 text-center">
+            <div className="relative p-6 text-center sm:p-8">
               {/* Icon */}
               <motion.div
                 initial={{ scale: 0, rotate: -180 }}
@@ -192,128 +180,114 @@ export function ResultCard({
                 }}
                 transition={{
                   type: 'spring',
-                  stiffness: 200,
-                  damping: 15,
-                  duration: shouldAnimate ? 0.8 : 0,
+                  stiffness: 300,
+                  damping: 20,
+                  duration: shouldAnimate ? 0.5 : 0,
                 }}
-                className="mx-auto mb-6 will-change-transform"
+                className="mx-auto mb-5 will-change-transform"
               >
-                <div className={`relative h-20 w-20 rounded-full bg-linear-to-br ${resultColor} p-4 shadow-lg`}>
-                  {/* Multi-layered glow effect */}
-                  <div className={`absolute inset-0 rounded-full bg-linear-to-br ${resultColor} opacity-50 blur-md`} />
-                  <div className={`absolute inset-1 rounded-full bg-linear-to-br ${resultColor} opacity-30 blur-sm`} />
-
+                <div className={`relative h-16 w-16 rounded-full bg-linear-to-br ${config.gradient} p-3 shadow-lg sm:h-20 sm:w-20 sm:p-4`}>
+                  {/* Glow effect */}
+                  <div className={`absolute inset-0 rounded-full bg-linear-to-br ${config.gradient} opacity-40 blur-md`} />
                   <ResultIcon className="relative z-10 h-full w-full text-white" />
                 </div>
               </motion.div>
 
               {/* Result Title */}
               <motion.h2
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{
                   opacity: stageCompleted.title ? 1 : 0,
-                  y: stageCompleted.title ? 0 : 20,
+                  y: stageCompleted.title ? 0 : 15,
                 }}
                 transition={{
-                  duration: shouldAnimate ? 0.6 : 0,
+                  duration: shouldAnimate ? 0.4 : 0,
                   ease: 'easeOut',
                 }}
-                className={`mb-4 bg-linear-to-r text-4xl font-bold ${resultColor} bg-clip-text text-transparent`}
+                className={`mb-3 text-3xl font-bold tracking-tight sm:text-4xl bg-linear-to-r ${config.gradient} bg-clip-text text-transparent`}
               >
-                {result === 'F'
-                  ? 'FRIENDSHIP'
-                  : result === 'L'
-                    ? 'LOVE'
-                    : result === 'A'
-                      ? 'AFFECTION'
-                      : result === 'M'
-                        ? 'MARRIAGE'
-                        : result === 'E'
-                          ? 'ENEMY'
-                          : result === 'S'
-                            ? 'SISTER'
-                            : result}
+                {config.label}
               </motion.h2>
 
               {/* Description */}
               <motion.p
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{
                   opacity: stageCompleted.description ? 1 : 0,
-                  y: stageCompleted.description ? 0 : 20,
+                  y: stageCompleted.description ? 0 : 15,
                 }}
                 transition={{
-                  duration: shouldAnimate ? 0.6 : 0,
+                  duration: shouldAnimate ? 0.4 : 0,
                   ease: 'easeOut',
-                  delay: shouldAnimate ? 0.1 : 0,
                 }}
-                className="mb-6 leading-relaxed text-gray-700 dark:text-gray-300"
-                dangerouslySetInnerHTML={{ __html: description }}
-              />
+                className="mb-5 text-sm leading-relaxed text-gray-700 dark:text-gray-300 sm:text-base"
+              >
+                {description.split('**').map((part, i) => 
+                  i % 2 === 1 ? <strong key={i} className="font-semibold">{part}</strong> : part
+                )}
+              </motion.p>
 
               {/* Quote */}
               <motion.blockquote
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{
                   opacity: stageCompleted.quote ? 1 : 0,
-                  scale: stageCompleted.quote ? 1 : 0.9,
+                  scale: stageCompleted.quote ? 1 : 0.95,
                 }}
                 transition={{
-                  duration: shouldAnimate ? 0.6 : 0,
+                  duration: shouldAnimate ? 0.4 : 0,
                   ease: 'easeOut',
-                  delay: shouldAnimate ? 0.2 : 0,
                 }}
-                className="mb-8 rounded-lg border border-white/10 bg-white/5 p-4 text-gray-600 italic dark:border-white/5 dark:bg-black/10 dark:text-gray-400"
+                className="mb-6 rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-gray-600 italic dark:border-white/5 dark:bg-black/10 dark:text-gray-400 sm:p-4 sm:text-base"
               >
-                "{quote}"
+                &ldquo;{quote}&rdquo;
               </motion.blockquote>
 
-              {/* Action Buttons */}
+              {/* Action Buttons - Grid layout for mobile */}
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{
                   opacity: stageCompleted.actions ? 1 : 0,
-                  y: stageCompleted.actions ? 0 : 30,
+                  y: stageCompleted.actions ? 0 : 20,
                 }}
                 transition={{
-                  duration: shouldAnimate ? 0.6 : 0,
+                  duration: shouldAnimate ? 0.4 : 0,
                   ease: 'easeOut',
-                  delay: shouldAnimate ? 0.3 : 0,
                 }}
-                className="flex flex-wrap justify-center gap-3"
+                className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-center sm:gap-3"
               >
                 {/* Try Again Button */}
                 <motion.button
                   onClick={onRetry}
-                  className="flex items-center gap-2 rounded-full bg-linear-to-r from-blue-500 to-purple-600 px-6 py-3 font-medium text-white shadow-md"
-                  whileHover={{ scale: 1.05, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                  className="flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-blue-500 to-purple-600 px-4 py-2.5 text-sm font-medium text-white shadow-md sm:px-6 sm:py-3"
+                  whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <RotateCcw className="h-4 w-4" />
-                  Try Again
+                  <span>Try Again</span>
                 </motion.button>
 
                 {/* Share Button */}
                 <motion.button
                   onClick={handleShare}
-                  className="flex items-center gap-2 rounded-full bg-linear-to-r from-green-500 to-emerald-600 px-6 py-3 font-medium text-white shadow-md"
-                  whileHover={{ scale: 1.05, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                  className="flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-green-500 to-emerald-600 px-4 py-2.5 text-sm font-medium text-white shadow-md sm:px-6 sm:py-3"
+                  whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <Share2 className="h-4 w-4" />
-                  Share
+                  <span>Share</span>
                 </motion.button>
 
                 {/* Manual Mode Button */}
                 {onNavigateToManual && (
                   <motion.button
                     onClick={onNavigateToManual}
-                    className="flex items-center gap-2 rounded-full bg-linear-to-r from-amber-500 to-orange-600 px-6 py-3 font-medium text-white shadow-md"
-                    whileHover={{ scale: 1.05, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                    className="flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-amber-500 to-orange-600 px-4 py-2.5 text-sm font-medium text-white shadow-md sm:px-6 sm:py-3"
+                    whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
                     <Sparkles className="h-4 w-4" />
-                    Manual Mode
+                    <span>Manual</span>
                   </motion.button>
                 )}
 
@@ -321,12 +295,12 @@ export function ResultCard({
                 {onNavigateToStats && (
                   <motion.button
                     onClick={onNavigateToStats}
-                    className="flex items-center gap-2 rounded-full bg-linear-to-r from-indigo-500 to-blue-600 px-6 py-3 font-medium text-white shadow-md"
-                    whileHover={{ scale: 1.05, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                    className="flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-indigo-500 to-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-md sm:px-6 sm:py-3"
+                    whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <ArrowLeft className="h-4 w-4" />
-                    Global Charts
+                    <BarChart3 className="h-4 w-4" />
+                    <span>Charts</span>
                   </motion.button>
                 )}
               </motion.div>
