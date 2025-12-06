@@ -24,11 +24,6 @@ const DynamicBackground = dynamic(() => import('@components/ui/DynamicBackground
   loading: () => null,
 });
 
-const ConfettiEffect = dynamic(() => import('@ui/ConfettiEffect'), {
-  ssr: false,
-  loading: () => null,
-});
-
 // Lightweight loading placeholders
 function ProcessingPlaceholder() {
   return (
@@ -56,8 +51,8 @@ function HomePage() {
   const { shouldAnimate } = useAnimationPreferences();
 
   // References for scrolling
-  const resultCardRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const resultSectionRef = useRef<HTMLDivElement>(null);
 
   // FLAMES game engine state and actions
   const [
@@ -67,10 +62,10 @@ function HomePage() {
 
   // Scroll to results when they appear
   useEffect(() => {
-    if (stage === 'result' && resultCardRef.current) {
+    if (stage === 'result' && resultSectionRef.current) {
       const scrollDelay = shouldAnimate ? 800 : 200;
       const timer = setTimeout(() => {
-        resultCardRef.current?.scrollIntoView({
+        resultSectionRef.current?.scrollIntoView({
           behavior: 'smooth',
           block: 'center',
         });
@@ -114,9 +109,6 @@ function HomePage() {
         season={currentSeason}
         intensity="medium"
       />
-
-      {/* Confetti effect for results */}
-      <ConfettiEffect result={result} isActive={stage === 'result'} />
 
       <div className="relative z-10 w-full max-w-2xl">
         {/* Animated Header */}
@@ -180,7 +172,7 @@ function HomePage() {
           {stage === 'result' && result && (
             <motion.div
               key="result-stage"
-              ref={resultCardRef}
+              ref={resultSectionRef}
               initial={shouldAnimate ? { opacity: 0, y: 40, scale: 0.95 } : false}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}

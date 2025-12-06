@@ -84,8 +84,8 @@ export const shareResult = async ({ name1, name2, result, resultText, imageUrl }
  * Shares the result on Twitter
  */
 export const shareOnTwitter = (data: ShareData): void => {
-  const { name2, result } = data;
-  const text = `🔥 ${name2} got ${result} in FLAMES! ✨ Find out your result too! 👇 #FLAMESGame`;
+  const { name1, name2, result } = data;
+  const text = `🔥 ${name1} + ${name2} = ${result} in FLAMES! ✨ Find out your result too! 👇 #FLAMESGame`;
   const url = window.location.origin;
   const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
   window.open(twitterUrl, '_blank', 'noopener,noreferrer');
@@ -95,8 +95,8 @@ export const shareOnTwitter = (data: ShareData): void => {
  * Shares the result on Telegram
  */
 export const shareOnTelegram = (data: ShareData): void => {
-  const { name2, result } = data;
-  const text = `🔥 ${name2} got ${result} in FLAMES! ✨ Find out your result too! 👇 ${window.location.origin} #FLAMESGame`;
+  const { name1, name2, result } = data;
+  const text = `🔥 ${name1} + ${name2} = ${result} in FLAMES! ✨ Find out your result too! 👇 ${window.location.origin} #FLAMESGame`;
   const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(window.location.origin)}&text=${encodeURIComponent(text)}`;
   window.open(telegramUrl, '_blank', 'noopener,noreferrer');
 };
@@ -107,18 +107,28 @@ export const shareOnTelegram = (data: ShareData): void => {
 export const downloadResultCard = async (element: HTMLElement): Promise<void> => {
   try {
     const canvas = await html2canvas(element, {
-      scale: 3, // Increase scale for better resolution
+      scale: 2, // Good resolution
       useCORS: true,
-      backgroundColor: null, // Use element's background
-      logging: false, // Disable logging
-      imageTimeout: 15000, // Increase timeout for loading images
-      onclone: (document) => {
-        // Ensure watermark is visible and centered during capture
-        const watermark = document.getElementById('watermark');
+      backgroundColor: '#1a1a2e', // Dark background
+      logging: false,
+      imageTimeout: 15000,
+      foreignObjectRendering: false,
+      onclone: (_document, clonedElement) => {
+        // Ensure watermark is visible
+        const watermark = clonedElement.querySelector('#watermark') as HTMLElement;
         if (watermark) {
-          watermark.style.display = 'block';
+          watermark.style.display = 'flex';
           watermark.style.opacity = '1';
         }
+
+        // Remove animations
+        const allElements = clonedElement.querySelectorAll('*');
+        allElements.forEach((el) => {
+          if (el instanceof HTMLElement) {
+            el.style.animation = 'none';
+            el.style.transition = 'none';
+          }
+        });
       },
     });
     const dataUrl = canvas.toDataURL('image/png');
@@ -128,8 +138,8 @@ export const downloadResultCard = async (element: HTMLElement): Promise<void> =>
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  } catch {
-    console.error('Error generating canvas for download:');
+  } catch (error) {
+    console.error('Error generating canvas for download:', error);
     throw new Error('Failed to generate result card image.');
   }
 };

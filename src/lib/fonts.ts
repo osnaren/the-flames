@@ -1,4 +1,4 @@
-import { DM_Serif_Text, Josefin_Sans, Noto_Sans, Patrick_Hand, Space_Grotesk } from 'next/font/google';
+import { DM_Serif_Text, Josefin_Sans, Noto_Emoji, Noto_Sans, Patrick_Hand, Space_Grotesk } from 'next/font/google';
 
 // Primary body font
 export const notoSans = Noto_Sans({
@@ -6,6 +6,15 @@ export const notoSans = Noto_Sans({
   display: 'swap',
   variable: '--font-body',
   weight: ['400', '500', '600', '700'],
+  preload: true,
+});
+
+// Emoji support font
+export const notoEmoji = Noto_Emoji({
+  subsets: ['emoji'],
+  display: 'swap',
+  variable: '--font-emoji',
+  weight: ['400'],
   preload: true,
 });
 
@@ -46,4 +55,4 @@ export const patrickHand = Patrick_Hand({
 });
 
 // Combined font variables for use in className
-export const fontVariables = `${notoSans.variable} ${dmSerifText.variable} ${spaceGrotesk.variable} ${josefinSans.variable} ${patrickHand.variable}`;
+export const fontVariables = `${notoSans.variable} ${notoEmoji.variable} ${dmSerifText.variable} ${spaceGrotesk.variable} ${josefinSans.variable} ${patrickHand.variable}`;
