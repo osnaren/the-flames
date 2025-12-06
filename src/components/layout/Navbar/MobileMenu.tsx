@@ -1,9 +1,10 @@
 'use client';
 
 import Logo from '@components/ui/Logo';
+import { NAVBAR_CONFIG } from '@config/navigation';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
-import { BarChart3, BookOpen, Flame, Wand2, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import NavItem from './NavItem';
@@ -148,36 +149,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
   };
 
   // Navigation items with enhanced configuration
-  const navItems = [
-    {
-      label: 'Home',
-      icon: Flame,
-      path: '/',
-      isActive: pathname === '/',
-      description: 'Play the FLAMES game',
-    },
-    {
-      label: 'About FLAMES',
-      icon: BookOpen,
-      path: '/about',
-      isActive: pathname === '/about',
-      description: 'Learn about FLAMES',
-    },
-    {
-      label: 'Global Charts',
-      icon: BarChart3,
-      path: '/charts',
-      isActive: pathname === '/charts',
-      description: 'View global statistics',
-    },
-    {
-      label: 'Manual Mode',
-      icon: Wand2,
-      path: '/manual',
-      isActive: pathname === '/manual',
-      description: 'Step-by-step calculation',
-    },
-  ];
+  const navItems = NAVBAR_CONFIG.items;
 
   return (
     <AnimatePresence>
@@ -256,14 +228,14 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
             {/* Enhanced navigation section */}
             <nav className="relative px-6 py-6" role="navigation" aria-label="Mobile navigation">
               <motion.div className="space-y-3" variants={containerVariants} initial="hidden" animate="visible">
-                {navItems.map((item, _index) => (
+                {navItems.map((item) => (
                   <motion.div key={item.path} variants={itemVariants} className="group">
                     {/* Enhanced nav item wrapper */}
                     <div className="relative">
                       <NavItem
                         label={item.label}
                         icon={item.icon}
-                        isActive={item.isActive}
+                        isActive={pathname === item.path}
                         onClick={() => handleNavigation(item.path)}
                         mobileOnly
                         className="w-full justify-start"

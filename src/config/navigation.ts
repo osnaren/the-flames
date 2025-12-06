@@ -1,12 +1,41 @@
-import { Calendar, Coffee, ExternalLink, Github, Heart, Mail, TrendingUp, Users } from 'lucide-react';
-import type { FooterConfig } from './types';
+import { BarChart3, BookOpen, Coffee, ExternalLink, Flame, Heart, Mail, TrendingUp, Users, Wand2 } from 'lucide-react';
+import { FaGithub, FaInstagram } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 
 // Use a constant year to avoid any potential hydration issues
-// This value should be updated annually or use a build-time constant
-const CURRENT_YEAR = 2025;
+const CURRENT_YEAR = new Date().getFullYear();
 
-// Centralized Footer configuration for easy maintenance
-export const FOOTER_CONFIG: FooterConfig = {
+export const NAVBAR_CONFIG = {
+  items: [
+    {
+      label: 'Home',
+      icon: Flame,
+      path: '/',
+      description: 'Play the FLAMES game',
+      mobileOnly: true,
+    },
+    {
+      label: 'About FLAMES',
+      icon: BookOpen,
+      path: '/about',
+      description: 'Learn about FLAMES',
+    },
+    {
+      label: 'Global Charts',
+      icon: BarChart3,
+      path: '/charts',
+      description: 'View global statistics',
+    },
+    {
+      label: 'Manual Mode',
+      icon: Wand2,
+      path: '/manual',
+      description: 'Step-by-step calculation',
+    },
+  ],
+};
+
+export const FOOTER_CONFIG = {
   brand: {
     name: 'osLabs',
     tagline: 'Cooked up with ❤️ at osLabs',
@@ -36,6 +65,7 @@ export const FOOTER_CONFIG: FooterConfig = {
       { label: 'Privacy Policy', to: '/privacy' },
       { label: 'Terms of Service', to: '/terms' },
       { label: 'About Us', to: '/about' },
+      { label: 'API Docs', to: '/api-docs' },
     ],
   },
 
@@ -43,7 +73,7 @@ export const FOOTER_CONFIG: FooterConfig = {
     {
       label: 'GitHub Repository',
       href: 'https://github.com/osnaren/the-flames',
-      icon: Github,
+      icon: FaGithub,
       description: 'View source code and contribute',
     },
     {
@@ -64,14 +94,21 @@ export const FOOTER_CONFIG: FooterConfig = {
     {
       label: 'GitHub Profile',
       href: 'https://github.com/osnaren',
-      icon: Github,
+      icon: FaGithub,
       hoverColor: 'hover:text-gray-400',
     },
     {
       label: 'Contact Developer',
-      href: 'mailto:hello@osnaren.dev',
+      href: 'mailto:66naren@gmail.com',
       icon: Mail,
       hoverColor: 'hover:text-blue-400',
+    },
+    { label: 'Follow on Twitter', href: 'https://x.com/osnaren', icon: FaXTwitter, hoverColor: 'hover:text-gray-400' },
+    {
+      label: 'Follow on Instagram',
+      href: 'https://instagram.com/osnaren',
+      icon: FaInstagram,
+      hoverColor: 'hover:text-pink-400',
     },
   ],
 
@@ -79,7 +116,7 @@ export const FOOTER_CONFIG: FooterConfig = {
     { icon: Users, label: 'Happy Users', value: '10K+' },
     { icon: Heart, label: 'Relationships Tested', value: '50K+' },
     { icon: TrendingUp, label: 'Accuracy Rate', value: '99.9%*' },
-    { icon: Calendar, label: 'Years Active', value: '2+' },
+    // { icon: Calendar, label: 'Years Active', value: '2+' },
   ],
   showStats: false,
 
@@ -87,27 +124,4 @@ export const FOOTER_CONFIG: FooterConfig = {
     text: 'For entertainment only. No guarantees on marriage 💍',
     note: '*Scientifically unverified but emotionally accurate',
   },
-};
-
-// Helper function to update stats dynamically (if needed)
-export const updateFooterStats = (newStats: Partial<Record<string, string>>) => {
-  Object.entries(newStats).forEach(([key, value]) => {
-    const stat = FOOTER_CONFIG.stats.find((s) => s.label.toLowerCase().includes(key.toLowerCase()));
-    if (stat && value) {
-      stat.value = value;
-    }
-  });
-};
-
-// Helper to add new navigation links dynamically
-export const addNavigationLink = (
-  section: 'primary' | 'secondary',
-  link: { label: string; to: string; description?: string }
-) => {
-  FOOTER_CONFIG.navigation[section].push(link);
-};
-
-// Helper to add new external links
-export const addExternalLink = (link: { label: string; href: string; icon: typeof Github; description?: string }) => {
-  FOOTER_CONFIG.external.push(link);
 };

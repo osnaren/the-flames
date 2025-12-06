@@ -1,21 +1,21 @@
 'use client';
 
 import Logo from '@components/ui/Logo';
+import { FOOTER_CONFIG } from '@config/navigation';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { motion, useScroll, useTransform, Variants } from 'framer-motion';
 import { ExternalLink, Heart, Sparkles, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { memo } from 'react';
-import { FOOTER_CONFIG } from './config';
 import type { FooterLinkProps } from './types';
 
 function Footer() {
   const { shouldAnimate, prefersReducedMotion } = useAnimationPreferences();
   const { scrollYProgress } = useScroll();
 
-  // Enhanced scroll-based effects
-  const footerOpacity = useTransform(scrollYProgress, [0.6, 0.9], [0, 1]);
-  const footerY = useTransform(scrollYProgress, [0.8, 1], [50, 0]);
+  // Enhanced scroll-based effects - use wider range to work on shorter pages
+  const footerOpacity = useTransform(scrollYProgress, [0.3, 0.7], [0.8, 1]);
+  const footerY = useTransform(scrollYProgress, [0.5, 0.9], [20, 0]);
 
   // Animation variants
   const containerVariants: Variants = {
@@ -245,7 +245,7 @@ function Footer() {
                 Our Impact
               </h3>
               <div className="grid grid-cols-2 gap-3">
-                {FOOTER_CONFIG.stats.map((stat, _index) => (
+                {FOOTER_CONFIG.stats.map((stat) => (
                   <motion.div
                     key={stat.label}
                     variants={statsVariants}

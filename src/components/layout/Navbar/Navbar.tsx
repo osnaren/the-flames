@@ -1,10 +1,11 @@
 'use client';
 
 import Logo from '@components/ui/Logo';
+import { NAVBAR_CONFIG } from '@config/navigation';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import FloatingControlPanel from '@layout/FloatingControlPanel';
 import { motion, useScroll, useTransform, Variants } from 'framer-motion';
-import { BarChart3, BookOpen, Menu, Wand2 } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -157,9 +158,10 @@ function Navbar() {
           className="absolute inset-0"
           style={{
             background: isScrolled
-              ? 'linear-gradient(135deg, hsl(var(--surface) / var(--tw-bg-opacity)) 0%, hsl(var(--surface-container-low) / var(--tw-bg-opacity)) 50%, hsl(var(--surface) / var(--tw-bg-opacity)) 100%)'
+              ? 'hsl(var(--surface) / 0.95)'
               : 'linear-gradient(135deg, hsl(var(--surface) / 0.7) 0%, hsl(var(--surface-container-low) / 0.75) 50%, hsl(var(--surface) / 0.7) 100%)',
-            opacity: prefersReducedMotion ? (isScrolled ? 0.95 : 0.7) : backgroundOpacity,
+            opacity: prefersReducedMotion ? (isScrolled ? 1 : 0.7) : backgroundOpacity,
+            boxShadow: isScrolled ? '0 4px 20px -2px hsl(var(--shadow) / 0.1)' : 'none',
           }}
         />
 
@@ -195,9 +197,17 @@ function Navbar() {
             {/* Enhanced Desktop Navigation Links */}
             <nav className="hidden items-center space-x-2 md:flex" role="navigation" aria-label="Main navigation">
               <motion.div className="flex items-center space-x-2" variants={contentVariants}>
-                <NavItem label="About FLAMES" icon={BookOpen} to="/about" isActive={pathname === '/about'} />
-                <NavItem label="Global Charts" icon={BarChart3} to="/charts" isActive={pathname === '/charts'} />
-                <NavItem label="Manual Mode" icon={Wand2} to="/manual" isActive={pathname === '/manual'} />
+                {NAVBAR_CONFIG.items
+                  .filter((item) => !item.mobileOnly)
+                  .map((item) => (
+                    <NavItem
+                      key={item.path}
+                      label={item.label}
+                      icon={item.icon}
+                      to={item.path}
+                      isActive={pathname === item.path}
+                    />
+                  ))}
               </motion.div>
             </nav>
 

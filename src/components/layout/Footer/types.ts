@@ -1,4 +1,8 @@
 import type { LucideIcon } from 'lucide-react';
+import type { IconType } from 'react-icons';
+
+// Support both Lucide icons and react-icons
+export type IconComponent = LucideIcon | IconType;
 
 export interface FooterNavigationLink {
   label: string;
@@ -9,19 +13,19 @@ export interface FooterNavigationLink {
 export interface FooterExternalLink {
   label: string;
   href: string;
-  icon: LucideIcon;
+  icon: IconComponent;
   description?: string;
 }
 
 export interface FooterSocialLink {
   label: string;
   href: string;
-  icon: LucideIcon;
+  icon: IconComponent;
   hoverColor: string;
 }
 
 export interface FooterStat {
-  icon: LucideIcon;
+  icon: IconComponent;
   label: string;
   value: string;
 }

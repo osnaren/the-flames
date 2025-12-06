@@ -33,6 +33,7 @@
       "@vendor/*": ["./src/components/vendor/*"],
       "@assets/*": ["./src/assets/*"],
       "@components/*": ["./src/components/*"],
+      "@config/*": ["./src/config/*"],
       "@shadcn/*": ["./src/components/shadcn/*"],
       "@magicui/*": ["./src/components/magicui/*"],
       "@layout/*": ["./src/components/layout/*"],
