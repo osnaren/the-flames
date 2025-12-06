@@ -75,7 +75,8 @@ export function useSoundEffects() {
 
   // Preload audio files
   useEffect(() => {
-    if (!isSoundEnabled) return;
+    // Guard against SSR - Audio is not available on server
+    if (typeof window === 'undefined' || !isSoundEnabled) return;
 
     const loadSound = async (effect: SoundEffect, config: SoundConfig) => {
       if (loadedSounds.current.has(effect)) return;

@@ -180,6 +180,9 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
 
   // Fetch stats when dependencies change
   useEffect(() => {
+    // Guard against SSR
+    if (typeof window === 'undefined') return;
+
     fetchStats();
 
     // Set up polling for live updates (every 30 seconds)

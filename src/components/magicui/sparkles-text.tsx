@@ -1,6 +1,6 @@
 "use client"
 
-import { CSSProperties, ReactElement, useEffect, useState } from "react"
+import { CSSProperties, ReactElement, useEffect, useId, useState } from "react"
 import { motion } from "framer-motion"
 
 import { cn } from "@/utils"
@@ -92,29 +92,39 @@ export const SparklesText: React.FC<SparklesTextProps> = ({
   ...props
 }) => {
   const [sparkles, setSparkles] = useState<SparkleType[]>([])
+  const [isMounted, setIsMounted] = useState(false)
+  const instanceId = useId()
+
+  // Only run sparkle generation on client after mount
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   useEffect(() => {
-    const generateStar = (): SparkleType => {
+    if (!isMounted) return
+
+    const generateStar = (index: number): SparkleType => {
       const starX = `${Math.random() * 100}%`
       const starY = `${Math.random() * 100}%`
       const color = Math.random() > 0.5 ? colors.first : colors.second
       const delay = Math.random() * 2
       const scale = Math.random() * 1 + 0.3
       const lifespan = Math.random() * 10 + 5
-      const id = `${starX}-${starY}-${Date.now()}`
+      // Use stable ID based on instance and index, not Date.now()
+      const id = `${instanceId}-sparkle-${index}-${Math.random().toString(36).slice(2, 9)}`
       return { id, x: starX, y: starY, color, delay, scale, lifespan }
     }
 
     const initializeStars = () => {
-      const newSparkles = Array.from({ length: sparklesCount }, generateStar)
+      const newSparkles = Array.from({ length: sparklesCount }, (_, i) => generateStar(i))
       setSparkles(newSparkles)
     }
 
     const updateStars = () => {
       setSparkles((currentSparkles) =>
-        currentSparkles.map((star) => {
+        currentSparkles.map((star, index) => {
           if (star.lifespan <= 0) {
-            return generateStar()
+            return generateStar(index)
           } else {
             return { ...star, lifespan: star.lifespan - 0.1 }
           }
@@ -126,7 +136,7 @@ export const SparklesText: React.FC<SparklesTextProps> = ({
     const interval = setInterval(updateStars, 100)
 
     return () => clearInterval(interval)
-  }, [colors.first, colors.second, sparklesCount])
+  }, [colors.first, colors.second, sparklesCount, isMounted, instanceId])
 
   return (
     <div
@@ -140,7 +150,7 @@ export const SparklesText: React.FC<SparklesTextProps> = ({
       }
     >
       <span className="relative inline-block">
-        {sparkles.map((sparkle) => (
+        {isMounted && sparkles.map((sparkle) => (
           <Sparkle key={sparkle.id} {...sparkle} />
         ))}
         <strong>{children}</strong>

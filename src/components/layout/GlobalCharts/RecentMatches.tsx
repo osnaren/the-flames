@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Clock, Globe } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { RecentMatch, ResultInfo } from './types';
 import { getCountryFlag, getCountryName } from './utils';
 
@@ -8,10 +9,10 @@ interface RecentMatchesProps {
   resultInfo: Record<string, ResultInfo>;
 }
 
-function getRelativeTime(dateString: string) {
+// Calculate relative time - must be called only on client side
+function getRelativeTime(dateString: string, currentTime: number) {
   const date = new Date(dateString);
-  const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const diffInSeconds = Math.floor((currentTime - date.getTime()) / 1000);
 
   if (diffInSeconds < 60) return 'just now';
   if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
@@ -20,6 +21,21 @@ function getRelativeTime(dateString: string) {
 }
 
 export default function RecentMatches({ matches, resultInfo }: RecentMatchesProps) {
+  // Track current time on client only to avoid hydration mismatch
+  const [currentTime, setCurrentTime] = useState<number | null>(null);
+
+  useEffect(() => {
+    // Set initial time on mount
+    setCurrentTime(Date.now());
+
+    // Update every 30 seconds for "just now" / "Xm ago" accuracy
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   if (!matches || matches.length === 0) return null;
 
   return (
@@ -38,7 +54,8 @@ export default function RecentMatches({ matches, resultInfo }: RecentMatchesProp
       <div className="space-y-3">
         {matches.map((match, index) => {
           const info = resultInfo[match.result];
-          const relativeTime = getRelativeTime(match.created_at);
+          // Only show relative time after hydration, otherwise show placeholder
+          const relativeTime = currentTime ? getRelativeTime(match.created_at, currentTime) : '...';
 
           return (
             <motion.div

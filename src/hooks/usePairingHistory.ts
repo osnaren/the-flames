@@ -223,6 +223,9 @@ export function usePairingHistory() {
 
   // Load data from localStorage on mount
   useEffect(() => {
+    // Guard against SSR - localStorage is not available on server
+    if (typeof window === 'undefined') return;
+
     try {
       const savedHistory = localStorage.getItem(STORAGE_KEY);
       const savedBadges = localStorage.getItem(BADGES_KEY);

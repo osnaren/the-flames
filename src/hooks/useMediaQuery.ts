@@ -1,36 +1,29 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
+/**
+ * SSR-safe media query hook using useSyncExternalStore
+ * This prevents hydration mismatches by returning a consistent value during SSR
+ */
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const subscribe = useCallback(
+    (callback: () => void) => {
+      const mediaQuery = window.matchMedia(query);
+      mediaQuery.addEventListener('change', callback);
+      return () => mediaQuery.removeEventListener('change', callback);
+    },
+    [query]
+  );
 
-  useEffect(() => {
-    if (!mounted) {
-      setTimeout(() => setMounted(true), 0);
-    }
-    const media = window.matchMedia(query);
+  const getSnapshot = useCallback(() => {
+    return window.matchMedia(query).matches;
+  }, [query]);
 
-    // Set initial value
-    if (media.matches !== matches) {
-      setTimeout(() => setMatches(media.matches), 0);
-    }
+  // Return false on server to match initial client render
+  const getServerSnapshot = useCallback(() => {
+    return false;
+  }, []);
 
-    // Create listener function
-    const listener = () => {
-      setMatches(media.matches);
-    };
-
-    // Add listener
-    media.addEventListener('change', listener);
-
-    // Cleanup
-    return () => {
-      media.removeEventListener('change', listener);
-    };
-  }, [matches, query, mounted]);
-
-  // Return false on server-side rendering to avoid hydration mismatch
-  return mounted ? matches : false;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

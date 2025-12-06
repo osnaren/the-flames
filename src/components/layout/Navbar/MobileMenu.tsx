@@ -5,7 +5,7 @@ import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { BarChart3, BookOpen, Flame, Wand2, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import NavItem from './NavItem';
 
 interface MobileMenuProps {
@@ -19,6 +19,12 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
   const { prefersReducedMotion } = useAnimationPreferences();
   const menuRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  // Use state for year to avoid hydration mismatch
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
 
   // Handle navigation and close menu with enhanced feedback
   const handleNavigation = (path: string) => {
@@ -313,7 +319,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
                 </motion.div>
 
                 <div className="text-center">
-                  <p className="text-on-surface-variant/70 text-sm">© {new Date().getFullYear()} OSLabs</p>
+                  <p className="text-on-surface-variant/70 text-sm">© {currentYear ?? '2025'} OSLabs</p>
                   <motion.p
                     className="text-on-surface-variant/50 mt-1 text-xs"
                     initial={{ opacity: 0 }}

@@ -1,13 +1,17 @@
 import { Calendar, Coffee, ExternalLink, Github, Heart, Mail, TrendingUp, Users } from 'lucide-react';
 import type { FooterConfig } from './types';
 
+// Use a constant year to avoid any potential hydration issues
+// This value should be updated annually or use a build-time constant
+const CURRENT_YEAR = 2025;
+
 // Centralized Footer configuration for easy maintenance
 export const FOOTER_CONFIG: FooterConfig = {
   brand: {
     name: 'osLabs',
     tagline: 'Cooked up with ❤️ at osLabs',
     description: 'Creating fun and engaging web experiences that bring people together.',
-    year: new Date().getFullYear(),
+    year: CURRENT_YEAR,
   },
 
   navigation: {

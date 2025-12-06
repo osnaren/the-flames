@@ -104,25 +104,27 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
 
   // Initialize from URL params
   useEffect(() => {
-    if (!searchParams) return;
+    // Guard against SSR or missing searchParams
+    if (typeof window === 'undefined' || !searchParams) return;
+
     const urlName1 = searchParams.get('name1');
     const urlName2 = searchParams.get('name2');
 
     if (urlName1) {
       const decoded1 = decodeURIComponent(urlName1);
       if (decoded1 !== name1) {
-        // Defer state update to avoid synchronous setState in effect warning
-        setTimeout(() => setName1(decoded1), 0);
+        setName1(decoded1);
       }
     }
     if (urlName2) {
       const decoded2 = decodeURIComponent(urlName2);
       if (decoded2 !== name2) {
-        // Defer state update to avoid synchronous setState in effect warning
-        setTimeout(() => setName2(decoded2), 0);
+        setName2(decoded2);
       }
     }
-  }, [searchParams, name1, name2]);
+    // Only run on mount and when searchParams changes, not when names change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   // Update URL params when names change
   const updateUrlParams = useCallback(

@@ -53,9 +53,12 @@ function HomePage() {
   );
 
   // Determine current season for background theming
+  // Initialize with undefined to match SSR state
   const [currentSeason, setCurrentSeason] = useState<'valentine' | 'halloween' | 'christmas' | undefined>(undefined);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     const month = new Date().getMonth();
     if (month === 1)
       setCurrentSeason('valentine'); // February

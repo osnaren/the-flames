@@ -20,6 +20,26 @@ interface PreferencesActions {
   init: () => void;
 }
 
+// Helper to safely access localStorage (SSR-safe)
+const safeLocalStorage = {
+  getItem: (key: string): string | null => {
+    if (typeof window === 'undefined') return null;
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  setItem: (key: string, value: string): void => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // Ignore storage errors (e.g., quota exceeded, private browsing)
+    }
+  },
+};
+
 export const usePreferencesStore = create<PreferencesState & PreferencesActions>((set) => ({
   isDarkTheme: false,
   animationsEnabled: true,
@@ -31,52 +51,57 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
   toggleTheme: () =>
     set((s) => {
       const newTheme = !s.isDarkTheme;
-      localStorage.setItem('theme', newTheme ? 'dark' : 'light');
-      if (newTheme) {
-        document.documentElement.classList.add('dark');
-        document.documentElement.setAttribute('data-theme', 'dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.setAttribute('data-theme', 'light');
+      safeLocalStorage.setItem('theme', newTheme ? 'dark' : 'light');
+      if (typeof document !== 'undefined') {
+        if (newTheme) {
+          document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
       }
       return { isDarkTheme: newTheme };
     }),
   toggleAnimations: () =>
     set((s) => {
       const value = !s.animationsEnabled;
-      localStorage.setItem('animations', String(value));
+      safeLocalStorage.setItem('animations', String(value));
       return { animationsEnabled: value };
     }),
   toggleSound: () =>
     set((s) => {
       const value = !s.isSoundEnabled;
-      localStorage.setItem('sound', String(value));
+      safeLocalStorage.setItem('sound', String(value));
       return { isSoundEnabled: value };
     }),
   toggleHaptic: () =>
     set((s) => {
       const value = !s.isHapticEnabled;
-      localStorage.setItem('haptic', String(value));
+      safeLocalStorage.setItem('haptic', String(value));
       return { isHapticEnabled: value };
     }),
   setVolume: (volume: number) =>
     set(() => {
       const clampedVolume = Math.max(0, Math.min(1, volume));
-      localStorage.setItem('volume', String(clampedVolume));
+      safeLocalStorage.setItem('volume', String(clampedVolume));
       return { volume: clampedVolume };
     }),
   setSeasonalTheme: (theme: PreferencesState['seasonalTheme']) =>
     set(() => {
-      localStorage.setItem('seasonalTheme', theme);
+      safeLocalStorage.setItem('seasonalTheme', theme);
       return { seasonalTheme: theme };
     }),
   init: () => {
-    const storedTheme = localStorage.getItem('theme');
-    const storedAnimations = localStorage.getItem('animations');
-    const storedSound = localStorage.getItem('sound');
-    const storedHaptic = localStorage.getItem('haptic');
-    const storedVolume = localStorage.getItem('volume');
-    const storedSeasonalTheme = localStorage.getItem('seasonalTheme');
+    // Guard against SSR
+    if (typeof window === 'undefined') return;
+
+    const storedTheme = safeLocalStorage.getItem('theme');
+    const storedAnimations = safeLocalStorage.getItem('animations');
+    const storedSound = safeLocalStorage.getItem('sound');
+    const storedHaptic = safeLocalStorage.getItem('haptic');
+    const storedVolume = safeLocalStorage.getItem('volume');
+    const storedSeasonalTheme = safeLocalStorage.getItem('seasonalTheme');
 
     if (storedTheme === 'dark') {
       document.documentElement.classList.add('dark');
