@@ -1,16 +1,51 @@
 import { useFlamesEngine } from '@features/flamesGame/useFlamesEngine';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { AnimatePresence, motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
-// Import new components
+// Critical components - loaded immediately
 import AnimatedHeader from '@/components/homepage/AnimatedHeader';
-import { CommonLettersStrike } from '@components/homepage/CommonLettersStrike';
-import { FlamesAnimation } from '@components/homepage/FlamesAnimation';
 import InputForm from '@components/homepage/InputForm';
-import ResultCard from '@components/homepage/ResultCard';
-import DynamicBackground from '@components/ui/DynamicBackground';
-import ConfettiEffect from '@ui/ConfettiEffect';
+
+// Non-critical components - dynamically imported for better LCP
+const CommonLettersStrike = dynamic(
+  () => import('@components/homepage/CommonLettersStrike').then((mod) => ({ default: mod.CommonLettersStrike })),
+  { ssr: false, loading: () => <ProcessingPlaceholder /> }
+);
+
+const FlamesAnimation = dynamic(
+  () => import('@components/homepage/FlamesAnimation').then((mod) => ({ default: mod.FlamesAnimation })),
+  { ssr: false, loading: () => <ProcessingPlaceholder /> }
+);
+
+const ResultCard = dynamic(() => import('@components/homepage/ResultCard'), {
+  ssr: false,
+  loading: () => <ResultPlaceholder />,
+});
+
+const DynamicBackground = dynamic(() => import('@components/ui/DynamicBackground'), {
+  ssr: false,
+  loading: () => null,
+});
+
+const ConfettiEffect = dynamic(() => import('@ui/ConfettiEffect'), {
+  ssr: false,
+  loading: () => null,
+});
+
+// Lightweight loading placeholders
+function ProcessingPlaceholder() {
+  return (
+    <div className="flex h-48 items-center justify-center">
+      <div className="bg-primary/20 h-8 w-8 animate-pulse rounded-full" />
+    </div>
+  );
+}
+
+function ResultPlaceholder() {
+  return <div className="bg-surface/90 border-outline/20 h-64 animate-pulse rounded-2xl border" />;
+}
 
 /**
  * Completely revamped HomePage with streamlined architecture
@@ -55,10 +90,8 @@ function HomePage() {
   // Determine current season for background theming
   // Initialize with undefined to match SSR state
   const [currentSeason, setCurrentSeason] = useState<'valentine' | 'halloween' | 'christmas' | undefined>(undefined);
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
     const month = new Date().getMonth();
     if (month === 1)
       setCurrentSeason('valentine'); // February

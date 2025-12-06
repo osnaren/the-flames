@@ -20,7 +20,8 @@ import {
 import { Input } from '@shadcn/input';
 import Button from '@ui/Button';
 import { Copy, Heart } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
+import React, { memo, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { cn } from 'src/utils';
 import upiqr from 'upiqr';
@@ -162,7 +163,7 @@ const UpiPaymentContent: React.FC<{
 
           {qrCodeDataUrl && (
             <div className="rounded-md bg-white p-2">
-              <img
+              <Image
                 src={qrCodeDataUrl}
                 width={200}
                 height={200}
@@ -283,7 +284,7 @@ const UpiPaymentContent: React.FC<{
       {/* UPI Apps Section */}
       <div className="text-on-surface-variant mt-2 flex flex-col items-center gap-2 text-xs">
         All UPI Apps supported
-        <img src="/upi-apps.png" alt="UPI Apps" width={50} height={50} className="w-24" />
+        <Image src="/upi-apps.png" alt="UPI Apps" width={96} height={24} className="w-24" loading="lazy" />
       </div>
     </div>
   );
@@ -376,4 +377,4 @@ const UpiModal: React.FC<UpiModalProps> = (props) => {
   return isDesktop ? <UpiDialog {...props} /> : <UpiDrawer {...props} />;
 };
 
-export default UpiModal;
+export default memo(UpiModal);

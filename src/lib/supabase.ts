@@ -12,7 +12,16 @@ if (!supabaseUrl || !supabaseKey || supabaseUrl === 'undefined' || supabaseKey =
   throw new Error('Supabase URL and Anon Key must be set in environment variables (.env or .env.local)');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    persistSession: false, // Disable session persistence for better performance
+  },
+  global: {
+    headers: {
+      'x-client-info': 'flames-game',
+    },
+  },
+});
 
 // Time window types for stats
 export type TimeWindow = 'today' | 'week' | 'alltime';
@@ -32,6 +41,35 @@ export class StatsError extends Error {
 const RETRY_ATTEMPTS = 3;
 const RETRY_DELAY = 1000; // ms
 
+// Simple in-memory cache for stats
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+  ttl: number;
+}
+
+const cache = new Map<string, CacheEntry<unknown>>();
+
+function getCached<T>(key: string): T | null {
+  const entry = cache.get(key) as CacheEntry<T> | undefined;
+  if (!entry) return null;
+
+  if (Date.now() - entry.timestamp > entry.ttl) {
+    cache.delete(key);
+    return null;
+  }
+
+  return entry.data;
+}
+
+function setCache<T>(key: string, data: T, ttlMs: number): void {
+  cache.set(key, {
+    data,
+    timestamp: Date.now(),
+    ttl: ttlMs,
+  });
+}
+
 // Helper function for exponential backoff retry
 async function withRetry<T>(
   operation: () => PromiseLike<T>,
@@ -48,15 +86,29 @@ async function withRetry<T>(
   }
 }
 
-// Get user's country code
+// Country cache key
+const COUNTRY_CACHE_KEY = 'user_country';
+const COUNTRY_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+// Get user's country code with caching
 export const getUserCountry = async (): Promise<string | null> => {
+  // Check cache first
+  const cached = getCached<string>(COUNTRY_CACHE_KEY);
+  if (cached) return cached;
+
   try {
     // 1. Try our local optimized API route (fastest, uses Vercel headers)
     try {
-      const localResponse = await fetch('/api/geo');
+      const localResponse = await fetch('/api/geo', {
+        // Use cache for geo requests
+        next: { revalidate: 3600 }, // Cache for 1 hour
+      } as RequestInit);
       if (localResponse.ok) {
         const { country } = await localResponse.json();
-        if (country) return country;
+        if (country) {
+          setCache(COUNTRY_CACHE_KEY, country, COUNTRY_CACHE_TTL);
+          return country;
+        }
       }
     } catch (e) {
       // Ignore local API errors and fall back to Edge Function
@@ -77,6 +129,9 @@ export const getUserCountry = async (): Promise<string | null> => {
     }
 
     const { country } = await response.json();
+    if (country) {
+      setCache(COUNTRY_CACHE_KEY, country, COUNTRY_CACHE_TTL);
+    }
     return country;
   } catch (error) {
     console.error('Error detecting country:', error);
@@ -84,8 +139,21 @@ export const getUserCountry = async (): Promise<string | null> => {
   }
 };
 
-// Get statistics with trends
+// Stats cache configuration
+const STATS_CACHE_TTL: Record<TimeWindow, number> = {
+  today: 30 * 1000, // 30 seconds for today's stats
+  week: 60 * 1000, // 1 minute for weekly stats
+  alltime: 5 * 60 * 1000, // 5 minutes for all-time stats
+};
+
+// Get statistics with trends (with caching)
 export const getStatsWithTrends = async (window: TimeWindow = 'today', country?: string) => {
+  const cacheKey = `stats_${window}_${country || 'global'}`;
+
+  // Check cache first
+  const cached = getCached(cacheKey);
+  if (cached) return cached;
+
   try {
     const { data, error } = await withRetry(() =>
       supabase.rpc('get_stats_with_trends', {
@@ -97,6 +165,9 @@ export const getStatsWithTrends = async (window: TimeWindow = 'today', country?:
     if (error) {
       throw new StatsError('Failed to fetch statistics', 'STATS_FETCH_FAILED');
     }
+
+    // Cache the result
+    setCache(cacheKey, data, STATS_CACHE_TTL[window]);
 
     return data;
   } catch (error) {

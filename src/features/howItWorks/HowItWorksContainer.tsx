@@ -1,5 +1,6 @@
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { motion } from 'framer-motion';
+import { memo } from 'react';
 import CallToAction from './components/CallToAction';
 import Header from './components/Header';
 import MeaningSection from './components/MeaningSection';
@@ -12,7 +13,7 @@ import { DEMO_COMMON_LETTERS, DEMO_NAME1, DEMO_NAME2, DEMO_REMAINING_COUNT } fro
  * Enhanced container component for the How It Works feature
  * Serves as the composition point for all section components with improved spacing and animations
  */
-export default function HowItWorksContainer() {
+function HowItWorksContainer() {
   const { shouldAnimate } = useAnimationPreferences();
 
   return (
@@ -88,3 +89,5 @@ export default function HowItWorksContainer() {
     </div>
   );
 }
+
+export default memo(HowItWorksContainer);

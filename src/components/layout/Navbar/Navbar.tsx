@@ -5,12 +5,18 @@ import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import FloatingControlPanel from '@layout/FloatingControlPanel';
 import { motion, useScroll, useTransform, Variants } from 'framer-motion';
 import { BarChart3, BookOpen, Menu, Wand2 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import MobileMenu from './MobileMenu';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import NavItem from './NavItem';
 
-export default function Navbar() {
+// Lazy load MobileMenu since it's not needed on initial render
+const MobileMenu = dynamic(() => import('./MobileMenu'), {
+  ssr: false,
+  loading: () => null,
+});
+
+function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -245,21 +251,20 @@ export default function Navbar() {
         {/* Subtle animated accent line */}
         {!prefersReducedMotion && (
           <motion.div
-            className="from-primary via-secondary to-tertiary absolute bottom-0 left-0 h-0.5 bg-linear-to-r"
+            className="from-primary via-secondary to-tertiary absolute bottom-0 left-0 h-0.5 bg-linear-to-r will-change-transform"
             initial={{ scaleX: 0, originX: 0 }}
             animate={{
               scaleX: isScrolled ? 1 : 0,
               opacity: isScrolled ? 0.6 : 0,
             }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
           />
         )}
       </motion.header>
 
-      {/* Enhanced space filler with dynamic height */}
-      <motion.div
-        className="transition-all duration-300"
-        style={{ height: isScrolled ? '64px' : '56px' }}
+      {/* Enhanced space filler with fixed height to prevent CLS */}
+      <div
+        className="h-14 md:h-16"
         aria-hidden="true"
       />
 
@@ -271,3 +276,6 @@ export default function Navbar() {
     </>
   );
 }
+
+// Memoize Navbar to prevent unnecessary re-renders
+export default memo(Navbar);

@@ -5,10 +5,11 @@ import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { motion, useScroll, useTransform, Variants } from 'framer-motion';
 import { ExternalLink, Heart, Sparkles, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
+import { memo } from 'react';
 import { FOOTER_CONFIG } from './config';
 import type { FooterLinkProps } from './types';
 
-export default function Footer() {
+function Footer() {
   const { shouldAnimate, prefersReducedMotion } = useAnimationPreferences();
   const { scrollYProgress } = useScroll();
 
@@ -316,13 +317,16 @@ export default function Footer() {
       {/* Decorative bottom accent */}
       {shouldAnimate && (
         <motion.div
-          className="from-primary via-secondary to-tertiary absolute right-0 bottom-0 left-0 h-1 bg-linear-to-r opacity-60"
+          className="from-primary via-secondary to-tertiary absolute right-0 bottom-0 left-0 h-1 bg-linear-to-r opacity-60 will-change-transform"
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
-          transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
           viewport={{ once: true }}
         />
       )}
     </motion.footer>
   );
 }
+
+// Memoize Footer to prevent unnecessary re-renders
+export default memo(Footer);

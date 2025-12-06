@@ -1,28 +1,34 @@
 'use client';
 
+import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
-import { ReactNode } from 'react';
+import { memo, ReactNode } from 'react';
 
 interface PageTransitionProps {
   children: ReactNode;
   className?: string;
 }
 
-export default function PageTransition({ children, className = '' }: PageTransitionProps) {
+function PageTransition({ children, className = '' }: PageTransitionProps) {
   const pathname = usePathname();
+  const { shouldAnimate, prefersReducedMotion } = useAnimationPreferences();
+
+  // Skip animation for reduced motion preference or disabled animations
+  if (!shouldAnimate || prefersReducedMotion) {
+    return <div className={`w-full ${className}`}>{children}</div>;
+  }
 
   return (
     <motion.div
       key={pathname}
-      initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
-      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
       transition={{
-        type: 'spring',
-        stiffness: 260,
-        damping: 20,
-        duration: 0.5,
+        type: 'tween',
+        ease: 'easeOut',
+        duration: 0.2,
       }}
       className={`w-full ${className}`}
     >
@@ -30,3 +36,6 @@ export default function PageTransition({ children, className = '' }: PageTransit
     </motion.div>
   );
 }
+
+// Memoize to prevent unnecessary re-renders
+export default memo(PageTransition);

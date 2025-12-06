@@ -1,18 +1,22 @@
 import LoadingScreen from '@components/ui/LoadingScreen';
-import { Suspense } from 'react';
-import ManualMode from '../features/flamesGame/ManualMode';
+import dynamic from 'next/dynamic';
+import { memo } from 'react';
 import ErrorBoundary from '../features/flamesGame/ManualMode/components/ErrorBoundary';
 
-export default function ManualModePage() {
+// Lazy load ManualMode as it's a heavy component with canvas
+const ManualMode = dynamic(() => import('../features/flamesGame/ManualMode'), {
+  ssr: false,
+  loading: () => <LoadingScreen message="Loading Manual Mode..." fullScreen={false} className="min-h-screen" />,
+});
+
+function ManualModePage() {
   return (
     <div className="min-h-screen">
       <ErrorBoundary>
-        <Suspense
-          fallback={<LoadingScreen message="Loading Manual Mode..." fullScreen={false} className="min-h-screen" />}
-        >
-          <ManualMode />
-        </Suspense>
+        <ManualMode />
       </ErrorBoundary>
     </div>
   );
 }
+
+export default memo(ManualModePage);

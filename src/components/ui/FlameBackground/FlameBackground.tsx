@@ -1,9 +1,9 @@
 'use client';
 
-import { useAnimationPreferences } from '@/hooks/useAnimationPreferences'; // Import hook
-import { colorToRgbaPrefix } from '@utils/colorUtils'; // Import the function
+import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
+import { colorToRgbaPrefix } from '@utils/colorUtils';
 import { motion } from 'framer-motion';
-import { useEffect, useRef } from 'react';
+import { memo, useCallback, useEffect, useRef } from 'react';
 
 class Particle {
   x: number;
@@ -44,9 +44,58 @@ class Particle {
   }
 }
 
-export default function FlameBackground() {
-  const { shouldAnimate } = useAnimationPreferences(); // Use hook
+function FlameBackground() {
+  const { shouldAnimate, prefersReducedMotion } = useAnimationPreferences();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationIdRef = useRef<number>(0);
+  const particlesRef = useRef<Particle[]>([]);
+  const colorsRef = useRef<string[]>([]);
+  const isVisibleRef = useRef(true);
+
+  // Handle visibility change to pause animation when tab is hidden
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      isVisibleRef.current = !document.hidden;
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
+  // Memoized animation loop for better performance
+  const animate = useCallback((ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
+    // Skip frame if page is not visible
+    if (!isVisibleRef.current) {
+      animationIdRef.current = requestAnimationFrame(() => animate(ctx, canvas));
+      return;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Create particles less frequently for better performance
+    if (Math.random() > 0.92) {
+      for (let i = 0; i < 3; i++) {
+        particlesRef.current.push(new Particle(canvas.width, canvas.height, colorsRef.current));
+      }
+    }
+
+    // Limit max particles for performance
+    const maxParticles = 100;
+    if (particlesRef.current.length > maxParticles) {
+      particlesRef.current = particlesRef.current.slice(-maxParticles);
+    }
+
+    for (let i = particlesRef.current.length - 1; i >= 0; i--) {
+      particlesRef.current[i].update();
+      particlesRef.current[i].draw(ctx, colorsRef.current[0]);
+
+      if (particlesRef.current[i].size <= 0.2 || particlesRef.current[i].opacity <= 0) {
+        particlesRef.current.splice(i, 1);
+      }
+    }
+
+    animationIdRef.current = requestAnimationFrame(() => animate(ctx, canvas));
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -68,60 +117,38 @@ export default function FlameBackground() {
       colorToRgbaPrefix(secondaryContainer),
       colorToRgbaPrefix(tertiaryContainer),
       colorToRgbaPrefix(primary),
-    ].filter((prefix) => prefix !== 'rgba(0, 0, 0, '); // Filter out fallback color if parsing failed
+    ].filter((prefix) => prefix !== 'rgba(0, 0, 0, ');
 
-    // Handle case where all color parsing fails
     if (particleColorPrefixes.length === 0) {
-      particleColorPrefixes.push('rgba(249, 115, 22, '); // Add a default fallback color prefix
+      particleColorPrefixes.push('rgba(249, 115, 22, ');
     }
 
-    const resizeCanvas = () => {
+    colorsRef.current = particleColorPrefixes;
+
+    // Use ResizeObserver for more efficient resize handling
+    const resizeObserver = new ResizeObserver(() => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-    };
+    });
 
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    resizeObserver.observe(document.documentElement);
 
-    const particles: Particle[] = [];
-
-    const createParticles = () => {
-      if (Math.random() > 0.9) {
-        for (let i = 0; i < 4; i++) {
-          particles.push(new Particle(canvas.width, canvas.height, particleColorPrefixes));
-        }
-      }
-
-      for (let i = particles.length - 1; i >= 0; i--) {
-        particles[i].update();
-        particles[i].draw(ctx, particleColorPrefixes[0]);
-
-        if (particles[i].size <= 0.2 || particles[i].opacity <= 0) {
-          particles.splice(i, 1);
-        }
-      }
-    };
-
-    let animationId: number;
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      createParticles();
-      animationId = requestAnimationFrame(animate);
-    };
-
-    animate();
+    animate(ctx, canvas);
 
     return () => {
-      cancelAnimationFrame(animationId);
-      window.removeEventListener('resize', resizeCanvas);
+      cancelAnimationFrame(animationIdRef.current);
+      resizeObserver.disconnect();
+      particlesRef.current = [];
     };
-  }, [shouldAnimate]);
+  }, [shouldAnimate, animate]);
 
-  if (!shouldAnimate) {
+  // Static background for reduced motion or no animation
+  if (!shouldAnimate || prefersReducedMotion) {
     return (
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
+        <div className="absolute inset-0 bg-[url('/assets/noise.webp')] opacity-10"></div>
         <div className="bg-primary-container/20 absolute top-1/4 left-1/2 h-160 w-160 -translate-x-1/2 rounded-full blur-3xl"></div>
         <div className="bg-tertiary-container/20 absolute right-0 bottom-0 h-120 w-120 rounded-full blur-3xl"></div>
         <div className="bg-secondary-container/20 absolute top-0 left-0 h-80 w-[20rem] rounded-full blur-3xl"></div>
@@ -131,10 +158,10 @@ export default function FlameBackground() {
 
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden">
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
+      <div className="absolute inset-0 bg-[url('/assets/noise.webp')] opacity-10"></div>
 
       <motion.div
-        className="bg-tertiary-container/20 absolute top-1/4 left-1/2 h-160 w-160 -translate-x-1/2 rounded-full blur-3xl"
+        className="bg-tertiary-container/20 absolute top-1/4 left-1/2 h-160 w-160 -translate-x-1/2 rounded-full blur-3xl will-change-transform"
         animate={{
           scale: [1, 1.2, 1],
           opacity: [0.5, 0.7, 0.5],
@@ -146,7 +173,7 @@ export default function FlameBackground() {
         }}
       />
       <motion.div
-        className="bg-secondary-container/30 absolute right-0 bottom-0 h-120 w-120 rounded-full blur-3xl"
+        className="bg-secondary-container/30 absolute right-0 bottom-0 h-120 w-120 rounded-full blur-3xl will-change-transform"
         animate={{
           scale: [1, 1.1, 1],
           opacity: [0.4, 0.6, 0.4],
@@ -158,7 +185,7 @@ export default function FlameBackground() {
         }}
       />
       <motion.div
-        className="bg-primary-container/40 absolute top-0 left-0 h-80 w-[20rem] rounded-full blur-3xl"
+        className="bg-primary-container/40 absolute top-0 left-0 h-80 w-[20rem] rounded-full blur-3xl will-change-transform"
         animate={{
           scale: [1, 1.3, 1],
           opacity: [0.4, 0.5, 0.4],
@@ -174,3 +201,6 @@ export default function FlameBackground() {
     </div>
   );
 }
+
+// Memoize to prevent unnecessary re-renders
+export default memo(FlameBackground);
