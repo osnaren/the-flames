@@ -7,7 +7,7 @@ The FLAMES API provides a RESTful endpoint for calculating relationship compatib
 ## Base URL
 
 ```
-https://your-domain.com/api
+https://theflames.app/api
 ```
 
 ## Authentication
@@ -45,11 +45,11 @@ POST /flames
 #### Example Request
 
 ```bash
-curl -X POST https://your-domain.com/api/flames \
+curl -X POST https://theflames.app/api/flames \
   -H "Content-Type: application/json" \
   -d '{
-    "name1": "John",
-    "name2": "Jane"
+    "name1": "Alice",
+    "name2": "Bob"
   }'
 ```
 
@@ -61,21 +61,13 @@ curl -X POST https://your-domain.com/api/flames \
 {
   "success": true,
   "data": {
-    "name1": "John",
-    "name2": "Jane",
-    "commonLetters": [
-      {
-        "letter": "n",
-        "positions1": [3],
-        "positions2": [2],
-        "count": 1
-      }
-    ],
-    "flamesLetters": ["F", "L", "A", "M", "E", "S"],
-    "finalCount": 6,
+    "name1": "Alice",
+    "name2": "Bob",
     "result": "L",
     "resultMeaning": "Love",
-    "tagline": "Love is in the air! 💕"
+    "tagline": "Love is in the air! 💕",
+    "commonLetters": ["b"],
+    "timestamp": "2024-12-06T10:30:45.123Z"
   }
 }
 ```
@@ -103,7 +95,42 @@ curl -X POST https://your-domain.com/api/flames \
   "error": {
     "code": "RATE_LIMIT_EXCEEDED",
     "message": "Too many requests. Please try again later.",
-    "retryAfter": 60
+    "retryAfter": 45
+  }
+}
+```
+
+### Get API Info
+
+Get information about the FLAMES API.
+
+#### Endpoint
+
+```
+GET /flames
+```
+
+#### Success Response
+
+**Code:** `200 OK`
+
+```json
+{
+  "name": "FLAMES API",
+  "version": "1.0.0",
+  "description": "Calculate the relationship between two names using the classic FLAMES algorithm",
+  "endpoints": {
+    "POST /api/flames": {
+      "description": "Calculate FLAMES result for two names",
+      "body": {
+        "name1": "string (required) - First name",
+        "name2": "string (required) - Second name"
+      }
+    }
+  },
+  "rateLimits": {
+    "requests": 20,
+    "window": "60 seconds"
   }
 }
 ```
@@ -116,26 +143,14 @@ curl -X POST https://your-domain.com/api/flames \
 interface FlamesApiResponse {
   success: true;
   data: {
-    name1: string; // Original or anonymized name
-    name2: string; // Original or anonymized name
-    commonLetters: CommonLetter[]; // Array of common letters found
-    flamesLetters: string[]; // FLAMES letters array
-    finalCount: number; // Count used for elimination
-    result: 'F' | 'L' | 'A' | 'M' | 'E' | 'S'; // Final result
+    name1: string; // Sanitized first name
+    name2: string; // Sanitized second name
+    result: 'F' | 'L' | 'A' | 'M' | 'E' | 'S'; // Final FLAMES result
     resultMeaning: string; // Human-readable meaning
-    tagline: string; // Random motivational tagline
+    tagline: string; // Fun tagline with emoji
+    commonLetters: string[]; // Array of common letters found
+    timestamp: string; // ISO 8601 timestamp
   };
-}
-```
-
-### Common Letter Object
-
-```typescript
-interface CommonLetter {
-  letter: string; // The common letter
-  positions1: number[]; // Positions in first name
-  positions2: number[]; // Positions in second name
-  count: number; // Number of occurrences
 }
 ```
 
@@ -155,14 +170,14 @@ interface FlamesApiError {
 
 ## FLAMES Results
 
-| Letter | Meaning        | Description                           |
-| ------ | -------------- | ------------------------------------- |
-| **F**  | Friends        | Best friends forever                  |
-| **L**  | Love           | True love and romance                 |
-| **A**  | Affection      | Sweet affection and care              |
-| **M**  | Marriage       | Wedding bells and lifetime commitment |
-| **E**  | Enemy          | Opposites that clash                  |
-| **S**  | Sister/Sibling | Family-like bond                      |
+| Letter | Meaning    | Description                           |
+| ------ | ---------- | ------------------------------------- |
+| **F**  | Friends    | Best friends forever                  |
+| **L**  | Love       | True love and romance                 |
+| **A**  | Affection  | Sweet affection and care              |
+| **M**  | Marriage   | Wedding bells and lifetime commitment |
+| **E**  | Enemy      | Opposites that clash                  |
+| **S**  | Sibling    | Family-like bond                      |
 
 ## Error Codes
 
@@ -172,6 +187,7 @@ interface FlamesApiError {
 | -------------------- | ----------- | -------------------------------- |
 | `VALIDATION_ERROR`   | 400         | Input validation failed          |
 | `MISSING_PARAMETERS` | 400         | Required parameters not provided |
+| `INVALID_JSON`       | 400         | Request body is not valid JSON   |
 
 ### Rate Limiting
 
@@ -188,7 +204,7 @@ interface FlamesApiError {
 ## Rate Limiting
 
 - **Limit**: 20 requests per minute per IP address
-- **Window**: 60 seconds (rolling window)
+- **Window**: 60 seconds (sliding window)
 - **Headers**: Response includes rate limit headers
 
 ### Rate Limit Headers
@@ -196,8 +212,14 @@ interface FlamesApiError {
 ```
 X-RateLimit-Limit: 20
 X-RateLimit-Remaining: 19
-X-RateLimit-Reset: 1640995200
+X-RateLimit-Reset: 45
 ```
+
+| Header                  | Description                          |
+| ----------------------- | ------------------------------------ |
+| `X-RateLimit-Limit`     | Maximum requests allowed per window  |
+| `X-RateLimit-Remaining` | Requests remaining in current window |
+| `X-RateLimit-Reset`     | Seconds until the window resets      |
 
 ## Input Validation
 
@@ -207,6 +229,7 @@ X-RateLimit-Reset: 1640995200
 - **Characters**: Letters (Unicode), numbers, spaces, apostrophes, hyphens, dots
 - **Trimming**: Leading/trailing whitespace removed
 - **Normalization**: Unicode normalization applied
+- **Uniqueness**: Names must be different (case-insensitive)
 
 ### Validation Examples
 
@@ -224,27 +247,27 @@ X-RateLimit-Reset: 1640995200
 - `John@123` (contains @)
 - `A`.repeat(51) (too long)
 - `   ` (only whitespace)
+- Same name for both inputs
 
 ## Algorithm Details
 
 ### FLAMES Calculation Process
 
 1. **Normalization**: Convert names to lowercase, remove spaces
-2. **Common Letters**: Find matching letters between names
-3. **Remaining Count**: Count letters that don't match
-4. **Elimination**: Use count to eliminate FLAMES letters
+2. **Common Letters**: Find matching letters between names (one-to-one matching)
+3. **Remaining Count**: Count letters that don't match in both names
+4. **Elimination**: Use count to cycle through F-L-A-M-E-S, eliminating letters
 5. **Result**: Return the last remaining letter
 
 ### Example Calculation
 
-**Names**: John, Jane
+**Names**: Alice, Bob
 
-1. **Normalized**: `john`, `jane`
-2. **Common Letters**: `j`, `n` (2 letters)
-3. **Remaining**: `oh` + `ae` = 4 letters
-4. **FLAMES**: Start with [F,L,A,M,E,S], count 4
-5. **Elimination**: Remove every 4th letter until one remains
-6. **Result**: Final remaining letter
+1. **Normalized**: `alice`, `bob`
+2. **Common Letters**: `b` (1 letter)
+3. **Remaining**: `alice` - `b` match in `bob` = 4 + 2 = 6 letters remain
+4. **FLAMES**: Start with [F,L,A,M,E,S], count through and eliminate
+5. **Result**: Final remaining letter determines the relationship
 
 ## Code Examples
 
@@ -252,36 +275,26 @@ X-RateLimit-Reset: 1640995200
 
 ```javascript
 async function calculateFlames(name1, name2) {
-  try {
-    const response = await fetch('/api/flames', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name1, name2 }),
-    });
+  const response = await fetch('/api/flames', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name1, name2 }),
+  });
 
-    const data = await response.json();
+  const data = await response.json();
 
-    if (!data.success) {
-      throw new Error(data.error.message);
-    }
-
-    return data.data;
-  } catch (error) {
-    console.error('FLAMES calculation failed:', error);
-    throw error;
+  if (!data.success) {
+    throw new Error(data.error.message);
   }
+
+  return data.data;
 }
 
 // Usage
-calculateFlames('John', 'Jane')
+calculateFlames('Alice', 'Bob')
   .then((result) => {
-    console.log(`${result.name1} & ${result.name2} = ${result.result} (${result.resultMeaning})`);
-    console.log(result.tagline);
-  })
-  .catch((error) => {
-    console.error('Error:', error.message);
+    console.log(`Result: ${result.resultMeaning}`);
+    console.log(`Tagline: ${result.tagline}`);
   });
 ```
 
@@ -291,111 +304,44 @@ calculateFlames('John', 'Jane')
 import requests
 
 def calculate_flames(name1, name2):
-    url = 'https://your-domain.com/api/flames'
-    payload = {
-        'name1': name1,
-        'name2': name2
-    }
+    url = 'https://theflames.app/api/flames'
+    payload = {'name1': name1, 'name2': name2}
 
-    try:
-        response = requests.post(url, json=payload)
-        response.raise_for_status()
+    response = requests.post(url, json=payload)
+    data = response.json()
 
-        data = response.json()
+    if not data['success']:
+        raise Exception(data['error']['message'])
 
-        if not data['success']:
-            raise Exception(data['error']['message'])
-
-        return data['data']
-
-    except requests.exceptions.RequestException as e:
-        print(f'Request failed: {e}')
-        raise
+    return data['data']
 
 # Usage
-try:
-    result = calculate_flames('John', 'Jane')
-    print(f"{result['name1']} & {result['name2']} = {result['result']} ({result['resultMeaning']})")
-    print(result['tagline'])
-except Exception as e:
-    print(f'Error: {e}')
+result = calculate_flames('Alice', 'Bob')
+print(f"Result: {result['resultMeaning']}")
+print(f"Tagline: {result['tagline']}")
 ```
 
-### cURL Examples
+### Node.js (Axios)
 
-#### Basic Request
+```javascript
+const axios = require('axios');
 
-```bash
-curl -X POST https://your-domain.com/api/flames \
-  -H "Content-Type: application/json" \
-  -d '{"name1": "John", "name2": "Jane"}'
+const response = await axios.post(
+  'https://theflames.app/api/flames',
+  { name1: 'Alice', name2: 'Bob' },
+  { headers: { 'Content-Type': 'application/json' } }
+);
+
+console.log('Result:', response.data.data.resultMeaning);
+console.log('Tagline:', response.data.data.tagline);
 ```
 
-#### With Verbose Output
+### cURL
 
 ```bash
-curl -X POST https://your-domain.com/api/flames \
-  -H "Content-Type: application/json" \
-  -d '{"name1": "John", "name2": "Jane"}' \
-  -w "\nStatus: %{http_code}\nTime: %{time_total}s\n" \
-  -v
-```
-
-## Testing
-
-### Test Cases
-
-```bash
-# Valid request
-curl -X POST localhost:3000/api/flames \
+curl -X POST https://theflames.app/api/flames \
   -H "Content-Type: application/json" \
   -d '{"name1": "Alice", "name2": "Bob"}'
-
-# Invalid characters
-curl -X POST localhost:3000/api/flames \
-  -H "Content-Type: application/json" \
-  -d '{"name1": "Al!ce", "name2": "Bob"}'
-
-# Missing parameter
-curl -X POST localhost:3000/api/flames \
-  -H "Content-Type: application/json" \
-  -d '{"name1": "Alice"}'
-```
-
-## Integration Examples
-
-### Express.js Server
-
-```javascript
-const express = require('express');
-const { createFlamesEndpoint } = require('./flames-api');
-
-const app = express();
-app.use(express.json());
-
-app.post('/api/flames', createFlamesEndpoint());
-
-app.listen(3000, () => {
-  console.log('FLAMES API server running on port 3000');
-});
-```
-
-### Vercel Serverless Function
-
-```javascript
-// api/flames.js
-const { createFlamesEndpoint } = require('../lib/flames-api');
-
-export default createFlamesEndpoint();
-```
-
-### Next.js API Route
-
-```javascript
-// pages/api/flames.js
-import { createFlamesEndpoint } from '../../lib/flames-api';
-
-export default createFlamesEndpoint();
 ```
 
 ## Performance
@@ -408,9 +354,7 @@ export default createFlamesEndpoint();
 
 ### Throughput
 
-- **Maximum**: 1000 requests/second
-- **Sustained**: 500 requests/second
-- **Per IP**: 20 requests/minute
+- **Per IP**: 20 requests/minute (rate limited)
 
 ## Security
 
@@ -419,7 +363,7 @@ export default createFlamesEndpoint();
 - Unicode normalization
 - Invisible character removal
 - XSS prevention
-- SQL injection prevention (though no database used)
+- Whitespace normalization
 
 ### Rate Limiting
 
@@ -431,32 +375,7 @@ export default createFlamesEndpoint();
 
 - No data persistence
 - No logging of names
-
-## Monitoring
-
-### Metrics Tracked
-
-- Request count
-- Response times
-- Error rates
-- Rate limit violations
-- Input validation failures
-
-### Health Check
-
-```bash
-curl https://your-domain.com/api/health
-```
-
-Response:
-
-```json
-{
-  "status": "healthy",
-  "timestamp": "2024-01-01T00:00:00.000Z",
-  "version": "1.0.0"
-}
-```
+- Stateless API
 
 ## Changelog
 
@@ -464,35 +383,11 @@ Response:
 
 - Initial API release
 - FLAMES calculation endpoint
-- Input validation
-- Rate limiting
-- Error handling
-- Comprehensive documentation
-
-### Planned Features
-
-- Batch processing endpoint
-- Webhook support
-- API key authentication
-- Enhanced analytics
-- Multi-language support
-
-## Support
-
-### Getting Help
-
-- **GitHub Issues**: Report bugs and request features
-- **Documentation**: Comprehensive guides available
-- **Email**: <api-support@your-domain.com>
-
-### Contributing
-
-- Fork the repository
-- Create feature branch
-- Add tests
-- Submit pull request
-- Update documentation
+- Input validation with Zod
+- Sliding window rate limiting
+- Comprehensive error handling
+- Rate limit headers
 
 ---
 
-**Happy coding with FLAMES API!** 🔥🚀
+**Happy coding with FLAMES API!** 🔥💕
