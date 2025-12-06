@@ -1,5 +1,4 @@
-import { FlamesResult } from '@features/flamesGame/flames.types';
-import { getResultData } from '@features/flamesGame/resultData';
+import { FlamesResult, getResultData } from '@shared/utils/resultData';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useMemo } from 'react';

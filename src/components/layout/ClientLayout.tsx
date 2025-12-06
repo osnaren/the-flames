@@ -9,7 +9,7 @@ const FlameBackground = dynamic(() => import('@ui/FlameBackground'), {
   loading: () => null,
 });
 
-const SponsorFAB = dynamic(() => import('@features/sponsor/SponsorFAB'), {
+const SponsorFAB = dynamic(() => import('@components/sponsor/SponsorFAB'), {
   ssr: false,
   loading: () => null,
 });

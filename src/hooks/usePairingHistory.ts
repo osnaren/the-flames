@@ -1,4 +1,4 @@
-import { FlamesResult } from '@features/flamesGame/flames.types';
+import { FlamesResult } from '@shared/utils/resultData';
 import { useCallback, useEffect, useState } from 'react';
 
 interface PairingEntry {

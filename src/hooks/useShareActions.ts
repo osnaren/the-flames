@@ -1,5 +1,4 @@
-import { FlamesResult } from '@features/flamesGame/flames.types';
-import { getResultData } from '@features/flamesGame/resultData';
+import { FlamesResult, getResultData } from '@shared/utils/resultData';
 import { copyShareUrl, shareResult } from '@lib/share';
 import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';

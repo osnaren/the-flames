@@ -27,6 +27,10 @@
     "paths": {
       "@/*": ["./src/*"],
       "src/*": ["./src/*"],
+      "@modules/*": ["./src/modules/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@core/*": ["./src/components/core/*"],
+      "@vendor/*": ["./src/components/vendor/*"],
       "@assets/*": ["./src/assets/*"],
       "@components/*": ["./src/components/*"],
       "@shadcn/*": ["./src/components/shadcn/*"],

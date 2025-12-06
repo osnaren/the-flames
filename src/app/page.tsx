@@ -1,6 +1,6 @@
 'use client';
 
-import HomePage from '@pages/HomePage';
+import { HomePage } from '@modules/home';
 
 export default function Page() {
   return <HomePage />;

@@ -66,6 +66,7 @@ function FlameBackground() {
   const animate = useCallback((ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
     // Skip frame if page is not visible
     if (!isVisibleRef.current) {
+      // eslint-disable-next-line react-hooks/immutability
       animationIdRef.current = requestAnimationFrame(() => animate(ctx, canvas));
       return;
     }
@@ -148,7 +149,7 @@ function FlameBackground() {
   if (!shouldAnimate || prefersReducedMotion) {
     return (
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/assets/noise.webp')] opacity-10"></div>
+        <div className="absolute inset-0 bg-[url('/assets/noise.webp')] opacity-5"></div>
         <div className="bg-primary-container/20 absolute top-1/4 left-1/2 h-160 w-160 -translate-x-1/2 rounded-full blur-3xl"></div>
         <div className="bg-tertiary-container/20 absolute right-0 bottom-0 h-120 w-120 rounded-full blur-3xl"></div>
         <div className="bg-secondary-container/20 absolute top-0 left-0 h-80 w-[20rem] rounded-full blur-3xl"></div>
@@ -158,7 +159,7 @@ function FlameBackground() {
 
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden">
-      <div className="absolute inset-0 bg-[url('/assets/noise.webp')] opacity-10"></div>
+      <div className="absolute inset-0 bg-[url('/assets/noise.webp')] opacity-5"></div>
 
       <motion.div
         className="bg-tertiary-container/20 absolute top-1/4 left-1/2 h-160 w-160 -translate-x-1/2 rounded-full blur-3xl will-change-transform"

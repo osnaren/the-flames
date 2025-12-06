@@ -1,7 +1,4 @@
-/* 
- * Fonts are loaded via next/font in src/lib/fonts.ts
- * This eliminates render-blocking font requests and improves LCP
- */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap');
 
 @import 'tailwindcss';
 

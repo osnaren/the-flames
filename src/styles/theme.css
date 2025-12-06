@@ -27,8 +27,8 @@
   --font-space: var(--font-space-grotesk), sans-serif;
   --font-handwriting: var(--font-patrick-hand), cursive;
   --font-emoji:
-    var(--font-noto-emoji), 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Android Emoji', 'EmojiSymbols',
-    'EmojiOne Mozilla', 'Twemoji Mozilla', 'Segoe UI Symbol', 'Noto Color Emoji Compat', emoji, sans-serif;
+    'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Android Emoji', 'EmojiSymbols', 'EmojiOne Mozilla',
+    'Twemoji Mozilla', 'Segoe UI Symbol', 'Noto Color Emoji Compat', emoji, sans-serif;
 
   /* Font Sizes */
   --text-h1: clamp(3.5rem, 4vw + 2rem, 6rem);

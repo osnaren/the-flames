@@ -1,6 +1,6 @@
 'use client';
 
-import ManualModePage from '@pages/ManualModePage';
+import { ManualModePage } from '@modules/manual';
 
 export default function Page() {
   return <ManualModePage />;

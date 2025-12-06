@@ -1,1 +1,0 @@
-export { CommonLettersStrike } from './CommonLettersStrike';
