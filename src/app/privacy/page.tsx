@@ -48,7 +48,7 @@ const PolicySection = ({ icon, title, children, index, color }: PolicySectionPro
       <div className="bg-surface-container/50 border-outline/10 hover:border-primary/30 hover:shadow-primary/5 relative overflow-hidden rounded-2xl border p-6 backdrop-blur-sm transition-all duration-300 hover:shadow-xl md:p-8">
         {/* Decorative gradient */}
         <div
-          className={`absolute -right-10 -top-10 h-32 w-32 rounded-full bg-linear-to-br ${color} opacity-10 blur-3xl transition-opacity duration-300 group-hover:opacity-20`}
+          className={`absolute -top-10 -right-10 h-32 w-32 rounded-full bg-linear-to-br ${color} opacity-10 blur-3xl transition-opacity duration-300 group-hover:opacity-20`}
         />
 
         <div className="relative z-10">
@@ -112,7 +112,7 @@ export default function PrivacyPage() {
           >
             Privacy & Terms
           </SparklesText>
-          <h2 className="text-muted-foreground text-xl font-light tracking-wide md:text-2xl">
+          <h2 className="font-heading text-muted-foreground text-xl font-light tracking-wide md:text-2xl">
             The Fun Stuff (Legally Speaking) 🔐
           </h2>
         </motion.div>
@@ -254,7 +254,7 @@ export default function PrivacyPage() {
                   <strong>Recent Pairings:</strong> History of your recent games (stored locally, never sent to us)
                 </li>
               </ul>
-              <p className="mt-4 italic text-amber-600 dark:text-amber-400">
+              <p className="mt-4 text-amber-600 italic dark:text-amber-400">
                 These are NOT tracking cookies - they're just your personal settings that live in your browser! 🍪
               </p>
             </PolicySection>
@@ -310,7 +310,7 @@ export default function PrivacyPage() {
       </section>
 
       {/* Terms of Service Section */}
-      <section id="terms" className="scroll-mt-20 bg-muted/10 px-4 py-20">
+      <section id="terms" className="bg-muted/10 scroll-mt-20 px-4 py-20">
         <div className="container mx-auto max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -420,9 +420,7 @@ export default function PrivacyPage() {
             >
               <p>The important legal stuff (read with a smile):</p>
               <ul className="list-inside list-disc space-y-2 pl-4">
-                <li>
-                  FLAMES is provided "as is" - we can't guarantee 100% uptime (though we try our best!)
-                </li>
+                <li>FLAMES is provided "as is" - we can't guarantee 100% uptime (though we try our best!)</li>
                 <li>We're not responsible if you and your "Enemy" result actually become best friends 😉</li>
                 <li>
                   Results are for entertainment - please don't sue us if your FLAMES prediction doesn't come true!
@@ -451,7 +449,7 @@ export default function PrivacyPage() {
                 <span className="text-muted-foreground text-sm font-medium">Got Questions?</span>
               </div>
 
-              <h2 className="mb-4 text-3xl font-bold md:text-4xl">Contact Us</h2>
+              <h2 className="font-heading mb-4 text-3xl font-bold md:text-4xl">Contact Us</h2>
               <p className="text-muted-foreground mx-auto mb-8 max-w-xl text-lg">
                 If you have any questions about our privacy policy or terms, or just want to say hi, we'd love to hear
                 from you!
@@ -490,7 +488,7 @@ export default function PrivacyPage() {
             viewport={{ once: true }}
             className="space-y-4"
           >
-            <p className="text-muted-foreground text-lg italic">
+            <p className="font-handwriting text-muted-foreground text-lg italic">
               "We treat your data like we treat the FLAMES game - with respect, fun, and absolutely no drama."
             </p>
             <p className="text-muted-foreground/60 text-sm">— The FLAMES Team 💜</p>

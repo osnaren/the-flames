@@ -184,7 +184,7 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
                     duration: shouldAnimate ? 0.4 : 0,
                     ease: 'easeOut',
                   }}
-                  className="mb-3 flex items-center justify-center gap-3 text-lg font-medium"
+                  className="font-space mb-3 flex items-center justify-center gap-3 text-lg font-medium"
                 >
                   <span className="text-gray-700 dark:text-gray-200">{name1}</span>
                   <span className={cn('bg-clip-text text-2xl font-bold text-transparent', gradient.text)}>❤️</span>
@@ -204,7 +204,7 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
                   ease: 'easeOut',
                 }}
                 className={cn(
-                  'mb-3 text-4xl font-bold tracking-tight sm:text-5xl',
+                  'font-heading mb-3 text-4xl font-bold tracking-tight sm:text-5xl',
                   'bg-clip-text text-transparent',
                   gradient.text
                 )}

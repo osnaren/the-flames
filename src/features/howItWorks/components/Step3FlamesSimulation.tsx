@@ -80,7 +80,7 @@ const FlamesLetter = ({
       }}
       transition={{ type: 'spring', stiffness: 200, damping: 25 }} // Adjusted for smoother spring physics
       exit={{ opacity: 0, scale: 0.5, rotateY: 90, transition: { duration: 0.4 } }}
-      className={`group relative flex h-14 w-14 items-center justify-center rounded-xl font-mono text-xl font-bold shadow-lg transition-all duration-300 md:h-16 md:w-16 ${
+      className={`font-space group relative flex h-14 w-14 items-center justify-center rounded-xl text-xl font-bold shadow-lg transition-all duration-300 md:h-16 md:w-16 ${
         isFinal
           ? 'from-secondary via-primary-container to-tertiary text-on-secondary ring-primary/40 bg-linear-to-br shadow-2xl ring-4'
           : isHighlighted

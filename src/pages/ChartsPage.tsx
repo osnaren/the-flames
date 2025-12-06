@@ -59,7 +59,7 @@ function ChartsPage() {
               <Flame className="h-8 w-8 text-orange-500 dark:text-orange-400" />
             </div>
           )}
-          <h1 className="text-center text-2xl font-bold text-gray-800 md:text-3xl dark:text-white">
+          <h1 className="font-heading text-center text-2xl font-bold text-gray-800 md:text-3xl dark:text-white">
             FLAMES Global Charts
           </h1>
           <p className="mt-1 text-center text-gray-600 dark:text-gray-300">

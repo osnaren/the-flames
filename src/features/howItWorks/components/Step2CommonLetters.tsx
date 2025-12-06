@@ -75,7 +75,7 @@ const AnimatedLetter = ({
       whileHover={{ scale: isCommon ? 1.05 : 1.1, y: -2 }}
     >
       <motion.span
-        className={`relative inline-block rounded-lg px-4 py-2 text-lg font-medium transition-all duration-300 ${
+        className={`font-space relative inline-block rounded-lg px-4 py-2 text-lg font-medium transition-all duration-300 ${
           isCommon
             ? 'bg-error/10 text-error border-error/30 border-2 shadow-lg'
             : 'bg-surface-container-high text-on-surface border-outline/20 border shadow-md hover:shadow-lg'

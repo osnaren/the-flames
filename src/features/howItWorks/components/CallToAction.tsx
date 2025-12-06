@@ -263,7 +263,7 @@ export default function CallToAction() {
 
       {/* Subtitle */}
       <motion.p
-        className="text-on-surface-variant mt-6 text-base opacity-80 md:text-lg"
+        className="font-handwriting text-on-surface-variant mt-6 text-base opacity-80 md:text-lg"
         initial={{ opacity: 0, y: 20 }}
         animate={isInView ? { opacity: 0.8, y: 0 } : {}}
         transition={{ duration: 0.6, delay: 0.8, ease: 'easeOut' }}

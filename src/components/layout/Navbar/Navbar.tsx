@@ -195,12 +195,7 @@ function Navbar() {
             {/* Enhanced Desktop Navigation Links */}
             <nav className="hidden items-center space-x-2 md:flex" role="navigation" aria-label="Main navigation">
               <motion.div className="flex items-center space-x-2" variants={contentVariants}>
-                <NavItem
-                  label="How it Works"
-                  icon={BookOpen}
-                  to="/how-it-works"
-                  isActive={pathname === '/how-it-works'}
-                />
+                <NavItem label="About FLAMES" icon={BookOpen} to="/about" isActive={pathname === '/about'} />
                 <NavItem label="Global Charts" icon={BarChart3} to="/charts" isActive={pathname === '/charts'} />
                 <NavItem label="Manual Mode" icon={Wand2} to="/manual" isActive={pathname === '/manual'} />
               </motion.div>
@@ -263,10 +258,7 @@ function Navbar() {
       </motion.header>
 
       {/* Enhanced space filler with fixed height to prevent CLS */}
-      <div
-        className="h-14 md:h-16"
-        aria-hidden="true"
-      />
+      <div className="h-14 md:h-16" aria-hidden="true" />
 
       {/* Mobile menu */}
       <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} pathname={pathname || ''} />

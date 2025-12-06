@@ -330,7 +330,7 @@ export default function MeaningSection() {
             transition={{ delay: 1.2, duration: 0.6 }}
           >
             <motion.p
-              className="text-on-surface-variant mx-auto max-w-lg text-base leading-relaxed italic"
+              className="font-handwriting text-on-surface-variant mx-auto max-w-lg text-base leading-relaxed italic"
               whileHover={{ scale: shouldAnimate ? 1.02 : 1 }}
               transition={{ type: 'spring', stiffness: 300 }}
             >

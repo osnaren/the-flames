@@ -4,7 +4,7 @@ import { DM_Serif_Text, Josefin_Sans, Noto_Emoji, Noto_Sans, Patrick_Hand, Space
 export const notoSans = Noto_Sans({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-body',
+  variable: '--font-noto-sans',
   weight: ['400', '500', '600', '700'],
   preload: true,
 });
@@ -13,7 +13,7 @@ export const notoSans = Noto_Sans({
 export const notoEmoji = Noto_Emoji({
   subsets: ['emoji'],
   display: 'swap',
-  variable: '--font-emoji',
+  variable: '--font-noto-emoji',
   weight: ['400'],
   preload: true,
 });
@@ -22,7 +22,7 @@ export const notoEmoji = Noto_Emoji({
 export const dmSerifText = DM_Serif_Text({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-display',
+  variable: '--font-dm-serif',
   weight: ['400'],
   preload: true,
 });
@@ -31,7 +31,7 @@ export const dmSerifText = DM_Serif_Text({
 export const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-accent',
+  variable: '--font-space-grotesk',
   weight: ['300', '400', '500', '600', '700'],
   preload: false, // Lower priority
 });
@@ -40,7 +40,7 @@ export const spaceGrotesk = Space_Grotesk({
 export const josefinSans = Josefin_Sans({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-alt',
+  variable: '--font-josefin-sans',
   weight: ['400', '500', '600', '700'],
   preload: false,
 });
@@ -49,7 +49,7 @@ export const josefinSans = Josefin_Sans({
 export const patrickHand = Patrick_Hand({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-handwriting',
+  variable: '--font-patrick-hand',
   weight: ['400'],
   preload: false,
 });

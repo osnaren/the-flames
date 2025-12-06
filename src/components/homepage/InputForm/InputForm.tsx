@@ -168,7 +168,7 @@ function InputFormComponent({
             >
               <Heart className="h-6 w-6 text-white" fill="currentColor" />
             </motion.div>
-            <h2 className="text-on-surface text-xl font-bold md:text-2xl">Enter Two Names</h2>
+            <h2 className="font-heading text-on-surface text-xl font-bold md:text-2xl">Enter Two Names</h2>
             <p className="text-on-surface-variant mt-1 text-sm">Find out what destiny has in store</p>
           </div>
 

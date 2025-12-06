@@ -90,7 +90,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body>
+      <body className="font-body antialiased">
         <ClientLayout>
           <Navbar />
           <main className="pt-6">

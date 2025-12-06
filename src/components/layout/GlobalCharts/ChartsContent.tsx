@@ -139,7 +139,7 @@ export default function ChartsContent({
                 <div className="rounded-lg bg-white/20 p-2 backdrop-blur-sm">
                   <BarChart3 className="h-6 w-6 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-white sm:text-3xl">Global Charts</h2>
+                <h2 className="font-heading text-2xl font-bold text-white sm:text-3xl">Global Charts</h2>
               </div>
               <motion.p
                 className="mt-2 text-sm font-medium text-white/90 sm:text-base"

@@ -134,7 +134,7 @@ function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) 
 
       {/* Subtitle */}
       <motion.p
-        className="text-on-surface-variant mx-auto max-w-md text-lg font-medium md:text-xl lg:text-2xl"
+        className="font-heading text-on-surface-variant mx-auto max-w-md text-lg font-medium md:text-xl lg:text-2xl"
         initial={shouldAnimate ? { opacity: 0, y: 10 } : { opacity: 1 }}
         animate={{ opacity: isCompact ? 0.7 : 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.5 }}

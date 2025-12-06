@@ -218,7 +218,7 @@ export default function Step1Names({ name1, name2 }: Step1Props) {
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             >
               <motion.div
-                className="bg-surface-container-highest/90 text-on-surface relative rounded-xl p-6 text-2xl font-medium shadow-lg backdrop-blur-sm"
+                className="font-space bg-surface-container-highest/90 text-on-surface relative rounded-xl p-6 text-2xl font-medium shadow-lg backdrop-blur-sm"
                 animate={
                   isHovered && shouldAnimate
                     ? {
@@ -266,7 +266,7 @@ export default function Step1Names({ name1, name2 }: Step1Props) {
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             >
               <motion.div
-                className="bg-surface-container-highest/90 text-on-surface relative rounded-xl p-6 text-2xl font-medium shadow-lg backdrop-blur-sm"
+                className="font-space bg-surface-container-highest/90 text-on-surface relative rounded-xl p-6 text-2xl font-medium shadow-lg backdrop-blur-sm"
                 animate={
                   isHovered && shouldAnimate
                     ? {

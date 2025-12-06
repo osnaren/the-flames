@@ -21,13 +21,14 @@
   --s-duration: 14.5s;
 
   /* Font Families */
-  --font-heading: 'DM Serif Text', serif;
-  --font-body: 'Noto Sans', sans-serif;
-  --font-josefin: 'Josefin Sans', sans-serif;
-  --font-space: 'Space Grotesk', sans-serif;
+  --font-heading: var(--font-dm-serif), serif;
+  --font-body: var(--font-noto-sans), sans-serif;
+  --font-josefin: var(--font-josefin-sans), sans-serif;
+  --font-space: var(--font-space-grotesk), sans-serif;
+  --font-handwriting: var(--font-patrick-hand), cursive;
   --font-emoji:
-    'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Android Emoji', 'EmojiSymbols', 'EmojiOne Mozilla',
-    'Twemoji Mozilla', 'Segoe UI Symbol', 'Noto Color Emoji Compat', emoji, sans-serif;
+    var(--font-noto-emoji), 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Android Emoji', 'EmojiSymbols',
+    'EmojiOne Mozilla', 'Twemoji Mozilla', 'Segoe UI Symbol', 'Noto Color Emoji Compat', emoji, sans-serif;
 
   /* Font Sizes */
   --text-h1: clamp(3.5rem, 4vw + 2rem, 6rem);

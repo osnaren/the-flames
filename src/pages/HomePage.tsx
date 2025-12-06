@@ -205,13 +205,13 @@ function HomePage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.6 }}
           >
-            <p className="text-on-surface-variant/80 text-sm font-medium">
+            <p className="font-space text-on-surface-variant/80 text-sm font-medium">
               <span className="text-blue-500">F</span>riends •<span className="text-pink-500"> L</span>ove •
               <span className="text-amber-500"> A</span>ffection •<span className="text-emerald-500"> M</span>arriage •
               <span className="text-red-500"> E</span>nemies •<span className="text-purple-500"> S</span>iblings
             </p>
 
-            <p className="text-on-surface-variant/60 text-xs">
+            <p className="font-handwriting text-on-surface-variant/60 text-xs">
               ✨ The classic relationship game, reimagined with modern magic ✨
             </p>
           </motion.footer>

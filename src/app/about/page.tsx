@@ -105,14 +105,14 @@ export default function AboutPage() {
           >
             FLAMES
           </SparklesText>
-          <h2 className="text-muted-foreground text-2xl font-light tracking-wide md:text-4xl">The Nostalgia Project</h2>
+          <h2 className="font-heading text-muted-foreground text-2xl font-light tracking-wide md:text-4xl">The Nostalgia Project</h2>
         </motion.div>
 
         <div className="z-10 mx-auto mt-8 max-w-2xl">
           <TextAnimate
             animation="blurInUp"
             by="word"
-            className="text-muted-foreground/80 text-lg leading-relaxed md:text-xl"
+            className="font-handwriting text-muted-foreground/80 text-lg leading-relaxed md:text-xl"
           >
             Remember the days of scribbling names on the back of your rough notebook? Crossing out letters, counting the
             remains, and predicting your destiny?
@@ -138,7 +138,7 @@ export default function AboutPage() {
       <section className="bg-muted/10 px-4 py-32">
         <div className="container mx-auto space-y-16">
           <div className="space-y-4 text-center">
-            <h2 className="text-3xl font-bold tracking-tight md:text-5xl">Captured Memories</h2>
+            <h2 className="font-heading text-3xl font-bold tracking-tight md:text-5xl">Captured Memories</h2>
             <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
               Snapshots of the past, reimagined for the future.
             </p>
@@ -151,7 +151,7 @@ export default function AboutPage() {
       <section className="relative overflow-hidden px-4 py-32">
         <div className="from-background to-primary/5 absolute inset-0 -z-10 bg-linear-to-b" />
         <div className="relative z-10 container mx-auto space-y-10 text-center">
-          <h2 className="text-4xl font-bold tracking-tighter md:text-6xl">Ready to find out your destiny?</h2>
+          <h2 className="font-heading text-4xl font-bold tracking-tighter md:text-6xl">Ready to find out your destiny?</h2>
           <p className="text-muted-foreground mx-auto max-w-2xl text-xl font-light md:text-2xl">
             Don't let the past stay in the past. The flames are still burning.
           </p>

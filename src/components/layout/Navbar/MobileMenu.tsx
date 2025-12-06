@@ -157,10 +157,10 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
       description: 'Play the FLAMES game',
     },
     {
-      label: 'How it Works',
+      label: 'About FLAMES',
       icon: BookOpen,
-      path: '/how-it-works',
-      isActive: pathname === '/how-it-works',
+      path: '/about',
+      isActive: pathname === '/about',
       description: 'Learn about FLAMES',
     },
     {

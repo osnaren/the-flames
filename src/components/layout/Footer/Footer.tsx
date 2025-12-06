@@ -295,8 +295,7 @@ function Footer() {
               >
                 <Heart className="text-error h-4 w-4 fill-current drop-shadow-sm" />
               </motion.div>
-              <span>at osLabs</span>
-              <span className="font-emoji">🇮🇳</span>
+              <span>for love calculations</span>
             </motion.div>
           </div>
 

@@ -75,7 +75,7 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
           {/* Header */}
           <motion.div variants={itemVariants} className="mb-8 text-center">
             <Heart className="text-primary mx-auto mb-4 h-12 w-12" />
-            <h1 className="text-on-surface mb-2 text-3xl font-bold tracking-tight">FLAMES Manual Mode</h1>
+            <h1 className="font-heading text-on-surface mb-2 text-3xl font-bold tracking-tight">FLAMES Manual Mode</h1>
             <p className="text-on-surface-variant">Discover your relationship destiny.</p>
           </motion.div>
 
