@@ -252,7 +252,7 @@ export function generateArticleSchema(options: {
     headline: options.title,
     description: options.description,
     url: options.url,
-    datePublished: options.datePublished || '2024-01-01',
+    datePublished: options.datePublished || '2025-01-01',
     dateModified: options.dateModified || new Date().toISOString().split('T')[0],
     author: {
       '@type': 'Organization',

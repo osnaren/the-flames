@@ -67,7 +67,7 @@ curl -X POST https://theflames.app/api/flames \
     "resultMeaning": "Love",
     "tagline": "Love is in the air! 💕",
     "commonLetters": ["b"],
-    "timestamp": "2024-12-06T10:30:45.123Z"
+    "timestamp": "2025-12-06T10:30:45.123Z"
   }
 }
 ```

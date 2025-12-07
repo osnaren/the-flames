@@ -32,7 +32,7 @@ const articleSchema = generateArticleSchema({
   title: pagesSEO.about.title,
   description: pagesSEO.about.description,
   url: `${siteConfig.url}/about`,
-  datePublished: '2024-01-01',
+  datePublished: '2025-12-01',
 });
 
 export default function Page() {
