@@ -1,3 +1,4 @@
+import { Database } from '@/types/supabase';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize the Supabase client
@@ -12,7 +13,7 @@ if (!supabaseUrl || !supabaseKey || supabaseUrl === 'undefined' || supabaseKey =
   throw new Error('Supabase URL and Anon Key must be set in environment variables (.env or .env.local)');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey, {
+export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
   auth: {
     persistSession: false, // Disable session persistence for better performance
   },
