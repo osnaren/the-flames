@@ -40,7 +40,9 @@ function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) 
   const isCompact = stage === 'processing' || stage === 'result';
 
   return (
-    <motion.header
+    <motion.div
+      role="group"
+      aria-label="FLAMES title"
       className="relative mb-8 text-center md:mb-12"
       initial={shouldAnimate ? { opacity: 0, y: -20 } : { opacity: 1, y: 0 }}
       animate={{
@@ -180,7 +182,7 @@ function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) 
           ))}
         </div>
       )}
-    </motion.header>
+    </motion.div>
   );
 }
 

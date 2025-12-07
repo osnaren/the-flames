@@ -103,6 +103,9 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
             duration: shouldAnimate ? 0.4 : 0,
           }}
           className={cn('relative mx-auto w-full max-w-md will-change-transform', className)}
+          role="region"
+          aria-live="polite"
+          aria-label={`FLAMES Result: ${label}`}
         >
           {/* Result Glow Effect */}
           <ResultGlow result={result} isVisible={stageCompleted.entry} />
@@ -162,12 +165,14 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
                   <div className="relative flex h-full w-full items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
                     <Image
                       src={iconSrc}
-                      alt={label}
+                      alt=""
+                      aria-hidden="true"
                       width={64}
                       height={64}
                       className="h-14 w-14 object-contain drop-shadow-lg sm:h-16 sm:w-16"
                       priority
                     />
+                    <span className="sr-only">{label} result icon</span>
                   </div>
                 </div>
               </motion.div>
@@ -187,7 +192,8 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
                   className="font-space mb-3 flex items-center justify-center gap-3 text-lg font-medium"
                 >
                   <span className="text-gray-700 dark:text-gray-200">{name1}</span>
-                  <span className={cn('bg-clip-text text-2xl font-bold text-transparent', gradient.text)}>❤️</span>
+                  <span className={cn('bg-clip-text text-2xl font-bold text-transparent', gradient.text)} aria-hidden="true">❤️</span>
+                  <span className="sr-only"> and </span>
                   <span className="text-gray-700 dark:text-gray-200">{name2}</span>
                 </motion.div>
               )}

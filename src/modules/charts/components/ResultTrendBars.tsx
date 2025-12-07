@@ -63,8 +63,8 @@ export default function ResultTrendBars({ results, resultInfo }: ResultTrendBars
               {/* Trend indicator */}
               <div className="mt-1 flex justify-end">
                 <span
-                  className={`text-[10px] font-medium ${
-                    stat.trend > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'
+                  className={`text-xs font-medium ${
+                    stat.trend > 0 ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'
                   }`}
                 >
                   {stat.trend > 0 ? '↑' : '↓'} {Math.abs(stat.trend)}% trend

@@ -21,6 +21,8 @@ tsconfig.tsbuildinfo
 # misc
 .DS_Store
 *.pem
+.lighthouseci
+playwright-report
 
 # debug
 npm-debug.log*

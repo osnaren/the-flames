@@ -115,7 +115,7 @@ export default function Header() {
             }}
             whileHover={{ scale: 1.15, rotate: 5 }}
           >
-            <Flame className="text-primary h-20 w-20 drop-shadow-[0_0_15px_rgba(249,115,22,0.6)]" />
+            <Flame className="text-primary h-20 w-20 drop-shadow-[0_0_15px_rgba(249,115,22,0.6)]" aria-hidden="true" />
 
             {/* Floating sparkles around the flame */}
             {shouldAnimate && (
@@ -133,7 +133,7 @@ export default function Header() {
                     ease: 'easeInOut',
                   }}
                 >
-                  <GiSparkyBomb className="text-tertiary h-4 w-4" />
+                  <GiSparkyBomb className="text-tertiary h-4 w-4" aria-hidden="true" />
                 </motion.div>
                 <motion.div
                   className="absolute -bottom-1 -left-3"
@@ -149,7 +149,7 @@ export default function Header() {
                     delay: 0.5,
                   }}
                 >
-                  <Zap className="text-secondary h-3 w-3" />
+                  <Zap className="text-secondary h-3 w-3" aria-hidden="true" />
                 </motion.div>
               </>
             )}

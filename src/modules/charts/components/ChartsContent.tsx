@@ -174,11 +174,14 @@ export default function ChartsContent({
           <>
             {/* Filters & Controls */}
             <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex flex-wrap gap-2 rounded-xl bg-white p-1 shadow-sm ring-1 ring-gray-900/5 dark:bg-gray-800 dark:ring-white/10">
+              <div className="flex flex-wrap gap-2 rounded-xl bg-white p-1 shadow-sm ring-1 ring-gray-900/5 dark:bg-gray-800 dark:ring-white/10" role="tablist" aria-label="Time filter options">
                 {(['today', 'week', 'alltime'] as const).map((filter) => (
                   <button
                     key={filter}
                     onClick={() => setTimeFilter(filter)}
+                    role="tab"
+                    aria-selected={timeFilter === filter}
+                    aria-controls="charts-content-panel"
                     className={`flex items-center rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200 ${
                       timeFilter === filter
                         ? 'bg-orange-100 text-orange-700 shadow-sm dark:bg-orange-900/50 dark:text-orange-200'
@@ -213,7 +216,7 @@ export default function ChartsContent({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div id="charts-content-panel" className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               {/* Result Stats - Full width on mobile, half on large screens */}
               <ResultTrendBars results={data.resultStats} resultInfo={resultInfo} />
 

@@ -195,6 +195,8 @@ function InputFormComponent({
                   onChange={handleName1Change}
                   onFocus={() => setFocusedField('name1')}
                   onBlur={() => handleBlur('name1')}
+                  aria-describedby={errors.name1?.length ? 'name1-error' : undefined}
+                  aria-invalid={errors.name1?.length ? 'true' : undefined}
                   className={`w-full rounded-xl border-2 bg-white/50 px-4 py-3.5 text-base font-medium transition-all duration-200 placeholder:text-gray-400 focus:outline-none dark:bg-white/5 ${
                     errors.name1?.length
                       ? 'border-red-400 focus:border-red-500 focus:ring-4 focus:ring-red-500/20'
@@ -220,6 +222,8 @@ function InputFormComponent({
               </div>
               {errors.name1?.[0] && (
                 <motion.p
+                  id="name1-error"
+                  role="alert"
                   className="mt-1.5 text-sm text-red-500"
                   initial={{ opacity: 0, y: -5 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -255,6 +259,8 @@ function InputFormComponent({
                   onChange={handleName2Change}
                   onFocus={() => setFocusedField('name2')}
                   onBlur={() => handleBlur('name2')}
+                  aria-describedby={errors.name2?.length ? 'name2-error' : undefined}
+                  aria-invalid={errors.name2?.length ? 'true' : undefined}
                   className={`w-full rounded-xl border-2 bg-white/50 px-4 py-3.5 text-base font-medium transition-all duration-200 placeholder:text-gray-400 focus:outline-none dark:bg-white/5 ${
                     errors.name2?.length
                       ? 'border-red-400 focus:border-red-500 focus:ring-4 focus:ring-red-500/20'
@@ -279,6 +285,8 @@ function InputFormComponent({
               </div>
               {errors.name2?.[0] && (
                 <motion.p
+                  id="name2-error"
+                  role="alert"
                   className="mt-1.5 text-sm text-red-500"
                   initial={{ opacity: 0, y: -5 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -291,6 +299,8 @@ function InputFormComponent({
             {/* General Errors */}
             {errors.general?.[0] && (
               <motion.div
+                role="alert"
+                aria-live="polite"
                 className="rounded-xl bg-red-50 p-3 text-center text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}

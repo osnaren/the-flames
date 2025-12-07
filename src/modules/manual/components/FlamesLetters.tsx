@@ -93,8 +93,8 @@ export default function FlamesLetters({
   }, [userResult, correctResult]);
 
   return (
-    <div className={`relative ${className}`}>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+    <div className={`relative ${className}`} role="group" aria-label="FLAMES letter selection">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6" role="list">
         {flamesData.map((flame, index) => {
           const status = getLetterStatus(flame.letter);
           const colors = getStatusColors(flame.letter, status);
@@ -104,8 +104,12 @@ export default function FlamesLetters({
             <motion.button
               key={flame.letter}
               onClick={() => onLetterToggle?.(flame.letter)}
+              aria-label={`${flame.meaning} (${flame.letter}): ${status === 'crossed-out' ? 'Crossed out' : status === 'final-result' ? 'Final result' : 'Active - Click to cross out'}`}
+              aria-pressed={status === 'crossed-out'}
+              disabled={isFinalResult}
               className={cn(
                 'relative overflow-hidden rounded-2xl border-2 p-4 text-center transition-all duration-300',
+                'focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none',
                 colors.container,
                 isFinalResult ? 'z-10 scale-110' : 'hover:scale-105',
                 onLetterToggle ? 'cursor-pointer' : 'cursor-default'
@@ -154,8 +158,8 @@ export default function FlamesLetters({
                 </motion.div>
               )}
 
-              <div className={cn('mb-2 text-3xl font-bold', colors.text)}>{flame.letter}</div>
-              <div className={cn('mb-2 text-2xl', colors.icon)}>{flame.icon}</div>
+              <div className={cn('mb-2 text-3xl font-bold', colors.text)} aria-hidden="true">{flame.letter}</div>
+              <div className={cn('mb-2 text-2xl', colors.icon)} aria-hidden="true" role="img">{flame.icon}</div>
               <div className={cn('text-sm font-medium', colors.meaning)}>{flame.meaning}</div>
 
               {status === 'crossed-out' && (

@@ -139,7 +139,7 @@ export function ApiHero() {
         transition={{ delay: 1, duration: 0.6 }}
         className="z-10 flex flex-wrap items-center justify-center gap-3 pt-4 text-xs"
       >
-        <span className="rounded-full border border-green-600/40 bg-green-100 px-4 py-1.5 font-medium text-green-700 dark:border-green-500/40 dark:bg-green-500/10 dark:text-green-400">
+        <span className="rounded-full border border-green-600/40 bg-green-100 px-4 py-1.5 font-medium text-green-800 dark:border-green-500/40 dark:bg-green-500/10 dark:text-green-300">
           Uptime {hero.status.uptime}
         </span>
         <span className="border-border bg-surface-container text-muted-foreground rounded-full border px-4 py-1.5">

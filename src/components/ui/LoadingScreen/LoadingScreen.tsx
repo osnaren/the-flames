@@ -16,6 +16,9 @@ function LoadingScreen({ message = 'Loading...', fullScreen = true, className = 
   return (
     <div
       className={`bg-surface/80 flex flex-col items-center justify-center backdrop-blur-md ${fullScreen ? 'fixed inset-0 z-50' : 'h-full min-h-[200px] w-full'} ${className}`}
+      role="status"
+      aria-live="polite"
+      aria-label={message}
     >
       <div className="animate-fade-in flex flex-col items-center gap-6">
         {/* Simple animated logo placeholder */}
@@ -48,7 +51,7 @@ function LoadingScreen({ message = 'Loading...', fullScreen = true, className = 
           <p className="text-on-surface text-lg font-medium tracking-wider">{message}</p>
 
           {/* CSS-only loading dots */}
-          <div className="flex gap-1">
+          <div className="flex gap-1" aria-hidden="true">
             <span className="bg-primary h-1.5 w-1.5 animate-bounce rounded-full" style={{ animationDelay: '0ms' }} />
             <span className="bg-primary h-1.5 w-1.5 animate-bounce rounded-full" style={{ animationDelay: '150ms' }} />
             <span className="bg-primary h-1.5 w-1.5 animate-bounce rounded-full" style={{ animationDelay: '300ms' }} />

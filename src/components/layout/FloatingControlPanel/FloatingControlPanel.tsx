@@ -209,8 +209,7 @@ export default function FloatingControlPanel() {
           duration: prefersReducedMotion ? 0.2 : undefined,
         }}
         aria-label="Settings panel"
-        aria-modal={isExpanded}
-        aria-expanded={isExpanded}
+        role="region"
       >
         <motion.button
           ref={toggleButtonRef}

@@ -198,11 +198,11 @@ function Footer() {
 
           {/* Navigation Section */}
           <motion.div variants={itemVariants} className="lg:col-span-1">
-            <h3 className="text-on-surface mb-4 flex items-center gap-2 font-semibold">
-              <Sparkles className="text-primary h-4 w-4" />
+            <h3 className="text-on-surface mb-4 flex items-center gap-2 font-semibold" id="footer-nav-heading">
+              <Sparkles className="text-primary h-4 w-4" aria-hidden="true" />
               Navigation
             </h3>
-            <nav className="space-y-3">
+            <nav className="space-y-3" aria-labelledby="footer-nav-heading">
               {FOOTER_CONFIG.navigation.primary.map((link) => (
                 <div key={link.to}>
                   <FooterLink to={link.to} description={link.description}>
@@ -222,11 +222,11 @@ function Footer() {
 
           {/* Resources Section */}
           <motion.div variants={itemVariants} className="lg:col-span-1">
-            <h3 className="text-on-surface mb-4 flex items-center gap-2 font-semibold">
-              <ExternalLink className="text-primary h-4 w-4" />
+            <h3 className="text-on-surface mb-4 flex items-center gap-2 font-semibold" id="footer-resources-heading">
+              <ExternalLink className="text-primary h-4 w-4" aria-hidden="true" />
               Resources
             </h3>
-            <nav className="space-y-3">
+            <nav className="space-y-3" aria-labelledby="footer-resources-heading">
               {FOOTER_CONFIG.external.map((link) => (
                 <div key={link.href}>
                   <FooterLink href={link.href} external={true} icon={link.icon} description={link.description}>
@@ -240,20 +240,21 @@ function Footer() {
           {/* Stats Section */}
           {FOOTER_CONFIG.showStats && (
             <motion.div variants={itemVariants} className="lg:col-span-1">
-              <h3 className="text-on-surface mb-4 flex items-center gap-2 font-semibold">
-                <TrendingUp className="text-primary h-4 w-4" />
+              <h3 className="text-on-surface mb-4 flex items-center gap-2 font-semibold" id="footer-stats-heading">
+                <TrendingUp className="text-primary h-4 w-4" aria-hidden="true" />
                 Our Impact
               </h3>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3" role="list" aria-labelledby="footer-stats-heading">
                 {FOOTER_CONFIG.stats.map((stat) => (
                   <motion.div
                     key={stat.label}
                     variants={statsVariants}
                     whileHover={{ scale: 1.05 }}
                     className="bg-surface-container-low/50 border-outline/10 group hover:border-primary/20 rounded-lg border p-3 transition-colors"
+                    role="listitem"
                   >
                     <div className="flex flex-col items-center text-center">
-                      <stat.icon className="text-primary mb-1 h-5 w-5 transition-transform group-hover:scale-110" />
+                      <stat.icon className="text-primary mb-1 h-5 w-5 transition-transform group-hover:scale-110" aria-hidden="true" />
                       <div className="text-on-surface text-sm font-bold">{stat.value}</div>
                       <div className="text-on-surface-variant text-xs leading-tight">{stat.label}</div>
                     </div>
@@ -292,9 +293,11 @@ function Footer() {
                   repeat: Infinity,
                   ease: 'easeInOut',
                 }}
+                aria-hidden="true"
               >
                 <Heart className="text-error h-4 w-4 fill-current drop-shadow-sm" />
               </motion.div>
+              <span className="sr-only">love</span>
               <span>for love calculations</span>
             </motion.div>
           </div>

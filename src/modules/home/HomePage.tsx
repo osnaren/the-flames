@@ -102,9 +102,10 @@ function HomePage() {
   }, []);
 
   return (
-    <main
+    <section
       className="relative flex min-h-screen flex-col items-center justify-center px-4 py-8 md:py-12"
       ref={containerRef}
+      aria-label="FLAMES Game"
     >
       {/* Dynamic background system */}
       <DynamicBackground
@@ -203,11 +204,13 @@ function HomePage() {
 
         {/* Footer tips - only on input stage */}
         {stage === 'input' && (
-          <motion.footer
+          <motion.div
             className="mt-12 space-y-3 text-center"
             initial={shouldAnimate ? { opacity: 0 } : { opacity: 1 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.6 }}
+            role="note"
+            aria-label="FLAMES meaning legend"
           >
             <p className="font-space text-on-surface-variant/80 text-sm font-medium">
               <span className="text-blue-500">F</span>riends •<span className="text-pink-500"> L</span>ove •
@@ -218,10 +221,10 @@ function HomePage() {
             <p className="font-handwriting text-on-surface-variant/60 text-xs">
               ✨ The classic relationship game, reimagined with modern magic ✨
             </p>
-          </motion.footer>
+          </motion.div>
         )}
       </div>
-    </main>
+    </section>
   );
 }
 

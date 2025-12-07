@@ -207,6 +207,9 @@ function FlamesProcessorComponent({
       initial="hidden"
       animate="visible"
       exit="exit"
+      role="status"
+      aria-live="polite"
+      aria-label="Processing FLAMES calculation"
     >
       {/* Main processing card */}
       <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/80 p-6 shadow-2xl backdrop-blur-xl md:p-8 dark:border-white/10 dark:bg-black/40">
@@ -222,6 +225,7 @@ function FlamesProcessorComponent({
               key={phase}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
+              aria-live="polite"
             >
               {phase === 'names-reveal' && '✨ Analyzing names...'}
               {phase === 'striking' && '❌ Removing common letters...'}

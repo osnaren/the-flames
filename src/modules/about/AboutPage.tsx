@@ -96,7 +96,10 @@ export default function AboutPage() {
   return (
     <div className="bg-background text-foreground min-h-screen overflow-x-hidden font-sans">
       {/* Hero Section */}
-      <section className="relative flex min-h-[90vh] flex-col items-center justify-center space-y-8 overflow-hidden px-4 text-center">
+      <section 
+        className="relative flex min-h-[90vh] flex-col items-center justify-center space-y-8 overflow-hidden px-4 text-center"
+        aria-labelledby="about-hero-title"
+      >
         <RetroGrid className="opacity-50" />
 
         <motion.div
@@ -111,7 +114,7 @@ export default function AboutPage() {
           >
             FLAMES
           </SparklesText>
-          <h2 className="font-heading text-muted-foreground text-2xl font-light tracking-wide md:text-4xl">
+          <h2 id="about-hero-title" className="font-heading text-muted-foreground text-2xl font-light tracking-wide md:text-4xl">
             The Nostalgia Project
           </h2>
         </motion.div>
@@ -132,6 +135,7 @@ export default function AboutPage() {
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5, duration: 1 }}
           className="absolute bottom-10 animate-bounce"
+          aria-hidden="true"
         >
           <ArrowRight className="text-muted-foreground h-8 w-8 rotate-90" />
         </motion.div>
@@ -141,10 +145,10 @@ export default function AboutPage() {
       <StoryTimeline items={timelineData} />
 
       {/* Image Gallery Section */}
-      <section className="bg-muted/10 px-4 py-32">
+      <section className="bg-muted/10 px-4 py-32" aria-labelledby="gallery-heading">
         <div className="container mx-auto space-y-16">
           <div className="space-y-4 text-center">
-            <h2 className="font-heading text-3xl font-bold tracking-tight md:text-5xl">Captured Memories</h2>
+            <h2 id="gallery-heading" className="font-heading text-3xl font-bold tracking-tight md:text-5xl">Captured Memories</h2>
             <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
               Snapshots of the past, reimagined for the future.
             </p>
@@ -154,10 +158,10 @@ export default function AboutPage() {
       </section>
 
       {/* Call to Action */}
-      <section className="relative overflow-hidden px-4 py-32">
-        <div className="from-background to-primary/5 absolute inset-0 -z-10 bg-linear-to-b" />
+      <section className="relative overflow-hidden px-4 py-32" aria-labelledby="cta-heading">
+        <div className="from-background to-primary/5 absolute inset-0 -z-10 bg-linear-to-b" aria-hidden="true" />
         <div className="relative z-10 container mx-auto space-y-10 text-center">
-          <h2 className="font-heading text-4xl font-bold tracking-tighter md:text-6xl">
+          <h2 id="cta-heading" className="font-heading text-4xl font-bold tracking-tighter md:text-6xl">
             Ready to find out your destiny?
           </h2>
           <p className="text-muted-foreground mx-auto max-w-2xl text-xl font-light md:text-2xl">

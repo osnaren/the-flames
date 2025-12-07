@@ -92,7 +92,7 @@ export default function RecentMatches({ matches, resultInfo }: RecentMatchesProp
                   </div>
                 </div>
               </div>
-              <div className="text-xs font-medium text-gray-400 dark:text-gray-500">{relativeTime}</div>
+              <div className="text-xs font-medium text-gray-600 dark:text-gray-300">{relativeTime}</div>
             </motion.div>
           );
         })}

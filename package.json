@@ -12,7 +12,14 @@
     "prepare": "husky install",
     "tailwind": "tailwindcss -o output.css",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "a11y:audit": "node scripts/a11y-audit.js",
+    "a11y:axe": "node scripts/a11y-audit.js --axe-only",
+    "a11y:lhci": "lhci autorun",
+    "a11y:axe:dev": "npx @axe-core/cli http://localhost:3000 --tags wcag2a,wcag2aa,wcag21a,wcag21aa,best-practice",
+    "test:a11y": "playwright test tests/a11y.spec.ts",
+    "test:a11y:headed": "playwright test tests/a11y.spec.ts --headed",
+    "test:a11y:debug": "playwright test tests/a11y.spec.ts --debug"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --fix",
@@ -52,7 +59,11 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@axe-core/cli": "^4.11.0",
+    "@axe-core/playwright": "^4.11.0",
     "@eslint/js": "^9.39.1",
+    "@lhci/cli": "^0.15.1",
+    "@playwright/test": "^1.57.0",
     "@types/canvas-confetti": "^1.9.0",
     "@types/eslint-plugin-jsx-a11y": "^6.10.1",
     "@types/node": "^24.10.1",
@@ -70,6 +81,7 @@
     "globals": "^16.5.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
+    "playwright": "^1.57.0",
     "postcss": "^8.5.6",
     "prettier": "^3.7.4",
     "prettier-plugin-organize-imports": "^4.3.0",

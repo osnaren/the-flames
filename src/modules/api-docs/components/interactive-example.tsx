@@ -40,15 +40,15 @@ export function InteractiveExample() {
   const getIcon = (id: string) => {
     switch (id) {
       case 'javascript':
-        return <SiJavascript className="text-yellow-600 dark:text-yellow-400" />;
+        return <SiJavascript className="text-yellow-600 dark:text-yellow-400" aria-hidden="true" />;
       case 'python':
-        return <SiPython className="text-blue-600 dark:text-blue-400" />;
+        return <SiPython className="text-blue-600 dark:text-blue-400" aria-hidden="true" />;
       case 'nodejs':
-        return <SiNodedotjs className="text-green-600 dark:text-green-400" />;
+        return <SiNodedotjs className="text-green-600 dark:text-green-400" aria-hidden="true" />;
       case 'go':
-        return <SiGo className="text-cyan-600 dark:text-cyan-400" />;
+        return <SiGo className="text-cyan-600 dark:text-cyan-400" aria-hidden="true" />;
       case 'curl':
-        return <BsTerminal className="text-gray-600 dark:text-gray-400" />;
+        return <BsTerminal className="text-gray-600 dark:text-gray-400" aria-hidden="true" />;
       default:
         return null;
     }
@@ -144,7 +144,7 @@ export function InteractiveExample() {
                       : 'hover:bg-muted/50 hover:text-foreground'
                   }`}
                 >
-                  <span className="mr-2 h-4 w-4">{getIcon(lang.id)}</span>
+                  <span className="mr-2 h-4 w-4" aria-hidden="true">{getIcon(lang.id)}</span>
                   {lang.name}
                 </Button>
               ))}
