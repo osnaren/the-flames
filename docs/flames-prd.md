@@ -1,5 +1,7 @@
 # The Flames App – Product Requirements Document (PRD)
 
+> **Note:** This is an internal planning document used during the initial development phase. It is preserved here for reference and historical context. Some features may have evolved or changed in the final implementation.
+
 ## 1. Overview & Vision
 
 **Product Name:**  

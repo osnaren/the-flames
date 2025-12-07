@@ -1,5 +1,7 @@
 # 🔥 The Flames App – Feature Requirements Document (FRD)
 
+> **Note:** This is an internal planning document used during the initial development phase. It is preserved here for reference and historical context. Some features may have evolved or changed in the final implementation.
+
 ---
 
 ## 🧠 1. Philosophy and Vision
