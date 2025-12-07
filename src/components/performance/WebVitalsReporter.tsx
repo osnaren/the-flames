@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect } from 'react';
-import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
 import type { Metric } from 'web-vitals';
+import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
 
 /**
  * Web Vitals Reporter Component
  * Reports Core Web Vitals metrics for performance monitoring
- * 
+ *
  * Metrics tracked:
  * - LCP (Largest Contentful Paint): Should be < 2.5s
  * - FCP (First Contentful Paint): Should be < 1.8s
@@ -30,7 +30,7 @@ export default function WebVitalsReporter() {
 
         const threshold = thresholds[metric.name];
         let rating: 'good' | 'needs-improvement' | 'poor' = 'good';
-        
+
         if (threshold) {
           if (metric.value > threshold.poor) {
             rating = 'poor';
@@ -48,10 +48,7 @@ export default function WebVitalsReporter() {
         const unit = metric.name === 'CLS' ? '' : 'ms';
         const value = metric.name === 'CLS' ? metric.value.toFixed(3) : Math.round(metric.value);
 
-        console.log(
-          `%c[Web Vital] ${metric.name}: ${value}${unit} (${rating})`,
-          colors[rating]
-        );
+        console.log(`%c[Web Vital] ${metric.name}: ${value}${unit} (${rating})`, colors[rating]);
       }
 
       // In production, you could send to analytics
@@ -73,7 +70,7 @@ export default function WebVitalsReporter() {
           // Use sendBeacon for reliable delivery
           // Uncomment when you have an analytics endpoint
           // navigator.sendBeacon('/api/analytics/vitals', JSON.stringify(payload));
-          
+
           // For now, just log in production too if needed
           void payload; // Prevent unused variable warning
         } catch {

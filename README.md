@@ -26,29 +26,29 @@ Enter two names. Watch the magic happen. Discover your destiny. 💕
 
 ## 🎮 Features
 
-| Feature | Description |
-|---------|-------------|
-| 🎰 **Slot Machine Reveal** | Watch FLAMES letters spin and land like a casino jackpot |
-| ✨ **Auto Mode** | Beautiful animated experience with confetti, glows, and transitions |
-| ✏️ **Manual Mode** | Paper-and-pencil style for the traditional experience |
-| 📊 **Global Charts** | See trending names and results from players worldwide |
-| 🎨 **Seasonal Themes** | Valentine's, Halloween, Christmas, and more! |
-| 🔊 **Sound & Haptics** | Immersive audio feedback and vibrations |
-| 🏆 **Achievements** | Unlock badges as you play |
-| 📱 **Mobile First** | Perfect on any device |
-| 🌙 **Dark Mode** | Easy on the eyes |
-| 📤 **Share Results** | Download and share your result cards |
+| Feature                    | Description                                                         |
+| -------------------------- | ------------------------------------------------------------------- |
+| 🎰 **Slot Machine Reveal** | Watch FLAMES letters spin and land like a casino jackpot            |
+| ✨ **Auto Mode**           | Beautiful animated experience with confetti, glows, and transitions |
+| ✏️ **Manual Mode**         | Paper-and-pencil style for the traditional experience               |
+| 📊 **Global Charts**       | See trending names and results from players worldwide               |
+| 🎨 **Seasonal Themes**     | Valentine's, Halloween, Christmas, and more!                        |
+| 🔊 **Sound & Haptics**     | Immersive audio feedback and vibrations                             |
+| 🏆 **Achievements**        | Unlock badges as you play                                           |
+| 📱 **Mobile First**        | Perfect on any device                                               |
+| 🌙 **Dark Mode**           | Easy on the eyes                                                    |
+| 📤 **Share Results**       | Download and share your result cards                                |
 
 ## 🔮 FLAMES Meanings
 
-| Letter | Meaning | Emoji |
-|:------:|---------|:-----:|
-| **F** | Friendship | 🤝 |
-| **L** | Love | ❤️ |
-| **A** | Affection | 💕 |
-| **M** | Marriage | 💍 |
-| **E** | Enemy | ⚔️ |
-| **S** | Siblings | 👫 |
+| Letter | Meaning    | Emoji |
+| :----: | ---------- | :---: |
+| **F**  | Friendship |  🤝   |
+| **L**  | Love       |  ❤️   |
+| **A**  | Affection  |  💕   |
+| **M**  | Marriage   |  💍   |
+| **E**  | Enemy      |  ⚔️   |
+| **S**  | Siblings   |  👫   |
 
 ## 🚀 Quick Start
 
@@ -116,14 +116,14 @@ Open [http://localhost:3000](http://localhost:3000) 🎉
 
 ### Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Create production build |
-| `npm run start` | Run production server |
-| `npm run lint` | Lint code with ESLint |
-| `npm run format` | Format code with Prettier |
-| `npm run typecheck` | Run TypeScript checks |
+| Command             | Description               |
+| ------------------- | ------------------------- |
+| `npm run dev`       | Start development server  |
+| `npm run build`     | Create production build   |
+| `npm run start`     | Run production server     |
+| `npm run lint`      | Lint code with ESLint     |
+| `npm run format`    | Format code with Prettier |
+| `npm run typecheck` | Run TypeScript checks     |
 
 ### API
 

@@ -38,7 +38,9 @@ export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
 
   // Get active (non-eliminated) letters
   const getActiveLetters = () => {
-    return FLAMES_LETTERS.map((letter, idx) => ({ letter, idx })).filter((item) => !eliminatedLetters.includes(item.idx));
+    return FLAMES_LETTERS.map((letter, idx) => ({ letter, idx })).filter(
+      (item) => !eliminatedLetters.includes(item.idx)
+    );
   };
 
   // Run FLAMES simulation
@@ -194,16 +196,15 @@ export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
                   }}
                 >
                   <motion.div
-                    className={`relative flex h-14 w-14 items-center justify-center rounded-xl text-2xl font-bold shadow-md transition-all duration-300 md:h-16 md:w-16 md:text-3xl
-                      ${
-                        isResult
-                          ? 'ring-success ring-4'
-                          : isEliminated
-                            ? 'bg-surface-container-low text-on-surface-variant/30 line-through'
-                            : isCurrent
-                              ? 'bg-primary text-on-primary ring-primary-container ring-4'
-                              : 'bg-surface-container-high text-on-surface hover:bg-surface-container-highest'
-                      }`}
+                    className={`relative flex h-14 w-14 items-center justify-center rounded-xl text-2xl font-bold shadow-md transition-all duration-300 md:h-16 md:w-16 md:text-3xl ${
+                      isResult
+                        ? 'ring-success ring-4'
+                        : isEliminated
+                          ? 'bg-surface-container-low text-on-surface-variant/30 line-through'
+                          : isCurrent
+                            ? 'bg-primary text-on-primary ring-primary-container ring-4'
+                            : 'bg-surface-container-high text-on-surface hover:bg-surface-container-highest'
+                    }`}
                     style={{
                       borderColor: isResult ? meaning.color : undefined,
                       boxShadow: isResult ? `0 0 20px ${meaning.color}` : undefined,
@@ -263,7 +264,7 @@ export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
                   {/* Meaning tooltip for result */}
                   {isResult && (
                     <motion.div
-                      className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-center text-sm font-medium"
+                      className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-center text-sm font-medium whitespace-nowrap"
                       style={{ color: meaning.color }}
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}

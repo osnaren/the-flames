@@ -1,7 +1,7 @@
 'use client';
 
-import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import Button from '@/components/ui/Button';
+import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Flame } from 'lucide-react';
 import dynamic from 'next/dynamic';

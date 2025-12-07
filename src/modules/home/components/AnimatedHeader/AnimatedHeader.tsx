@@ -1,7 +1,7 @@
-import type { GameStage } from '../../types';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { memo, useState } from 'react';
 import { FLAMES_LETTERS } from '../../constants';
+import type { GameStage } from '../../types';
 
 interface AnimatedHeaderProps {
   shouldAnimate: boolean;

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { RateLimiter, RateLimitError, validateFlamesInput, ValidationError } from '@/utils/validation';
-import { calculateFlamesResult, findCommonLetters } from '@/modules/home/utils';
 import { flamesRateLimiter, isRedisConfigured } from '@/lib/redis';
+import { calculateFlamesResult, findCommonLetters } from '@/modules/home/utils';
+import { RateLimiter, RateLimitError, validateFlamesInput, ValidationError } from '@/utils/validation';
+import { NextRequest, NextResponse } from 'next/server';
 
 // In-memory rate limiter fallback - 20 requests per minute per IP
 const memoryRateLimiter = new RateLimiter(20, 60000);

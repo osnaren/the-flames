@@ -170,14 +170,14 @@ interface FlamesApiError {
 
 ## FLAMES Results
 
-| Letter | Meaning    | Description                           |
-| ------ | ---------- | ------------------------------------- |
-| **F**  | Friends    | Best friends forever                  |
-| **L**  | Love       | True love and romance                 |
-| **A**  | Affection  | Sweet affection and care              |
-| **M**  | Marriage   | Wedding bells and lifetime commitment |
-| **E**  | Enemy      | Opposites that clash                  |
-| **S**  | Sibling    | Family-like bond                      |
+| Letter | Meaning   | Description                           |
+| ------ | --------- | ------------------------------------- |
+| **F**  | Friends   | Best friends forever                  |
+| **L**  | Love      | True love and romance                 |
+| **A**  | Affection | Sweet affection and care              |
+| **M**  | Marriage  | Wedding bells and lifetime commitment |
+| **E**  | Enemy     | Opposites that clash                  |
+| **S**  | Sibling   | Family-like bond                      |
 
 ## Error Codes
 
@@ -291,11 +291,10 @@ async function calculateFlames(name1, name2) {
 }
 
 // Usage
-calculateFlames('Alice', 'Bob')
-  .then((result) => {
-    console.log(`Result: ${result.resultMeaning}`);
-    console.log(`Tagline: ${result.tagline}`);
-  });
+calculateFlames('Alice', 'Bob').then((result) => {
+  console.log(`Result: ${result.resultMeaning}`);
+  console.log(`Tagline: ${result.tagline}`);
+});
 ```
 
 ### Python (Requests)

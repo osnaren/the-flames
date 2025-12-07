@@ -1,9 +1,4 @@
-import {
-  generateBreadcrumbSchema,
-  generateHowToSchema,
-  generatePageMetadata,
-  pagesSEO,
-} from '@/lib/seo';
+import { generateBreadcrumbSchema, generateHowToSchema, generatePageMetadata, pagesSEO } from '@/lib/seo';
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 

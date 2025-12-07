@@ -13,10 +13,26 @@ export const apiDocsConfig = {
     subtitle:
       'Integrate the classic FLAMES relationship calculator into your applications with our simple RESTful API. Fast, fun, and nostalgic!',
     features: [
-      { label: 'JSON responses', badgeClass: 'bg-emerald-100 text-emerald-700 ring-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-400/40' },
-      { label: '6 relationship types', badgeClass: 'bg-pink-100 text-pink-700 ring-pink-500/30 dark:bg-pink-500/15 dark:text-pink-300 dark:ring-pink-400/40' },
-      { label: 'Rate limited', badgeClass: 'bg-purple-100 text-purple-700 ring-purple-500/30 dark:bg-purple-500/15 dark:text-purple-300 dark:ring-purple-400/40' },
-      { label: 'Input validation', badgeClass: 'bg-orange-100 text-orange-700 ring-orange-500/30 dark:bg-orange-500/15 dark:text-orange-300 dark:ring-orange-400/40' },
+      {
+        label: 'JSON responses',
+        badgeClass:
+          'bg-emerald-100 text-emerald-700 ring-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-400/40',
+      },
+      {
+        label: '6 relationship types',
+        badgeClass:
+          'bg-pink-100 text-pink-700 ring-pink-500/30 dark:bg-pink-500/15 dark:text-pink-300 dark:ring-pink-400/40',
+      },
+      {
+        label: 'Rate limited',
+        badgeClass:
+          'bg-purple-100 text-purple-700 ring-purple-500/30 dark:bg-purple-500/15 dark:text-purple-300 dark:ring-purple-400/40',
+      },
+      {
+        label: 'Input validation',
+        badgeClass:
+          'bg-orange-100 text-orange-700 ring-orange-500/30 dark:bg-orange-500/15 dark:text-orange-300 dark:ring-orange-400/40',
+      },
     ],
     metrics: [
       { label: 'Avg Latency', value: '<50ms', helper: 'Lightning fast calculations' },

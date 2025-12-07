@@ -48,11 +48,7 @@ function HowItWorksPage() {
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <Step2CommonLetters
-                name1={DEMO_NAME1}
-                name2={DEMO_NAME2}
-                commonLetters={DEMO_COMMON_LETTERS}
-              />
+              <Step2CommonLetters name1={DEMO_NAME1} name2={DEMO_NAME2} commonLetters={DEMO_COMMON_LETTERS} />
             </motion.div>
 
             {/* Step 3: FLAMES Simulation */}

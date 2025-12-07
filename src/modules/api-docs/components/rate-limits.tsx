@@ -76,9 +76,7 @@ export function RateLimits() {
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
               <h5 className="font-semibold text-amber-800 dark:text-amber-200">Rate limit best practices</h5>
-              <p className="text-xs text-amber-700 dark:text-amber-300/80">
-                {apiDocsConfig.rateLimits.cooldownHint}
-              </p>
+              <p className="text-xs text-amber-700 dark:text-amber-300/80">{apiDocsConfig.rateLimits.cooldownHint}</p>
             </div>
             <ul className="space-y-1 text-sm text-amber-800 dark:text-amber-200">
               {apiDocsConfig.rateLimits.bestPractices.map((practice) => (

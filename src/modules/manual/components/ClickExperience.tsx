@@ -1,12 +1,12 @@
 'use client';
 
+import Button from '@/components/ui/Button';
+import { calculateFlamesResult } from '@modules/home/utils';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Download, RotateCcw, Share, SquareArrowOutUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import Button from '@/components/ui/Button';
-import { calculateFlamesResult } from '@modules/home/utils';
 import type { ClickExperienceProps } from '../types';
 import FlamesLetters from './FlamesLetters';
 import LetterTile from './LetterTile';

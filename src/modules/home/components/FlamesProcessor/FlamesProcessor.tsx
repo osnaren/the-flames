@@ -1,7 +1,7 @@
-import type { FlamesResult } from '../../types';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { FLAMES_DATA, PROCESSOR_TIMING } from '../../constants';
+import type { FlamesResult } from '../../types';
 
 interface FlamesProcessorProps {
   name1: string;

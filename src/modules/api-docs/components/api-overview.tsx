@@ -22,7 +22,7 @@ export function ApiOverview() {
           <Badge variant="outline" className="border-border bg-surface-container font-mono text-[11px]">
             {apiDocsConfig.endpoint.path}
           </Badge>
-          <span className="text-green-700 dark:text-green-400 text-xs font-medium" aria-live="polite">
+          <span className="text-xs font-medium text-green-700 dark:text-green-400" aria-live="polite">
             ● {apiDocsConfig.hero.status.uptime} uptime
           </span>
         </div>

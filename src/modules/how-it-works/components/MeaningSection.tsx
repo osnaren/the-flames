@@ -175,7 +175,17 @@ export default function MeaningSection() {
                   className="flex h-12 w-12 items-center justify-center rounded-xl text-2xl font-bold text-white shadow-lg"
                   style={{ backgroundColor: card.color }}
                   whileHover={{ scale: 1.1, rotate: 10 }}
-                  animate={shouldAnimate ? { boxShadow: [`0 4px 15px ${card.color}40`, `0 8px 25px ${card.color}60`, `0 4px 15px ${card.color}40`] } : {}}
+                  animate={
+                    shouldAnimate
+                      ? {
+                          boxShadow: [
+                            `0 4px 15px ${card.color}40`,
+                            `0 8px 25px ${card.color}60`,
+                            `0 4px 15px ${card.color}40`,
+                          ],
+                        }
+                      : {}
+                  }
                   transition={{ duration: 2, repeat: Infinity }}
                 >
                   {card.letter}
@@ -190,10 +200,7 @@ export default function MeaningSection() {
               </motion.div>
 
               {/* Title */}
-              <motion.h3
-                className="font-heading text-on-surface mb-2 text-xl font-bold"
-                style={{ color: card.color }}
-              >
+              <motion.h3 className="font-heading text-on-surface mb-2 text-xl font-bold" style={{ color: card.color }}>
                 {card.title}
               </motion.h3>
 

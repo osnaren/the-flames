@@ -58,12 +58,11 @@ export default function Step2CommonLetters({ name1, name2, commonLetters }: Step
             onMouseLeave={() => setHoveredLetter(null)}
           >
             <motion.span
-              className={`relative inline-flex min-w-[2rem] cursor-pointer items-center justify-center rounded-lg px-2 py-2 text-xl font-bold shadow-sm transition-all duration-300 md:min-w-[2.5rem] md:px-3 md:py-3 md:text-2xl
-                ${
-                  isCommon
-                    ? 'bg-error-container/30 text-error border-error/20 line-through decoration-4'
-                    : 'bg-surface-container-high text-on-surface hover:bg-surface-container-highest border-outline/10'
-                } border`}
+              className={`relative inline-flex min-w-[2rem] cursor-pointer items-center justify-center rounded-lg px-2 py-2 text-xl font-bold shadow-sm transition-all duration-300 md:min-w-[2.5rem] md:px-3 md:py-3 md:text-2xl ${
+                isCommon
+                  ? 'bg-error-container/30 text-error border-error/20 line-through decoration-4'
+                  : 'bg-surface-container-high text-on-surface hover:bg-surface-container-highest border-outline/10'
+              } border`}
               animate={
                 isCommon && shouldAnimate
                   ? {
@@ -112,7 +111,7 @@ export default function Step2CommonLetters({ name1, name2, commonLetters }: Step
             {/* Tooltip on hover */}
             {hoveredLetter === uniqueKey && (
               <motion.div
-                className="bg-surface-container text-on-surface absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-xs shadow-lg"
+                className="bg-surface-container text-on-surface absolute -top-8 left-1/2 -translate-x-1/2 rounded-md px-2 py-1 text-xs whitespace-nowrap shadow-lg"
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
               >

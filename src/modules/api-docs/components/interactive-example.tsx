@@ -275,7 +275,7 @@ export function InteractiveExample() {
                       exit={{ opacity: 0, scale: 0.95 }}
                       className="space-y-3"
                     >
-                      <div className="flex items-center gap-3 border-l-4 border-green-600 dark:border-green-500 py-2 pl-3">
+                      <div className="flex items-center gap-3 border-l-4 border-green-600 py-2 pl-3 dark:border-green-500">
                         <Badge variant="default" className="bg-green-600 text-xs text-white">
                           200
                         </Badge>

@@ -9,12 +9,12 @@
 export { default as HowItWorksPage } from './HowItWorksPage';
 
 // Components
+export { default as CallToAction } from './components/CallToAction';
 export { default as Header } from './components/Header';
+export { default as MeaningSection } from './components/MeaningSection';
 export { default as Step1Names } from './components/Step1Names';
 export { default as Step2CommonLetters } from './components/Step2CommonLetters';
 export { default as Step3FlamesSimulation } from './components/Step3FlamesSimulation';
-export { default as MeaningSection } from './components/MeaningSection';
-export { default as CallToAction } from './components/CallToAction';
 
 // Constants
 export * from './constants';

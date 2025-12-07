@@ -1,2 +1,1 @@
-export { FlamesProcessor } from './FlamesProcessor';
-export { FlamesProcessor as default } from './FlamesProcessor';
+export { FlamesProcessor, FlamesProcessor as default } from './FlamesProcessor';

@@ -1,8 +1,8 @@
 import { validateFlamesInput, validateName } from '@/utils/validation';
-import type { GameStage } from '../../types';
 import { motion } from 'framer-motion';
 import { Heart, Sparkles } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
+import type { GameStage } from '../../types';
 
 interface InputFormProps {
   name1: string;
@@ -129,12 +129,12 @@ function InputFormComponent({
       className="relative mx-auto w-full max-w-lg"
       initial={shouldAnimate ? { opacity: 0, y: 30, scale: 0.95 } : false}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ 
-        opacity: 0, 
-        scale: 0.9, 
+      exit={{
+        opacity: 0,
+        scale: 0.9,
         y: -20,
         filter: 'blur(8px)',
-        transition: { duration: 0.4, ease: 'easeInOut' }
+        transition: { duration: 0.4, ease: 'easeInOut' },
       }}
       transition={{
         duration: 0.6,
@@ -143,27 +143,35 @@ function InputFormComponent({
     >
       {/* Glass Card */}
       <motion.div
-        className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/80 p-6 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-black/40 md:p-8"
-        whileHover={shouldAnimate && !isProcessing ? { 
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255,255,255,0.1)',
-        } : {}}
-        style={{ 
+        className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/80 p-6 shadow-2xl backdrop-blur-xl md:p-8 dark:border-white/10 dark:bg-black/40"
+        whileHover={
+          shouldAnimate && !isProcessing
+            ? {
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255,255,255,0.1)',
+              }
+            : {}
+        }
+        style={{
           transformStyle: 'preserve-3d',
         }}
       >
         {/* Decorative gradient blob */}
-        <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-linear-to-br from-pink-500/20 to-purple-500/20 blur-3xl" />
+        <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-linear-to-br from-pink-500/20 to-purple-500/20 blur-3xl" />
         <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-linear-to-br from-blue-500/20 to-cyan-500/20 blur-3xl" />
 
         <form onSubmit={handleSubmit} className="relative space-y-6">
           {/* Header */}
           <div className="mb-6 text-center">
-            <motion.div 
+            <motion.div
               className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-pink-500 to-rose-500 shadow-lg"
-              animate={shouldAnimate ? { 
-                scale: [1, 1.05, 1],
-                rotate: [0, 5, -5, 0]
-              } : {}}
+              animate={
+                shouldAnimate
+                  ? {
+                      scale: [1, 1.05, 1],
+                      rotate: [0, 5, -5, 0],
+                    }
+                  : {}
+              }
               transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
             >
               <Heart className="h-6 w-6 text-white" fill="currentColor" />
@@ -224,7 +232,7 @@ function InputFormComponent({
             {/* Heart divider */}
             <div className="flex items-center justify-center py-1">
               <div className="h-px flex-1 bg-linear-to-r from-transparent via-gray-300 to-transparent dark:via-gray-600" />
-              <motion.span 
+              <motion.span
                 className="mx-4 text-2xl"
                 animate={shouldAnimate && name1 && name2 ? { scale: [1, 1.2, 1] } : {}}
                 transition={{ duration: 1, repeat: Infinity }}
@@ -297,26 +305,34 @@ function InputFormComponent({
             type="submit"
             disabled={!isFormValid || isProcessing}
             className="group relative w-full overflow-hidden rounded-xl bg-linear-to-r from-pink-500 via-rose-500 to-red-500 px-6 py-4 font-bold text-white shadow-lg transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale"
-            whileHover={shouldAnimate && isFormValid && !isProcessing ? { 
-              scale: 1.02, 
-              boxShadow: '0 20px 40px -10px rgba(236, 72, 153, 0.5)' 
-            } : {}}
+            whileHover={
+              shouldAnimate && isFormValid && !isProcessing
+                ? {
+                    scale: 1.02,
+                    boxShadow: '0 20px 40px -10px rgba(236, 72, 153, 0.5)',
+                  }
+                : {}
+            }
             whileTap={shouldAnimate && isFormValid && !isProcessing ? { scale: 0.98 } : {}}
           >
             {/* Shine effect */}
             <motion.div
               className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/30 to-transparent"
-              animate={shouldAnimate && isFormValid && !isProcessing ? { 
-                translateX: ['-100%', '100%'] 
-              } : {}}
-              transition={{ 
-                duration: 2, 
-                repeat: Infinity, 
+              animate={
+                shouldAnimate && isFormValid && !isProcessing
+                  ? {
+                      translateX: ['-100%', '100%'],
+                    }
+                  : {}
+              }
+              transition={{
+                duration: 2,
+                repeat: Infinity,
                 repeatDelay: 3,
-                ease: 'easeInOut'
+                ease: 'easeInOut',
               }}
             />
-            
+
             <span className="relative flex items-center justify-center gap-2">
               {isProcessing ? (
                 <>

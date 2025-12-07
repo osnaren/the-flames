@@ -1,6 +1,5 @@
 'use client';
 
-import { useMediaQuery } from '@/hooks/useMediaQuery';
 import {
   Dialog,
   DialogClose,
@@ -18,6 +17,7 @@ import {
   DrawerTitle,
 } from '@/components/shadcn/drawer';
 import Button from '@/components/ui/Button';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { motion } from 'framer-motion';
 import { HelpCircle } from 'lucide-react';
 import { useState } from 'react';

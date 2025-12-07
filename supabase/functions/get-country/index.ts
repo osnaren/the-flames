@@ -20,9 +20,7 @@ Deno.serve(async (req: Request) => {
   try {
     // 1. Try to get country from headers (Cloudflare, Vercel, etc.)
     const countryFromHeaders =
-      req.headers.get('cf-ipcountry') ||
-      req.headers.get('x-vercel-ip-country') ||
-      req.headers.get('x-country-code');
+      req.headers.get('cf-ipcountry') || req.headers.get('x-vercel-ip-country') || req.headers.get('x-country-code');
 
     if (countryFromHeaders && countryFromHeaders.length === 2) {
       return new Response(JSON.stringify({ country: countryFromHeaders }), {

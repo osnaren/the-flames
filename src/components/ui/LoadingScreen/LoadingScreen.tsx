@@ -12,16 +12,12 @@ interface LoadingScreenProps {
  * Lightweight loading screen optimized for fast FCP
  * Uses CSS animations instead of Framer Motion for initial load
  */
-function LoadingScreen({
-  message = 'Loading...',
-  fullScreen = true,
-  className = '',
-}: LoadingScreenProps) {
+function LoadingScreen({ message = 'Loading...', fullScreen = true, className = '' }: LoadingScreenProps) {
   return (
     <div
       className={`bg-surface/80 flex flex-col items-center justify-center backdrop-blur-md ${fullScreen ? 'fixed inset-0 z-50' : 'h-full min-h-[200px] w-full'} ${className}`}
     >
-      <div className="flex animate-fade-in flex-col items-center gap-6">
+      <div className="animate-fade-in flex flex-col items-center gap-6">
         {/* Simple animated logo placeholder */}
         <div className="relative">
           {/* Pulse effect behind the logo */}

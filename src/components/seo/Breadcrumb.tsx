@@ -81,15 +81,8 @@ export function Breadcrumb({ items, showHome = true, className = '' }: Breadcrum
       />
 
       {/* Visual Breadcrumb Navigation */}
-      <nav
-        aria-label="Breadcrumb"
-        className={`mb-4 flex items-center text-sm ${className}`}
-      >
-        <ol
-          className="flex flex-wrap items-center gap-1.5"
-          itemScope
-          itemType="https://schema.org/BreadcrumbList"
-        >
+      <nav aria-label="Breadcrumb" className={`mb-4 flex items-center text-sm ${className}`}>
+        <ol className="flex flex-wrap items-center gap-1.5" itemScope itemType="https://schema.org/BreadcrumbList">
           {breadcrumbItems.map((item, index) => {
             const isLast = index === breadcrumbItems.length - 1;
             const isHome = item.url === '/';
@@ -102,19 +95,10 @@ export function Breadcrumb({ items, showHome = true, className = '' }: Breadcrum
                 itemScope
                 itemType="https://schema.org/ListItem"
               >
-                {index > 0 && (
-                  <ChevronRight
-                    className="h-4 w-4 text-gray-400 dark:text-gray-500"
-                    aria-hidden="true"
-                  />
-                )}
+                {index > 0 && <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />}
 
                 {isLast ? (
-                  <span
-                    className="text-gray-600 dark:text-gray-300"
-                    itemProp="name"
-                    aria-current="page"
-                  >
+                  <span className="text-gray-600 dark:text-gray-300" itemProp="name" aria-current="page">
                     {isHome ? <Home className="h-4 w-4" aria-label="Home" /> : item.name}
                   </span>
                 ) : (
@@ -123,9 +107,7 @@ export function Breadcrumb({ items, showHome = true, className = '' }: Breadcrum
                     className="text-gray-500 transition-colors hover:text-pink-600 dark:text-gray-400 dark:hover:text-pink-400"
                     itemProp="item"
                   >
-                    <span itemProp="name">
-                      {isHome ? <Home className="h-4 w-4" aria-label="Home" /> : item.name}
-                    </span>
+                    <span itemProp="name">{isHome ? <Home className="h-4 w-4" aria-label="Home" /> : item.name}</span>
                   </Link>
                 )}
 

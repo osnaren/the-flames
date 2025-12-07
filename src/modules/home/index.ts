@@ -18,12 +18,7 @@ export { InputForm } from './components/InputForm';
 export { FlamesProcessor } from './components/FlamesProcessor';
 
 // Feature components - ResultCard
-export {
-  ResultCard,
-  ResultCardContainer,
-  ResultCardDisplay,
-  ResultActionsDock,
-} from './components/ResultCard';
+export { ResultActionsDock, ResultCard, ResultCardContainer, ResultCardDisplay } from './components/ResultCard';
 
 // Hooks
 export { useFlamesEngine } from './hooks/useFlamesEngine';

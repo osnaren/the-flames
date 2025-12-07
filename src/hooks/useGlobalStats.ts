@@ -1,8 +1,7 @@
+import { generateMockData, GlobalStats } from '@modules/charts';
 import { NonNullFlamesResult } from '@shared/utils/resultData';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { GlobalStats } from '@modules/charts';
-import { generateMockData } from '@modules/charts';
 import { getStatsWithTrends, getUserCountry, StatsError, TimeWindow } from '../lib/supabase';
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes

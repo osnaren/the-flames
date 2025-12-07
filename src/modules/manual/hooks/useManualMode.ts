@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import type { FlamesResult, ExperienceMode, ManualModeState } from '../types';
 import { generateCanvasImage, generateClickResultImage, saveImage, shareImage } from '../image.utils';
+import type { ExperienceMode, FlamesResult, ManualModeState } from '../types';
 import {
   clearCanvas,
   eraseArea,

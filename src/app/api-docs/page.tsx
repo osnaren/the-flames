@@ -1,9 +1,4 @@
-import {
-  generateAPISchema,
-  generateBreadcrumbSchema,
-  generatePageMetadata,
-  pagesSEO,
-} from '@/lib/seo';
+import { generateAPISchema, generateBreadcrumbSchema, generatePageMetadata, pagesSEO } from '@/lib/seo';
 import { ApiDocsPage } from '@modules/api-docs/ApiDocsPage';
 import type { Metadata } from 'next';
 

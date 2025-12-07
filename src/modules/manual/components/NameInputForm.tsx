@@ -1,8 +1,8 @@
+import Button from '@/components/ui/Button';
 import { motion } from 'framer-motion';
 import { ArrowRight, Heart, Info, Pen, Pointer } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import Button from '@/components/ui/Button';
 import type { NameInputFormProps } from '../types';
 import { validateNameInput } from '../utils';
 
