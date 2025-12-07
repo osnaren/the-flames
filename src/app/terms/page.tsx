@@ -1,19 +1,16 @@
-'use client';
+import { generatePageMetadata } from '@/lib/seo';
+import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+// SEO metadata for redirect page
+export const metadata: Metadata = generatePageMetadata({
+  title: 'Terms of Service',
+  description: 'Terms of Service for FLAMES Game. Read our terms governing your use of the service.',
+  path: '/terms',
+  noIndex: true, // Don't index redirect pages
+});
 
+// Server-side redirect for better SEO
 export default function TermsPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to privacy page which contains both privacy and terms
-    router.replace('/privacy#terms');
-  }, [router]);
-
-  return (
-    <div className="flex min-h-[50vh] items-center justify-center">
-      <div className="text-muted-foreground animate-pulse text-lg">Redirecting to Privacy & Terms...</div>
-    </div>
-  );
+  redirect('/privacy#terms');
 }

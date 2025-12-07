@@ -1,9 +1,9 @@
-import type { FlamesResult } from './types';
-import { getResultData } from './resultData';
 import html2canvas from 'html2canvas';
 import { createRoot } from 'react-dom/client';
 import toast from 'react-hot-toast';
 import ClickResultImage from './components/ClickResultImage';
+import { getResultData } from './resultData';
+import type { FlamesResult } from './types';
 
 /**
  * Saves an image by creating a link and triggering a download.
@@ -114,7 +114,7 @@ export const generateCanvasImage = async (canvas: HTMLCanvasElement, name1: stri
   outputCtx.font = `${fontSize}px Inter, -apple-system, BlinkMacSystemFont, sans-serif`;
   outputCtx.fillStyle = isDarkMode ? '#94a3b8' : '#475569';
   outputCtx.textAlign = 'center';
-  outputCtx.fillText('the-flames.com', outputCanvas.width / 2, outputCanvas.height - 50 * scaleFactor);
+  outputCtx.fillText('theflames.app', outputCanvas.width / 2, outputCanvas.height - 50 * scaleFactor);
 
   outputCtx.font = `bold ${titleFontSize}px Inter, -apple-system, BlinkMacSystemFont, sans-serif`;
   outputCtx.fillStyle = isDarkMode ? '#ffffff' : '#1e293b';
@@ -316,7 +316,7 @@ export const generateFallbackClickResultImage = async (
   // Footer
   ctx.fillStyle = subtleColor;
   ctx.font = '32px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
-  ctx.fillText('the-flames.com', canvas.width / 2, canvas.height - 80);
+  ctx.fillText('theflames.app', canvas.width / 2, canvas.height - 80);
 
   return canvas.toDataURL('image/png', 0.9);
 };

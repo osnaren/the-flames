@@ -1,7 +1,7 @@
 'use client';
 
-import type { FlamesResult } from '../types';
 import { getResultData } from '../resultData';
+import type { FlamesResult } from '../types';
 
 interface ClickResultImageProps {
   name1: string;
@@ -140,7 +140,7 @@ export default function ClickResultImage({ name1, name2, result }: ClickResultIm
           textAlign: 'center' as const,
         }}
       >
-        the-flames.com
+        theflames.app
       </div>
     </div>
   );

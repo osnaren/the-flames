@@ -44,7 +44,7 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
 
-  // Headers for performance and security
+  // Headers for performance, security, and SEO
   async headers() {
     return [
       {
@@ -62,6 +62,19 @@ const nextConfig: NextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'origin-when-cross-origin',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          // Permissions Policy for security
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
           },
         ],
       },
@@ -85,16 +98,92 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // Cache favicon and images
+        source: '/favicon/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        // Cache OG images
+        source: '/(opengraph-image|twitter-image)(.png)?',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
     ];
   },
 
   // Redirects for SEO
   async redirects() {
     return [
-      // Redirect trailing slashes
+      // Redirect trailing slashes for clean URLs
       {
         source: '/:path+/',
         destination: '/:path+',
+        permanent: true,
+      },
+      // Redirect common misspellings or alternative URLs
+      {
+        source: '/flame',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/game',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/play',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/calculator',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/tutorial',
+        destination: '/how-it-works',
+        permanent: true,
+      },
+      {
+        source: '/learn',
+        destination: '/how-it-works',
+        permanent: true,
+      },
+      {
+        source: '/stats',
+        destination: '/charts',
+        permanent: true,
+      },
+      {
+        source: '/statistics',
+        destination: '/charts',
+        permanent: true,
+      },
+      {
+        source: '/api',
+        destination: '/api-docs',
+        permanent: true,
+      },
+      {
+        source: '/docs',
+        destination: '/api-docs',
+        permanent: true,
+      },
+      {
+        source: '/terms',
+        destination: '/privacy#terms',
         permanent: true,
       },
     ];

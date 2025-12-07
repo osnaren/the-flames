@@ -1,5 +1,15 @@
 import ClientLayout from '@/components/layout/ClientLayout';
 import { fontVariables } from '@/lib/fonts';
+import {
+  baseMetadata,
+  generateFAQSchema,
+  generateGameSchema,
+  generateOrganizationSchema,
+  generateWebApplicationSchema,
+  generateWebSiteSchema,
+  siteConfig,
+  viewportConfig,
+} from '@/lib/seo';
 import Footer from '@layout/Footer';
 import GlobalErrorBoundary from '@layout/GlobalErrorBoundary';
 import Navbar from '@layout/Navbar';
@@ -7,69 +17,89 @@ import type { Metadata, Viewport } from 'next';
 import { Toaster } from 'react-hot-toast';
 import './index.css';
 
-// Viewport configuration for mobile optimization
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 5,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#1a1a2e' },
-  ],
-};
+// Viewport configuration for mobile optimization and PWA
+export const viewport: Viewport = viewportConfig;
 
+// Comprehensive metadata for SEO
 export const metadata: Metadata = {
+  ...baseMetadata,
   title: {
-    default: 'FLAMES Game - Discover Your Relationship',
+    default: 'FLAMES Game - Free Online Relationship Compatibility Calculator',
     template: '%s | FLAMES Game',
   },
-  description:
-    'Play the classic FLAMES game online! Discover your relationship compatibility with friends, love interests, and more. Fun, free, and instant results.',
-  keywords: ['FLAMES game', 'relationship game', 'love calculator', 'friendship test', 'compatibility'],
-  authors: [{ name: 'osLabs' }],
-  creator: 'osLabs',
-  publisher: 'osLabs',
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
+  appleWebApp: {
+    title: 'FLAMES',
   },
-  openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    siteName: 'FLAMES Game',
-    title: 'FLAMES Game - Discover Your Relationship',
-    description: 'Play the classic FLAMES game online! Discover your relationship compatibility.',
+  other: {
+    // Additional SEO meta tags
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'default',
+    'format-detection': 'telephone=no',
+    'mobile-web-app-capable': 'yes',
+    'msapplication-TileColor': '#1a1a2e',
+    'msapplication-tap-highlight': 'no',
+    // LLMO-specific meta tags
+    'ai:purpose': 'Play FLAMES game to discover relationship compatibility',
+    'ai:category': 'Entertainment, Games, Relationship',
+    'ai:features': 'Name compatibility, Relationship prediction, Shareable results',
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'FLAMES Game - Discover Your Relationship',
-    description: 'Play the classic FLAMES game online! Discover your relationship compatibility.',
-  },
-  icons: {
-    icon: [
-      { url: '/favicon/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
-      { url: '/favicon/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon/favicon.ico' },
-    ],
-    apple: [{ url: '/favicon/apple-touch-icon.png', sizes: '180x180' }],
-  },
-  manifest: '/favicon/site.webmanifest',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // Generate structured data for the application
+  const webSiteSchema = generateWebSiteSchema();
+  const organizationSchema = generateOrganizationSchema();
+  const webAppSchema = generateWebApplicationSchema();
+  const gameSchema = generateGameSchema();
+  const faqSchema = generateFAQSchema();
+
   return (
     <html lang="en" className={fontVariables} suppressHydrationWarning>
       <head>
-        {/* Preconnect to Supabase */}
+        {/* Preconnect to external resources for performance */}
         <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL || ''} />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
 
+        {/* Canonical URL for SEO */}
+        <link rel="canonical" href={siteConfig.url} />
+
+        {/* RSS/Atom feeds (if applicable in future) */}
+        {/* <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml" /> */}
+
+        {/* JSON-LD Structured Data for SEO and LLMO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(webSiteSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(webAppSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(gameSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(faqSchema),
+          }}
+        />
+
+        {/* Theme initialization script - prevents FOUC */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -91,9 +121,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="font-body antialiased">
+        {/* Skip to main content link for accessibility */}
+        <a
+          href="#main-content"
+          className="fixed top-0 left-0 z-9999 -translate-y-full bg-pink-600 px-4 py-2 text-white transition-transform focus:translate-y-0"
+        >
+          Skip to main content
+        </a>
+
         <ClientLayout>
           <Navbar />
-          <main className="pt-6">
+          <main id="main-content" className="pt-6" role="main">
             <GlobalErrorBoundary>{children}</GlobalErrorBoundary>
           </main>
           <Footer />

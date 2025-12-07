@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React from 'react';
 import { BsPaypal } from 'react-icons/bs';
 import { SiBuymeacoffee, SiGithubsponsors } from 'react-icons/si';
@@ -48,7 +49,7 @@ export const sponsorOptions: SponsorOptionConfig[] = [
   {
     id: 'upi',
     label: 'Support via UPI',
-    icon: <img src="/upi-logo.svg" alt="" width={24} height={24} aria-hidden="true" />, // Slightly larger UPI icon
+    icon: <Image src="/upi-logo.svg" alt="" width={24} height={24} aria-hidden="true" />,
     bgColor: 'bg-[#e0e4dc] hover:bg-[#e0e4dc]/90',
     textColor: 'text-white',
     action: { type: 'modal', modalId: 'upi' },

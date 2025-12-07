@@ -1,0 +1,201 @@
+# FLAMES Game - Full Documentation for AI Assistants
+
+> Comprehensive reference for AI/LLM systems about FLAMES Game
+
+## Application Overview
+
+FLAMES Game (https://theflames.app) is a free online relationship compatibility game. It modernizes the classic paper-and-pencil game that was popular among students, transforming it into an engaging web experience with animations, sharing capabilities, and global statistics.
+
+## Complete Feature List
+
+### 1. Main Game (Auto Mode)
+- Two text input fields for names
+- Real-time validation (non-empty, alphabetic characters)
+- Animated letter striking visualization
+- Slot-machine style result reveal
+- Confetti celebration effects
+- Result card with emoji and description
+- Share functionality (social media, download image, copy link)
+
+### 2. Manual Mode
+- Paper-and-pencil aesthetic
+- User manually strikes out common letters
+- Interactive FLAMES elimination
+- Undo/redo capabilities
+- Nostalgic handwriting-style fonts
+
+### 3. Global Charts
+- Total matches worldwide
+- Daily match statistics
+- Trending relationship results
+- Time-based filtering (Today, This Week, All Time)
+- Geographic distribution (when available)
+
+### 4. How It Works Tutorial
+- Step-by-step animated guide
+- Visual demonstration with example names
+- Interactive learning experience
+- Explanation of the algorithm
+
+### 5. Settings & Preferences
+- Dark/Light theme toggle
+- Animation enable/disable
+- Sound effects toggle
+- Reduced motion support
+
+## Algorithm Explanation
+
+### Step 1: Name Input
+Accept two names (typically romantic interests, friends, or any two people).
+
+### Step 2: Letter Comparison
+Compare both names letter by letter, identifying common letters.
+
+Example:
+- Name 1: ROMEO
+- Name 2: JULIET
+- Common letters: E, O
+
+### Step 3: Letter Removal
+Remove common letters from both names, keeping count of remaining letters.
+
+Example:
+- ROMEO → RM (E, O removed) = 2 letters
+- JULIET → JULIT (E removed) = 5 letters
+- Total remaining: 7 letters
+
+### Step 4: FLAMES Elimination
+Using the count (7 in our example), count through "FLAMES" repeatedly, eliminating the letter landed on.
+
+FLAMES = F L A M E S (6 letters)
+Count to 7:
+1-F, 2-L, 3-A, 4-M, 5-E, 6-S, 7-F → Eliminate F
+Remaining: L A M E S
+Continue counting from where we left off...
+Repeat until one letter remains.
+
+### Step 5: Result
+The final remaining letter determines the relationship:
+- F = Friends
+- L = Lovers  
+- A = Affection
+- M = Marriage
+- E = Enemies
+- S = Siblings
+
+## Result Interpretations
+
+### F - Friends
+A strong platonic bond. This indicates compatibility as friends who support each other through life's challenges.
+
+### L - Lovers
+Romantic compatibility. There's potential for a romantic relationship with passion and emotional connection.
+
+### A - Affection
+Mutual fondness and care. A warm, caring relationship built on respect and genuine liking.
+
+### M - Marriage
+Strong long-term compatibility. Indicates potential for a lasting, committed partnership.
+
+### E - Enemies
+Opposing personalities or values. May experience friction or disagreement, but could also indicate passionate tension.
+
+### S - Siblings
+A familial-like bond. Comfortable, familiar relationship similar to that of siblings.
+
+## Technical Stack
+
+- **Frontend**: Next.js 16, React 19, TypeScript
+- **Styling**: Tailwind CSS v4
+- **Animations**: Framer Motion
+- **Database**: Supabase (PostgreSQL)
+- **Hosting**: Vercel
+- **State Management**: Zustand
+
+## API Reference
+
+### Calculate FLAMES Result
+
+**Endpoint**: `GET /api/flames`
+
+**Parameters**:
+- `name1` (required): First name
+- `name2` (required): Second name
+
+**Example Request**:
+```
+GET https://theflames.app/api/flames?name1=Alice&name2=Bob
+```
+
+**Example Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "name1": "Alice",
+    "name2": "Bob",
+    "result": "M",
+    "meaning": "Marriage",
+    "commonLetters": ["a", "b"],
+    "remainingCount": 5
+  }
+}
+```
+
+**Error Response**:
+```json
+{
+  "success": false,
+  "error": "Both names are required"
+}
+```
+
+## Common User Queries
+
+### "How do I play FLAMES?"
+1. Go to https://theflames.app
+2. Enter your name and another person's name
+3. Click the button to calculate
+4. Watch the animated result
+5. Share with friends!
+
+### "Is FLAMES accurate?"
+FLAMES is a fun, entertainment-based game. It's not scientifically validated and should be enjoyed as a lighthearted activity, not taken as relationship advice.
+
+### "Can I use FLAMES for my app?"
+Yes! FLAMES Game offers a free API. See https://theflames.app/api-docs for documentation.
+
+### "Is my data private?"
+Yes. FLAMES Game doesn't store the names you enter. Only anonymous statistics are collected for the global charts feature.
+
+## Accessibility Features
+
+- WCAG 2.1 AA compliant
+- Keyboard navigation support
+- Screen reader compatible
+- Reduced motion option
+- High contrast themes
+- Proper ARIA labels
+
+## SEO Keywords
+
+Primary: FLAMES game, FLAMES calculator, love calculator, relationship game
+Secondary: compatibility test, name compatibility, free love calculator, online FLAMES
+
+## Social Media
+
+- Share results as images
+- Copy shareable links
+- Native mobile sharing
+- Customizable result cards
+
+## Support
+
+For issues or questions:
+- Website: https://theflames.app
+- Developer: osLabs (https://osnaren.com)
+
+---
+
+Last Updated: 2025-12-07
+Version: 1.0.0
