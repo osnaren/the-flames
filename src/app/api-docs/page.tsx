@@ -24,12 +24,14 @@ export default function Page() {
     <>
       {/* Structured data for this page */}
       <script
+        key="json-ld-breadcrumb"
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(breadcrumbSchema),
         }}
       />
       <script
+        key="json-ld-api"
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(apiSchema),

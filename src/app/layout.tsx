@@ -67,38 +67,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* RSS/Atom feeds (if applicable in future) */}
         {/* <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml" /> */}
 
-        {/* JSON-LD Structured Data for SEO and LLMO */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(webSiteSchema),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationSchema),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(webAppSchema),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(gameSchema),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(faqSchema),
-          }}
-        />
-
         {/* Theme initialization script - prevents FOUC */}
         <script
           dangerouslySetInnerHTML={{
@@ -147,6 +115,43 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }}
           />
         </ClientLayout>
+
+        {/* JSON-LD Structured Data for SEO and LLMO - Placed in body to avoid hydration mismatches with browser extensions */}
+        <script
+          key="json-ld-website"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(webSiteSchema),
+          }}
+        />
+        <script
+          key="json-ld-org"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
+        />
+        <script
+          key="json-ld-webapp"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(webAppSchema),
+          }}
+        />
+        <script
+          key="json-ld-game"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(gameSchema),
+          }}
+        />
+        <script
+          key="json-ld-faq"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(faqSchema),
+          }}
+        />
       </body>
     </html>
   );
