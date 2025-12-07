@@ -1,11 +1,24 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Award, Calendar, Headphones, Moon, Palette, Settings, Sun, Vibrate, Volume2, VolumeX, X } from 'lucide-react';
+import {
+  Award,
+  Calendar,
+  Headphones,
+  Moon,
+  Palette,
+  Settings,
+  Sun,
+  Vibrate,
+  Volume2,
+  VolumeX,
+  X,
+  Zap,
+} from 'lucide-react';
 import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
-import { usePreferencesStore } from '@/store/usePreferencesStore';
+import { TransitionSpeed, usePreferencesStore } from '@/store/usePreferencesStore';
 import { SeasonalTheme } from '@/themes/seasonal/types';
 import { useSeasonalTheme } from '@/themes/seasonal/useSeasonalTheme';
 
@@ -24,11 +37,13 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
     isHapticEnabled,
     volume,
     seasonalTheme,
+    transitionSpeed,
     toggleTheme,
     toggleAnimations,
     toggleSound,
     toggleHaptic,
     setVolume,
+    setTransitionSpeed,
   } = usePreferencesStore();
 
   const { playSound } = useSoundEffects();
@@ -200,6 +215,46 @@ export function SettingsPanel({ isVisible, onClose }: SettingsPanelProps) {
                       />
                     </button>
                   </div>
+
+                  {/* Transition Speed */}
+                  {animationsEnabled && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <Zap className="h-5 w-5" />
+                        <div>
+                          <span className="font-medium text-gray-900 dark:text-white">Transition Speed</span>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Control how fast page transitions animate
+                          </p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-4 gap-2">
+                        {(
+                          [
+                            { value: 'instant', label: 'Instant', description: 'No animation' },
+                            { value: 'fast', label: 'Fast', description: '0.15s' },
+                            { value: 'normal', label: 'Normal', description: '0.3s' },
+                            { value: 'slow', label: 'Slow', description: '0.5s' },
+                          ] as const
+                        ).map(({ value, label, description }) => (
+                          <button
+                            key={value}
+                            onClick={() => setTransitionSpeed(value as TransitionSpeed)}
+                            className={`flex flex-col items-center rounded-lg border-2 p-2 transition-all ${
+                              transitionSpeed === value
+                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600'
+                            }`}
+                            aria-label={`Set transition speed to ${label}`}
+                            aria-pressed={transitionSpeed === value}
+                          >
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">{label}</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">{description}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

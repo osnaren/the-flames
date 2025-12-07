@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect } from 'react';
-import { usePreferencesStore } from '../store/usePreferencesStore';
+import { TransitionSpeed, usePreferencesStore } from '../store/usePreferencesStore';
 
 interface Preferences {
   isDarkTheme: boolean;
   animationsEnabled: boolean;
   isSoundEnabled: boolean;
+  transitionSpeed: TransitionSpeed;
   hydrated: boolean;
 }
 
@@ -14,14 +15,25 @@ interface PreferenceActions {
   toggleTheme: () => void;
   toggleAnimations: () => void;
   toggleSound: () => void;
+  setTransitionSpeed: (speed: TransitionSpeed) => void;
 }
 
 /**
  * Custom hook for managing user preferences with localStorage persistence
  */
 export function usePreferences(): [Preferences, PreferenceActions] {
-  const { isDarkTheme, animationsEnabled, isSoundEnabled, hydrated, toggleTheme, toggleAnimations, toggleSound, init } =
-    usePreferencesStore();
+  const {
+    isDarkTheme,
+    animationsEnabled,
+    isSoundEnabled,
+    transitionSpeed,
+    hydrated,
+    toggleTheme,
+    toggleAnimations,
+    toggleSound,
+    setTransitionSpeed,
+    init,
+  } = usePreferencesStore();
 
   // Load preferences from localStorage on mount
   useEffect(() => {
@@ -29,7 +41,7 @@ export function usePreferences(): [Preferences, PreferenceActions] {
   }, [init]);
 
   return [
-    { isDarkTheme, animationsEnabled, isSoundEnabled, hydrated },
-    { toggleTheme, toggleAnimations, toggleSound },
+    { isDarkTheme, animationsEnabled, isSoundEnabled, transitionSpeed, hydrated },
+    { toggleTheme, toggleAnimations, toggleSound, setTransitionSpeed },
   ];
 }

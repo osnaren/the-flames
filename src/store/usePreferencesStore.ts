@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 
+export type TransitionSpeed = 'instant' | 'fast' | 'normal' | 'slow';
+
 interface PreferencesState {
   isDarkTheme: boolean;
   animationsEnabled: boolean;
@@ -7,6 +9,7 @@ interface PreferencesState {
   isHapticEnabled: boolean;
   volume: number;
   seasonalTheme: 'auto' | 'valentine' | 'halloween' | 'christmas' | 'default';
+  transitionSpeed: TransitionSpeed;
   hydrated: boolean;
 }
 
@@ -17,8 +20,17 @@ interface PreferencesActions {
   toggleHaptic: () => void;
   setVolume: (volume: number) => void;
   setSeasonalTheme: (theme: PreferencesState['seasonalTheme']) => void;
+  setTransitionSpeed: (speed: TransitionSpeed) => void;
   init: () => void;
 }
+
+// Transition duration mapping (in seconds)
+export const TRANSITION_DURATIONS: Record<TransitionSpeed, number> = {
+  instant: 0,
+  fast: 0.15,
+  normal: 0.3,
+  slow: 0.75,
+};
 
 // Helper to safely access localStorage (SSR-safe)
 const safeLocalStorage = {
@@ -47,6 +59,7 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
   isHapticEnabled: true,
   volume: 0.7,
   seasonalTheme: 'auto',
+  transitionSpeed: 'slow',
   hydrated: false,
   toggleTheme: () =>
     set((s) => {
@@ -92,6 +105,11 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
       safeLocalStorage.setItem('seasonalTheme', theme);
       return { seasonalTheme: theme };
     }),
+  setTransitionSpeed: (speed: TransitionSpeed) =>
+    set(() => {
+      safeLocalStorage.setItem('transitionSpeed', speed);
+      return { transitionSpeed: speed };
+    }),
   init: () => {
     // Guard against SSR
     if (typeof window === 'undefined') return;
@@ -102,6 +120,7 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
     const storedHaptic = safeLocalStorage.getItem('haptic');
     const storedVolume = safeLocalStorage.getItem('volume');
     const storedSeasonalTheme = safeLocalStorage.getItem('seasonalTheme');
+    const storedTransitionSpeed = safeLocalStorage.getItem('transitionSpeed');
 
     if (storedTheme === 'dark') {
       document.documentElement.classList.add('dark');
@@ -116,6 +135,7 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
       isHapticEnabled: storedHaptic !== 'false',
       volume: storedVolume ? parseFloat(storedVolume) : 0.7,
       seasonalTheme: (storedSeasonalTheme as PreferencesState['seasonalTheme']) || 'auto',
+      transitionSpeed: (storedTransitionSpeed as TransitionSpeed) || 'normal',
       hydrated: true,
     });
   },
