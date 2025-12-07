@@ -1,9 +1,10 @@
 'use client';
 
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
+import { useBackgroundStore } from '@/store/useBackgroundStore';
 import { AnimatePresence, motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef } from 'react';
 
 // Critical components - loaded immediately
 import { AnimatedHeader } from './components/AnimatedHeader';
@@ -19,11 +20,6 @@ const FlamesProcessor = dynamic(
 const ResultCard = dynamic(() => import('./components/ResultCard').then((mod) => mod.ResultCard), {
   ssr: false,
   loading: () => <ResultPlaceholder />,
-});
-
-const DynamicBackground = dynamic(() => import('@/components/ui/DynamicBackground'), {
-  ssr: false,
-  loading: () => null,
 });
 
 // Lightweight loading placeholders
@@ -45,14 +41,13 @@ function ResultPlaceholder() {
   );
 }
 
-type SeasonalTheme = 'valentine' | 'halloween' | 'christmas' | undefined;
-
 /**
  * HomePage - Main FLAMES game page
  * Features streamlined stage management and beautiful animations
  */
 function HomePage() {
   const { shouldAnimate } = useAnimationPreferences();
+  const { setBackgroundState } = useBackgroundStore();
 
   // References for scrolling
   const containerRef = useRef<HTMLDivElement>(null);
@@ -63,6 +58,12 @@ function HomePage() {
     { name1, name2, result, stage, commonLetters, remainingLetters, isProcessing },
     { setName1, setName2, handleSubmit, resetGame, onFlamesAnimationComplete },
   ] = useFlamesEngine();
+
+  // Sync game state with background system
+  useEffect(() => {
+    const variant = stage === 'result' ? 'result' : stage === 'processing' ? 'processing' : 'default';
+    setBackgroundState({ variant, result });
+  }, [stage, result, setBackgroundState]);
 
   // Scroll to results when they appear
   useEffect(() => {
@@ -91,30 +92,12 @@ function HomePage() {
     onFlamesAnimationComplete();
   }, [onFlamesAnimationComplete]);
 
-  // Determine current season for background theming
-  const [currentSeason, setCurrentSeason] = useState<SeasonalTheme>(undefined);
-
-  useEffect(() => {
-    const month = new Date().getMonth();
-    if (month === 1) setCurrentSeason('valentine');
-    else if (month === 9) setCurrentSeason('halloween');
-    else if (month === 11) setCurrentSeason('christmas');
-  }, []);
-
   return (
     <section
       className="relative flex min-h-screen flex-col items-center justify-center px-4 py-8 md:py-12"
       ref={containerRef}
       aria-label="FLAMES Game"
     >
-      {/* Dynamic background system */}
-      <DynamicBackground
-        variant={stage === 'result' ? 'result' : stage === 'processing' ? 'processing' : 'default'}
-        result={result}
-        season={currentSeason}
-        intensity="medium"
-      />
-
       <div className="relative z-10 w-full max-w-2xl">
         {/* Animated Header */}
         <AnimatedHeader shouldAnimate={shouldAnimate} stage={stage} />

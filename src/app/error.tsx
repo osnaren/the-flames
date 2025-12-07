@@ -30,7 +30,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
       {/* Animated background glow */}
       <div className="pointer-events-none absolute inset-0">
         <motion.div
-          className="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-red-500/20 to-orange-500/20 blur-3xl"
+          className="absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-linear-to-r from-red-500/20 to-orange-500/20 blur-3xl"
           animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
           transition={{ duration: 4, repeat: Infinity }}
         />
@@ -43,12 +43,9 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
         animate="visible"
       >
         {/* Fire emoji with glow effect */}
-        <motion.div
-          variants={itemVariants}
-          className="relative mb-6"
-        >
+        <motion.div variants={itemVariants} className="relative mb-6">
           <motion.div
-            className="flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-red-500/20 to-orange-500/20 shadow-2xl"
+            className="flex h-28 w-28 items-center justify-center rounded-full bg-linear-to-br from-red-500/20 to-orange-500/20 shadow-2xl"
             animate={{
               boxShadow: [
                 '0 0 30px rgba(239, 68, 68, 0.3)',
@@ -61,7 +58,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
             <Flame className="h-14 w-14 text-red-500" strokeWidth={1.5} />
           </motion.div>
           <motion.div
-            className="absolute -right-1 -top-1"
+            className="absolute -top-1 -right-1"
             animate={{ rotate: [0, 15, -15, 0] }}
             transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
           >
@@ -74,14 +71,14 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
           variants={itemVariants}
           className="text-on-surface text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl"
         >
-          Oops! <span className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">Too Hot to Handle</span>
+          Oops!{' '}
+          <span className="bg-linear-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
+            Too Hot to Handle
+          </span>
         </motion.h1>
 
         {/* Subtext */}
-        <motion.p
-          variants={itemVariants}
-          className="text-on-surface-variant mt-4 max-w-md text-base sm:text-lg"
-        >
+        <motion.p variants={itemVariants} className="text-on-surface-variant mt-4 max-w-md text-base sm:text-lg">
           Something sparked an error. 🔥 Our love calculator overheated, but we're cooling things down!
         </motion.p>
 
@@ -109,10 +106,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
         </motion.div>
 
         {/* Reassuring footer */}
-        <motion.p
-          variants={itemVariants}
-          className="text-on-surface-variant/50 mt-10 text-sm"
-        >
+        <motion.p variants={itemVariants} className="text-on-surface-variant/50 mt-10 text-sm">
           Don't worry, your love life is still intact. This is just a technical hiccup! 💕
         </motion.p>
       </motion.div>

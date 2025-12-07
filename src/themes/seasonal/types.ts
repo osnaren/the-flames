@@ -16,11 +16,13 @@ export interface ThemeColors {
   border: string;
 }
 
+export type ParticleShape = 'circle' | 'heart' | 'star' | 'snowflake' | 'pumpkin' | 'bat' | 'flame';
+
 export interface ParticleConfig {
   enabled: boolean;
   count: number;
   colors: string[];
-  shapes: ('circle' | 'heart' | 'star' | 'snowflake' | 'pumpkin' | 'bat')[];
+  shapes: ParticleShape[];
   size: {
     min: number;
     max: number;

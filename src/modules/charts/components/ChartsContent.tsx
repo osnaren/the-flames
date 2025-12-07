@@ -165,7 +165,7 @@ export default function ChartsContent({
       </div>
 
       {/* Main Content */}
-      <div className="max-h-[70vh] overflow-y-auto bg-gray-50/50 p-4 sm:p-6 dark:bg-gray-900/50">
+      <div className="max-h-[70vh] overflow-y-auto relative z-1 bg-gray-50/50 p-4 sm:p-6 dark:bg-gray-900/50">
         {isLoading ? (
           <LoadingState />
         ) : error ? (
