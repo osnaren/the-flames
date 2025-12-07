@@ -198,6 +198,7 @@ function InputFormComponent({
                   required
                   disabled={isProcessing}
                   autoComplete="off"
+                  suppressHydrationWarning
                 />
                 {/* Focus glow effect */}
                 {focusedField === 'name1' && shouldAnimate && (
@@ -257,6 +258,7 @@ function InputFormComponent({
                   required
                   disabled={isProcessing}
                   autoComplete="off"
+                  suppressHydrationWarning
                 />
                 {focusedField === 'name2' && shouldAnimate && (
                   <motion.div
