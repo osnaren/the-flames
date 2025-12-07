@@ -134,8 +134,8 @@ export function useHapticFeedback() {
               }
             }
           }
-        } catch (error) {
-          console.warn('Haptic feedback failed:', error);
+        } catch {
+          // Haptic feedback failed, ignore
         }
       };
 
@@ -205,18 +205,15 @@ export function useHapticFeedback() {
     celebration: () => triggerHaptic('celebration'),
   };
 
-  // Test haptic functionality
   const testHaptic = useCallback(async () => {
     if (!capabilities.canVibrate) {
-      console.warn('Haptic feedback not available on this device');
       return false;
     }
 
     try {
       await triggerHaptic('medium');
       return true;
-    } catch (error) {
-      console.warn('Haptic test failed:', error);
+    } catch {
       return false;
     }
   }, [capabilities, triggerHaptic]);

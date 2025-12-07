@@ -111,9 +111,8 @@ export const getUserCountry = async (): Promise<string | null> => {
           return country;
         }
       }
-    } catch (e) {
-      // Ignore local API errors and fall back to Edge Function
-      console.warn('Local geo API failed, falling back to Edge Function', e);
+    } catch (_e) {
+      // Local API unavailable, fall back to Edge Function
     }
 
     // 2. Fallback to Supabase Edge Function (uses IP geolocation)
@@ -134,8 +133,7 @@ export const getUserCountry = async (): Promise<string | null> => {
       setCache(COUNTRY_CACHE_KEY, country, COUNTRY_CACHE_TTL);
     }
     return country;
-  } catch (error) {
-    console.error('Error detecting country:', error);
+  } catch {
     return null;
   }
 };

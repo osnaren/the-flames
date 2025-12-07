@@ -2,7 +2,7 @@ import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { usePairingHistory } from '@/hooks/usePairingHistory';
 import { useTimers } from '@/hooks/useTimers';
 import { getUserCountry, insertMatch } from '@lib/supabase';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
@@ -45,7 +45,6 @@ interface FlamesEngineActions {
  */
 export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   // Core game state
   const [name1, setName1] = useState<string>('');
@@ -86,8 +85,8 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       try {
         const country = await getUserCountry();
         setUserCountry(country);
-      } catch (error) {
-        console.warn('Failed to fetch user country:', error);
+      } catch {
+        // Silent failure - country detection is non-critical
       }
     };
     fetchCountry();
@@ -102,15 +101,13 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
     const urlName2 = searchParams.get('name2');
 
     if (urlName1) {
-      const decoded1 = decodeURIComponent(urlName1);
-      if (decoded1 !== name1) {
-        setName1(decoded1);
+      if (urlName1 !== name1) {
+        setName1(urlName1);
       }
     }
     if (urlName2) {
-      const decoded2 = decodeURIComponent(urlName2);
-      if (decoded2 !== name2) {
-        setName2(decoded2);
+      if (urlName2 !== name2) {
+        setName2(urlName2);
       }
     }
     // Only run on mount and when searchParams changes, not when names change
@@ -121,13 +118,16 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
   const updateUrlParams = useCallback(
     (newName1: string, newName2: string) => {
       const params = new URLSearchParams(searchParams?.toString() || '');
-      if (newName1.trim()) params.set('name1', encodeURIComponent(newName1.trim()));
+      if (newName1.trim()) params.set('name1', newName1.trim());
       else params.delete('name1');
-      if (newName2.trim()) params.set('name2', encodeURIComponent(newName2.trim()));
+      if (newName2.trim()) params.set('name2', newName2.trim());
       else params.delete('name2');
-      router.replace(`?${params.toString()}`);
+      
+      // Use history API directly to avoid Next.js navigation/re-render issues
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState(null, '', newUrl);
     },
-    [searchParams, router]
+    [searchParams]
   );
 
   // Memoized name setters
@@ -229,8 +229,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
   }, [progressToNextStage]);
 
   const onResultReveal = useCallback(() => {
-    // Final stage - everything is complete
-    console.log('Game sequence complete');
+    // Final stage complete
   }, []);
 
   /**
@@ -263,16 +262,14 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
         // Update URL params
         updateUrlParams(validName1, validName2);
 
-        // INSTANT CALCULATION - All game logic happens immediately
+        // Calculate all game data immediately
         const gameData = calculateGameData(validName1, validName2);
         calculatedDataRef.current = gameData;
 
-        console.log('Game data calculated instantly:', gameData);
-
         // Record match in background (non-blocking)
         if (gameData.result) {
-          insertMatch(gameData.result, userCountry || undefined).catch((error) => {
-            console.error('Failed to record match:', error);
+          insertMatch(gameData.result, userCountry || undefined).catch(() => {
+            // Silent failure - match recording is non-critical
           });
         }
 
@@ -306,7 +303,6 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           toast.error((error as any).errors[0].message);
         } else {
-          console.error('Unexpected error:', error);
           toast.error('Something went wrong. Please try again.');
         }
       }
@@ -348,8 +344,9 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
     });
 
     // Clear URL params
-    router.replace('?');
-  }, [clearAll, router]);
+    const newUrl = window.location.pathname;
+    window.history.replaceState(null, '', newUrl);
+  }, [clearAll]);
 
   /**
    * Force reset processing state - useful for when form validation fails
@@ -364,7 +361,6 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
   useEffect(() => {
     if (isProcessing && stage === 'processing') {
       const safetyTimeout = addTimeout(() => {
-        console.log('Safety timeout triggered - forcing completion');
         if (calculatedDataRef.current) {
           setResult(calculatedDataRef.current.result);
           setStage('result');

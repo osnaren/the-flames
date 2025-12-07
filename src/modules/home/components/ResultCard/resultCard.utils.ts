@@ -91,8 +91,7 @@ export async function captureResultCardAsImage(element: HTMLElement): Promise<Bl
         1.0
       );
     });
-  } catch (error) {
-    console.error('Error capturing result card:', error);
+  } catch {
     return null;
   }
 }
@@ -137,7 +136,6 @@ export async function shareAsImage(
     if ((error as Error).name === 'AbortError') {
       return true; // Not an error, just cancelled
     }
-    console.error('Share failed:', error);
     return false;
   }
 }

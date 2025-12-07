@@ -56,8 +56,8 @@ export const shareResult = async ({ name1, name2, result, resultText, imageUrl }
       const blob = await response.blob();
       const file = new File([blob], 'flames-result.png', { type: 'image/png' });
       shareData.files = [file];
-    } catch (error) {
-      console.warn('Failed to attach image:', error);
+    } catch {
+      // Image attachment failed, continue without it
     }
   }
 
@@ -138,8 +138,7 @@ export const downloadResultCard = async (element: HTMLElement): Promise<void> =>
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  } catch (error) {
-    console.error('Error generating canvas for download:', error);
+  } catch {
     throw new Error('Failed to generate result card image.');
   }
 };

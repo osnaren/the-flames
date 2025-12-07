@@ -20,8 +20,7 @@ export const saveImage = (imageDataUrl: string, filename: string) => {
     link.click();
     document.body.removeChild(link);
     // Don't show success toast here as it's handled in the calling function
-  } catch (error) {
-    console.error('Error saving image:', error);
+  } catch {
     throw new Error('Failed to save image');
   }
 };
@@ -60,9 +59,8 @@ export const shareImage = async (imageDataUrl: string, name1: string, name2: str
       throw new Error('Web Share API not supported and clipboard access denied');
     }
   } catch (error) {
-    console.error('Error sharing image:', error);
     if (error instanceof Error && error.name === 'AbortError') {
-      // User cancelled the share, don't show error
+      // User cancelled the share
       return;
     }
     throw new Error('Failed to share result');
@@ -210,7 +208,7 @@ export const generateClickResultImage = async (
     document.body.removeChild(container);
 
     return canvas.toDataURL('image/png', 0.9);
-  } catch (error) {
+  } catch {
     // Cleanup on error
     try {
       root.unmount();
@@ -220,12 +218,9 @@ export const generateClickResultImage = async (
     }
 
     // If html2canvas fails due to oklch or other issues, use fallback
-    console.warn('html2canvas failed, using fallback image generation:', error);
-
     try {
       return await generateFallbackClickResultImage(name1, name2, result);
-    } catch (fallbackError) {
-      console.error('Fallback image generation also failed:', fallbackError);
+    } catch {
       throw new Error('Failed to generate image. Please try again.');
     }
   }

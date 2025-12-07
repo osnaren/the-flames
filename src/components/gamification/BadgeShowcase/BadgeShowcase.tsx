@@ -242,16 +242,15 @@ export function BadgeShowcase({ isVisible, onClose }: BadgeShowcaseProps) {
             text: shareText,
             url: window.location.origin,
           });
-        } catch (error) {
-          console.warn('Share failed:', error);
+        } catch {
+          // User cancelled or share failed silently
         }
       } else {
         // Fallback to clipboard
         try {
           await navigator.clipboard.writeText(`${shareText}\n\nPlay FLAMES: ${window.location.origin}`);
           toast.success('Badge details copied to clipboard!');
-        } catch (error) {
-          console.warn('Clipboard write failed:', error);
+        } catch {
           toast.error('Could not copy to clipboard');
         }
       }

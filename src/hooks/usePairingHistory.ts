@@ -213,8 +213,8 @@ export function usePairingHistory() {
         setBadges(updatedBadges);
         try {
           localStorage.setItem(BADGES_KEY, JSON.stringify(updatedBadges));
-        } catch (error) {
-          console.error('Error saving badges:', error);
+        } catch {
+          // localStorage save failed - badges will be recalculated on next visit
         }
       }
     },
@@ -246,8 +246,8 @@ export function usePairingHistory() {
         }));
         setBadges(initialBadges);
       }
-    } catch (error) {
-      console.error('Error loading pairing history:', error);
+    } catch {
+      // localStorage load failed - start fresh
     }
   }, [calculateStats]);
 
@@ -269,8 +269,8 @@ export function usePairingHistory() {
       // Save to localStorage
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
-      } catch (error) {
-        console.error('Error saving pairing history:', error);
+      } catch {
+        // localStorage save failed - history persists in memory
       }
 
       // Check for new badges
@@ -291,8 +291,8 @@ export function usePairingHistory() {
     });
     try {
       localStorage.removeItem(STORAGE_KEY);
-    } catch (error) {
-      console.error('Error clearing history:', error);
+    } catch {
+      // localStorage clear failed - state is already cleared
     }
   }, []);
 

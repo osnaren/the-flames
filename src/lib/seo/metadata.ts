@@ -77,12 +77,7 @@ export const baseMetadata: Metadata = {
       'en-US': siteConfig.url,
     },
   },
-  verification: {
-    // Add verification tokens when available
-    // google: 'google-site-verification-token',
-    // yandex: 'yandex-verification-token',
-    // bing: 'bing-verification-token',
-  },
+  verification: {},
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',

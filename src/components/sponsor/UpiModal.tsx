@@ -67,9 +67,8 @@ const UpiPaymentContent: React.FC<{
     try {
       await navigator.clipboard.writeText(upiId);
       toast.success('UPI ID copied to clipboard!');
-    } catch (err) {
+    } catch {
       toast.error('Failed to copy UPI ID.');
-      console.error('Failed to copy text: ', err);
     }
   };
 
@@ -99,8 +98,7 @@ const UpiPaymentContent: React.FC<{
         setQrCodeDataUrl(res.qr);
         setIsLoadingQr(false);
       })
-      .catch((err) => {
-        console.error('Failed to generate UPI QR code:', err);
+      .catch(() => {
         toast.error('Could not generate QR code.');
         setIsLoadingQr(false);
       });

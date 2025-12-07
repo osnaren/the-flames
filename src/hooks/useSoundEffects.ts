@@ -97,7 +97,6 @@ export function useSoundEffects() {
           const onError = () => {
             audio.removeEventListener('canplaythrough', onLoad);
             audio.removeEventListener('error', onError);
-            console.warn(`Failed to load sound: ${config.src}`);
             reject(new Error(`Failed to load sound: ${config.src}`));
           };
 
@@ -107,8 +106,8 @@ export function useSoundEffects() {
 
         audioCache.current.set(effect, audio);
         loadedSounds.current.add(effect);
-      } catch (error) {
-        console.warn(`Sound loading failed for ${effect}:`, error);
+      } catch {
+        // Sound loading failed, continue silently
       }
     };
 
@@ -159,8 +158,7 @@ export function useSoundEffects() {
           audio = new Audio(config.src);
           audio.volume = (options?.volume || config.volume || 1) * volume;
           audioCache.current.set(effect, audio);
-        } catch (error) {
-          console.warn(`Failed to create audio for ${effect}:`, error);
+        } catch {
           return;
         }
       }
@@ -180,13 +178,15 @@ export function useSoundEffects() {
         // Play with optional delay
         if (options?.delay) {
           setTimeout(() => {
-            audio?.play().catch((e) => console.warn(`Audio play failed for ${effect}:`, e));
+            audio?.play().catch(() => {
+              // Audio playback failed, ignore
+            });
           }, options.delay);
         } else {
           await audio.play();
         }
-      } catch (error) {
-        console.warn(`Audio play failed for ${effect}:`, error);
+      } catch {
+        // Audio playback failed, ignore
       }
     },
     [isSoundEnabled, volume]
@@ -236,8 +236,8 @@ export function useSoundEffects() {
 
         audioCache.current.set(effect, audio);
         loadedSounds.current.add(effect);
-      } catch (error) {
-        console.warn(`Failed to preload sound ${effect}:`, error);
+      } catch {
+        // Preload failed, will try again on play
       }
     },
     [volume]

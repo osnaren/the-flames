@@ -238,8 +238,6 @@ export function useManualMode() {
       await shareImage(imageDataUrl, name1, name2);
       toast.success('Result shared successfully!');
     } catch (error) {
-      console.error('Sharing failed:', error);
-
       // Provide more specific error messages
       if (error instanceof Error) {
         if (error.message.includes('oklch') || error.message.includes('unsupported color')) {
@@ -292,8 +290,6 @@ export function useManualMode() {
       saveImage(imageDataUrl, filename);
       toast.success('Image saved successfully!');
     } catch (error) {
-      console.error('Saving failed:', error);
-
       // Provide more specific error messages
       if (error instanceof Error) {
         if (error.message.includes('oklch') || error.message.includes('unsupported color')) {

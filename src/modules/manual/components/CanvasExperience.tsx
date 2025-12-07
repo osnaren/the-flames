@@ -411,11 +411,7 @@ export default function CanvasExperience({
     };
   }, [setupCanvas]);
 
-  // Pass canvas ref to parent
-  useEffect(() => {
-    // This is a potential way to pass canvas ref up if needed
-    // for parent-level operations like sharing
-  }, [canvasRef]);
+
 
   return (
     <div

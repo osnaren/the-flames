@@ -31,9 +31,8 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
       try {
         const country = await getUserCountry();
         setUserCountry(country);
-      } catch (error) {
-        console.error('Failed to detect country:', error);
-        // Don't set error state - country detection is non-critical
+      } catch {
+        // Country detection is non-critical - silent failure
       }
     };
     detectCountry();
@@ -141,7 +140,6 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
       statsCache.set(cacheKey, { data: stats, timestamp: Date.now() });
     } catch (err) {
       const error = err as Error;
-      console.error('Error fetching stats:', error);
 
       // Handle specific error types
       if (error instanceof StatsError) {

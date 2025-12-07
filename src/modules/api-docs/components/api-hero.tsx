@@ -20,8 +20,8 @@ export function ApiHero() {
       await navigator.clipboard.writeText(hero.cta.primary.value);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
-    } catch (error) {
-      console.error('Failed to copy endpoint snippet', error);
+    } catch {
+      // Copy failed silently - non-critical
     }
   };
 

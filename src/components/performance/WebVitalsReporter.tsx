@@ -51,33 +51,8 @@ export default function WebVitalsReporter() {
         console.log(`%c[Web Vital] ${metric.name}: ${value}${unit} (${rating})`, colors[rating]);
       }
 
-      // In production, you could send to analytics
-      // Example: sendToAnalytics(metric)
-      if (process.env.NODE_ENV === 'production') {
-        // Send to your analytics endpoint
-        // This could be Google Analytics, Vercel Analytics, or custom
-        try {
-          const payload = {
-            name: metric.name,
-            value: metric.value,
-            rating: metric.rating,
-            id: metric.id,
-            navigationType: metric.navigationType,
-            // Add any additional context
-            path: typeof window !== 'undefined' ? window.location.pathname : '',
-          };
-
-          // Use sendBeacon for reliable delivery
-          // Uncomment when you have an analytics endpoint
-          // navigator.sendBeacon('/api/analytics/vitals', JSON.stringify(payload));
-
-          // For now, just log in production too if needed
-          void payload; // Prevent unused variable warning
-        } catch {
-          // Silently fail - don't break the app for analytics
-        }
-      }
     };
+
 
     // Register all metric handlers
     onLCP(reportMetric);

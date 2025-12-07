@@ -99,8 +99,7 @@ function ResultCardContainer({
         URL.revokeObjectURL(url);
         toast.success('Image downloaded!', { id: 'capture' });
       }
-    } catch (error) {
-      console.error('Failed to capture image:', error);
+    } catch {
       toast.error('Failed to create image. Try again.', { id: 'capture' });
     } finally {
       setIsCapturing(false);
@@ -116,8 +115,7 @@ function ResultCardContainer({
         await copyShareUrl(name1, name2);
       }
       // Toast is already shown in ResultActionsDock
-    } catch (error) {
-      console.error('Failed to copy link:', error);
+    } catch {
       toast.error('Failed to copy link');
     }
   }, [name1, name2]);

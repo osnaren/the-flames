@@ -26,24 +26,15 @@ export function ParticleBackground({
   const showParticles = useMemo(() => enabled && shouldAnimate, [enabled, shouldAnimate]);
   const [init, setInit] = useState(false);
 
-  // Initialize the particle engine once per application lifetime
   useEffect(() => {
-    // Initialize the engine once on component mount
-    initParticlesEngine(async (_engine) => {
-      // You can load specific presets or plugins here if needed, e.g.:
-      // await loadFull(engine); // Loads all features
-      // Or, load individual features if your options require them and they aren't auto-loaded.
-      // For the current options (circle shape, basic movement, opacity, size),
-      // explicit loading beyond initParticlesEngine might not be necessary with @tsparticles/react.
+    initParticlesEngine(async () => {
+      // Engine initialization
     }).then(() => {
       setInit(true);
     });
-  }, []); // Empty dependency array ensures this runs only once on mount
-
-  const particlesLoaded = useCallback(async (_container?: Container): Promise<void> => {
-    // Optional container parameter to match expected signature
-    // You can add custom initialization logic here if needed
   }, []);
+
+  const particlesLoaded = useCallback(async (_container?: Container): Promise<void> => {}, []);
 
   // Particle configuration with theme-consistent styling
   const options: ISourceOptions = useMemo(

@@ -123,8 +123,8 @@ export function useSeasonalTheme() {
             document.body.classList.remove('theme-transitioning');
           }, 300);
         }, 150);
-      } catch (error) {
-        console.error('Theme transition failed:', error);
+      } catch {
+        // Theme transition failed - gracefully recover
         setState((prev) => ({ ...prev, isTransitioning: false }));
       }
     },
@@ -255,8 +255,8 @@ export function useSeasonalTheme() {
 
     try {
       await Promise.all(preloadPromises);
-    } catch (error) {
-      console.warn(`Failed to preload assets for theme ${themeId}:`, error);
+    } catch {
+      // Asset preload failed, continue without preloaded assets
     }
   }, []);
 
