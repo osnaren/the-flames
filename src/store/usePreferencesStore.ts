@@ -53,6 +53,9 @@ const safeLocalStorage = {
   },
 };
 
+// Module-level variable to store cleanup function (avoids global namespace pollution)
+let themeCleanup: (() => void) | null = null;
+
 export const usePreferencesStore = create<PreferencesState & PreferencesActions>((set) => ({
   isDarkTheme: false,
   animationsEnabled: true,
@@ -191,8 +194,8 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
         mediaQuery.addListener(handleSystemThemeChange);
       }
       
-      // Store cleanup function reference
-      (window as Window & { __themeCleanup?: () => void }).__themeCleanup = () => {
+      // Store cleanup function reference (module-level to avoid global namespace pollution)
+      themeCleanup = () => {
         if (mediaQuery.removeEventListener) {
           mediaQuery.removeEventListener('change', handleSystemThemeChange);
         } else {
@@ -203,10 +206,10 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
     }
   },
   cleanup: () => {
-    // Clean up system preference listener
-    if (typeof window !== 'undefined' && (window as Window & { __themeCleanup?: () => void }).__themeCleanup) {
-      (window as Window & { __themeCleanup?: () => void }).__themeCleanup?.();
-      delete (window as Window & { __themeCleanup?: () => void }).__themeCleanup;
+    // Clean up system preference listener (idempotent - safe to call multiple times)
+    if (themeCleanup) {
+      themeCleanup();
+      themeCleanup = null;
     }
   },
 }));

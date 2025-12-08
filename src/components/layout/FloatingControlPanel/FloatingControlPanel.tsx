@@ -13,7 +13,7 @@ export default function FloatingControlPanel() {
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  const [{ isDarkTheme, isSoundEnabled, hydrated }, { toggleTheme, toggleSound, toggleAnimations }] = usePreferences();
+  const [{ isDarkTheme, isSoundEnabled }, { toggleTheme, toggleSound, toggleAnimations }] = usePreferences();
   const { shouldAnimate } = useAnimationPreferences();
 
   // Local wrapper for toggling animations to ensure parent state is updated too
