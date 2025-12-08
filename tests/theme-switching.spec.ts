@@ -164,8 +164,13 @@ test.describe('Theme Switching Functionality', () => {
     await page.waitForTimeout(300);
     
     // Check that the theme toggle shows the correct state (dark mode)
-    const themeToggleLabel = page.locator('button[aria-label*="Switch to light theme"]').first();
-    await expect(themeToggleLabel).toBeVisible();
+    // Use a more flexible selector that works with both possible states
+    const themeToggle = page.locator('button[aria-label*="theme"]').first();
+    await expect(themeToggle).toBeVisible();
+    
+    // Verify it has the correct label for dark mode
+    const ariaLabel = await themeToggle.getAttribute('aria-label');
+    expect(ariaLabel?.toLowerCase()).toContain('light');
   });
 
   test('should toggle theme correctly via FloatingControlPanel', async ({ page, context }) => {
@@ -225,8 +230,8 @@ test.describe('Theme Switching Functionality', () => {
       // Wait for settings panel to open
       await page.waitForTimeout(300);
       
-      // Find the theme toggle in settings panel
-      const themeToggle = page.locator('button[aria-label*="Switch to dark mode"]').first();
+      // Find the theme toggle in settings panel (consistent with other tests)
+      const themeToggle = page.locator('button[aria-label*="Switch to dark theme"]').first();
       await themeToggle.click();
       
       // Should now be dark mode

@@ -39,9 +39,11 @@ export function usePreferences(): [Preferences, PreferenceActions] {
   useEffect(() => {
     init();
     
+    // Capture cleanup function reference during setup to avoid stale reference
+    const { cleanup } = usePreferencesStore.getState();
+    
     // Cleanup on unmount
     return () => {
-      const { cleanup } = usePreferencesStore.getState();
       cleanup();
     };
   }, [init]);

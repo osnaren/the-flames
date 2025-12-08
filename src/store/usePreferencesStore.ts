@@ -169,7 +169,7 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
     if (!storedTheme && typeof window !== 'undefined') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       
-      const handleSystemThemeChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      const handleSystemThemeChange = (e: MediaQueryListEvent) => {
         // Only update if user still hasn't set an explicit preference
         const currentStoredTheme = safeLocalStorage.getItem('theme');
         if (!currentStoredTheme) {
@@ -186,16 +186,17 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
         }
       };
 
-      // Add listener for changes
-      if (mediaQuery.addEventListener) {
-        mediaQuery.addEventListener('change', handleSystemThemeChange);
-      } else {
-        // Fallback for older browsers
-        mediaQuery.addListener(handleSystemThemeChange);
-      }
-      
-      // Store cleanup function reference (module-level to avoid global namespace pollution)
-      themeCleanup = () => {
+      // Helper to add/remove listener with browser compatibility
+      const addListener = () => {
+        if (mediaQuery.addEventListener) {
+          mediaQuery.addEventListener('change', handleSystemThemeChange);
+        } else {
+          // Fallback for older browsers
+          mediaQuery.addListener(handleSystemThemeChange);
+        }
+      };
+
+      const removeListener = () => {
         if (mediaQuery.removeEventListener) {
           mediaQuery.removeEventListener('change', handleSystemThemeChange);
         } else {
@@ -203,6 +204,12 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
           mediaQuery.removeListener(handleSystemThemeChange);
         }
       };
+
+      // Add listener
+      addListener();
+      
+      // Store cleanup function reference (module-level to avoid global namespace pollution)
+      themeCleanup = removeListener;
     }
   },
   cleanup: () => {
