@@ -139,9 +139,8 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
       
       // If inline script didn't set dark mode, check system preference directly
       // This handles the case where inline script failed or wasn't run
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      
-      isDarkTheme = hasInlineScriptSetDark || systemPrefersDark;
+      // Use short-circuit evaluation to avoid unnecessary matchMedia call
+      isDarkTheme = hasInlineScriptSetDark || window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
 
     // Sync DOM with determined theme state
@@ -186,23 +185,14 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
         }
       };
 
-      // Helper to add/remove listener with browser compatibility
+      // Helper to add/remove listener
+      // Modern browsers (Chrome 76+, Firefox 67+, Safari 12.1+) support addEventListener
       const addListener = () => {
-        if (mediaQuery.addEventListener) {
-          mediaQuery.addEventListener('change', handleSystemThemeChange);
-        } else {
-          // Fallback for older browsers
-          mediaQuery.addListener(handleSystemThemeChange);
-        }
+        mediaQuery.addEventListener('change', handleSystemThemeChange);
       };
 
       const removeListener = () => {
-        if (mediaQuery.removeEventListener) {
-          mediaQuery.removeEventListener('change', handleSystemThemeChange);
-        } else {
-          // Fallback for older browsers
-          mediaQuery.removeListener(handleSystemThemeChange);
-        }
+        mediaQuery.removeEventListener('change', handleSystemThemeChange);
       };
 
       // Add listener

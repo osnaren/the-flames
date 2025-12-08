@@ -3,12 +3,20 @@ import { expect, test } from '@playwright/test';
 /**
  * Theme Switching Tests using Playwright
  * 
- * These tests verify that theme switching works correctly in all scenarios:
- * - System preference detection
- * - Manual theme toggle
- * - Icon state synchronization
- * - localStorage persistence
- * - Hydration handling
+ * @description These tests verify that theme switching works correctly in all scenarios:
+ * - System preference detection (dark/light mode)
+ * - Manual theme toggle via UI controls
+ * - Icon state synchronization on load
+ * - localStorage persistence across sessions
+ * - Hydration handling for SSR
+ * - Dynamic system preference changes
+ * - FOUC (Flash of Unstyled Content) prevention
+ * - Rapid toggle handling
+ * 
+ * @see {@link ../docs/THEME_SWITCHING.md} for implementation details
+ * 
+ * @note Some tests use `waitForTimeout` for UI interaction delays (e.g., panel animations).
+ * For DOM state changes, we use `waitForFunction` to avoid flakiness.
  */
 
 test.describe('Theme Switching Functionality', () => {
@@ -114,8 +122,8 @@ test.describe('Theme Switching Functionality', () => {
     // Change system preference to dark
     await context.emulateMedia({ colorScheme: 'dark' });
     
-    // Wait a bit for the listener to trigger
-    await page.waitForTimeout(500);
+    // Wait for the listener to trigger and update the DOM
+    await page.waitForFunction(() => document.documentElement.classList.contains('dark'), { timeout: 2000 });
     
     // Verify dark mode is now active
     await expect(htmlElement).toHaveClass(/dark/);
@@ -138,7 +146,8 @@ test.describe('Theme Switching Functionality', () => {
     // Change system preference to dark
     await context.emulateMedia({ colorScheme: 'dark' });
     
-    // Wait a bit
+    // Wait a moment to ensure no change happens
+    // Using a small timeout here is acceptable since we're testing that nothing changes
     await page.waitForTimeout(500);
     
     // Verify light mode is still active (stored preference takes priority)
