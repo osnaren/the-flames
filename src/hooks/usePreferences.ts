@@ -38,6 +38,12 @@ export function usePreferences(): [Preferences, PreferenceActions] {
   // Load preferences from localStorage on mount
   useEffect(() => {
     init();
+    
+    // Cleanup on unmount
+    return () => {
+      const { cleanup } = usePreferencesStore.getState();
+      cleanup();
+    };
   }, [init]);
 
   return [
