@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { ReactNode } from 'react';
+import { PreferencesInitializer } from '@components/providers';
 
 // Unified background component that handles all states (seasonal, game, mobile)
 const UnifiedBackground = dynamic(
@@ -38,6 +39,7 @@ interface ClientLayoutProps {
 export default function ClientLayout({ children }: ClientLayoutProps) {
   return (
     <>
+      <PreferencesInitializer />
       <WebVitalsReporter />
       <div className="from-customBg-1 to-customBg-2 relative flex min-h-screen flex-col bg-linear-to-br transition-colors duration-500">
         <UnifiedBackground />
