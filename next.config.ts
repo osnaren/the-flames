@@ -1,6 +1,8 @@
 import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
 
+const isWindows = process.platform === 'win32';
+
 const nextConfig: NextConfig = {
   // Enable React strict mode for better development experience
   reactStrictMode: true,
@@ -37,6 +39,10 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-checkbox',
       'zod',
     ],
+  },
+
+  outputFileTracingExcludes: {
+    '*': ['**/*node:inspector*'],
   },
 
   // Compiler options for production optimization
@@ -192,7 +198,8 @@ const nextConfig: NextConfig = {
 
   // Enable gzip/brotli compression is handled by hosting platform
   // But we can optimize output
-  output: 'standalone',
+  // Disable standalone output on Windows to avoid node:inspector filename issues
+  output: isWindows ? undefined : 'standalone',
 
   // Reduce bundle size by excluding source maps in production
   productionBrowserSourceMaps: false,
