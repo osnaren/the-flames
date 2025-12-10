@@ -1,9 +1,10 @@
+import SeasonalThemeSelector from '@/components/settings/SeasonalThemeSelector';
 import { cn } from '@/utils';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { usePreferences } from '@hooks/usePreferences';
 import Toggle from '@ui/Toggle';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { ChevronUp, Flame, Moon, MousePointerClick, Settings, Sun, Volume2, VolumeX } from 'lucide-react';
+import { ChevronUp, Flame, Moon, MousePointerClick, Palette, Settings, Sun, Volume2, VolumeX } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function FloatingControlPanel() {
@@ -156,7 +157,7 @@ export default function FloatingControlPanel() {
       borderRadius: '24px',
     },
     expanded: {
-      width: '280px',
+      width: '300px',
       height: 'auto',
       borderRadius: '16px',
     },
@@ -264,6 +265,20 @@ export default function FloatingControlPanel() {
                     />
                   </motion.div>
                 ))}
+
+                {/* Seasonal Theme Selector */}
+                <motion.div
+                  className="border-outline/20 mt-3 border-t pt-3"
+                  variants={childVariants}
+                >
+                  <div className="mb-2 flex items-center gap-1.5">
+                    <Palette className="text-secondary h-3.5 w-3.5" />
+                    <span className="text-on-surface-variant text-[10px] font-medium uppercase tracking-wide">
+                      Seasonal Theme
+                    </span>
+                  </div>
+                  <SeasonalThemeSelector isExpanded={isExpanded} />
+                </motion.div>
 
                 <motion.div
                   className="border-outline/20 text-on-surface-variant mt-4 border-t pt-4 text-center text-xs"

@@ -4,6 +4,8 @@ export const christmasTheme: SeasonalThemeConfig = {
   id: 'christmas',
   name: 'Christmas',
   description: 'Festive winter theme with snow and holiday colors',
+  emoji: '🎄',
+  region: 'global',
   dateRange: {
     start: { month: 12, day: 1 },
     end: { month: 12, day: 25 },
@@ -39,7 +41,7 @@ export const christmasTheme: SeasonalThemeConfig = {
       direction: 'down',
       animation: 'fall',
     },
-    overlayPattern: '/patterns/snowflakes.svg',
+    overlayPattern: '/patterns/snowflakes.png',
     overlayOpacity: 0.06,
     glowEffects: true,
     pulsing: true,

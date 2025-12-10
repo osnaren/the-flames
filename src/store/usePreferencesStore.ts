@@ -8,7 +8,17 @@ interface PreferencesState {
   isSoundEnabled: boolean;
   isHapticEnabled: boolean;
   volume: number;
-  seasonalTheme: 'auto' | 'valentine' | 'halloween' | 'christmas' | 'default';
+  seasonalTheme:
+    | 'auto'
+    | 'default'
+    | 'valentine'
+    | 'holi'
+    | 'onam'
+    | 'halloween'
+    | 'diwali'
+    | 'christmas'
+    | 'newYear'
+    | 'pongal';
   transitionSpeed: TransitionSpeed;
   hydrated: boolean;
 }

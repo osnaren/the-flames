@@ -4,6 +4,8 @@ export const halloweenTheme: SeasonalThemeConfig = {
   id: 'halloween',
   name: 'Halloween',
   description: 'Spooky theme with dark colors and haunting effects',
+  emoji: '🎃',
+  region: 'western',
   dateRange: {
     start: { month: 10, day: 1 },
     end: { month: 10, day: 31 },
@@ -39,7 +41,7 @@ export const halloweenTheme: SeasonalThemeConfig = {
       direction: 'random',
       animation: 'sparkle',
     },
-    overlayPattern: '/patterns/spider-web.svg',
+    overlayPattern: '/patterns/halloween.png',
     overlayOpacity: 0.08,
     glowEffects: true,
     pulsing: true,

@@ -1,4 +1,13 @@
-export type SeasonalTheme = 'valentine' | 'halloween' | 'christmas' | 'default';
+export type SeasonalTheme =
+  | 'default'
+  | 'valentine'
+  | 'halloween'
+  | 'christmas'
+  | 'newYear'
+  | 'diwali'
+  | 'holi'
+  | 'onam'
+  | 'pongal';
 
 export interface ThemeColors {
   primary: string;
@@ -16,7 +25,35 @@ export interface ThemeColors {
   border: string;
 }
 
-export type ParticleShape = 'circle' | 'heart' | 'star' | 'snowflake' | 'pumpkin' | 'bat' | 'flame';
+// Particle shapes for all seasonal themes
+export type ParticleShape =
+  | 'circle'
+  | 'heart'
+  | 'star'
+  | 'snowflake'
+  | 'pumpkin'
+  | 'bat'
+  | 'flame'
+  // New Year
+  | 'firework'
+  | 'confetti'
+  | 'champagne'
+  // Diwali
+  | 'diya'
+  | 'rangoli'
+  | 'sparkler'
+  // Holi
+  | 'colorSplash'
+  | 'gulal'
+  | 'waterBalloon'
+  // Onam
+  | 'flower'
+  | 'banana'
+  | 'umbrella'
+  // Pongal
+  | 'sugarcane'
+  | 'pot'
+  | 'kolam';
 
 export interface ParticleConfig {
   enabled: boolean;
@@ -68,11 +105,14 @@ export interface SeasonalThemeConfig {
   id: SeasonalTheme;
   name: string;
   description: string;
+  emoji: string; // For carousel display
+  region?: 'global' | 'india' | 'western'; // Cultural region
   dateRange: {
     start: { month: number; day: number };
     end: { month: number; day: number };
   };
   colors: ThemeColors;
+  darkModeColors?: Partial<ThemeColors>; // Override colors for dark mode
   backgroundEffects: BackgroundEffects;
   soundTheme: SoundTheme;
   customCSS?: string;

@@ -4,6 +4,8 @@ export const defaultTheme: SeasonalThemeConfig = {
   id: 'default',
   name: 'Default',
   description: 'Classic FLAMES theme with vibrant colors',
+  emoji: '🔥',
+  region: 'global',
   dateRange: {
     start: { month: 1, day: 1 },
     end: { month: 12, day: 31 },

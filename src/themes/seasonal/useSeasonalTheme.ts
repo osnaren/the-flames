@@ -1,30 +1,62 @@
 import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { christmasTheme } from './configs/christmas';
-import { defaultTheme } from './configs/default';
-import { halloweenTheme } from './configs/halloween';
-import { valentineTheme } from './configs/valentine';
+import {
+  christmasTheme,
+  defaultTheme,
+  diwaliTheme,
+  halloweenTheme,
+  holiTheme,
+  newYearTheme,
+  onamTheme,
+  pongalTheme,
+  valentineTheme,
+} from './configs';
 import { SeasonalTheme, SeasonalThemeConfig, SeasonalThemeState } from './types';
 
 // All available themes
 const THEME_CONFIGS: Record<SeasonalTheme, SeasonalThemeConfig> = {
-  valentine: valentineTheme,
-  halloween: halloweenTheme,
-  christmas: christmasTheme,
   default: defaultTheme,
+  valentine: valentineTheme,
+  holi: holiTheme,
+  onam: onamTheme,
+  halloween: halloweenTheme,
+  diwali: diwaliTheme,
+  christmas: christmasTheme,
+  newYear: newYearTheme,
+  pongal: pongalTheme,
 };
 
-// Theme order for detection (checked in order)
-const SEASONAL_THEMES: SeasonalTheme[] = ['valentine', 'halloween', 'christmas'];
+// Theme order for detection (checked in order of date priority)
+// This determines which theme is auto-detected based on current date
+const SEASONAL_THEMES: SeasonalTheme[] = [
+  'pongal',    // Jan 10-20
+  'valentine', // Feb 1-14
+  'holi',      // Mar 1-20
+  'onam',      // Aug 15 - Sep 15
+  'halloween', // Oct 1-31
+  'diwali',    // Oct 15 - Nov 15
+  'christmas', // Dec 1-25
+  'newYear',   // Dec 26 - Jan 5
+];
 
 export function useSeasonalTheme() {
-  const { seasonalTheme: preferenceTheme, setSeasonalTheme } = usePreferencesStore();
+  const { seasonalTheme: preferenceTheme, setSeasonalTheme, isDarkTheme } = usePreferencesStore();
 
   const [state, setState] = useState<SeasonalThemeState>({
     currentTheme: 'default',
     isTransitioning: false,
-    availableThemes: ['default', 'valentine', 'halloween', 'christmas'],
+    availableThemes: [
+      'default',
+      'valentine',
+      'holi',
+      'onam',
+      'halloween',
+      'diwali',
+      'christmas',
+      'newYear',
+      'pongal',
+    ],
     detectedTheme: 'default',
     manualOverride: null,
   });
@@ -58,11 +90,15 @@ export function useSeasonalTheme() {
   const currentThemeConfig = useMemo(() => THEME_CONFIGS[state.currentTheme], [state.currentTheme]);
 
   // Apply theme to DOM
-  const applyTheme = useCallback((theme: SeasonalThemeConfig) => {
+  const applyTheme = useCallback((theme: SeasonalThemeConfig, isDark?: boolean) => {
     const root = document.documentElement;
 
+    // Merge base colors with dark mode overrides if applicable
+    const effectiveColors =
+      isDark && theme.darkModeColors ? { ...theme.colors, ...theme.darkModeColors } : theme.colors;
+
     // Apply CSS custom properties
-    Object.entries(theme.colors).forEach(([key, value]) => {
+    Object.entries(effectiveColors).forEach(([key, value]) => {
       if (Array.isArray(value)) {
         // Handle gradient arrays
         value.forEach((gradient, index) => {
@@ -111,7 +147,7 @@ export function useSeasonalTheme() {
 
         // Apply new theme after short delay
         setTimeout(() => {
-          applyTheme(THEME_CONFIGS[newTheme]);
+          applyTheme(THEME_CONFIGS[newTheme], isDarkTheme);
           setState((prev) => ({
             ...prev,
             currentTheme: newTheme,
@@ -128,7 +164,7 @@ export function useSeasonalTheme() {
         setState((prev) => ({ ...prev, isTransitioning: false }));
       }
     },
-    [applyTheme]
+    [applyTheme, isDarkTheme]
   );
 
   // Set manual theme override
@@ -177,9 +213,9 @@ export function useSeasonalTheme() {
       setTimeout(() => transitionToTheme(targetTheme), 0);
     } else {
       // Ensure theme is applied even if same (for initial load)
-      applyTheme(THEME_CONFIGS[targetTheme]);
+      applyTheme(THEME_CONFIGS[targetTheme], isDarkTheme);
     }
-  }, [preferenceTheme, detectCurrentTheme, transitionToTheme, applyTheme, state.currentTheme]);
+  }, [preferenceTheme, detectCurrentTheme, transitionToTheme, applyTheme, state.currentTheme, isDarkTheme]);
 
   // Check for theme changes periodically (every hour)
   useEffect(() => {
@@ -198,6 +234,13 @@ export function useSeasonalTheme() {
 
     return () => clearInterval(interval);
   }, [preferenceTheme, state.detectedTheme, detectCurrentTheme, transitionToTheme]);
+
+  // Reapply theme when dark mode changes (to apply darkModeColors)
+  useEffect(() => {
+    if (state.currentTheme) {
+      applyTheme(THEME_CONFIGS[state.currentTheme], isDarkTheme);
+    }
+  }, [isDarkTheme, state.currentTheme, applyTheme]);
 
   // Utility functions
   const getThemeConfig = useCallback((themeId: SeasonalTheme) => {

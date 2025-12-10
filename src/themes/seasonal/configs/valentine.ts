@@ -4,6 +4,8 @@ export const valentineTheme: SeasonalThemeConfig = {
   id: 'valentine',
   name: "Valentine's Day",
   description: 'Romantic theme with hearts and warm colors',
+  emoji: '💕',
+  region: 'global',
   dateRange: {
     start: { month: 2, day: 1 },
     end: { month: 2, day: 14 },
@@ -39,7 +41,7 @@ export const valentineTheme: SeasonalThemeConfig = {
       direction: 'swirl',
       animation: 'float',
     },
-    overlayPattern: '/patterns/hearts.svg',
+    overlayPattern: '/patterns/hearts.png',
     overlayOpacity: 0.05,
     glowEffects: true,
     pulsing: true,
