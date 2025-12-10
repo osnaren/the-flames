@@ -24,6 +24,7 @@ next-env.d.ts
 *.pem
 .lighthouseci
 playwright-report
+test-results
 
 # debug
 npm-debug.log*

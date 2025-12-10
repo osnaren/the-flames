@@ -26,9 +26,9 @@ test.describe('Theme Switching Functionality', () => {
     await page.evaluate(() => localStorage.clear());
   });
 
-  test('should respect system preference on first visit (dark mode)', async ({ page, context }) => {
+  test('should respect system preference on first visit (dark mode)', async ({ page }) => {
     // Set system preference to dark mode
-    await context.emulateMedia({ colorScheme: 'dark' });
+    await page.emulateMedia({ colorScheme: 'dark' });
 
     // Navigate to the page
     await page.goto('/');
@@ -46,9 +46,9 @@ test.describe('Theme Switching Functionality', () => {
     expect(storedTheme).toBeNull();
   });
 
-  test('should respect system preference on first visit (light mode)', async ({ page, context }) => {
+  test('should respect system preference on first visit (light mode)', async ({ page }) => {
     // Set system preference to light mode
-    await context.emulateMedia({ colorScheme: 'light' });
+    await page.emulateMedia({ colorScheme: 'light' });
 
     // Navigate to the page
     await page.goto('/');
@@ -66,9 +66,9 @@ test.describe('Theme Switching Functionality', () => {
     expect(storedTheme).toBeNull();
   });
 
-  test('should persist user theme preference in localStorage', async ({ page, context }) => {
+  test('should persist user theme preference in localStorage', async ({ page }) => {
     // Set system preference to light mode
-    await context.emulateMedia({ colorScheme: 'light' });
+    await page.emulateMedia({ colorScheme: 'light' });
 
     // Navigate to the page
     await page.goto('/');
@@ -91,9 +91,9 @@ test.describe('Theme Switching Functionality', () => {
     expect(storedTheme).toBe('dark');
   });
 
-  test('should respect stored preference over system preference', async ({ page, context }) => {
+  test('should respect stored preference over system preference', async ({ page }) => {
     // Set system preference to light mode
-    await context.emulateMedia({ colorScheme: 'light' });
+    await page.emulateMedia({ colorScheme: 'light' });
 
     // Set stored preference to dark mode
     await page.goto('/');
@@ -109,9 +109,9 @@ test.describe('Theme Switching Functionality', () => {
     await expect(htmlElement).toHaveAttribute('data-theme', 'dark');
   });
 
-  test('should update theme when system preference changes (no stored preference)', async ({ page, context }) => {
+  test('should update theme when system preference changes (no stored preference)', async ({ page }) => {
     // Start with light mode
-    await context.emulateMedia({ colorScheme: 'light' });
+    await page.emulateMedia({ colorScheme: 'light' });
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
@@ -120,7 +120,7 @@ test.describe('Theme Switching Functionality', () => {
     await expect(htmlElement).not.toHaveClass(/dark/);
 
     // Change system preference to dark
-    await context.emulateMedia({ colorScheme: 'dark' });
+    await page.emulateMedia({ colorScheme: 'dark' });
 
     // Wait for the listener to trigger and update the DOM
     await page.waitForFunction(() => document.documentElement.classList.contains('dark'), { timeout: 2000 });
@@ -129,13 +129,13 @@ test.describe('Theme Switching Functionality', () => {
     await expect(htmlElement).toHaveClass(/dark/);
   });
 
-  test('should NOT update theme when system preference changes (with stored preference)', async ({ page, context }) => {
+  test('should NOT update theme when system preference changes (with stored preference)', async ({ page }) => {
     // Set stored preference to light mode
     await page.goto('/');
     await page.evaluate(() => localStorage.setItem('theme', 'light'));
 
     // Start with light system preference
-    await context.emulateMedia({ colorScheme: 'light' });
+    await page.emulateMedia({ colorScheme: 'light' });
     await page.reload();
     await page.waitForLoadState('networkidle');
 
@@ -144,7 +144,7 @@ test.describe('Theme Switching Functionality', () => {
     await expect(htmlElement).not.toHaveClass(/dark/);
 
     // Change system preference to dark
-    await context.emulateMedia({ colorScheme: 'dark' });
+    await page.emulateMedia({ colorScheme: 'dark' });
 
     // Wait a moment to ensure no change happens
     // Using a small timeout here is acceptable since we're testing that nothing changes
@@ -154,9 +154,9 @@ test.describe('Theme Switching Functionality', () => {
     await expect(htmlElement).not.toHaveClass(/dark/);
   });
 
-  test('should sync icon state with theme on page load', async ({ page, context }) => {
+  test('should sync icon state with theme on page load', async ({ page }) => {
     // Set system preference to dark mode
-    await context.emulateMedia({ colorScheme: 'dark' });
+    await page.emulateMedia({ colorScheme: 'dark' });
 
     // Navigate to the page
     await page.goto('/');
@@ -182,9 +182,9 @@ test.describe('Theme Switching Functionality', () => {
     expect(ariaLabel?.toLowerCase()).toContain('light');
   });
 
-  test('should toggle theme correctly via FloatingControlPanel', async ({ page, context }) => {
+  test('should toggle theme correctly via FloatingControlPanel', async ({ page }) => {
     // Set system preference to light mode
-    await context.emulateMedia({ colorScheme: 'light' });
+    await page.emulateMedia({ colorScheme: 'light' });
 
     // Navigate to the page
     await page.goto('/');
@@ -216,9 +216,9 @@ test.describe('Theme Switching Functionality', () => {
     await expect(htmlElement).not.toHaveClass(/dark/);
   });
 
-  test('should toggle theme correctly via SettingsPanel', async ({ page, context }) => {
+  test('should toggle theme correctly via SettingsPanel', async ({ page }) => {
     // Set system preference to light mode
-    await context.emulateMedia({ colorScheme: 'light' });
+    await page.emulateMedia({ colorScheme: 'light' });
 
     // Navigate to the page
     await page.goto('/');
@@ -248,9 +248,9 @@ test.describe('Theme Switching Functionality', () => {
     }
   });
 
-  test('should prevent FOUC (Flash of Unstyled Content)', async ({ page, context }) => {
+  test('should prevent FOUC (Flash of Unstyled Content)', async ({ page }) => {
     // Set system preference to dark mode
-    await context.emulateMedia({ colorScheme: 'dark' });
+    await page.emulateMedia({ colorScheme: 'dark' });
 
     // Navigate with a listener to check initial state
     let initialThemeClass = '';
@@ -266,8 +266,8 @@ test.describe('Theme Switching Functionality', () => {
     expect(initialThemeClass).toContain('dark');
   });
 
-  test('should handle multiple rapid theme toggles', async ({ page, context }) => {
-    await context.emulateMedia({ colorScheme: 'light' });
+  test('should handle multiple rapid theme toggles', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'light' });
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 

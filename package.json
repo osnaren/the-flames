@@ -17,6 +17,9 @@
     "a11y:axe": "node scripts/a11y-audit.js --axe-only",
     "a11y:lhci": "lhci autorun",
     "a11y:axe:dev": "npx @axe-core/cli http://localhost:3000 --tags wcag2a,wcag2aa,wcag21a,wcag21aa,best-practice",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
     "test:a11y": "playwright test tests/a11y.spec.ts",
     "test:a11y:headed": "playwright test tests/a11y.spec.ts --headed",
     "test:a11y:debug": "playwright test tests/a11y.spec.ts --debug"
