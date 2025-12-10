@@ -67,10 +67,11 @@ function HomePage() {
     setBackgroundState({ variant, result });
   }, [stage, result, setBackgroundState]);
 
-  // Scroll to results when they appear
+  // Scroll to results when they appear (after hero transition completes)
   useEffect(() => {
     if (stage === 'result' && resultSectionRef.current) {
-      const scrollDelay = shouldAnimate ? 800 : 200;
+      // Hero transition takes ~1600ms, then card animates in ~800ms
+      const scrollDelay = shouldAnimate ? 2400 : 200;
       const timer = setTimeout(() => {
         resultSectionRef.current?.scrollIntoView({
           behavior: 'smooth',
@@ -182,15 +183,12 @@ function HomePage() {
             <motion.div
               key="result-stage"
               ref={resultSectionRef}
-              initial={shouldAnimate ? { opacity: 0, y: 40, scale: 0.95 } : false}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
               transition={{
-                duration: 0.6,
-                ease: [0.25, 0.46, 0.45, 0.94],
-                type: 'spring',
-                stiffness: 150,
-                damping: 20,
+                duration: 0.3,
+                ease: 'easeOut',
               }}
             >
               <ResultCard

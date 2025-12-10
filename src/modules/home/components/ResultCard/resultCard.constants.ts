@@ -107,6 +107,16 @@ export const RESULT_GRADIENTS: Record<NonNullFlamesResult, ResultGradient> = {
   },
 };
 
+// Raw color values for inline styles (hero transition glow effects)
+export const RESULT_COLORS: Record<NonNullFlamesResult, { primary: string; secondary: string }> = {
+  F: { primary: '#3b82f6', secondary: '#4f46e5' }, // blue-500, indigo-600
+  L: { primary: '#ec4899', secondary: '#e11d48' }, // pink-500, rose-600
+  A: { primary: '#f59e0b', secondary: '#ea580c' }, // amber-500, orange-600
+  M: { primary: '#a855f7', secondary: '#7c3aed' }, // purple-500, violet-600
+  E: { primary: '#ef4444', secondary: '#b91c1c' }, // red-500, red-700
+  S: { primary: '#10b981', secondary: '#16a34a' }, // emerald-500, green-600
+};
+
 // ============================================================================
 // DESCRIPTION TEMPLATES POOL
 // Add more descriptions here - they will be randomly selected
@@ -373,3 +383,15 @@ export function getRandomResultContent(
 
 export const ANIMATION_STAGES = ['entry', 'icon', 'names', 'title', 'description', 'quote'] as const;
 export const ANIMATION_DELAYS = [100, 250, 400, 550, 700, 850];
+
+// Animation stages when hero transition is used (card content fades in after hero icon shrinks)
+export const ANIMATION_STAGES_WITH_HERO = ['entry', 'card', 'icon', 'names', 'title', 'description', 'quote'] as const;
+export const ANIMATION_DELAYS_WITH_HERO = [0, 100, 200, 350, 500, 650, 800];
+
+// Hero transition timing constants
+export const HERO_TRANSITION_TIMING = {
+  START_DELAY: 200, // Delay before hero icon appears (let processor exit)
+  BURST_DURATION: 800, // How long the large icon is shown
+  SHRINK_DURATION: 600, // How long the shrink animation takes
+  TOTAL_DURATION: 1600, // Total hero transition time
+} as const;

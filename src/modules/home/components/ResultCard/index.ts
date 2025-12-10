@@ -4,6 +4,7 @@ export { default as ResultCard, default as ResultCardContainer } from './ResultC
 // Individual component exports for flexibility
 export { default as ResultActionsDock } from './ResultActionsDock';
 export { default as ResultCardDisplay } from './ResultCardDisplay';
+export { default as ResultHeroTransition } from './ResultHeroTransition';
 
 // Utilities and constants
 export * from './resultCard.constants';

@@ -11,7 +11,9 @@ import type { FlamesResult, GameStage, NonNullFlamesResult } from '../../types';
 
 import {
   ANIMATION_DELAYS,
+  ANIMATION_DELAYS_WITH_HERO,
   ANIMATION_STAGES,
+  ANIMATION_STAGES_WITH_HERO,
   getRandomResultContent,
   RESULT_GRADIENTS,
   RESULT_ICONS,
@@ -24,6 +26,8 @@ interface ResultCardProps {
   name1?: string;
   name2?: string;
   className?: string;
+  /** Whether the hero transition has completed (icon has shrunk into place) */
+  heroTransitionComplete?: boolean;
 }
 
 /**
@@ -32,15 +36,19 @@ interface ResultCardProps {
  * Ref forwarded for screenshot functionality
  */
 const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCard(
-  { result, stage, name1, name2, className },
+  { result, stage, name1, name2, className, heroTransitionComplete = false },
   ref
 ) {
   const { shouldAnimate } = useAnimationPreferences();
 
+  // Choose animation stages based on whether hero transition is used
+  const stages = heroTransitionComplete ? [...ANIMATION_STAGES_WITH_HERO] : [...ANIMATION_STAGES];
+  const delays = heroTransitionComplete ? ANIMATION_DELAYS_WITH_HERO : ANIMATION_DELAYS;
+
   // Use the staggered animation hook
   const { stageCompleted, hasStarted, startAnimation, resetAnimation } = useStaggeredAnimation({
-    stages: [...ANIMATION_STAGES],
-    delays: ANIMATION_DELAYS,
+    stages,
+    delays,
     shouldAnimate,
   });
 
@@ -91,17 +99,25 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
       {isVisible && (
         <motion.div
           ref={ref}
-          initial={{ opacity: 0, y: 40, scale: 0.95 }}
+          initial={heroTransitionComplete ? { opacity: 0, scale: 0.9, y: 0 } : { opacity: 0, y: 40, scale: 0.95 }}
           animate={{
-            opacity: stageCompleted.entry ? 1 : 0,
-            y: stageCompleted.entry ? 0 : 40,
-            scale: stageCompleted.entry ? 1 : 0.95,
+            opacity: (heroTransitionComplete ? stageCompleted.card : stageCompleted.entry) ? 1 : 0,
+            y: (heroTransitionComplete ? stageCompleted.card : stageCompleted.entry)
+              ? 0
+              : heroTransitionComplete
+                ? 0
+                : 40,
+            scale: (heroTransitionComplete ? stageCompleted.card : stageCompleted.entry)
+              ? 1
+              : heroTransitionComplete
+                ? 0.9
+                : 0.95,
           }}
           exit={{ opacity: 0, y: -30, scale: 0.95 }}
           transition={{
             type: 'spring',
-            stiffness: 400,
-            damping: 30,
+            stiffness: heroTransitionComplete ? 300 : 400,
+            damping: heroTransitionComplete ? 25 : 30,
             duration: shouldAnimate ? 0.4 : 0,
           }}
           className={cn('relative mx-auto w-full max-w-md will-change-transform', className)}
@@ -110,10 +126,12 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
           aria-label={`FLAMES Result: ${label}`}
         >
           {/* Result Glow Effect */}
-          <ResultGlow result={result} isVisible={stageCompleted.entry} />
+          <ResultGlow result={result} isVisible={heroTransitionComplete ? stageCompleted.card : stageCompleted.entry} />
 
           {/* Confetti Effect for positive results */}
-          {isResultPositive && stageCompleted.entry && <ConfettiEffect result={result} isActive={true} />}
+          {isResultPositive && (heroTransitionComplete ? stageCompleted.card : stageCompleted.entry) && (
+            <ConfettiEffect result={result} isActive={true} />
+          )}
 
           {/* Main Card */}
           <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-black/30">
@@ -154,15 +172,16 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
             <div className="relative p-6 text-center sm:p-8">
               {/* Result Icon from game assets */}
               <motion.div
-                initial={{ scale: 0, rotate: -180 }}
+                initial={heroTransitionComplete ? { scale: 1, rotate: 0, opacity: 1 } : { scale: 0, rotate: -180 }}
                 animate={{
-                  scale: stageCompleted.icon ? 1 : 0,
-                  rotate: stageCompleted.icon ? 0 : -180,
+                  scale: stageCompleted.icon ? 1 : heroTransitionComplete ? 1 : 0,
+                  rotate: stageCompleted.icon ? 0 : heroTransitionComplete ? 0 : -180,
+                  opacity: 1,
                 }}
                 transition={{
                   type: 'spring',
-                  stiffness: 300,
-                  damping: 20,
+                  stiffness: heroTransitionComplete ? 400 : 300,
+                  damping: heroTransitionComplete ? 30 : 20,
                   duration: shouldAnimate ? 0.5 : 0,
                 }}
                 className="mx-auto mb-5 will-change-transform"
