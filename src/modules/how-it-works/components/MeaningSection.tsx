@@ -11,59 +11,73 @@ interface MeaningCard {
   letter: string;
   title: string;
   description: string;
+  funFact: string;
   icon: React.ReactNode;
-  color: string;
-  bgGradient: string;
+  colorClass: string;
+  bgColorClass: string;
+  borderColorClass: string;
 }
 
 const meaningCards: MeaningCard[] = [
   {
     letter: 'F',
     title: 'Friends',
-    description: 'A beautiful friendship awaits. The foundation of all great relationships!',
+    description: 'The ultimate "let\'s just be friends" energy.',
+    funFact: 'Hey, at least they\'ll share their fries with you! 🍟',
     icon: <Users className="h-8 w-8" />,
-    color: 'var(--tertiary)',
-    bgGradient: 'from-tertiary/10 to-tertiary/5',
+    colorClass: 'text-friendship dark:text-friendship',
+    bgColorClass: 'bg-friendship-container/20 dark:bg-friendship-container/30',
+    borderColorClass: 'border-friendship/30 dark:border-friendship/40',
   },
   {
     letter: 'L',
     title: 'Love',
-    description: 'True love is in the cards. Hearts beating as one!',
+    description: 'Cupid just did a happy dance! 💘',
+    funFact: 'Time to start practicing your "meet the parents" speech!',
     icon: <Heart className="h-8 w-8 fill-current" />,
-    color: 'var(--error)',
-    bgGradient: 'from-error/10 to-error/5',
+    colorClass: 'text-love dark:text-love',
+    bgColorClass: 'bg-love-container/20 dark:bg-love-container/30',
+    borderColorClass: 'border-love/30 dark:border-love/40',
   },
   {
     letter: 'A',
     title: 'Affection',
-    description: 'Deep care and tenderness. A bond that warms the soul!',
+    description: 'More than friends, less than "putting a ring on it".',
+    funFact: 'Expect butterflies, chocolates, and awkward hand-holding! 🦋',
     icon: <Sparkles className="h-8 w-8" />,
-    color: 'var(--secondary)',
-    bgGradient: 'from-secondary/10 to-secondary/5',
+    colorClass: 'text-affection dark:text-affection',
+    bgColorClass: 'bg-affection-container/20 dark:bg-affection-container/30',
+    borderColorClass: 'border-affection/30 dark:border-affection/40',
   },
   {
     letter: 'M',
     title: 'Marriage',
-    description: 'Wedding bells are ringing! A lifetime commitment awaits!',
+    description: 'The algorithm says: "Start shopping for rings!" 💍',
+    funFact: 'Your aunties already started planning the wedding menu.',
     icon: <GiBigDiamondRing className="h-8 w-8" />,
-    color: 'var(--primary)',
-    bgGradient: 'from-primary/10 to-primary/5',
+    colorClass: 'text-marriage dark:text-marriage',
+    bgColorClass: 'bg-marriage-container/20 dark:bg-marriage-container/30',
+    borderColorClass: 'border-marriage/30 dark:border-marriage/40',
   },
   {
     letter: 'E',
     title: 'Enemies',
-    description: 'A rivalry for the ages. May the best prevail!',
+    description: 'Plot twist! You\'re destined to be frenemies.',
+    funFact: 'Keep your friends close, and this one... closer? 😈',
     icon: <GiBrokenHeart className="h-8 w-8" />,
-    color: 'var(--warning)',
-    bgGradient: 'from-warning/10 to-warning/5',
+    colorClass: 'text-enemy dark:text-enemy',
+    bgColorClass: 'bg-enemy-container/20 dark:bg-enemy-container/30',
+    borderColorClass: 'border-enemy/30 dark:border-enemy/40',
   },
   {
     letter: 'S',
     title: 'Siblings',
-    description: 'A brotherly/sisterly bond. Family-like connection!',
+    description: 'Congratulations! You\'ve gained a sibling from another parent.',
+    funFact: 'Get ready for fights over the TV remote! 📺',
     icon: <Shield className="h-8 w-8" />,
-    color: 'var(--success)',
-    bgGradient: 'from-success/10 to-success/5',
+    colorClass: 'text-siblings dark:text-siblings',
+    bgColorClass: 'bg-siblings-container/20 dark:bg-siblings-container/30',
+    borderColorClass: 'border-siblings/30 dark:border-siblings/40',
   },
 ];
 
@@ -112,24 +126,26 @@ export default function MeaningSection() {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          What Does Each Letter Mean?
+          The Sacred Scrolls of{' '}
+          <span className="text-primary">FLAMES</span>
         </motion.h2>
 
         <motion.p
-          className="text-on-surface-variant mx-auto max-w-2xl text-lg"
+          className="text-on-surface-variant mx-auto max-w-2xl text-lg leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          Each letter in{' '}
-          <span className="text-primary font-semibold">
-            F<span className="text-secondary">L</span>
-            <span className="text-tertiary">A</span>
-            <span className="text-primary">M</span>
-            <span className="text-warning">E</span>
-            <span className="text-success">S</span>
-          </span>{' '}
-          represents a unique relationship destiny!
+          Behold! Each letter holds the key to your romantic destiny.{' '}
+          <span className="text-on-surface font-medium">No pressure</span>, but this is literally{' '}
+          <motion.span
+            className="text-primary font-semibold"
+            animate={shouldAnimate ? { scale: [1, 1.05, 1] } : {}}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            ancient playground wisdom
+          </motion.span>{' '}
+          passed down through generations of 5th graders. 📜✨
         </motion.p>
       </motion.div>
 
@@ -150,13 +166,12 @@ export default function MeaningSection() {
             className="group"
           >
             <Card
-              className={`relative h-full overflow-hidden bg-linear-to-br p-6 shadow-lg transition-all duration-300 hover:shadow-xl ${card.bgGradient}`}
+              className={`relative h-full overflow-hidden border p-6 shadow-lg transition-all duration-300 hover:shadow-xl ${card.bgColorClass} ${card.borderColorClass}`}
             >
               {/* Background decoration */}
               {shouldAnimate && (
                 <motion.div
-                  className="absolute -top-10 -right-10 opacity-10"
-                  style={{ color: card.color }}
+                  className={`absolute -top-10 -right-10 opacity-10 ${card.colorClass}`}
                   animate={{ rotate: [0, 360] }}
                   transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
                 >
@@ -172,17 +187,12 @@ export default function MeaningSection() {
                 transition={{ delay: 0.6 + idx * 0.1 }}
               >
                 <motion.div
-                  className="flex h-12 w-12 items-center justify-center rounded-xl text-2xl font-bold text-white shadow-lg"
-                  style={{ backgroundColor: card.color }}
+                  className={`flex h-12 w-12 items-center justify-center rounded-xl text-2xl font-bold shadow-lg ${card.bgColorClass} ${card.colorClass} border-2 ${card.borderColorClass}`}
                   whileHover={{ scale: 1.1, rotate: 10 }}
                   animate={
                     shouldAnimate
                       ? {
-                          boxShadow: [
-                            `0 4px 15px ${card.color}40`,
-                            `0 8px 25px ${card.color}60`,
-                            `0 4px 15px ${card.color}40`,
-                          ],
+                          scale: [1, 1.05, 1],
                         }
                       : {}
                   }
@@ -190,27 +200,23 @@ export default function MeaningSection() {
                 >
                   {card.letter}
                 </motion.div>
-                <motion.div
-                  className="transition-colors duration-300"
-                  style={{ color: card.color }}
-                  whileHover={{ scale: 1.1 }}
-                >
+                <motion.div className={`transition-colors duration-300 ${card.colorClass}`} whileHover={{ scale: 1.1 }}>
                   {card.icon}
                 </motion.div>
               </motion.div>
 
               {/* Title */}
-              <motion.h3 className="font-heading text-on-surface mb-2 text-xl font-bold" style={{ color: card.color }}>
-                {card.title}
-              </motion.h3>
+              <h3 className={`font-heading mb-2 text-xl font-bold ${card.colorClass}`}>{card.title}</h3>
 
               {/* Description */}
-              <p className="text-on-surface-variant text-sm leading-relaxed">{card.description}</p>
+              <p className="text-on-surface mb-3 text-sm leading-relaxed">{card.description}</p>
+
+              {/* Fun Fact */}
+              <p className="text-on-surface-variant text-xs italic opacity-80">{card.funFact}</p>
 
               {/* Hover effect line */}
               <motion.div
-                className="absolute bottom-0 left-0 h-1 origin-left"
-                style={{ backgroundColor: card.color }}
+                className={`absolute bottom-0 left-0 h-1 origin-left ${card.bgColorClass}`}
                 initial={{ scaleX: 0 }}
                 whileHover={{ scaleX: 1 }}
                 transition={{ duration: 0.3 }}

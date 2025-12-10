@@ -163,7 +163,7 @@ export default function Header() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6, ease: 'easeOut' }}
         >
-          How Does{' '}
+          The Secret Behind{' '}
           <motion.span
             className="text-primary-container relative inline-block"
             whileHover={{ scale: 1.05, rotate: 1 }}
@@ -190,24 +190,22 @@ export default function Header() {
                 FLAMES
               </motion.span>
             )}
-          </motion.span>{' '}
-          Ignite?
+          </motion.span>
         </motion.h1>
 
-        {/* Enhanced Subtitle */}
+        {/* Enhanced Subtitle - More fun and mysterious */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8, ease: 'easeOut' }}
         >
           <p className="text-on-surface-variant mx-auto max-w-2xl text-lg leading-relaxed md:text-xl">
-            Discover the{' '}
             <motion.span
-              className="text-secondary font-semibold"
+              className="text-primary font-semibold"
               animate={
                 shouldAnimate
                   ? {
-                      color: ['hsl(var(--secondary))', 'hsl(var(--primary))', 'hsl(var(--secondary))'],
+                      color: ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--primary))'],
                     }
                   : {}
               }
@@ -217,9 +215,14 @@ export default function Header() {
                 ease: 'easeInOut',
               }}
             >
-              sparks behind
+              Plot twist:
             </motion.span>{' '}
-            the classic childhood game, one step at a time.
+            It&apos;s not magic (well, maybe a little ✨). The results aren&apos;t some secret prophecy—just good old-fashioned
+            letter-crossing chaos from playgrounds worldwide.
+          </p>
+          <p className="text-on-surface-variant/70 mx-auto mt-3 max-w-xl text-base italic">
+            But here&apos;s the real mystery: <span className="text-on-surface font-medium">who invented this?</span> No one knows. 
+            Could be ancient love gods. Could be a bored kid in math class. We prefer the divine magic theory. 🔮
           </p>
         </motion.div>
 

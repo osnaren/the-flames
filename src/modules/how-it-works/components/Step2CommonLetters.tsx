@@ -23,7 +23,7 @@ export default function Step2CommonLetters({ name1, name2, commonLetters }: Step
   const containerRef = useRef(null);
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
 
-  const isCommonLetter = (letter: string) => commonLetters.includes(letter.toUpperCase());
+  const isCommonLetter = (letter: string) => commonLetters.includes(letter.toLocaleLowerCase());
 
   // Enhanced letter rendering with strike animation
   const renderEnhancedLetters = (name: string, nameIndex: number) => {
@@ -262,8 +262,7 @@ export default function Step2CommonLetters({ name1, name2, commonLetters }: Step
             transition={{ delay: 0.9, duration: 0.5 }}
           >
             <p className="text-on-surface-variant text-lg leading-relaxed">
-              We strike out matching letters from both names.
-              <br className="hidden md:block" />
+              Time for some letter elimination drama!{' '}
               <motion.span
                 className="text-error font-semibold"
                 animate={
@@ -285,7 +284,10 @@ export default function Step2CommonLetters({ name1, name2, commonLetters }: Step
               >
                 Crossed-out letters
               </motion.span>{' '}
-              represent the shared connection 💥
+              = what you two have in common. 💥
+            </p>
+            <p className="text-on-surface-variant/70 mt-2 text-sm italic">
+              Think of it as fate removing the "extra baggage" from your connection.
             </p>
           </motion.div>
         </motion.div>

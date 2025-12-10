@@ -338,7 +338,7 @@ export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
             transition={{ delay: 0.9, duration: 0.5 }}
           >
             <p className="text-on-surface-variant text-lg leading-relaxed">
-              Count through{' '}
+              This is where the magic happens!{' '}
               <motion.span
                 className="text-primary font-semibold"
                 animate={
@@ -358,12 +358,12 @@ export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
                   ease: 'easeInOut',
                 }}
               >
-                F-L-A-M-E-S
+                Count, eliminate, repeat
               </motion.span>{' '}
-              using the remaining letter count.
-              <br className="hidden md:block" />
-              Each cycle eliminates one letter until only the{' '}
-              <span className="text-secondary font-semibold">final result</span> remains! 🎯
+              until destiny reveals itself! 🎯
+            </p>
+            <p className="text-on-surface-variant/70 mt-2 text-sm italic">
+              It&apos;s like musical chairs, but for your love life. Each letter fights for survival!
             </p>
           </motion.div>
         </motion.div>

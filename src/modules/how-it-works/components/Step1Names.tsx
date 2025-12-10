@@ -316,7 +316,7 @@ export default function Step1Names({ name1, name2 }: Step1Props) {
             transition={{ delay: 0.6, duration: 0.5 }}
           >
             <p className="text-on-surface-variant text-lg leading-relaxed">
-              We start with two names, ready to{' '}
+              Enter two names and let the{' '}
               <motion.span
                 className="text-primary font-semibold"
                 animate={
@@ -336,9 +336,12 @@ export default function Step1Names({ name1, name2 }: Step1Props) {
                   ease: 'easeInOut',
                 }}
               >
-                uncover the spark
-              </motion.span>
-              ✨
+                cosmic algorithm
+              </motion.span>{' '}
+              begin its work! 🌟
+            </p>
+            <p className="text-on-surface-variant/70 mt-2 text-sm italic">
+              (Don&apos;t worry, we won&apos;t tell anyone you&apos;re checking your crush&apos;s name... again.)
             </p>
           </motion.div>
         </motion.div>
