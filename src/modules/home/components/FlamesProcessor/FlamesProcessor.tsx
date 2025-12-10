@@ -57,9 +57,14 @@ function FlamesProcessorComponent({
   const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
   const isCancelledRef = useRef(false);
   const flamesAnimatedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
 
-  // Memoize dependencies to prevent unnecessary restarts
-  const commonLettersKey = useMemo(() => JSON.stringify(commonLetters), [commonLetters]);
+  // Keep onComplete ref up to date without triggering effects
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
+  // Memoize dependencies
   const safeRemainingCount = Math.max(1, remainingCount);
 
   // Prepare letter data
@@ -115,9 +120,10 @@ function FlamesProcessorComponent({
   const handleSkip = useCallback(() => {
     isCancelledRef.current = true;
     timeoutsRef.current.forEach(clearTimeout);
+    timeoutsRef.current = [];
     setPhase('complete');
-    onComplete();
-  }, [onComplete]);
+    onCompleteRef.current();
+  }, []);
 
   // Helper to add timeout and track it
   const addTimeout = useCallback((callback: () => void, delay: number) => {
@@ -134,7 +140,7 @@ function FlamesProcessorComponent({
   useEffect(() => {
     if (!shouldAnimate) {
       setPhase('complete');
-      setTimeout(onComplete, 100);
+      setTimeout(() => onCompleteRef.current(), 100);
       return;
     }
 
@@ -163,7 +169,7 @@ function FlamesProcessorComponent({
       timeoutsRef.current.forEach(clearTimeout);
       timeoutsRef.current = [];
     };
-  }, [shouldAnimate, commonLettersKey, safeRemainingCount, onComplete, addTimeout, runId]);
+  }, [shouldAnimate, addTimeout, runId]);
 
   // Phase transition logic
   useEffect(() => {
@@ -206,7 +212,7 @@ function FlamesProcessorComponent({
       case 'result-reveal':
         addTimeout(() => {
           setPhase('complete');
-          onComplete();
+          onCompleteRef.current();
         }, PROCESSOR_TIMING.RESULT_REVEAL);
         break;
     }
