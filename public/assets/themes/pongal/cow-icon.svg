@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+    <!-- Cow body -->
+    <ellipse cx="32" cy="40" rx="20" ry="14" fill="#DEB887" />
+    <!-- Head -->
+    <ellipse cx="50" cy="30" rx="10" ry="8" fill="#DEB887" />
+    <!-- Ears -->
+    <ellipse cx="44" cy="22" rx="4" ry="6" fill="#CD853F" transform="rotate(-20 44 22)" />
+    <ellipse cx="56" cy="24" rx="4" ry="6" fill="#CD853F" transform="rotate(20 56 24)" />
+    <!-- Horns -->
+    <path d="M46 18 Q44 10 48 8" stroke="#8B4513" stroke-width="3" fill="none" />
+    <path d="M54 18 Q56 10 52 8" stroke="#8B4513" stroke-width="3" fill="none" />
+    <!-- Eyes -->
+    <circle cx="48" cy="28" r="2" fill="#3E2723" />
+    <circle cx="54" cy="28" r="2" fill="#3E2723" />
+    <!-- Nose -->
+    <ellipse cx="52" cy="34" rx="4" ry="3" fill="#CD853F" />
+    <!-- Legs -->
+    <rect x="18" y="48" width="4" height="12" fill="#CD853F" />
+    <rect x="26" y="48" width="4" height="12" fill="#CD853F" />
+    <rect x="36" y="48" width="4" height="12" fill="#CD853F" />
+    <rect x="44" y="48" width="4" height="12" fill="#CD853F" />
+    <!-- Tail -->
+    <path d="M12 38 Q6 44 8 52" stroke="#8B4513" stroke-width="2" fill="none" />
+    <!-- Decoration -->
+    <circle cx="50" cy="20" r="2" fill="#FFD700" />
+</svg>

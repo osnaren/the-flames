@@ -46,7 +46,7 @@ export const defaultTheme: SeasonalThemeConfig = {
     gradientAnimation: true,
     particleEffects: {
       enabled: true,
-      count: 35,
+      count: 50, // Increased count for ember effect
       colors: [
         '#F97316', // Orange
         '#EF4444', // Red
@@ -55,10 +55,10 @@ export const defaultTheme: SeasonalThemeConfig = {
         '#FCD34D', // Gold
         '#DC2626', // Deep Red
       ],
-      shapes: ['flame'],
-      size: { min: 6, max: 18 },
-      speed: { min: 0.8, max: 2.5 },
-      opacity: { min: 0.4, max: 0.85 },
+      shapes: ['circle'], // Only circles for embers
+      size: { min: 2, max: 5 }, // Small size for embers
+      speed: { min: 1, max: 3 }, // Slightly faster upward movement
+      opacity: { min: 0.4, max: 0.8 },
       direction: 'up',
       animation: 'sparkle',
     },

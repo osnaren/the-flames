@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+    <defs>
+        <linearGradient id="valentineBg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#FCE4EC" />
+            <stop offset="50%" style="stop-color:#F8BBD9" />
+            <stop offset="100%" style="stop-color:#FCE4EC" />
+        </linearGradient>
+        <radialGradient id="pinkGlow1" cx="25%" cy="30%">
+            <stop offset="0%" style="stop-color:#E91E63;stop-opacity:0.15" />
+            <stop offset="100%" style="stop-color:#E91E63;stop-opacity:0" />
+        </radialGradient>
+        <radialGradient id="pinkGlow2" cx="75%" cy="70%">
+            <stop offset="0%" style="stop-color:#F06292;stop-opacity:0.12" />
+            <stop offset="100%" style="stop-color:#F06292;stop-opacity:0" />
+        </radialGradient>
+        <radialGradient id="redGlow" cx="60%" cy="25%">
+            <stop offset="0%" style="stop-color:#C62828;stop-opacity:0.1" />
+            <stop offset="100%" style="stop-color:#C62828;stop-opacity:0" />
+        </radialGradient>
+    </defs>
+    <rect width="800" height="600" fill="url(#valentineBg)" />
+    <circle cx="200" cy="180" r="220" fill="url(#pinkGlow1)" />
+    <circle cx="600" cy="420" r="250" fill="url(#pinkGlow2)" />
+    <circle cx="480" cy="150" r="180" fill="url(#redGlow)" />
+</svg>

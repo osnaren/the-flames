@@ -59,7 +59,7 @@ export type ParticleShape =
 
 // Mapping of themes to their emojis for emoji particles
 export const THEME_EMOJIS: Record<SeasonalTheme, string[]> = {
-  default: ['🔥', '✨', '💫'],
+  default: [],
   valentine: ['❤️', '💕', '💗', '💖', '🌹'],
   halloween: ['🎃', '🦇', '👻', '🕷️', '💀'],
   christmas: ['❄️', '🎄', '⭐', '🎁', '🔔'],

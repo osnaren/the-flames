@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Candy cane shape -->
+  <path d="M44 60 L44 24 Q44 8 32 8 Q20 8 20 24" stroke="#FFFFFF" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <!-- Red stripes -->
+  <path d="M44 60 L44 24 Q44 8 32 8 Q20 8 20 24" stroke="#DC143C" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="8 8"/>
+  <!-- Shine -->
+  <path d="M40 56 L40 28" stroke="#FFF0F0" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>
+</svg>

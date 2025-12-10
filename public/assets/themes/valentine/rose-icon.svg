@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+    <!-- Rose stem -->
+    <path d="M32 60 Q28 48 32 36" stroke="#2E7D32" stroke-width="3" fill="none" />
+    <!-- Leaves -->
+    <path d="M32 50 Q24 46 20 50 Q24 54 32 50" fill="#4CAF50" />
+    <path d="M32 44 Q40 40 44 44 Q40 48 32 44" fill="#4CAF50" />
+    <!-- Rose bloom - outer petals -->
+    <ellipse cx="32" cy="22" rx="16" ry="14" fill="#C62828" />
+    <!-- Petal layers -->
+    <path d="M20 26 Q24 18 32 16 Q24 20 20 26" fill="#D32F2F" />
+    <path d="M44 26 Q40 18 32 16 Q40 20 44 26" fill="#D32F2F" />
+    <path d="M24 30 Q28 22 36 22 Q32 28 24 30" fill="#E53935" />
+    <path d="M40 30 Q36 22 28 22 Q32 28 40 30" fill="#E53935" />
+    <!-- Inner petals -->
+    <ellipse cx="32" cy="20" rx="10" ry="8" fill="#EF5350" />
+    <path d="M28 22 Q32 14 36 22 Q32 18 28 22" fill="#E57373" />
+    <!-- Center spiral -->
+    <path d="M30 18 Q32 14 34 18 Q32 16 30 18" fill="#EF9A9A" />
+    <!-- Rose highlight -->
+    <ellipse cx="28" cy="16" rx="3" ry="2" fill="#FFCDD2" opacity="0.5" />
+    <!-- Thorns -->
+    <path d="M30 54 L26 52 L30 52" fill="#2E7D32" />
+    <path d="M34 48 L38 46 L34 46" fill="#2E7D32" />
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Heart shape -->
+  <path d="M32 56 Q8 36 8 22 Q8 8 22 8 Q32 8 32 20 Q32 8 42 8 Q56 8 56 22 Q56 36 32 56" fill="#E91E63"/>
+  <!-- Gradient highlight -->
+  <path d="M32 52 Q12 34 12 22 Q12 12 22 12 Q30 12 32 22 Q34 12 42 12 Q52 12 52 22 Q52 34 32 52" fill="#F06292"/>
+  <!-- Inner highlight -->
+  <path d="M32 46 Q18 32 18 24 Q18 16 26 16 Q32 16 32 24" fill="#F8BBD9" opacity="0.6"/>
+  <!-- Shine -->
+  <ellipse cx="22" cy="20" rx="4" ry="5" fill="white" opacity="0.4"/>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+    <!-- Bat body -->
+    <ellipse cx="32" cy="32" rx="8" ry="10" fill="#1a1a1a" />
+    <!-- Head -->
+    <circle cx="32" cy="20" r="6" fill="#1a1a1a" />
+    <!-- Ears -->
+    <polygon points="28,16 26,8 30,14" fill="#1a1a1a" />
+    <polygon points="36,16 38,8 34,14" fill="#1a1a1a" />
+    <!-- Left wing -->
+    <path d="M24 28 Q10 20 6 32 Q8 38 14 36 Q12 42 18 40 Q16 46 24 42 L24 28" fill="#2D2D2D" />
+    <!-- Right wing -->
+    <path d="M40 28 Q54 20 58 32 Q56 38 50 36 Q52 42 46 40 Q48 46 40 42 L40 28" fill="#2D2D2D" />
+    <!-- Eyes -->
+    <circle cx="30" cy="19" r="2" fill="#FF6D00" />
+    <circle cx="34" cy="19" r="2" fill="#FF6D00" />
+    <circle cx="30" cy="19" r="1" fill="#FFEB3B" />
+    <circle cx="34" cy="19" r="1" fill="#FFEB3B" />
+</svg>

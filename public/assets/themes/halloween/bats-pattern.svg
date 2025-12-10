@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+    <!-- Bats pattern -->
+    <g fill="#1a1a1a" opacity="0.4">
+        <!-- Bat 1 -->
+        <g transform="translate(25, 30)">
+            <ellipse cx="0" cy="0" rx="3" ry="4" />
+            <circle cx="0" cy="-5" r="2.5" />
+            <path d="M-3 -2 Q-10 -6 -12 0 Q-10 2 -8 1 Q-9 4 -6 3 Q-7 6 -3 4" />
+            <path d="M3 -2 Q10 -6 12 0 Q10 2 8 1 Q9 4 6 3 Q7 6 3 4" />
+        </g>
+        <!-- Bat 2 -->
+        <g transform="translate(70, 60) scale(0.8)">
+            <ellipse cx="0" cy="0" rx="3" ry="4" />
+            <circle cx="0" cy="-5" r="2.5" />
+            <path d="M-3 -2 Q-10 -6 -12 0 Q-10 2 -8 1 Q-9 4 -6 3 Q-7 6 -3 4" />
+            <path d="M3 -2 Q10 -6 12 0 Q10 2 8 1 Q9 4 6 3 Q7 6 3 4" />
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+    <defs>
+        <linearGradient id="christmasBg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#F0F8FF" />
+            <stop offset="50%" style="stop-color:#E6F3FF" />
+            <stop offset="100%" style="stop-color:#F5FFFA" />
+        </linearGradient>
+        <radialGradient id="glow1" cx="20%" cy="30%">
+            <stop offset="0%" style="stop-color:#DC143C;stop-opacity:0.2" />
+            <stop offset="100%" style="stop-color:#DC143C;stop-opacity:0" />
+        </radialGradient>
+        <radialGradient id="glow2" cx="80%" cy="70%">
+            <stop offset="0%" style="stop-color:#228B22;stop-opacity:0.15" />
+            <stop offset="100%" style="stop-color:#228B22;stop-opacity:0" />
+        </radialGradient>
+    </defs>
+    <rect width="800" height="600" fill="url(#christmasBg)" />
+    <circle cx="160" cy="180" r="200" fill="url(#glow1)" />
+    <circle cx="640" cy="420" r="250" fill="url(#glow2)" />
+</svg>
