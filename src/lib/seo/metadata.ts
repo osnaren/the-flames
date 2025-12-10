@@ -1,6 +1,16 @@
 import type { Metadata } from 'next';
 import { siteConfig } from './config';
 
+// FLAMES result meanings for metadata generation
+const FLAMES_MEANINGS: Record<string, { label: string; emoji: string }> = {
+  F: { label: 'Friendship', emoji: '🤝' },
+  L: { label: 'Love', emoji: '❤️' },
+  A: { label: 'Affection', emoji: '🥰' },
+  M: { label: 'Marriage', emoji: '💍' },
+  E: { label: 'Enemy', emoji: '⚔️' },
+  S: { label: 'Siblings', emoji: '👫' },
+};
+
 /**
  * Base metadata that applies to all pages
  */
@@ -152,10 +162,15 @@ export function generatePageMetadata(options: {
 
 /**
  * Generate dynamic result page metadata for shared results
+ * Includes custom OG image URL with names and result for social preview
  */
 export function generateResultMetadata(name1: string, name2: string, result: string): Metadata {
-  const title = `${name1} & ${name2} FLAMES Result: ${result}`;
-  const description = `${name1} and ${name2} got "${result}" in the FLAMES game! Play now to discover your relationship compatibility.`;
+  const resultInfo = FLAMES_MEANINGS[result.toUpperCase()] || { label: result, emoji: '✨' };
+  const title = `${name1} & ${name2}: ${resultInfo.emoji} ${resultInfo.label} | FLAMES Result`;
+  const description = `${name1} and ${name2} got "${resultInfo.label}" in the FLAMES game! ${resultInfo.emoji} Play now to discover your relationship compatibility.`;
+
+  // Generate dynamic OG image URL
+  const ogImageUrl = `${siteConfig.url}/api/og/result?name1=${encodeURIComponent(name1)}&name2=${encodeURIComponent(name2)}&result=${result.toUpperCase()}`;
 
   return {
     title,
@@ -164,11 +179,47 @@ export function generateResultMetadata(name1: string, name2: string, result: str
       title,
       description,
       type: 'website',
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${name1} & ${name2} FLAMES Result: ${resultInfo.label}`,
+          type: 'image/png',
+        },
+      ],
     },
     twitter: {
       title,
       description,
       card: 'summary_large_image',
+      images: [ogImageUrl],
     },
   };
+}
+
+/**
+ * Generate dynamic OG image URL for any page
+ * @param page - Page identifier (home, about, how-it-works, charts, manual, api-docs)
+ * @returns Full URL to the dynamic OG image
+ */
+export function generatePageOGImageUrl(page: string): string {
+  return `${siteConfig.url}/api/og/page?page=${encodeURIComponent(page)}`;
+}
+
+/**
+ * Generate dynamic result OG image URL
+ * @param name1 - First name
+ * @param name2 - Second name
+ * @param result - Optional FLAMES result character
+ * @returns Full URL to the dynamic result OG image
+ */
+export function generateResultOGImageUrl(name1: string, name2: string, result?: string): string {
+  const params = new URLSearchParams();
+  params.set('name1', name1);
+  params.set('name2', name2);
+  if (result) {
+    params.set('result', result.toUpperCase());
+  }
+  return `${siteConfig.url}/api/og/result?${params.toString()}`;
 }

@@ -7,7 +7,14 @@
 export { faqData, pagesSEO, siteConfig, socialLinks } from './config';
 
 // Metadata utilities
-export { baseMetadata, generatePageMetadata, generateResultMetadata, viewportConfig } from './metadata';
+export {
+  baseMetadata,
+  generatePageMetadata,
+  generatePageOGImageUrl,
+  generateResultMetadata,
+  generateResultOGImageUrl,
+  viewportConfig,
+} from './metadata';
 
 // Structured data generators
 export {
