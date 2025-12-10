@@ -155,7 +155,7 @@ export const diwaliTheme: SeasonalThemeConfig = {
   `,
   assets: {
     logo: '/assets/themes/diwali/logo.svg',
-    background: '/assets/themes/diwali/background.jpg',
+    background: '/assets/themes/diwali/background.svg',
     patterns: [
       '/assets/themes/diwali/rangoli-pattern.svg',
       '/assets/themes/diwali/diya-pattern.svg',

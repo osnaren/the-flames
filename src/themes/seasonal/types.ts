@@ -53,7 +53,22 @@ export type ParticleShape =
   // Pongal
   | 'sugarcane'
   | 'pot'
-  | 'kolam';
+  | 'kolam'
+  // Emoji-based particles (rendered as text)
+  | 'emoji';
+
+// Mapping of themes to their emojis for emoji particles
+export const THEME_EMOJIS: Record<SeasonalTheme, string[]> = {
+  default: ['🔥', '✨', '💫'],
+  valentine: ['❤️', '💕', '💗', '💖', '🌹'],
+  halloween: ['🎃', '🦇', '👻', '🕷️', '💀'],
+  christmas: ['❄️', '🎄', '⭐', '🎁', '🔔'],
+  newYear: ['🎆', '🎇', '✨', '🥂', '🎉'],
+  diwali: ['🪔', '✨', '🎆', '🌟', '🎇'],
+  holi: ['🎨', '💜', '💙', '💚', '💛', '🧡', '❤️'],
+  onam: ['🌸', '🌺', '🌼', '🪷', '🌻'],
+  pongal: ['🍯', '🌾', '☀️', '🪴', '🎍'],
+};
 
 export interface ParticleConfig {
   enabled: boolean;

@@ -50,8 +50,16 @@ export const holiTheme: SeasonalThemeConfig = {
       enabled: true,
       count: 60,
       colors: [
-        '#E91E63', '#FF5722', '#FFEB3B', '#4CAF50', '#00BCD4', 
-        '#9C27B0', '#673AB7', '#2196F3', '#FF9800', '#8BC34A'
+        '#E91E63',
+        '#FF5722',
+        '#FFEB3B',
+        '#4CAF50',
+        '#00BCD4',
+        '#9C27B0',
+        '#673AB7',
+        '#2196F3',
+        '#FF9800',
+        '#8BC34A',
       ],
       shapes: ['colorSplash', 'gulal', 'circle', 'waterBalloon'],
       size: { min: 10, max: 35 },
@@ -171,7 +179,7 @@ export const holiTheme: SeasonalThemeConfig = {
   `,
   assets: {
     logo: '/assets/themes/holi/logo.svg',
-    background: '/assets/themes/holi/background.jpg',
+    background: '/assets/themes/holi/background.svg',
     patterns: [
       '/assets/themes/holi/splash-pattern.svg',
       '/assets/themes/holi/powder-pattern.svg',

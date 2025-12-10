@@ -109,7 +109,7 @@ export const halloweenTheme: SeasonalThemeConfig = {
   `,
   assets: {
     logo: '/assets/themes/halloween/logo.svg',
-    background: '/assets/themes/halloween/background.jpg',
+    background: '/assets/themes/halloween/background.svg',
     patterns: [
       '/assets/themes/halloween/spider-web-pattern.svg',
       '/assets/themes/halloween/bats-pattern.svg',

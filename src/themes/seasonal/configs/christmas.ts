@@ -41,7 +41,7 @@ export const christmasTheme: SeasonalThemeConfig = {
       direction: 'down',
       animation: 'fall',
     },
-    overlayPattern: '/patterns/snowflakes.png',
+    overlayPattern: '/patterns/snowflakes.svg',
     overlayOpacity: 0.06,
     glowEffects: true,
     pulsing: true,
@@ -133,7 +133,7 @@ export const christmasTheme: SeasonalThemeConfig = {
   `,
   assets: {
     logo: '/assets/themes/christmas/logo.svg',
-    background: '/assets/themes/christmas/background.jpg',
+    background: '/assets/themes/christmas/background.svg',
     patterns: [
       '/assets/themes/christmas/snowflakes-pattern.svg',
       '/assets/themes/christmas/holly-pattern.svg',

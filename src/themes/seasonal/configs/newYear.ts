@@ -136,7 +136,7 @@ export const newYearTheme: SeasonalThemeConfig = {
   `,
   assets: {
     logo: '/assets/themes/newYear/logo.svg',
-    background: '/assets/themes/newYear/background.jpg',
+    background: '/assets/themes/newYear/background.svg',
     patterns: [
       '/assets/themes/newYear/fireworks-pattern.svg',
       '/assets/themes/newYear/confetti-pattern.svg',

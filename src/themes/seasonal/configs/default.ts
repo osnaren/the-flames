@@ -3,7 +3,7 @@ import { SeasonalThemeConfig } from '../types';
 export const defaultTheme: SeasonalThemeConfig = {
   id: 'default',
   name: 'Default',
-  description: 'Classic FLAMES theme with vibrant colors',
+  description: 'Classic FLAMES theme with vibrant fire embers',
   emoji: '🔥',
   region: 'global',
   dateRange: {
@@ -11,38 +11,61 @@ export const defaultTheme: SeasonalThemeConfig = {
     end: { month: 12, day: 31 },
   },
   colors: {
-    primary: '#F97316',
+    primary: '#F97316', // Orange
     primaryContainer: '#FFF7ED',
-    secondary: '#8B5CF6',
-    secondaryContainer: '#F3F4F6',
-    accent: '#06B6D4',
-    accentContainer: '#F0F9FF',
-    background: '#FFFFFF',
+    secondary: '#EF4444', // Red
+    secondaryContainer: '#FEF2F2',
+    accent: '#FBBF24', // Amber/Gold
+    accentContainer: '#FFFBEB',
+    background: '#FFFAF5',
     backgroundGradient: [
-      'linear-gradient(135deg, #F97316 0%, #F59E0B 25%, #EAB308 50%, #84CC16 75%, #06B6D4 100%)',
-      'linear-gradient(45deg, #FFF7ED 0%, #F3F4F6 50%, #F0F9FF 100%)',
+      'linear-gradient(135deg, #F97316 0%, #EF4444 25%, #F59E0B 50%, #DC2626 75%, #FBBF24 100%)',
+      'linear-gradient(45deg, #FFF7ED 0%, #FEF2F2 50%, #FFFBEB 100%)',
     ],
     surface: '#FFFFFF',
-    surfaceVariant: '#F9FAFB',
+    surfaceVariant: '#FFF7ED',
     text: '#1F2937',
     textSecondary: '#6B7280',
-    border: '#E5E7EB',
+    border: '#FDBA74',
+  },
+  darkModeColors: {
+    primary: '#FB923C', // Brighter orange for dark
+    primaryContainer: '#7C2D12',
+    secondary: '#F87171', // Lighter red for visibility
+    secondaryContainer: '#7F1D1D',
+    accent: '#FCD34D', // Brighter gold
+    accentContainer: '#78350F',
+    background: '#0C0A09',
+    surface: '#1C1917',
+    surfaceVariant: '#292524',
+    text: '#FEF2F2',
+    textSecondary: '#FED7AA',
+    border: '#EA580C',
   },
   backgroundEffects: {
     gradientAnimation: true,
     particleEffects: {
       enabled: true,
-      count: 20,
-      colors: ['#F97316', '#8B5CF6', '#06B6D4', '#EAB308', '#84CC16'],
-      shapes: ['circle', 'star'],
-      size: { min: 4, max: 12 },
-      speed: { min: 0.5, max: 1.5 },
-      opacity: { min: 0.2, max: 0.6 },
-      direction: 'random',
-      animation: 'float',
+      count: 35,
+      colors: [
+        '#F97316', // Orange
+        '#EF4444', // Red
+        '#FBBF24', // Amber
+        '#FB923C', // Light Orange
+        '#FCD34D', // Gold
+        '#DC2626', // Deep Red
+      ],
+      shapes: ['flame'],
+      size: { min: 6, max: 18 },
+      speed: { min: 0.8, max: 2.5 },
+      opacity: { min: 0.4, max: 0.85 },
+      direction: 'up',
+      animation: 'sparkle',
     },
-    glowEffects: false,
-    pulsing: false,
+    overlayPattern: undefined,
+    overlayOpacity: 0,
+    glowEffects: true,
+    pulsing: true,
   },
   soundTheme: {
     interactions: {
@@ -61,36 +84,69 @@ export const defaultTheme: SeasonalThemeConfig = {
   customCSS: `
     .default-theme {
       --smooth-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --ember-glow: ember-glow 2s ease-in-out infinite alternate;
+      --fire-flicker: fire-flicker 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes ember-glow {
+      0% { 
+        filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.4));
+      }
+      100% { 
+        filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.6));
+      }
+    }
+    
+    @keyframes fire-flicker {
+      0%, 100% { 
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+      25% { 
+        opacity: 0.9;
+        transform: scale(1.02) translateY(-1px);
+      }
+      50% { 
+        opacity: 1;
+        transform: scale(0.98) translateY(1px);
+      }
+      75% { 
+        opacity: 0.95;
+        transform: scale(1.01) translateY(-0.5px);
+      }
     }
     
     .default-theme .flames-letter {
       transition: var(--smooth-transition);
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+      animation: var(--ember-glow);
     }
     
     .default-theme .flames-letter:hover {
       transform: translateY(-2px);
-      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+      filter: drop-shadow(0 4px 12px rgba(249, 115, 22, 0.5));
     }
     
     .default-theme .result-card {
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid rgba(229, 231, 235, 0.8);
+      background: linear-gradient(135deg, 
+        rgba(249, 115, 22, 0.1) 0%, 
+        rgba(239, 68, 68, 0.08) 50%, 
+        rgba(251, 191, 36, 0.1) 100%);
+      border: 1px solid rgba(249, 115, 22, 0.3);
       backdrop-filter: blur(10px);
       transition: var(--smooth-transition);
     }
     
     .default-theme .gradient-background {
       background: linear-gradient(135deg, 
-        rgba(249, 115, 22, 0.1) 0%, 
-        rgba(139, 92, 246, 0.1) 50%, 
-        rgba(6, 182, 212, 0.1) 100%);
+        rgba(249, 115, 22, 0.15) 0%, 
+        rgba(239, 68, 68, 0.12) 50%, 
+        rgba(251, 191, 36, 0.15) 100%);
     }
   `,
   assets: {
     logo: '/assets/logo.svg',
     background: '/assets/background.jpg',
-    patterns: ['/patterns/default-pattern.svg'],
+    patterns: [],
     icons: {
       flame: '/assets/flame-icon.svg',
       heart: '/assets/heart-icon.svg',

@@ -85,7 +85,7 @@ export const valentineTheme: SeasonalThemeConfig = {
   `,
   assets: {
     logo: '/assets/themes/valentine/logo.svg',
-    background: '/assets/themes/valentine/background.jpg',
+    background: '/assets/themes/valentine/background.svg',
     patterns: ['/assets/themes/valentine/hearts-pattern.svg', '/assets/themes/valentine/cupid-pattern.svg'],
     icons: {
       heart: '/assets/themes/valentine/heart-icon.svg',

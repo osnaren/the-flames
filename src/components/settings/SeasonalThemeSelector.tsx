@@ -7,7 +7,7 @@ import { useSeasonalTheme } from '@/themes/seasonal/useSeasonalTheme';
 import { cn } from '@/utils';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 // Theme display order - organized by season/time
 const THEME_ORDER: SeasonalTheme[] = [
@@ -125,40 +125,60 @@ function SeasonalThemeSelector({ isExpanded }: SeasonalThemeSelectorProps) {
 
   const handleThemeSelect = useCallback(
     (themeId: SeasonalTheme) => {
-      if (themeId === 'default') {
-        // Reset to auto-detection
-        setManualTheme(null);
-      } else {
-        setManualTheme(themeId);
-      }
+      // Always set the manual theme, even for 'default'
+      // This ensures we override auto-detection when user explicitly chooses 'default'
+      setManualTheme(themeId);
     },
     [setManualTheme]
   );
 
+  // Get ordered theme configs - defined before getVisibleTheme
+  const orderedThemes = useMemo(() => THEME_ORDER.map((id) => themes[id]).filter(Boolean), [themes]);
+
+  // Get the theme at the currently visible center position
+  const getVisibleTheme = useCallback((): SeasonalTheme | null => {
+    if (!api) return null;
+    const selectedIndex = api.selectedScrollSnap();
+    return orderedThemes[selectedIndex]?.id || null;
+  }, [api, orderedThemes]);
+
   const handleScrollPrev = useCallback(() => {
-    api?.scrollPrev();
-  }, [api]);
+    if (!api) return;
+    api.scrollPrev();
+    // After scrolling, select the newly visible theme
+    setTimeout(() => {
+      const themeId = getVisibleTheme();
+      if (themeId && themeId !== currentTheme) {
+        handleThemeSelect(themeId);
+      }
+    }, 150);
+  }, [api, getVisibleTheme, currentTheme, handleThemeSelect]);
 
   const handleScrollNext = useCallback(() => {
-    api?.scrollNext();
-  }, [api]);
+    if (!api) return;
+    api.scrollNext();
+    // After scrolling, select the newly visible theme
+    setTimeout(() => {
+      const themeId = getVisibleTheme();
+      if (themeId && themeId !== currentTheme) {
+        handleThemeSelect(themeId);
+      }
+    }, 150);
+  }, [api, getVisibleTheme, currentTheme, handleThemeSelect]);
 
   // Keyboard navigation for the whole selector
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
-        api?.scrollPrev();
+        handleScrollPrev();
       } else if (e.key === 'ArrowRight') {
         e.preventDefault();
-        api?.scrollNext();
+        handleScrollNext();
       }
     },
-    [api]
+    [handleScrollPrev, handleScrollNext]
   );
-
-  // Get ordered theme configs
-  const orderedThemes = THEME_ORDER.map((id) => themes[id]).filter(Boolean);
 
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions

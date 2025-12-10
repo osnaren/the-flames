@@ -3,7 +3,7 @@ import { SeasonalThemeConfig } from '../types';
 export const onamTheme: SeasonalThemeConfig = {
   id: 'onam',
   name: 'Onam',
-  description: 'Kerala harvest festival - pookalam flowers and traditional elegance',
+  description: 'Kerala harvest festival - pookolam flowers and traditional elegance',
   emoji: '🌸',
   region: 'india',
   dateRange: {
@@ -57,7 +57,7 @@ export const onamTheme: SeasonalThemeConfig = {
       direction: 'down',
       animation: 'float',
     },
-    overlayPattern: '/patterns/pookalam.svg',
+    overlayPattern: '/patterns/onam.png',
     overlayOpacity: 0.06,
     glowEffects: true,
     pulsing: false, // More serene feel
@@ -154,9 +154,9 @@ export const onamTheme: SeasonalThemeConfig = {
   `,
   assets: {
     logo: '/assets/themes/onam/logo.svg',
-    background: '/assets/themes/onam/background.jpg',
+    background: '/assets/themes/onam/background.svg',
     patterns: [
-      '/assets/themes/onam/pookalam-pattern.svg',
+      '/assets/themes/onam/pookolam-pattern.svg',
       '/assets/themes/onam/flower-pattern.svg',
       '/assets/themes/onam/kasavu-pattern.svg',
     ],

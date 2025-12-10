@@ -4,7 +4,7 @@ import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { usePreferences } from '@hooks/usePreferences';
 import Toggle from '@ui/Toggle';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { ChevronUp, Flame, Moon, MousePointerClick, Palette, Settings, Sun, Volume2, VolumeX } from 'lucide-react';
+import { ChevronUp, Flame, Moon, MousePointerClick, Palette, Settings, Sun } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function FloatingControlPanel() {
@@ -14,7 +14,7 @@ export default function FloatingControlPanel() {
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  const [{ isDarkTheme, isSoundEnabled }, { toggleTheme, toggleSound, toggleAnimations }] = usePreferences();
+  const [{ isDarkTheme }, { toggleTheme, toggleAnimations }] = usePreferences();
   const { shouldAnimate } = useAnimationPreferences();
 
   // Local wrapper for toggling animations to ensure parent state is updated too
@@ -136,17 +136,18 @@ export default function FloatingControlPanel() {
       inactiveColor: 'text-on-surface-variant',
       ariaLabel: shouldAnimate ? 'Turn off animations' : 'Turn on animations',
     },
-    {
-      label: 'Sound',
-      activeIcon: Volume2,
-      inactiveIcon: VolumeX,
-      active: isSoundEnabled,
-      toggle: toggleSound,
-      color: 'bg-linear-to-r from-secondary-container/30 to-secondary/10',
-      activeColor: 'text-secondary text-glow-sm',
-      inactiveColor: 'text-on-surface-variant',
-      ariaLabel: isSoundEnabled ? 'Turn off sound' : 'Turn on sound',
-    },
+    // Disabled sound control for now
+    // {
+    //   label: 'Sound',
+    //   activeIcon: Volume2,
+    //   inactiveIcon: VolumeX,
+    //   active: isSoundEnabled,
+    //   toggle: toggleSound,
+    //   color: 'bg-linear-to-r from-secondary-container/30 to-secondary/10',
+    //   activeColor: 'text-secondary text-glow-sm',
+    //   inactiveColor: 'text-on-surface-variant',
+    //   ariaLabel: isSoundEnabled ? 'Turn off sound' : 'Turn on sound',
+    // },
   ];
 
   // Animation variants
@@ -267,13 +268,10 @@ export default function FloatingControlPanel() {
                 ))}
 
                 {/* Seasonal Theme Selector */}
-                <motion.div
-                  className="border-outline/20 mt-3 border-t pt-3"
-                  variants={childVariants}
-                >
+                <motion.div className="border-outline/20 mt-3 border-t pt-3" variants={childVariants}>
                   <div className="mb-2 flex items-center gap-1.5">
                     <Palette className="text-secondary h-3.5 w-3.5" />
-                    <span className="text-on-surface-variant text-[10px] font-medium uppercase tracking-wide">
+                    <span className="text-on-surface-variant text-[10px] font-medium tracking-wide uppercase">
                       Seasonal Theme
                     </span>
                   </div>

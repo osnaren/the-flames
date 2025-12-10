@@ -57,7 +57,7 @@ export const pongalTheme: SeasonalThemeConfig = {
       direction: 'up',
       animation: 'float',
     },
-    overlayPattern: '/patterns/kolam.svg',
+    overlayPattern: '/patterns/pongal.jpg',
     overlayOpacity: 0.05,
     glowEffects: true,
     pulsing: true,
@@ -164,7 +164,7 @@ export const pongalTheme: SeasonalThemeConfig = {
   `,
   assets: {
     logo: '/assets/themes/pongal/logo.svg',
-    background: '/assets/themes/pongal/background.jpg',
+    background: '/assets/themes/pongal/background.svg',
     patterns: [
       '/assets/themes/pongal/kolam-pattern.svg',
       '/assets/themes/pongal/sugarcane-pattern.svg',
