@@ -9,6 +9,8 @@ import { memo, useCallback, useEffect, useRef } from 'react';
 // Critical components - loaded immediately
 import { AnimatedHeader } from './components/AnimatedHeader';
 import { InputForm } from './components/InputForm';
+import { RecentMatchesSection } from './components/RecentMatches';
+import type { MatchEntry } from './components/RecentMatches/types';
 import { useFlamesEngine } from './hooks/useFlamesEngine';
 
 // Dynamically loaded components for code splitting
@@ -91,6 +93,23 @@ function HomePage() {
   const handleProcessorComplete = useCallback(() => {
     onFlamesAnimationComplete();
   }, [onFlamesAnimationComplete]);
+
+  // Handle replay from recent matches
+  const handleMatchReplay = useCallback(
+    (match: MatchEntry) => {
+      // Reset game first if in result stage
+      if (stage === 'result') {
+        resetGame();
+      }
+      
+      // Set names from the match (with a small delay to ensure reset completes)
+      setTimeout(() => {
+        setName1(match.name1);
+        setName2(match.name2);
+      }, 50);
+    },
+    [stage, resetGame, setName1, setName2]
+  );
 
   return (
     <section
@@ -204,6 +223,21 @@ function HomePage() {
             <p className="font-handwriting text-on-surface-variant/60 text-xs">
               ✨ The classic relationship game, reimagined with modern magic ✨
             </p>
+          </motion.div>
+        )}
+
+        {/* Recent Matches Section - only on input stage */}
+        {stage === 'input' && (
+          <motion.div
+            className="mt-8"
+            initial={shouldAnimate ? { opacity: 0, y: 20 } : { opacity: 1 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 0.5 }}
+          >
+            <RecentMatchesSection
+              displayCount={5}
+              onMatchClick={handleMatchReplay}
+            />
           </motion.div>
         )}
       </div>

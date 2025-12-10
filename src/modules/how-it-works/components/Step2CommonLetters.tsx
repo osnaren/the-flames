@@ -58,7 +58,7 @@ export default function Step2CommonLetters({ name1, name2, commonLetters }: Step
             onMouseLeave={() => setHoveredLetter(null)}
           >
             <motion.span
-              className={`relative inline-flex min-w-[2rem] cursor-pointer items-center justify-center rounded-lg px-2 py-2 text-xl font-bold shadow-sm transition-all duration-300 md:min-w-[2.5rem] md:px-3 md:py-3 md:text-2xl ${
+              className={`relative inline-flex min-w-8 cursor-pointer items-center justify-center rounded-lg px-2 py-2 text-xl font-bold shadow-sm transition-all duration-300 md:min-w-10 md:px-3 md:py-3 md:text-2xl ${
                 isCommon
                   ? 'bg-error-container/30 text-error border-error/20 line-through decoration-4'
                   : 'bg-surface-container-high text-on-surface hover:bg-surface-container-highest border-outline/10'

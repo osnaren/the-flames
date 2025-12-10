@@ -221,11 +221,8 @@ export function usePairingHistory() {
     [badges]
   );
 
-  // Load data from localStorage on mount
-  useEffect(() => {
-    // Guard against SSR - localStorage is not available on server
-    if (typeof window === 'undefined') return;
-
+  // Load data from localStorage
+  const loadFromStorage = useCallback(() => {
     try {
       const savedHistory = localStorage.getItem(STORAGE_KEY);
       const savedBadges = localStorage.getItem(BADGES_KEY);
@@ -251,6 +248,35 @@ export function usePairingHistory() {
     }
   }, [calculateStats]);
 
+  // Initial load and event listeners
+  useEffect(() => {
+    // Guard against SSR
+    if (typeof window === 'undefined') return;
+
+    // Initial load
+    loadFromStorage();
+
+    // Listen for storage changes (cross-tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY || e.key === BADGES_KEY) {
+        loadFromStorage();
+      }
+    };
+
+    // Listen for local updates (same-tab)
+    const handleLocalUpdate = () => {
+      loadFromStorage();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('flames-history-update', handleLocalUpdate);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('flames-history-update', handleLocalUpdate);
+    };
+  }, [loadFromStorage]);
+
   // Add a new pairing to history
   const addPairing = useCallback(
     (name1: string, name2: string, result: FlamesResult) => {
@@ -269,6 +295,10 @@ export function usePairingHistory() {
       // Save to localStorage
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
+        // Dispatch custom event for other components (e.g., RecentMatchesSection)
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('flames-history-update'));
+        }
       } catch {
         // localStorage save failed - history persists in memory
       }
@@ -291,6 +321,10 @@ export function usePairingHistory() {
     });
     try {
       localStorage.removeItem(STORAGE_KEY);
+      // Dispatch custom event for other components (e.g., RecentMatchesSection)
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('flames-history-update'));
+      }
     } catch {
       // localStorage clear failed - state is already cleared
     }

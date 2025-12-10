@@ -128,7 +128,7 @@ function ResultActionsDock({
       )}
     >
       {/* Primary Actions */}
-      <DockButton icon={RotateCcw} label="Retry" onClick={onRetry} variant="secondary" delay={0} />
+      <DockButton icon={RotateCcw} label="Reset" onClick={onRetry} variant="secondary" delay={0} />
 
       <DockButton icon={Share2} label="Share" onClick={onShare} variant="primary" delay={0.05} />
 
