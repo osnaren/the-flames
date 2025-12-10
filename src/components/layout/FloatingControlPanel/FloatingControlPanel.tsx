@@ -4,7 +4,7 @@ import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { usePreferences } from '@hooks/usePreferences';
 import Toggle from '@ui/Toggle';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { ChevronUp, Flame, Moon, MousePointerClick, Palette, Settings, Sun } from 'lucide-react';
+import { ChevronUp, Moon, MousePointerClick, Palette, Power, PowerOff, Settings, Sun } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function FloatingControlPanel() {
@@ -127,8 +127,8 @@ export default function FloatingControlPanel() {
     },
     {
       label: 'Animations',
-      activeIcon: Flame,
-      inactiveIcon: Flame,
+      activeIcon: Power,
+      inactiveIcon: PowerOff,
       active: shouldAnimate,
       toggle: handleToggleAnimations,
       color: 'bg-linear-to-r from-primary-container/30 to-primary/10',
