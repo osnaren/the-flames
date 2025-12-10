@@ -109,6 +109,7 @@ export default function AboutPage() {
           className="z-10"
         >
           <SparklesText
+            as="h1"
             className="mb-4 text-6xl font-extrabold tracking-tighter md:text-8xl"
             colors={{ first: '#FF5733', second: '#C70039' }}
           >

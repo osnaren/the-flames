@@ -135,6 +135,8 @@ export function generatePageMetadata(options: {
       title,
       description,
       url,
+      type: 'website',
+      siteName: siteConfig.name,
       images: ogImage
         ? [
             {
@@ -179,6 +181,7 @@ export function generateResultMetadata(name1: string, name2: string, result: str
       title,
       description,
       type: 'website',
+      siteName: siteConfig.name,
       images: [
         {
           url: ogImageUrl,

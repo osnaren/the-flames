@@ -59,6 +59,7 @@ export default function PrivacyPage() {
           </div>
 
           <SparklesText
+            as="h1"
             className="mb-4 text-5xl font-extrabold tracking-tighter md:text-7xl"
             colors={{ first: '#8B5CF6', second: '#EC4899' }}
           >

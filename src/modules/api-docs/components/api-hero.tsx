@@ -46,6 +46,7 @@ export function ApiHero() {
           </Badge>
         )}
         <SparklesText
+          as="h1"
           className="mb-4 text-5xl font-extrabold tracking-tighter md:text-7xl"
           colors={{ first: '#3b82f6', second: '#8b5cf6' }}
         >

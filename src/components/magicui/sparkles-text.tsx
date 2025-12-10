@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { CSSProperties, ReactElement, useEffect, useId, useState } from 'react';
+import { CSSProperties, useEffect, useId, useState } from 'react';
 
 import { cn } from '@/utils';
 
@@ -41,12 +41,12 @@ const Sparkle: React.FC<SparkleType> = ({ id, x, y, color, delay, scale }) => {
 
 interface SparklesTextProps {
   /**
-   * @default <div />
-   * @type ReactElement
+   * @default "div"
+   * @type React.ElementType
    * @description
    * The component to be rendered as the text
    * */
-  as?: ReactElement;
+  as?: React.ElementType;
 
   /**
    * @default ""
@@ -89,6 +89,7 @@ export const SparklesText: React.FC<SparklesTextProps> = ({
   colors = { first: '#9E7AFF', second: '#FE8BBB' },
   className,
   sparklesCount = 10,
+  as: Component = 'div',
   ...props
 }) => {
   const [sparkles, setSparkles] = useState<SparkleType[]>([]);
@@ -139,7 +140,7 @@ export const SparklesText: React.FC<SparklesTextProps> = ({
   }, [colors.first, colors.second, sparklesCount, isMounted, instanceId]);
 
   return (
-    <div
+    <Component
       className={cn('text-6xl font-bold', className)}
       {...props}
       style={
@@ -153,6 +154,6 @@ export const SparklesText: React.FC<SparklesTextProps> = ({
         {isMounted && sparkles.map((sparkle) => <Sparkle key={sparkle.id} {...sparkle} />)}
         <strong>{children}</strong>
       </span>
-    </div>
+    </Component>
   );
 };

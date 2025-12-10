@@ -423,6 +423,9 @@ export default function CanvasExperience({
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,var(--color-on-surface)_1px,transparent_0)] bg-size-[20px_20px] opacity-5" />
 
       {/* Header with Tools and Instructions */}
+      <h1 className="sr-only">
+        Canvas Mode: {name1} & {name2}
+      </h1>
       <div
         className={cn(
           'flex w-full items-center justify-center gap-4 p-4',
