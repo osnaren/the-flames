@@ -112,7 +112,7 @@ function Logo({
             initial="initial"
             whileHover="hover"
             variants={textVariants}
-            className={`font-heading from-primary-container to-error-container bg-linear-to-r bg-size-[200%] bg-clip-text text-xl font-bold text-transparent ${textClassName}`}
+            className={`font-handwriting from-primary-container to-error-container bg-linear-to-r bg-size-[200%] bg-clip-text text-xl font-bold text-transparent ${textClassName}`}
           >
             FLAMES
           </motion.span>

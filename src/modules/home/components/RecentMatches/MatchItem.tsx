@@ -155,7 +155,7 @@ function MatchItem({ match, index, onClick, shouldAnimate }: MatchItemProps) {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.15 }}
-              className="text-primary flex items-center gap-1 text-xs font-medium"
+              className="text-primary flex items-center gap-1 self-end text-xs font-medium"
             >
               <Play className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
               <span className="hidden sm:inline">Replay</span>

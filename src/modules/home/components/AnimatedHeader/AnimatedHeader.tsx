@@ -43,7 +43,7 @@ function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) 
     <motion.div
       role="group"
       aria-label="FLAMES title"
-      className="relative mb-8 text-center md:mb-12"
+      className="font-handwriting relative mb-8 text-center md:mb-12"
       initial={shouldAnimate ? { opacity: 0, y: -20 } : { opacity: 1, y: 0 }}
       animate={{
         opacity: 1,
