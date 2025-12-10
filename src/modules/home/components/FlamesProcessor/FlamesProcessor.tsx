@@ -11,6 +11,7 @@ interface FlamesProcessorProps {
   result: FlamesResult;
   onComplete: () => void;
   shouldAnimate: boolean;
+  runId?: number;
 }
 
 type ProcessingPhase = 'names-reveal' | 'striking' | 'counting' | 'result-reveal' | 'complete';
@@ -38,6 +39,7 @@ function FlamesProcessorComponent({
   result,
   onComplete,
   shouldAnimate,
+  runId,
 }: FlamesProcessorProps) {
   const [phase, setPhase] = useState<ProcessingPhase>('names-reveal');
   const [struckLetters, setStruckLetters] = useState<Set<number>>(new Set());
@@ -45,183 +47,221 @@ function FlamesProcessorComponent({
   const [eliminatedFlames, setEliminatedFlames] = useState<Set<number>>(new Set());
   const [showSkip, setShowSkip] = useState(false);
   const [countDisplay, setCountDisplay] = useState(0);
+  const [showFlames, setShowFlames] = useState(false);
 
-  // Track the current position across elimination rounds
+  // Refs for tracking state across async callbacks
   const currentPositionRef = useRef<number>(-1);
+  const eliminatedRef = useRef<Set<number>>(new Set());
+  const remainingIndicesRef = useRef<number[]>([0, 1, 2, 3, 4, 5]);
+  const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
+  const isCancelledRef = useRef(false);
+  const flamesAnimatedRef = useRef(false);
+
+  // Memoize dependencies to prevent unnecessary restarts
+  const commonLettersKey = useMemo(() => JSON.stringify(commonLetters), [commonLetters]);
+  const safeRemainingCount = Math.max(1, remainingCount);
 
   // Prepare letter data
   const name1Letters = useMemo(() => name1.toUpperCase().split(''), [name1]);
   const name2Letters = useMemo(() => name2.toUpperCase().split(''), [name2]);
   const commonSet = useMemo(() => new Set(commonLetters.map((l) => l.toUpperCase())), [commonLetters]);
 
-  // Find indices of common letters to strike
+  // Dynamic strike completion time based on letter counts and animation delays
+  const strikeAnimationDuration = useMemo(() => {
+    const NAME1_DELAY_STEP = 50; // ms per letter for the staggered reveal
+    const NAME2_BASE_DELAY = 300; // ms initial delay before second name starts animating
+    const ANIMATION_DURATION = 300; // ms duration for each letter animation
+
+    const name1LastFinish =
+      name1Letters.length > 0 ? (name1Letters.length - 1) * NAME1_DELAY_STEP + ANIMATION_DURATION : 0;
+    const name2LastFinish =
+      name2Letters.length > 0
+        ? NAME2_BASE_DELAY + (name2Letters.length - 1) * NAME1_DELAY_STEP + ANIMATION_DURATION
+        : 0;
+
+    const longestStrike = Math.max(name1LastFinish, name2LastFinish);
+
+    // Ensure we never go below the legacy static duration, and add a small buffer for safety
+    return Math.max(PROCESSOR_TIMING.STRIKE_DURATION, longestStrike + 150);
+  }, [name1Letters.length, name2Letters.length]);
+
+  // Find indices of common letters to strike (one occurrence matched to one occurrence)
   const getStrikeIndices = useCallback(() => {
+    // Build lists that skip spaces but keep original indices for accurate striking
+    const filtered1 = name1Letters.map((char, idx) => ({ char, idx })).filter(({ char }) => char.trim().length > 0);
+    const filtered2 = name2Letters.map((char, idx) => ({ char, idx })).filter(({ char }) => char.trim().length > 0);
+
+    const matched1 = new Set<number>();
+    const matched2 = new Set<number>();
     const indices1: number[] = [];
     const indices2: number[] = [];
-    const usedCommon = new Set<string>();
 
-    name1Letters.forEach((letter, idx) => {
-      if (commonSet.has(letter) && !usedCommon.has(`1-${letter}-${idx}`)) {
+    for (const { char, idx } of filtered1) {
+      // Find the first unmatched occurrence of this char in name2
+      const match = filtered2.find(({ char: c2, idx: idx2 }) => c2 === char && !matched2.has(idx2));
+      if (match) {
+        matched1.add(idx);
+        matched2.add(match.idx);
         indices1.push(idx);
-        usedCommon.add(`1-${letter}-${idx}`);
+        indices2.push(match.idx);
       }
-    });
-
-    name2Letters.forEach((letter, idx) => {
-      if (commonSet.has(letter) && !usedCommon.has(`2-${letter}-${idx}`)) {
-        indices2.push(idx);
-        usedCommon.add(`2-${letter}-${idx}`);
-      }
-    });
+    }
 
     return { indices1, indices2 };
-  }, [name1Letters, name2Letters, commonSet]);
+  }, [name1Letters, name2Letters]);
 
   // Handle skip
   const handleSkip = useCallback(() => {
+    isCancelledRef.current = true;
+    timeoutsRef.current.forEach(clearTimeout);
     setPhase('complete');
     onComplete();
   }, [onComplete]);
 
-  // Main animation sequence
+  // Helper to add timeout and track it
+  const addTimeout = useCallback((callback: () => void, delay: number) => {
+    const id = setTimeout(() => {
+      if (!isCancelledRef.current) {
+        callback();
+      }
+    }, delay);
+    timeoutsRef.current.push(id);
+    return id;
+  }, []);
+
+  // Reset state when animation should start
   useEffect(() => {
     if (!shouldAnimate) {
-      // Skip all animations
       setPhase('complete');
       setTimeout(onComplete, 100);
       return;
     }
 
-    let timeouts: NodeJS.Timeout[] = [];
-    let isCancelled = false;
+    // Reset refs and state
+    isCancelledRef.current = false;
+    currentPositionRef.current = -1;
+    eliminatedRef.current = new Set();
+    remainingIndicesRef.current = [0, 1, 2, 3, 4, 5];
 
-    const runSequence = async () => {
-      // Show skip button after 1.5 seconds
-      timeouts.push(setTimeout(() => setShowSkip(true), 1500));
-
-      // Phase 1: Names Reveal - wait for names to fully appear
-      timeouts.push(
-        setTimeout(() => {
-          if (isCancelled) return;
-          setPhase('striking');
-
-          // Phase 2: Strike common letters with a slight delay for visual effect
-          const { indices1, indices2 } = getStrikeIndices();
-          const allIndices = [
-            ...indices1.map((i) => ({ name: 1, idx: i })),
-            ...indices2.map((i) => ({ name: 2, idx: i })),
-          ];
-
-          // Strike all at once after the phase change is visible
-          timeouts.push(
-            setTimeout(() => {
-              if (isCancelled) return;
-              setStruckLetters(new Set(allIndices.map(({ name, idx }) => name * 100 + idx)));
-            }, PROCESSOR_TIMING.STRIKE_DELAY)
-          );
-
-          // Phase 3: Start FLAMES counting AFTER striking is complete
-          timeouts.push(
-            setTimeout(() => {
-              if (isCancelled) return;
-              setPhase('counting');
-
-              // Initialize tracking variables
-              const eliminated = new Set<number>();
-              let remainingIndices = [0, 1, 2, 3, 4, 5];
-              currentPositionRef.current = -1; // Start before first letter
-
-              const runEliminationRound = () => {
-                if (isCancelled) return;
-
-                if (remainingIndices.length === 1) {
-                  // Found the result - show final letter
-                  const finalIndex = remainingIndices[0];
-                  setActiveFlamesIndex(finalIndex);
-                  setCountDisplay(0);
-                  setPhase('result-reveal');
-
-                  timeouts.push(
-                    setTimeout(() => {
-                      if (isCancelled) return;
-                      setPhase('complete');
-                      onComplete();
-                    }, PROCESSOR_TIMING.RESULT_REVEAL)
-                  );
-                  return;
-                }
-
-                // Count through remaining letters
-                let count = 0;
-                const totalCount = remainingCount;
-
-                const countStep = () => {
-                  if (isCancelled) return;
-
-                  if (count < totalCount) {
-                    count++;
-                    setCountDisplay(count);
-
-                    // Move to next active (non-eliminated) letter
-                    let nextIndex = currentPositionRef.current;
-                    do {
-                      nextIndex = (nextIndex + 1) % 6; // FLAMES has 6 letters
-                    } while (eliminated.has(nextIndex));
-
-                    currentPositionRef.current = nextIndex;
-                    setActiveFlamesIndex(nextIndex);
-
-                    timeouts.push(setTimeout(countStep, PROCESSOR_TIMING.COUNT_PER_LETTER));
-                  } else {
-                    // Count complete - eliminate the current letter
-                    const eliminatedIdx = currentPositionRef.current;
-
-                    // Brief pause before elimination for visual clarity
-                    timeouts.push(
-                      setTimeout(() => {
-                        if (isCancelled) return;
-
-                        eliminated.add(eliminatedIdx);
-                        setEliminatedFlames(new Set(eliminated));
-                        setCountDisplay(0);
-
-                        // Remove from remaining
-                        remainingIndices = remainingIndices.filter((i) => i !== eliminatedIdx);
-
-                        // Clear active highlight briefly before next round
-                        setActiveFlamesIndex(null);
-
-                        // Start next round after a pause
-                        timeouts.push(
-                          setTimeout(() => {
-                            if (isCancelled) return;
-                            runEliminationRound();
-                          }, 400)
-                        );
-                      }, 200)
-                    );
-                  }
-                };
-
-                // Start counting after a brief delay
-                timeouts.push(setTimeout(countStep, PROCESSOR_TIMING.COUNT_START));
-              };
-
-              // Begin the first elimination round
-              runEliminationRound();
-            }, PROCESSOR_TIMING.STRIKE_DELAY + PROCESSOR_TIMING.STRIKE_DURATION)
-          );
-        }, PROCESSOR_TIMING.NAMES_REVEAL)
-      );
-    };
-
-    runSequence();
+    // Start sequence
+    setPhase('names-reveal');
+    addTimeout(() => setShowSkip(true), 1500);
 
     return () => {
-      isCancelled = true;
-      timeouts.forEach(clearTimeout);
+      isCancelledRef.current = true;
+      timeoutsRef.current.forEach(clearTimeout);
+      timeoutsRef.current = [];
     };
-  }, [shouldAnimate, remainingCount, getStrikeIndices, onComplete]);
+  }, [shouldAnimate, commonLettersKey, safeRemainingCount, onComplete, addTimeout, runId]);
+
+  // Phase transition logic
+  useEffect(() => {
+    if (isCancelledRef.current || !shouldAnimate) return;
+
+    switch (phase) {
+      case 'names-reveal':
+        addTimeout(() => setPhase('striking'), PROCESSOR_TIMING.NAMES_REVEAL);
+        break;
+
+      case 'striking': {
+        // Calculate strike indices
+        const { indices1, indices2 } = getStrikeIndices();
+        const allIndices = [
+          ...indices1.map((i) => ({ name: 1, idx: i })),
+          ...indices2.map((i) => ({ name: 2, idx: i })),
+        ];
+
+        // Strike letters after delay
+        addTimeout(() => {
+          setStruckLetters(new Set(allIndices.map(({ name, idx }) => name * 100 + idx)));
+
+          // Move to counting after strike duration
+          addTimeout(() => setPhase('counting'), strikeAnimationDuration);
+        }, PROCESSOR_TIMING.STRIKE_DELAY);
+        break;
+      }
+
+      case 'counting':
+        setShowFlames(true);
+        flamesAnimatedRef.current = false;
+
+        // Wait for FLAMES to animate in, then start counting
+        addTimeout(() => {
+          flamesAnimatedRef.current = true;
+          startEliminationProcess();
+        }, 600);
+        break;
+
+      case 'result-reveal':
+        addTimeout(() => {
+          setPhase('complete');
+          onComplete();
+        }, PROCESSOR_TIMING.RESULT_REVEAL);
+        break;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, shouldAnimate]); // Only re-run when phase changes
+
+  // Counting logic
+  const startEliminationProcess = useCallback(() => {
+    const runCountingRound = () => {
+      // If only one letter remains, reveal immediately without extra counting cycles
+      if (remainingIndicesRef.current.length === 1) {
+        const [onlyIdx] = remainingIndicesRef.current;
+        setActiveFlamesIndex(onlyIdx);
+        setCountDisplay(0);
+        setPhase('result-reveal');
+        return;
+      }
+
+      let count = 0;
+
+      const countStep = () => {
+        if (count < safeRemainingCount) {
+          count++;
+          setCountDisplay(count);
+
+          // Find next non-eliminated letter
+          let nextPos = currentPositionRef.current;
+          do {
+            nextPos = (nextPos + 1) % 6;
+          } while (eliminatedRef.current.has(nextPos));
+
+          currentPositionRef.current = nextPos;
+          setActiveFlamesIndex(nextPos);
+
+          addTimeout(countStep, PROCESSOR_TIMING.COUNT_PER_LETTER);
+        } else {
+          // Count complete
+          const remaining = remainingIndicesRef.current;
+
+          if (remaining.length === 1) {
+            // Result found!
+            setActiveFlamesIndex(remaining[0]);
+            setCountDisplay(0);
+            setPhase('result-reveal');
+          } else {
+            // Eliminate current letter
+            const eliminatedIdx = currentPositionRef.current;
+            eliminatedRef.current.add(eliminatedIdx);
+            setEliminatedFlames(new Set(eliminatedRef.current));
+            remainingIndicesRef.current = remainingIndicesRef.current.filter((i) => i !== eliminatedIdx);
+            setCountDisplay(0);
+
+            // Pause then next round
+            addTimeout(() => {
+              setActiveFlamesIndex(null);
+              addTimeout(runCountingRound, 300);
+            }, 350);
+          }
+        }
+      };
+
+      addTimeout(countStep, PROCESSOR_TIMING.COUNT_START);
+    };
+
+    runCountingRound();
+  }, [safeRemainingCount, addTimeout]);
 
   const resultData = result ? FLAMES_DATA.find((f) => f.letter === result) : null;
 
@@ -386,7 +426,7 @@ function FlamesProcessorComponent({
 
           {/* Remaining count badge */}
           <AnimatePresence>
-            {(phase === 'counting' || phase === 'result-reveal') && (
+            {showFlames && (
               <motion.div
                 className="flex justify-center"
                 initial={{ opacity: 0, y: 10 }}
@@ -401,7 +441,7 @@ function FlamesProcessorComponent({
           </AnimatePresence>
 
           {/* FLAMES letters */}
-          {(phase === 'counting' || phase === 'result-reveal' || phase === 'complete') && (
+          {showFlames && (
             <motion.div
               className="pt-4"
               initial={{ opacity: 0, y: 20 }}
@@ -413,18 +453,19 @@ function FlamesProcessorComponent({
                   const isActive = activeFlamesIndex === idx;
                   const isEliminated = eliminatedFlames.has(idx);
                   const isResult = phase === 'result-reveal' && isActive;
+                  const skipInitialAnimation = flamesAnimatedRef.current;
 
                   return (
                     <motion.div
                       key={item.letter}
                       className="relative"
-                      initial={{ opacity: 0, scale: 0 }}
+                      initial={skipInitialAnimation ? false : { opacity: 0, scale: 0 }}
                       animate={{
                         opacity: isEliminated ? 0.3 : 1,
                         scale: isResult ? 1.2 : isEliminated ? 0.8 : 1,
                       }}
                       transition={{
-                        delay: idx * 0.08,
+                        delay: skipInitialAnimation ? 0 : idx * 0.08,
                         duration: 0.3,
                         type: 'spring',
                         stiffness: 200,

@@ -317,7 +317,7 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
                   'after:text-muted-foreground after:absolute after:right-4 after:bottom-2 after:text-3xl after:content-[close-quote]'
                 )}
               >
-                <span className="relative z-10">{quote}</span>
+                <span className="relative z-10 px-1">{quote}</span>
               </motion.blockquote>
 
               {/* Watermark for screenshot - hidden during normal view */}

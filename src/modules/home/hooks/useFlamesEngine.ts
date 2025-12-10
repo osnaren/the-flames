@@ -15,6 +15,7 @@ interface FlamesEngineState {
   name2: string;
   result: FlamesResult;
   stage: GameStage;
+  runId: number;
   commonLetters: string[];
   remainingLetters: string[];
   isProcessing: boolean;
@@ -51,6 +52,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
   const [name2, setName2] = useState<string>('');
   const [result, setResult] = useState<FlamesResult>(null);
   const [stage, setStage] = useState<GameStage>('input');
+  const [runId, setRunId] = useState<number>(0);
   const [commonLetters, setCommonLetters] = useState<string[]>([]);
   const [remainingLetters, setRemainingLetters] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -170,22 +172,16 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
   const progressToNextStage = useCallback(() => {
     if (!calculatedDataRef.current) return;
 
-    const {
-      result: gameResult,
-      commonLetters: gameCommon,
-      remainingLetters: gameRemaining,
-    } = calculatedDataRef.current;
+    const { result: gameResult } = calculatedDataRef.current;
 
     // Stage 1: Reveal common letters
     if (!stageProgress.commonLettersRevealed) {
-      setCommonLetters(gameCommon);
       setStageProgress((prev) => ({ ...prev, commonLettersRevealed: true }));
 
       // The common letters will stay visible, but we'll start the FLAMES animation after a delay
       addTimeout(
         () => {
           setStageProgress((prev) => ({ ...prev, flamesAnimationStarted: true }));
-          setRemainingLetters(gameRemaining);
         },
         shouldAnimate ? STAGE_TIMINGS.COMMON_LETTERS_STRIKE : 100
       );
@@ -265,6 +261,13 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
         // Calculate all game data immediately
         const gameData = calculateGameData(validName1, validName2);
         calculatedDataRef.current = gameData;
+        // Make remaining letters available to the processor immediately so counting has the correct value
+        setRemainingLetters(gameData.remainingLetters);
+        // Provide common letters up-front so the processor doesn't restart mid-animation
+        setCommonLetters(gameData.commonLetters);
+
+        // Bump runId so processors remount even if names repeat
+        setRunId((id) => id + 1);
 
         // Record match in background (non-blocking)
         if (gameData.result) {
@@ -333,6 +336,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
     setName2('');
     setResult(null);
     setStage('input');
+    setRunId(0);
     setCommonLetters([]);
     setRemainingLetters([]);
     setIsProcessing(false);
@@ -345,7 +349,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
 
     // Clear URL params
     const newUrl = window.location.pathname;
-    window.history.replaceState(null, '', newUrl);
+    window.location.href = newUrl;
   }, [clearAll]);
 
   /**
@@ -367,7 +371,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
           setIsProcessing(false);
           setStageProgress((prev) => ({ ...prev, resultRevealed: true }));
         }
-      }, 10000); // 10 second safety net
+      }, 20000); // 20 second safety net
 
       return () => clearTimeout(safetyTimeout);
     }
@@ -380,13 +384,25 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       name2,
       result,
       stage,
+      runId,
       commonLetters,
       remainingLetters,
       isProcessing,
       stageProgress,
       newlyUnlockedBadges: getNewlyUnlockedBadges(),
     }),
-    [name1, name2, result, stage, commonLetters, remainingLetters, isProcessing, stageProgress, getNewlyUnlockedBadges]
+    [
+      name1,
+      name2,
+      result,
+      stage,
+      runId,
+      commonLetters,
+      remainingLetters,
+      isProcessing,
+      stageProgress,
+      getNewlyUnlockedBadges,
+    ]
   );
 
   const actions = useMemo(

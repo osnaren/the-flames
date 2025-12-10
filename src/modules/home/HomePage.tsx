@@ -57,7 +57,7 @@ function HomePage() {
 
   // FLAMES game engine state and actions
   const [
-    { name1, name2, result, stage, commonLetters, remainingLetters, isProcessing },
+    { name1, name2, result, stage, runId, commonLetters, remainingLetters, isProcessing },
     { setName1, setName2, handleSubmit, resetGame, onFlamesAnimationComplete },
   ] = useFlamesEngine();
 
@@ -164,6 +164,7 @@ function HomePage() {
               transition={{ duration: 0.4, ease: 'easeOut' }}
             >
               <FlamesProcessor
+                key={`${runId}`}
                 name1={name1}
                 name2={name2}
                 commonLetters={commonLetters}
