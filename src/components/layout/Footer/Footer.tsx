@@ -254,7 +254,10 @@ function Footer() {
                     role="listitem"
                   >
                     <div className="flex flex-col items-center text-center">
-                      <stat.icon className="text-primary mb-1 h-5 w-5 transition-transform group-hover:scale-110" aria-hidden="true" />
+                      <stat.icon
+                        className="text-primary mb-1 h-5 w-5 transition-transform group-hover:scale-110"
+                        aria-hidden="true"
+                      />
                       <div className="text-on-surface text-sm font-bold">{stat.value}</div>
                       <div className="text-on-surface-variant text-xs leading-tight">{stat.label}</div>
                     </div>

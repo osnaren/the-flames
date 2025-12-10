@@ -96,7 +96,7 @@ export default function AboutPage() {
   return (
     <div className="bg-background text-foreground min-h-screen overflow-x-hidden font-sans">
       {/* Hero Section */}
-      <section 
+      <section
         className="relative flex min-h-[90vh] flex-col items-center justify-center space-y-8 overflow-hidden px-4 text-center"
         aria-labelledby="about-hero-title"
       >
@@ -114,7 +114,10 @@ export default function AboutPage() {
           >
             FLAMES
           </SparklesText>
-          <h2 id="about-hero-title" className="font-heading text-muted-foreground text-2xl font-light tracking-wide md:text-4xl">
+          <h2
+            id="about-hero-title"
+            className="font-heading text-muted-foreground text-2xl font-light tracking-wide md:text-4xl"
+          >
             The Nostalgia Project
           </h2>
         </motion.div>
@@ -148,7 +151,9 @@ export default function AboutPage() {
       <section className="bg-muted/10 px-4 py-32" aria-labelledby="gallery-heading">
         <div className="container mx-auto space-y-16">
           <div className="space-y-4 text-center">
-            <h2 id="gallery-heading" className="font-heading text-3xl font-bold tracking-tight md:text-5xl">Captured Memories</h2>
+            <h2 id="gallery-heading" className="font-heading text-3xl font-bold tracking-tight md:text-5xl">
+              Captured Memories
+            </h2>
             <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
               Snapshots of the past, reimagined for the future.
             </p>

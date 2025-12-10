@@ -23,10 +23,7 @@ function Fallback({ error, resetErrorBoundary }: { error: Error; resetErrorBound
 
 export default function GlobalErrorBoundary({ children }: Props) {
   return (
-    <ErrorBoundary
-      FallbackComponent={Fallback}
-      onError={(error) => Sentry.captureException(error)}
-    >
+    <ErrorBoundary FallbackComponent={Fallback} onError={(error) => Sentry.captureException(error)}>
       {children}
     </ErrorBoundary>
   );

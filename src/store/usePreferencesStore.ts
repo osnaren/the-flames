@@ -138,7 +138,7 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
 
     // Determine the actual theme that should be applied
     let isDarkTheme: boolean;
-    
+
     if (storedTheme) {
       // If user has explicitly set a preference, use it
       isDarkTheme = storedTheme === 'dark';
@@ -146,7 +146,7 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
       // Check if inline script already set dark mode (system preference or first visit)
       // This syncs the store with what the inline script determined
       const hasInlineScriptSetDark = document.documentElement.classList.contains('dark');
-      
+
       // If inline script didn't set dark mode, check system preference directly
       // This handles the case where inline script failed or wasn't run
       // Use short-circuit evaluation to avoid unnecessary matchMedia call
@@ -162,7 +162,7 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
       document.documentElement.classList.remove('dark');
       document.documentElement.setAttribute('data-theme', 'light');
     }
-    
+
     set({
       isDarkTheme,
       animationsEnabled: storedAnimations !== 'false',
@@ -177,14 +177,14 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
     // Listen for system preference changes (only if user hasn't set explicit preference)
     if (!storedTheme && typeof window !== 'undefined') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      
+
       const handleSystemThemeChange = (e: MediaQueryListEvent) => {
         // Only update if user still hasn't set an explicit preference
         const currentStoredTheme = safeLocalStorage.getItem('theme');
         if (!currentStoredTheme) {
           const newIsDark = e.matches;
           set({ isDarkTheme: newIsDark });
-          
+
           if (newIsDark) {
             document.documentElement.classList.add('dark');
             document.documentElement.setAttribute('data-theme', 'dark');
@@ -207,7 +207,7 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
 
       // Add listener
       addListener();
-      
+
       // Store cleanup function reference (module-level to avoid global namespace pollution)
       themeCleanup = removeListener;
     }

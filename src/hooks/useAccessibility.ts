@@ -72,7 +72,7 @@ export function useAnnouncer() {
   useEffect(() => {
     // Create the announcer element if it doesn't exist
     let announcer = document.getElementById('sr-announcer') as HTMLDivElement | null;
-    
+
     if (!announcer) {
       announcer = document.createElement('div');
       announcer.id = 'sr-announcer';
@@ -92,7 +92,7 @@ export function useAnnouncer() {
       `;
       document.body.appendChild(announcer);
     }
-    
+
     announcerRef.current = announcer;
 
     return () => {

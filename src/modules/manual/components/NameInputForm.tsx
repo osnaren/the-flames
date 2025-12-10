@@ -66,7 +66,10 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
   const isFormValid = name1.trim().length >= 2 && name2.trim().length >= 2;
 
   return (
-    <section className="bg-background flex min-h-svh items-center justify-center overflow-y-auto p-4" aria-label="Name input form">
+    <section
+      className="bg-background flex min-h-svh items-center justify-center overflow-y-auto p-4"
+      aria-label="Name input form"
+    >
       <motion.div variants={containerVariants} initial="hidden" animate="visible" className="w-full max-w-md">
         <div className="bg-surface/80 border-outline/20 rounded-3xl border p-6 shadow-2xl backdrop-blur-xl sm:p-8">
           <motion.div variants={itemVariants} className="mb-8 text-center">

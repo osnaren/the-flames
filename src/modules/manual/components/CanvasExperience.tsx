@@ -411,8 +411,6 @@ export default function CanvasExperience({
     };
   }, [setupCanvas]);
 
-
-
   return (
     <div
       ref={containerRef}

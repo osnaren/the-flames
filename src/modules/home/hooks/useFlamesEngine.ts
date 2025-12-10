@@ -122,7 +122,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       else params.delete('name1');
       if (newName2.trim()) params.set('name2', newName2.trim());
       else params.delete('name2');
-      
+
       // Use history API directly to avoid Next.js navigation/re-render issues
       const newUrl = `${window.location.pathname}?${params.toString()}`;
       window.history.replaceState(null, '', newUrl);

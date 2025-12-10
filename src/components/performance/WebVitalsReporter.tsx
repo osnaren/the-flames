@@ -50,9 +50,7 @@ export default function WebVitalsReporter() {
 
         console.log(`%c[Web Vital] ${metric.name}: ${value}${unit} (${rating})`, colors[rating]);
       }
-
     };
-
 
     // Register all metric handlers
     onLCP(reportMetric);

@@ -192,7 +192,12 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
                   className="font-space mb-3 flex items-center justify-center gap-3 text-lg font-medium"
                 >
                   <span className="text-gray-700 dark:text-gray-200">{name1}</span>
-                  <span className={cn('bg-clip-text text-2xl font-bold text-transparent', gradient.text)} aria-hidden="true">❤️</span>
+                  <span
+                    className={cn('bg-clip-text text-2xl font-bold text-transparent', gradient.text)}
+                    aria-hidden="true"
+                  >
+                    ❤️
+                  </span>
                   <span className="sr-only"> and </span>
                   <span className="text-gray-700 dark:text-gray-200">{name2}</span>
                 </motion.div>

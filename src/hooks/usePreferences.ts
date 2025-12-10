@@ -38,7 +38,7 @@ export function usePreferences(): [Preferences, PreferenceActions] {
   // Load preferences from localStorage on mount
   useEffect(() => {
     init();
-    
+
     // Cleanup on unmount
     // Get cleanup function at cleanup time to avoid stale reference
     return () => {

@@ -165,7 +165,7 @@ export default function ChartsContent({
       </div>
 
       {/* Main Content */}
-      <div className="max-h-[70vh] overflow-y-auto relative z-1 bg-gray-50/50 p-4 sm:p-6 dark:bg-gray-900/50">
+      <div className="relative z-1 max-h-[70vh] overflow-y-auto bg-gray-50/50 p-4 sm:p-6 dark:bg-gray-900/50">
         {isLoading ? (
           <LoadingState />
         ) : error ? (
@@ -174,7 +174,11 @@ export default function ChartsContent({
           <>
             {/* Filters & Controls */}
             <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex flex-wrap gap-2 rounded-xl bg-white p-1 shadow-sm ring-1 ring-gray-900/5 dark:bg-gray-800 dark:ring-white/10" role="tablist" aria-label="Time filter options">
+              <div
+                className="flex flex-wrap gap-2 rounded-xl bg-white p-1 shadow-sm ring-1 ring-gray-900/5 dark:bg-gray-800 dark:ring-white/10"
+                role="tablist"
+                aria-label="Time filter options"
+              >
                 {(['today', 'week', 'alltime'] as const).map((filter) => (
                   <button
                     key={filter}

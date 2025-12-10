@@ -84,9 +84,7 @@ function generateReport(axeResults, lhciResult) {
     console.log(`     Error: ${lhciResult.error}`);
   }
 
-  const allPassed =
-    axeResults.every((r) => r.status === 'passed') &&
-    lhciResult.status === 'passed';
+  const allPassed = axeResults.every((r) => r.status === 'passed') && lhciResult.status === 'passed';
 
   console.log('\n' + '='.repeat(50));
   console.log(allPassed ? '✨ All accessibility audits passed!' : '⚠️ Some audits failed. Please review the results.');

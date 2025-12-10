@@ -3,9 +3,9 @@ import { expect, test } from '@playwright/test';
 
 /**
  * Accessibility Tests using Playwright and axe-core
- * 
+ *
  * Run with: npx playwright test a11y.spec.ts
- * 
+ *
  * These tests check for WCAG 2.1 AA compliance across all major pages.
  */
 
@@ -27,14 +27,12 @@ test.describe('Accessibility Tests', () => {
   for (const page of PAGES) {
     test(`${page.name} page should have no accessibility violations`, async ({ page: browserPage }) => {
       await browserPage.goto(page.path);
-      
+
       // Wait for page to be fully loaded
       await browserPage.waitForLoadState('networkidle');
-      
+
       // Run axe accessibility tests
-      const accessibilityScanResults = await new AxeBuilder({ page: browserPage })
-        .withTags(WCAG_TAGS)
-        .analyze();
+      const accessibilityScanResults = await new AxeBuilder({ page: browserPage }).withTags(WCAG_TAGS).analyze();
 
       // Report any violations
       if (accessibilityScanResults.violations.length > 0) {
@@ -67,7 +65,7 @@ test.describe('Keyboard Navigation Tests', () => {
 
     // Press Enter to activate skip link
     await page.keyboard.press('Enter');
-    
+
     // Main content should now be focused or focusable
     const mainContent = page.locator('#main-content');
     await expect(mainContent).toBeVisible();
@@ -130,12 +128,13 @@ test.describe('Screen Reader Tests', () => {
     // Get all buttons and check they have accessible names via aria-label or text content
     const buttons = page.locator('button');
     const count = await buttons.count();
-    
+
     for (let i = 0; i < count; i++) {
       const button = buttons.nth(i);
       const ariaLabel = await button.getAttribute('aria-label');
       const textContent = await button.textContent();
-      const hasAccessibleName = (ariaLabel && ariaLabel.trim().length > 0) || (textContent && textContent.trim().length > 0);
+      const hasAccessibleName =
+        (ariaLabel && ariaLabel.trim().length > 0) || (textContent && textContent.trim().length > 0);
       expect(hasAccessibleName, `Button ${i} should have accessible name`).toBe(true);
     }
   });
@@ -179,14 +178,9 @@ test.describe('Color Contrast Tests', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .withTags(['wcag2aa'])
-      .include('body')
-      .analyze();
+    const accessibilityScanResults = await new AxeBuilder({ page }).withTags(['wcag2aa']).include('body').analyze();
 
-    const contrastViolations = accessibilityScanResults.violations.filter(
-      (v) => v.id === 'color-contrast'
-    );
+    const contrastViolations = accessibilityScanResults.violations.filter((v) => v.id === 'color-contrast');
 
     expect(contrastViolations).toEqual([]);
   });
@@ -196,7 +190,7 @@ test.describe('Animation and Motion Tests', () => {
   test('Should respect prefers-reduced-motion', async ({ page }) => {
     // Emulate reduced motion preference
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    
+
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 

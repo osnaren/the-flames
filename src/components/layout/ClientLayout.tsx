@@ -1,17 +1,14 @@
 'use client';
 
+import { PreferencesInitializer } from '@components/providers';
 import dynamic from 'next/dynamic';
 import { ReactNode } from 'react';
-import { PreferencesInitializer } from '@components/providers';
 
 // Unified background component that handles all states (seasonal, game, mobile)
-const UnifiedBackground = dynamic(
-  () => import('@ui/UnifiedBackground').then((mod) => mod.default),
-  {
-    ssr: false,
-    loading: () => null,
-  }
-);
+const UnifiedBackground = dynamic(() => import('@ui/UnifiedBackground').then((mod) => mod.default), {
+  ssr: false,
+  loading: () => null,
+});
 
 const SponsorFAB = dynamic(() => import('@components/sponsor/SponsorFAB'), {
   ssr: false,

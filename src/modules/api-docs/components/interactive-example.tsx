@@ -144,7 +144,9 @@ export function InteractiveExample() {
                       : 'hover:bg-muted/50 hover:text-foreground'
                   }`}
                 >
-                  <span className="mr-2 h-4 w-4" aria-hidden="true">{getIcon(lang.id)}</span>
+                  <span className="mr-2 h-4 w-4" aria-hidden="true">
+                    {getIcon(lang.id)}
+                  </span>
                   {lang.name}
                 </Button>
               ))}

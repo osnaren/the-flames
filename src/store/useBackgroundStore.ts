@@ -1,8 +1,16 @@
-import { create } from 'zustand';
 import { FlamesResult } from '@shared/utils/resultData';
+import { create } from 'zustand';
 
 export type BackgroundVariant = 'default' | 'processing' | 'result';
-export type BackgroundSeason = 'spring' | 'summer' | 'autumn' | 'winter' | 'valentine' | 'halloween' | 'christmas' | undefined;
+export type BackgroundSeason =
+  | 'spring'
+  | 'summer'
+  | 'autumn'
+  | 'winter'
+  | 'valentine'
+  | 'halloween'
+  | 'christmas'
+  | undefined;
 export type BackgroundIntensity = 'low' | 'medium' | 'high';
 
 interface BackgroundState {

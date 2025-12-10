@@ -30,14 +30,14 @@ const THEME_CONFIGS: Record<SeasonalTheme, SeasonalThemeConfig> = {
 // Theme order for detection (checked in order of date priority)
 // This determines which theme is auto-detected based on current date
 const SEASONAL_THEMES: SeasonalTheme[] = [
-  'pongal',    // Jan 10-20
+  'pongal', // Jan 10-20
   'valentine', // Feb 1-14
-  'holi',      // Mar 1-20
-  'onam',      // Aug 15 - Sep 15
+  'holi', // Mar 1-20
+  'onam', // Aug 15 - Sep 15
   'halloween', // Oct 1-31
-  'diwali',    // Oct 15 - Nov 15
+  'diwali', // Oct 15 - Nov 15
   'christmas', // Dec 1-25
-  'newYear',   // Dec 26 - Jan 5
+  'newYear', // Dec 26 - Jan 5
 ];
 
 export function useSeasonalTheme() {
@@ -46,17 +46,7 @@ export function useSeasonalTheme() {
   const [state, setState] = useState<SeasonalThemeState>({
     currentTheme: 'default',
     isTransitioning: false,
-    availableThemes: [
-      'default',
-      'valentine',
-      'holi',
-      'onam',
-      'halloween',
-      'diwali',
-      'christmas',
-      'newYear',
-      'pongal',
-    ],
+    availableThemes: ['default', 'valentine', 'holi', 'onam', 'halloween', 'diwali', 'christmas', 'newYear', 'pongal'],
     detectedTheme: 'default',
     manualOverride: null,
   });

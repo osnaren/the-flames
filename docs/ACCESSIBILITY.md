@@ -106,12 +106,12 @@ npm run a11y:lhci
 
 ### Available Scripts
 
-| Script | Description |
-|--------|-------------|
-| `npm run a11y:audit` | Full accessibility audit (axe + Lighthouse) |
-| `npm run a11y:axe` | Run axe-core CLI only |
-| `npm run a11y:lhci` | Run Lighthouse CI only |
-| `npm run a11y:axe:dev` | Quick axe test on localhost:3000 |
+| Script                 | Description                                 |
+| ---------------------- | ------------------------------------------- |
+| `npm run a11y:audit`   | Full accessibility audit (axe + Lighthouse) |
+| `npm run a11y:axe`     | Run axe-core CLI only                       |
+| `npm run a11y:lhci`    | Run Lighthouse CI only                      |
+| `npm run a11y:axe:dev` | Quick axe test on localhost:3000            |
 
 ---
 
@@ -206,7 +206,9 @@ npm run a11y:lhci
 ```tsx
 // ✅ Good - Proper landmarks and labels
 <nav aria-label="Main navigation">
-  <Link href="/" aria-current={isActive ? 'page' : undefined}>Home</Link>
+  <Link href="/" aria-current={isActive ? 'page' : undefined}>
+    Home
+  </Link>
 </nav>
 ```
 
@@ -237,10 +239,7 @@ npm run a11y:lhci
 The application includes a skip-to-main-content link as the first focusable element:
 
 ```tsx
-<a
-  href="#main-content"
-  className="fixed top-0 left-0 z-9999 -translate-y-full focus:translate-y-0"
->
+<a href="#main-content" className="z-9999 fixed left-0 top-0 -translate-y-full focus:translate-y-0">
   Skip to main content
 </a>
 ```
@@ -271,12 +270,12 @@ The application respects user preferences for reduced motion:
 const { shouldAnimate, prefersReducedMotion } = useAnimationPreferences();
 
 // Use reduced or no animation when user prefers
-{shouldAnimate && <AnimatedComponent />}
+{
+  shouldAnimate && <AnimatedComponent />;
+}
 
 // Alternative for motion.div
-<motion.div
-  animate={prefersReducedMotion ? {} : { scale: [1, 1.1, 1] }}
-/>
+<motion.div animate={prefersReducedMotion ? {} : { scale: [1, 1.1, 1] }} />;
 ```
 
 ---

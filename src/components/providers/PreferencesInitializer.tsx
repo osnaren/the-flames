@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
 import { usePreferencesStore } from '@/store/usePreferencesStore';
+import { useEffect } from 'react';
 
 /**
  * Component that initializes preferences store early in the React lifecycle.

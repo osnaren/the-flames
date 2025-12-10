@@ -101,7 +101,7 @@ function HomePage() {
       if (stage === 'result') {
         resetGame();
       }
-      
+
       // Set names from the match (with a small delay to ensure reset completes)
       setTimeout(() => {
         setName1(match.name1);
@@ -234,10 +234,7 @@ function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1, duration: 0.5 }}
           >
-            <RecentMatchesSection
-              displayCount={5}
-              onMatchClick={handleMatchReplay}
-            />
+            <RecentMatchesSection displayCount={5} onMatchClick={handleMatchReplay} />
           </motion.div>
         )}
       </div>

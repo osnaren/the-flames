@@ -9,8 +9,8 @@
  * - types: Type definitions
  */
 
-export { default } from './UnifiedBackground';
 export { default as BackgroundEffects } from './BackgroundEffects';
-export { useParticleSystem } from './useParticleSystem';
 export * from './shapes';
 export * from './types';
+export { default } from './UnifiedBackground';
+export { useParticleSystem } from './useParticleSystem';

@@ -109,7 +109,7 @@ export default function FlamesLetters({
               disabled={isFinalResult}
               className={cn(
                 'relative overflow-hidden rounded-2xl border-2 p-4 text-center transition-all duration-300',
-                'focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none',
+                'focus:ring-primary focus:ring-2 focus:ring-offset-2 focus:outline-none',
                 colors.container,
                 isFinalResult ? 'z-10 scale-110' : 'hover:scale-105',
                 onLetterToggle ? 'cursor-pointer' : 'cursor-default'
@@ -158,8 +158,12 @@ export default function FlamesLetters({
                 </motion.div>
               )}
 
-              <div className={cn('mb-2 text-3xl font-bold', colors.text)} aria-hidden="true">{flame.letter}</div>
-              <div className={cn('mb-2 text-2xl', colors.icon)} aria-hidden="true" role="img">{flame.icon}</div>
+              <div className={cn('mb-2 text-3xl font-bold', colors.text)} aria-hidden="true">
+                {flame.letter}
+              </div>
+              <div className={cn('mb-2 text-2xl', colors.icon)} aria-hidden="true" role="img">
+                {flame.icon}
+              </div>
               <div className={cn('text-sm font-medium', colors.meaning)}>{flame.meaning}</div>
 
               {status === 'crossed-out' && (
