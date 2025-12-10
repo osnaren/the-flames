@@ -172,6 +172,7 @@ function HomePage() {
                 result={result}
                 onComplete={handleProcessorComplete}
                 shouldAnimate={shouldAnimate}
+                runId={runId}
               />
             </motion.div>
           )}

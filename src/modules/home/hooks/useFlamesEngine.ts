@@ -349,7 +349,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
 
     // Clear URL params
     const newUrl = window.location.pathname;
-    window.location.href = newUrl;
+    window.history.replaceState(null, '', newUrl);
   }, [clearAll]);
 
   /**

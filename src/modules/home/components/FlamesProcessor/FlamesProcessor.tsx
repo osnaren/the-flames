@@ -44,6 +44,7 @@ function FlamesProcessorComponent({
   const [phase, setPhase] = useState<ProcessingPhase>('names-reveal');
   const [struckLetters, setStruckLetters] = useState<Set<number>>(new Set());
   const [activeFlamesIndex, setActiveFlamesIndex] = useState<number | null>(null);
+  const [finalResultIndex, setFinalResultIndex] = useState<number | null>(null);
   const [eliminatedFlames, setEliminatedFlames] = useState<Set<number>>(new Set());
   const [showSkip, setShowSkip] = useState(false);
   const [countDisplay, setCountDisplay] = useState(0);
@@ -142,9 +143,19 @@ function FlamesProcessorComponent({
     currentPositionRef.current = -1;
     eliminatedRef.current = new Set();
     remainingIndicesRef.current = [0, 1, 2, 3, 4, 5];
+    flamesAnimatedRef.current = false;
+
+    // Reset all UI state
+    setPhase('names-reveal');
+    setStruckLetters(new Set());
+    setActiveFlamesIndex(null);
+    setFinalResultIndex(null);
+    setEliminatedFlames(new Set());
+    setShowSkip(false);
+    setCountDisplay(0);
+    setShowFlames(false);
 
     // Start sequence
-    setPhase('names-reveal');
     addTimeout(() => setShowSkip(true), 1500);
 
     return () => {
@@ -210,6 +221,7 @@ function FlamesProcessorComponent({
         const [onlyIdx] = remainingIndicesRef.current;
         setActiveFlamesIndex(onlyIdx);
         setCountDisplay(0);
+        setFinalResultIndex(onlyIdx);
         setPhase('result-reveal');
         return;
       }
@@ -238,6 +250,7 @@ function FlamesProcessorComponent({
           if (remaining.length === 1) {
             // Result found!
             setActiveFlamesIndex(remaining[0]);
+            setFinalResultIndex(remaining[0]);
             setCountDisplay(0);
             setPhase('result-reveal');
           } else {
@@ -264,6 +277,13 @@ function FlamesProcessorComponent({
   }, [safeRemainingCount, addTimeout]);
 
   const resultData = result ? FLAMES_DATA.find((f) => f.letter === result) : null;
+
+  // Keep the winning tile locked once determined
+  useEffect(() => {
+    if (finalResultIndex !== null) {
+      setActiveFlamesIndex(finalResultIndex);
+    }
+  }, [finalResultIndex]);
 
   return (
     <motion.div
@@ -452,7 +472,7 @@ function FlamesProcessorComponent({
                 {FLAMES_DATA.map((item, idx) => {
                   const isActive = activeFlamesIndex === idx;
                   const isEliminated = eliminatedFlames.has(idx);
-                  const isResult = phase === 'result-reveal' && isActive;
+                  const isResult = finalResultIndex === idx && (phase === 'result-reveal' || phase === 'complete');
                   const skipInitialAnimation = flamesAnimatedRef.current;
 
                   return (
