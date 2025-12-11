@@ -2,7 +2,7 @@ import { memo } from 'react';
 
 function SEOContentComponent() {
   return (
-    <article className="prose prose-pink dark:prose-invert mx-auto mt-16 max-w-2xl px-4 pb-12 text-center md:text-left">
+    <article className="prose prose-pink dark:prose-invert sr-only mx-auto mt-16 max-w-2xl px-4 pb-12 text-center md:text-left">
       <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">What is FLAMES Game?</h2>
       <p className="text-gray-600 dark:text-gray-300">
         FLAMES is a classic childhood game that predicts the relationship compatibility between two people. The acronym

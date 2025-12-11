@@ -2,7 +2,7 @@
 
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { TRANSITION_DURATIONS, usePreferencesStore } from '@/store/usePreferencesStore';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { memo, ReactNode } from 'react';
 
@@ -25,20 +25,22 @@ function PageTransition({ children, className = '' }: PageTransitionProps) {
   }
 
   return (
-    <motion.div
-      key={pathname}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      transition={{
-        type: 'tween',
-        ease: [0.25, 0.46, 0.45, 0.94], // Custom easing for smoother feel
-        duration,
-      }}
-      className={`w-full ${className}`}
-    >
-      {children}
-    </motion.div>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={pathname}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -8 }}
+        transition={{
+          type: 'tween',
+          ease: [0.25, 0.46, 0.45, 0.94], // Custom easing for smoother feel
+          duration,
+        }}
+        className={`w-full ${className}`}
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
   );
 }
 

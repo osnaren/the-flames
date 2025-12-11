@@ -226,6 +226,7 @@ export default function FloatingControlPanel() {
             'text-on-surface-variant hover:text-primary hover:bg-surface-container-low hover:text-glow-sm focus:ring-primary/50 focus:ring-2 focus:outline-none'
           )}
           aria-label={isExpanded ? 'Close settings' : 'Open settings'}
+          suppressHydrationWarning
         >
           {isExpanded ? (
             <ChevronUp size={18} />

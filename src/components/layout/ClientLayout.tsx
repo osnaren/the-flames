@@ -1,6 +1,7 @@
 'use client';
 
 import { PreferencesInitializer } from '@components/providers';
+import PageTransition from '@layout/PageTransition';
 import dynamic from 'next/dynamic';
 import { ReactNode } from 'react';
 
@@ -40,7 +41,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
       <WebVitalsReporter />
       <div className="from-customBg-1 to-customBg-2 relative flex min-h-screen flex-col bg-linear-to-br transition-colors duration-500">
         <UnifiedBackground />
-        {children}
+        <PageTransition>{children}</PageTransition>
         <SponsorFAB />
       </div>
     </>
