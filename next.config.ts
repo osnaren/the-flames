@@ -202,7 +202,7 @@ const nextConfig: NextConfig = {
   output: isWindows ? undefined : 'standalone',
 
   // Reduce bundle size by excluding source maps in production
-  productionBrowserSourceMaps: false,
+  productionBrowserSourceMaps: true,
 
   // PoweredBy header removal for security
   poweredByHeader: false,
