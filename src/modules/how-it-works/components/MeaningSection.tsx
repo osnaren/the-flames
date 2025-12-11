@@ -3,7 +3,7 @@
 import Card from '@/components/ui/Card';
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { motion, useInView } from 'framer-motion';
-import { Flame, Heart, Shield, Sparkles, Users, Zap } from 'lucide-react';
+import { Flame, Handshake, Heart, Shield, Sparkles, Zap } from 'lucide-react';
 import { useRef } from 'react';
 import { GiBigDiamondRing, GiBrokenHeart } from 'react-icons/gi';
 
@@ -23,8 +23,8 @@ const meaningCards: MeaningCard[] = [
     letter: 'F',
     title: 'Friends',
     description: 'The ultimate "let\'s just be friends" energy.',
-    funFact: 'Hey, at least they\'ll share their fries with you! 🍟',
-    icon: <Users className="h-8 w-8" />,
+    funFact: "Hey, at least they'll share their fries with you! 🍟",
+    icon: <Handshake className="h-8 w-8" />,
     colorClass: 'text-friendship dark:text-friendship',
     bgColorClass: 'bg-friendship-container/20 dark:bg-friendship-container/30',
     borderColorClass: 'border-friendship/30 dark:border-friendship/40',
@@ -62,7 +62,7 @@ const meaningCards: MeaningCard[] = [
   {
     letter: 'E',
     title: 'Enemies',
-    description: 'Plot twist! You\'re destined to be frenemies.',
+    description: "Plot twist! You're destined to be frenemies.",
     funFact: 'Keep your friends close, and this one... closer? 😈',
     icon: <GiBrokenHeart className="h-8 w-8" />,
     colorClass: 'text-enemy dark:text-enemy',
@@ -72,7 +72,7 @@ const meaningCards: MeaningCard[] = [
   {
     letter: 'S',
     title: 'Siblings',
-    description: 'Congratulations! You\'ve gained a sibling from another parent.',
+    description: "Congratulations! You've gained a sibling from another parent.",
     funFact: 'Get ready for fights over the TV remote! 📺',
     icon: <Shield className="h-8 w-8" />,
     colorClass: 'text-siblings dark:text-siblings',
@@ -126,8 +126,7 @@ export default function MeaningSection() {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          The Sacred Scrolls of{' '}
-          <span className="text-primary">FLAMES</span>
+          The Sacred Scrolls of <span className="text-primary">FLAMES</span>
         </motion.h2>
 
         <motion.p

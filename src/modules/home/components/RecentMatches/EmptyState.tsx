@@ -85,11 +85,11 @@ function EmptyState({ shouldAnimate }: EmptyStateProps) {
         variants={shouldAnimate ? itemVariants : undefined}
         className="text-on-surface-variant/50 mt-4 flex items-center gap-1 text-xs"
       >
-        <span className="text-pink-500">F</span>
-        <span className="text-red-500">L</span>
+        <span className="text-blue-500">F</span>
+        <span className="text-pink-500">L</span>
         <span className="text-amber-500">A</span>
         <span className="text-emerald-500">M</span>
-        <span className="text-orange-500">E</span>
+        <span className="text-red-500">E</span>
         <span className="text-purple-500">S</span>
         <span className="ml-1">awaits!</span>
       </motion.p>

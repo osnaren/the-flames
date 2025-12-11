@@ -3,7 +3,7 @@
 import Button from '@/components/ui/Button';
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { motion, useInView } from 'framer-motion';
-import { ArrowRight, Heart, Sparkles, Wand2 } from 'lucide-react';
+import { ArrowRight, FlameKindling, Heart, Sparkles, Wand2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRef } from 'react';
 import { RiSparklingLine } from 'react-icons/ri';
@@ -134,7 +134,7 @@ export default function CallToAction() {
               }
               transition={{ duration: 2, repeat: Infinity }}
             >
-              <RiSparklingLine className="text-primary h-12 w-12" />
+              <FlameKindling className="text-primary h-12 w-12" />
             </motion.div>
           </motion.div>
 
@@ -170,8 +170,8 @@ export default function CallToAction() {
           >
             <p>
               You&apos;ve learned the ancient secrets. You&apos;ve seen the magic unfold.{' '}
-              <span className="text-on-surface font-medium">Now it&apos;s your turn</span> to discover what fate
-              has written in the stars (or, you know, in some crossed-out letters).
+              <span className="text-on-surface font-medium">Now it&apos;s your turn</span> to discover what fate has
+              written in the stars (or, you know, in some crossed-out letters).
             </p>
             <p className="text-on-surface-variant/80 text-base">
               Will it be <span className="text-love font-semibold">Love</span>? 💕{' '}

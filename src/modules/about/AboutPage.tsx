@@ -51,22 +51,22 @@ const timelineData = [
         </p>
         <ul className="list-disc space-y-2 pl-5 text-lg font-medium">
           <li>
-            <span className="text-red-500">F</span>riends
+            <span className="text-blue-500">F</span>riends
           </li>
           <li>
             <span className="text-pink-500">L</span>overs
           </li>
           <li>
-            <span className="text-purple-500">A</span>ffection
+            <span className="text-amber-500">A</span>ffection
           </li>
           <li>
-            <span className="text-orange-500">M</span>arriage
+            <span className="text-emerald-500">M</span>arriage
           </li>
           <li>
-            <span className="text-blue-500">E</span>nemies
+            <span className="text-red-500">E</span>nemies
           </li>
           <li>
-            <span className="text-gray-500">S</span>iblings
+            <span className="text-purple-500">S</span>iblings
           </li>
         </ul>
       </div>

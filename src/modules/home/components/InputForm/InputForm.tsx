@@ -1,6 +1,6 @@
 import { validateFlamesInput, validateName } from '@/utils/validation';
 import { motion } from 'framer-motion';
-import { Heart, Sparkles } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
 import type { GameStage } from '../../types';
 
@@ -355,7 +355,7 @@ function InputFormComponent({
                 </>
               ) : (
                 <>
-                  <Sparkles className="h-5 w-5" />
+                  <span className="text-lg">🔥</span>
                   <span>Reveal Your FLAMES</span>
                   <span className="text-lg">🔥</span>
                 </>
