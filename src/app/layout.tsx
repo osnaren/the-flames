@@ -1,5 +1,9 @@
-import ClientLayout from '@/components/layout/ClientLayout';
 import { fontVariables } from '@/lib/fonts';
+import VercelAnalytics from '@components/analytics/vercel-analytics';
+import ClientLayout from '@components/layout/ClientLayout';
+import Footer from '@layout/Footer';
+import GlobalErrorBoundary from '@layout/GlobalErrorBoundary';
+import Navbar from '@layout/Navbar';
 import {
   baseMetadata,
   generateFAQSchema,
@@ -8,10 +12,7 @@ import {
   generateWebApplicationSchema,
   generateWebSiteSchema,
   viewportConfig,
-} from '@/lib/seo';
-import Footer from '@layout/Footer';
-import GlobalErrorBoundary from '@layout/GlobalErrorBoundary';
-import Navbar from '@layout/Navbar';
+} from '@lib/seo';
 import type { Metadata, Viewport } from 'next';
 import { Toaster } from 'react-hot-toast';
 import './index.css';
@@ -110,6 +111,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               },
             }}
           />
+          <VercelAnalytics />
         </ClientLayout>
 
         {/* JSON-LD Structured Data for SEO and LLMO - Placed in body to avoid hydration mismatches with browser extensions */}
