@@ -291,7 +291,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
                 </motion.div>
 
                 <div className="text-center">
-                  <p className="text-on-surface-variant/70 text-sm">© {currentYear ?? '2025'} OSLabs</p>
+                  <p className="text-on-surface-variant/70 text-sm">© {currentYear ?? '2025'} osLabs</p>
                   <motion.p
                     className="text-on-surface-variant/50 mt-1 text-xs"
                     initial={{ opacity: 0 }}

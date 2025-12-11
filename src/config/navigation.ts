@@ -15,10 +15,16 @@ export const NAVBAR_CONFIG = {
       mobileOnly: true,
     },
     {
-      label: 'About FLAMES',
+      label: 'About',
       icon: BookOpen,
       path: '/about',
       description: 'Learn about FLAMES',
+    },
+    {
+      label: 'How It Works',
+      icon: Coffee,
+      path: '/how-it-works',
+      description: 'Learn the FLAMES algorithm and methodology',
     },
     {
       label: 'Global Charts',
