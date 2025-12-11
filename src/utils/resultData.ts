@@ -2,9 +2,9 @@
  * FLAMES Result Data
  * Shared utilities for result rendering across modules
  */
+import { FlamesResultType } from '@/constants/flames';
 import type { LucideIcon } from 'lucide-react';
 import { BellRing, Heart, Star, Sword, Users } from 'lucide-react';
-import { FlamesResultType } from '../constants/flames';
 
 export type FlamesResult = 'F' | 'L' | 'A' | 'M' | 'E' | 'S' | null;
 export type NonNullFlamesResult = 'F' | 'L' | 'A' | 'M' | 'E' | 'S';

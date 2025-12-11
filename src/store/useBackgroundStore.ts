@@ -1,4 +1,4 @@
-import { FlamesResult } from '@shared/utils/resultData';
+import { FlamesResult } from '@/utils/resultData';
 import { create } from 'zustand';
 
 export type BackgroundVariant = 'default' | 'processing' | 'result';

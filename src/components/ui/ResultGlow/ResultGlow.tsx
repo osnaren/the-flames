@@ -1,5 +1,5 @@
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
-import { FlamesResult, getResultData } from '@shared/utils/resultData';
+import { FlamesResult, getResultData } from '@utils/resultData';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useMemo } from 'react';
 

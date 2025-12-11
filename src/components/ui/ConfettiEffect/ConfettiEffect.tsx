@@ -1,6 +1,6 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { FlamesResult, getResultData } from '@shared/utils/resultData';
+import { FlamesResult, getResultData } from '@/utils/resultData';
 import confetti from 'canvas-confetti';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 

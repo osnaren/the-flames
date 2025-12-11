@@ -1,4 +1,4 @@
-import { FlamesResult } from '@shared/constants/flames';
+import { FlamesResult } from '@/constants/flames';
 import { LucideIcon } from 'lucide-react';
 
 export type TimeFilter = 'today' | 'week' | 'alltime';

@@ -1,7 +1,7 @@
 /**
  * Home Module Type Definitions
  */
-import { FlamesResult as StrictFlamesResult } from '@/shared/constants/flames';
+import { FlamesResult as StrictFlamesResult } from '@/constants/flames';
 import React from 'react';
 
 export type FlamesResult = StrictFlamesResult | null;

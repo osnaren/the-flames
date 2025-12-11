@@ -1,4 +1,4 @@
-import { FlamesResult } from '@shared/utils/resultData';
+import { FlamesResult } from '@/utils/resultData';
 import { useCallback, useEffect, useState } from 'react';
 
 interface PairingEntry {

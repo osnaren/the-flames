@@ -1,5 +1,5 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
-import { FlamesResult, resultData } from '@shared/utils/resultData';
+import { FlamesResult, resultData } from '@/utils/resultData';
 import { motion, Variants } from 'framer-motion';
 import { memo, useMemo } from 'react'; // Removed unused useEffect, useState
 

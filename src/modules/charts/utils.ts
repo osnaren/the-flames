@@ -1,4 +1,4 @@
-import { FlamesResultType } from '@shared/constants/flames';
+import { FlamesResultType } from '@/constants/flames';
 import { FlamesResult, GlobalStats } from './types';
 
 /**

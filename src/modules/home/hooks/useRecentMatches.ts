@@ -3,7 +3,7 @@
  * Provides recent match history with display-ready computed properties
  */
 import { RECENT_MATCHES_CONFIG } from '@/config/recentMatches';
-import type { FlamesResult } from '@/shared/utils/resultData';
+import type { FlamesResult } from '@/utils/resultData';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { DisplayMatch, MatchEntry, UseRecentMatchesReturn } from '../components/RecentMatches/types';
 

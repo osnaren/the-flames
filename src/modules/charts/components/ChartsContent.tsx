@@ -1,5 +1,5 @@
 import Button from '@/components/ui/Button';
-import { FlamesResultType } from '@shared/constants/flames';
+import { FlamesResultType } from '@/constants/flames';
 import { motion } from 'framer-motion';
 import {
   Award,

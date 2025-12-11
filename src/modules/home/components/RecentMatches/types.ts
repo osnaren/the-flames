@@ -1,7 +1,7 @@
 /**
  * Recent Matches Type Definitions
  */
-import type { FlamesResult } from '@/shared/utils/resultData';
+import type { FlamesResult } from '@/utils/resultData';
 
 /**
  * Individual match entry stored in localStorage

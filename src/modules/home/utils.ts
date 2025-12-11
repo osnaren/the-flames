@@ -1,7 +1,7 @@
 /**
  * FLAMES Game Utilities
  */
-import { FLAMES_ORDER } from '@/shared/constants/flames';
+import { FLAMES_ORDER } from '@/constants/flames';
 import { z } from 'zod';
 import type { FlamesResult } from './types';
 
