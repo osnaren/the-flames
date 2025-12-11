@@ -1,5 +1,10 @@
 import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
+import withBundleAnalyzer from '@next/bundle-analyzer';
+
+const bundleAnalyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 const isWindows = process.platform === 'win32';
 
@@ -82,6 +87,21 @@ const nextConfig: NextConfig = {
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
+          },
+          // Content Security Policy for XSS protection
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com https://vercel.live",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com data:",
+              "img-src 'self' data: blob: https:",
+              "connect-src 'self' https://*.supabase.co https://fonts.googleapis.com https://va.vercel-scripts.com https://vercel.live wss://*.supabase.co",
+              "frame-ancestors 'self'",
+              "base-uri 'self'",
+              "form-action 'self'",
+            ].join('; '),
           },
         ],
       },
@@ -201,14 +221,14 @@ const nextConfig: NextConfig = {
   // Disable standalone output on Windows to avoid node:inspector filename issues
   output: isWindows ? undefined : 'standalone',
 
-  // Reduce bundle size by excluding source maps in production
-  productionBrowserSourceMaps: true,
+  // Disable source maps in production for security (Sentry still receives them)
+  productionBrowserSourceMaps: false,
 
   // PoweredBy header removal for security
   poweredByHeader: false,
 };
 
-export default withSentryConfig(nextConfig, {
+export default withSentryConfig(bundleAnalyzer(nextConfig), {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 

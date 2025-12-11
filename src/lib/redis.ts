@@ -242,3 +242,6 @@ export class RedisRateLimiter {
 
 // Export a singleton instance for the FLAMES API
 export const flamesRateLimiter = new RedisRateLimiter(20, 60000, 'ratelimit:flames:');
+
+// Export a singleton instance for OG Image generation (slightly higher limit for social sharing)
+export const ogRateLimiter = new RedisRateLimiter(50, 60000, 'ratelimit:og:');

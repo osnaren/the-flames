@@ -12,6 +12,7 @@
 import { ImageResponse } from 'next/og';
 import type { NextRequest } from 'next/server';
 
+import { isRedisConfigured, ogRateLimiter } from '@/lib/redis';
 import { OG_CACHE_CONFIG, OG_IMAGE_SIZES, PAGE_OG_CONFIGS, generateCacheControl, getOGFonts } from '@/lib/og';
 import { FlamesLetters, OGBackground, OGBadgeRow, OGCustomIcon, OGFooter, OGTitle } from '@/lib/og/components';
 
@@ -37,8 +38,23 @@ function generatePageImage(config: (typeof PAGE_OG_CONFIGS)['home']) {
 // Main Handler
 // ============================================================================
 
+function getClientId(request: NextRequest): string {
+  const forwarded = request.headers.get('x-forwarded-for');
+  const realIp = request.headers.get('x-real-ip');
+  return forwarded?.split(',')[0] || realIp || 'anonymous';
+}
+
 export async function GET(request: NextRequest) {
   try {
+    // Rate Limiting
+    if (isRedisConfigured()) {
+      const clientId = getClientId(request);
+      const { allowed } = await ogRateLimiter.checkLimit(clientId);
+      if (!allowed) {
+        return new Response('Too Many Requests', { status: 429 });
+      }
+    }
+
     const { searchParams } = new URL(request.url);
     const page = searchParams.get('page')?.toLowerCase() || 'home';
 

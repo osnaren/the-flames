@@ -156,6 +156,21 @@ export async function POST(request: NextRequest): Promise<NextResponse<FlamesApi
     );
   }
 
+  // Check payload size (max 10KB)
+  const contentLength = parseInt(request.headers.get('content-length') || '0');
+  if (contentLength > 10240) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: 'PAYLOAD_TOO_LARGE',
+          message: 'Request payload too large',
+        },
+      },
+      { status: 413, headers }
+    );
+  }
+
   try {
     // Parse request body
     let body: { name1?: string; name2?: string };

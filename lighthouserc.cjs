@@ -91,7 +91,7 @@ module.exports = {
         'visual-order-follows-dom': 'warn',
 
         // Disable performance assertions for this config (optional)
-        'categories:performance': 'off',
+        'categories:performance': ['warn', { minScore: 0.9 }],
         'categories:pwa': 'off',
         'categories:seo': 'off',
       },

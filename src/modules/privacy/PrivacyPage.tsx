@@ -147,8 +147,8 @@ export default function PrivacyPage() {
                   people visited, which pages are popular). No personal tracking, no profiles.
                 </li>
                 <li>
-                  <strong>🐛 Error Tracking:</strong> We use Sentry to catch bugs and crashes. This may include
-                  technical info like your IP address when an error occurs, so we can fix issues faster.
+                  <strong>🐛 Error Tracking:</strong> We use Sentry to catch bugs and crashes. We have disabled IP
+                  address collection, so your crash reports are anonymous.
                 </li>
               </ul>
             </PolicySection>
@@ -276,7 +276,7 @@ export default function PrivacyPage() {
                   <strong>Supabase:</strong> Our privacy-friendly, GDPR-compliant database
                 </li>
                 <li>
-                  <strong>Sentry:</strong> Catches errors so we can fix bugs (may collect IP for crash reports)
+                  <strong>Sentry:</strong> Catches errors so we can fix bugs
                 </li>
                 <li>
                   <strong>Google Fonts:</strong> Makes our text look pretty

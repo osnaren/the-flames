@@ -4,10 +4,12 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic'; // Ensure this route is never statically cached
 
 export async function GET(request: Request) {
-  // 1. Security Check (Best Practice)
-  // Vercel Cron jobs will send this header if CRON_SECRET is set in environment variables
+  // 1. Security Check (Required)
+  // Vercel Cron jobs will send this header with CRON_SECRET from environment variables
   const authHeader = request.headers.get('authorization');
-  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+
+  // CRON_SECRET is required in production - reject if not configured or doesn't match
+  if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
