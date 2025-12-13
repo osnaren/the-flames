@@ -8,6 +8,7 @@ export const metadata: Metadata = generatePageMetadata({
   description: pagesSEO.apiDocs.description,
   keywords: pagesSEO.apiDocs.keywords,
   path: '/api-docs',
+  ogImage: pagesSEO.apiDocs.ogImage,
 });
 
 // Breadcrumb schema for this page

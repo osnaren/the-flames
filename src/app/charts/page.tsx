@@ -13,6 +13,7 @@ export const metadata: Metadata = generatePageMetadata({
   description: pagesSEO.charts.description,
   keywords: pagesSEO.charts.keywords,
   path: '/charts',
+  ogImage: pagesSEO.charts.ogImage,
 });
 
 // Breadcrumb schema for this page

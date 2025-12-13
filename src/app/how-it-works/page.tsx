@@ -13,6 +13,7 @@ export const metadata: Metadata = generatePageMetadata({
   description: pagesSEO.howItWorks.description,
   keywords: pagesSEO.howItWorks.keywords,
   path: '/how-it-works',
+  ogImage: pagesSEO.howItWorks.ogImage,
 });
 
 // Breadcrumb schema for this page

@@ -76,6 +76,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     description: pagesSEO.home.description,
     keywords: pagesSEO.home.keywords,
     path: '',
+    ogImage: pagesSEO.home.ogImage,
   });
 }
 

@@ -13,6 +13,7 @@ export const metadata: Metadata = generatePageMetadata({
   description: pagesSEO.privacy.description,
   keywords: pagesSEO.privacy.keywords,
   path: '/privacy',
+  ogImage: pagesSEO.privacy.ogImage,
 });
 
 // Breadcrumb schema for this page

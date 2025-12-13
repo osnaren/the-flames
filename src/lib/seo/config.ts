@@ -9,8 +9,8 @@ export const siteConfig = {
   description:
     'Play the classic FLAMES game online! Discover your relationship compatibility with friends, love interests, and more. Fun, free, and instant results.',
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://theflames.app',
-  ogImage: '/og-image.png',
-  twitterImage: '/twitter-image.png',
+  ogImage: '/og/og.png',
+  twitterImage: '/og/og.png',
   locale: 'en_US',
   language: 'en',
   author: {
@@ -60,12 +60,14 @@ export const pagesSEO = {
       'relationship compatibility',
       'name compatibility test',
     ],
+    ogImage: '/og/og.png',
   },
   about: {
     title: 'About FLAMES Game - The Story Behind the Classic Game',
     description:
       'Discover the nostalgic story behind the FLAMES game. Learn how this classic schoolyard game evolved from backbench notebooks to a modern digital experience.',
     keywords: ['FLAMES game history', 'FLAMES game origin', 'schoolyard games', 'nostalgic games'],
+    ogImage: '/og/about-og.png',
   },
   howItWorks: {
     title: 'How FLAMES Game Works - Step by Step Guide',
@@ -78,30 +80,35 @@ export const pagesSEO = {
       'FLAMES game rules',
       'how to play FLAMES',
     ],
+    ogImage: '/og/og.png',
   },
   charts: {
     title: 'FLAMES Global Charts - Relationship Trends & Statistics',
     description:
       'Explore global FLAMES game statistics and trends. See the most popular relationship results, trending name pairings, and worldwide compatibility data.',
     keywords: ['FLAMES statistics', 'relationship trends', 'love calculator stats', 'popular name pairings'],
+    ogImage: '/og/charts-og.png',
   },
   manual: {
     title: 'Manual FLAMES Mode - Paper & Pencil Style Game',
     description:
       'Play FLAMES the traditional way with our manual mode. Cross out letters by hand, just like in school notebooks. A nostalgic paper-and-pencil experience!',
     keywords: ['manual FLAMES', 'paper FLAMES game', 'traditional FLAMES', 'interactive FLAMES'],
+    ogImage: '/og/manual-og.png',
   },
   apiDocs: {
     title: 'FLAMES API Documentation - Developer Guide',
     description:
       'Integrate the FLAMES game into your applications with our free API. Complete documentation with examples for calculating relationship compatibility programmatically.',
     keywords: ['FLAMES API', 'love calculator API', 'relationship API', 'FLAMES game developer'],
+    ogImage: '/og/api-docs-og.png',
   },
   privacy: {
     title: 'Privacy Policy & Terms of Service',
     description:
       'Read our privacy policy and terms of service. Learn how FLAMES Game protects your data and the terms governing your use of our service.',
     keywords: ['FLAMES privacy policy', 'terms of service', 'data privacy'],
+    ogImage: '/og/og.png',
   },
 };
 
