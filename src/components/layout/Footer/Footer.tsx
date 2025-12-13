@@ -7,6 +7,7 @@ import { motion, useScroll, useTransform, Variants } from 'framer-motion';
 import { ExternalLink, Heart, Sparkles, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { memo } from 'react';
+import ProductHuntBadge from '../ProductHuntBadge';
 import type { FooterLinkProps } from './types';
 
 function Footer() {
@@ -193,6 +194,11 @@ function Footer() {
                   </motion.a>
                 ))}
               </div>
+            </div>
+
+            {/* Product Hunt Badge */}
+            <div className="mt-6">
+              <ProductHuntBadge />
             </div>
           </motion.div>
 
