@@ -93,7 +93,7 @@ const RadialGlow = memo(function RadialGlow({
     <div
       className="pointer-events-none absolute inset-0"
       style={{
-        background: `
+        backgroundImage: `
           radial-gradient(circle at 15% 15%, ${primaryColor}${isDarkTheme ? '55' : '70'} 0%, transparent 45%),
           radial-gradient(circle at 85% 85%, ${secondaryColor}${isDarkTheme ? '55' : '70'} 0%, transparent 45%),
           radial-gradient(circle at 50% 50%, ${accentColor}${isDarkTheme ? '45' : '60'} 0%, transparent 55%),
@@ -119,7 +119,7 @@ const ShimmerEffect = memo(function ShimmerEffect({ primaryColor, secondaryColor
     <motion.div
       className="pointer-events-none absolute inset-0"
       style={{
-        background: `linear-gradient(135deg, 
+        backgroundImage: `linear-gradient(135deg, 
           transparent 0%, 
           ${primaryColor}15 25%, 
           transparent 50%, 
@@ -152,7 +152,7 @@ const PulsingOverlay = memo(function PulsingOverlay({ primaryColor, isDarkTheme 
     <motion.div
       className="pointer-events-none absolute inset-0"
       style={{
-        background: `radial-gradient(circle at 50% 50%, ${primaryColor}${isDarkTheme ? '25' : '35'} 0%, transparent 65%)`,
+        backgroundImage: `radial-gradient(circle at 50% 50%, ${primaryColor}${isDarkTheme ? '25' : '35'} 0%, transparent 65%)`,
       }}
       animate={{
         opacity: isDarkTheme ? [0.4, 0.7, 0.4] : [0.45, 0.75, 0.45],
