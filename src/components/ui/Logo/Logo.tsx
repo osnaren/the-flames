@@ -15,7 +15,7 @@ type LogoProps = {
   textClassName?: string;
 };
 
-const LOTTIE_URL = 'https://lottie.host/9cb4acbd-ebc9-47d5-a93d-b74645e73999/cjJpSqtrEH.lottie';
+const LOTTIE_URL = '/assets/logo.json';
 
 function Logo({
   variant = 'static',
