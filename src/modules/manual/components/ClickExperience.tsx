@@ -85,6 +85,13 @@ export default function ClickExperience({
     return remainingLetters.length === 1 ? remainingLetters[0] : null;
   }, [flamesCrossedLetters]);
 
+  // Calculate remaining count of valid letters (excluding spaces/symbols)
+  const remainingCount = useMemo(() => {
+    const isAlpha = (char: string) => /^[a-zA-Z]$/.test(char);
+    const totalValid = name1.split('').filter(isAlpha).length + name2.split('').filter(isAlpha).length;
+    return totalValid - crossedLetters.size;
+  }, [name1, name2, crossedLetters]);
+
   // Inform the parent component about the result change
   useEffect(() => {
     onResultChange(userResult);
@@ -112,7 +119,7 @@ export default function ClickExperience({
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8 flex items-center justify-between"
+          className="mb-8 flex flex-col items-center justify-between gap-3 md:flex-row"
         >
           <Button
             variant="outline"
@@ -165,10 +172,17 @@ export default function ClickExperience({
           transition={{ duration: 0.6, delay: 0.1 }}
           className="mb-12 text-center"
         >
-          <h1 className="text-on-surface mb-4 text-4xl font-bold md:text-5xl">
-            {name1} ❤️ {name2}
+          <h1 className="text-on-surface mb-4 flex items-center justify-center gap-3 text-4xl font-bold md:text-5xl">
+            {name1}
+            <motion.span
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              ❤️
+            </motion.span>
+            {name2}
           </h1>
-          <p className="text-on-surface-variant text-lg">Click letters to cross them out and solve the FLAMES puzzle</p>
+          <p className="text-on-surface-variant text-lg">Click on matching letters to cross them out</p>
         </motion.div>
 
         {/* Manual Calculation Steps */}
@@ -229,6 +243,23 @@ export default function ClickExperience({
             </div>
           </motion.section>
 
+          {/* Remaining Count Display */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="flex justify-center"
+          >
+            <div className="bg-secondary-container/20 border-secondary/20 flex flex-col items-center rounded-2xl border p-2 px-4 text-center backdrop-blur-md md:flex-row md:gap-8 md:text-left">
+              <div className="from-secondary to-secondary-container text-on-secondary shadow-secondary/20 flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br text-3xl font-bold shadow-lg">
+                {remainingCount}
+              </div>
+              <div>
+                <h3 className="text-on-surface text-lg font-bold">Remaining Letters</h3>
+              </div>
+            </div>
+          </motion.div>
+
           {/* Step 3: FLAMES Letters */}
           <motion.section
             initial={{ opacity: 0, y: 30 }}
@@ -258,28 +289,46 @@ export default function ClickExperience({
             transition={{ duration: 0.6, delay: 0.8 }}
             className="border-primary-container/20 bg-primary-container/10 rounded-2xl border p-6 backdrop-blur-xl"
           >
-            <h3 className="text-on-surface mb-4 flex gap-1 text-lg font-semibold">
+            <h3 className="text-on-surface mb-4 flex items-center gap-2 text-lg font-semibold">
               How to Play
-              <Link href="/how-it-works">
-                <SquareArrowOutUpRight className="text-on-surface-variant w-4 cursor-pointer" />
+              <Link
+                href="/how-it-works"
+                className="text-primary hover:text-primary/80 transition-colors"
+                aria-label="Learn more about how FLAMES works"
+              >
+                <SquareArrowOutUpRight className="h-5 w-5" />
               </Link>
             </h3>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="text-on-surface-variant space-y-2 text-sm">
-                <p>
-                  <strong>Step 1:</strong> Cross out matching letters between the two names
-                </p>
-                <p>
-                  <strong>Step 2:</strong> Count the remaining letters
-                </p>
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <span className="bg-primary-container text-on-primary-container flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-sm font-bold">
+                    1
+                  </span>
+                  <p className="text-on-surface-variant text-sm">
+                    Click matching letters in both names to cross them out
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="bg-primary-container text-on-primary-container flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-sm font-bold">
+                    2
+                  </span>
+                  <p className="text-on-surface-variant text-sm">Count the remaining uncrossed letters</p>
+                </div>
               </div>
-              <div className="text-on-surface-variant space-y-2 text-sm">
-                <p>
-                  <strong>Step 3:</strong> Use that count to eliminate F.L.A.M.E.S letters
-                </p>
-                <p>
-                  <strong>Step 4:</strong> The last remaining letter is your result!
-                </p>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <span className="bg-primary-container text-on-primary-container flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-sm font-bold">
+                    3
+                  </span>
+                  <p className="text-on-surface-variant text-sm">Use that count to eliminate F.L.A.M.E.S letters</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="bg-primary-container text-on-primary-container flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-sm font-bold">
+                    4
+                  </span>
+                  <p className="text-on-surface-variant text-sm">The last remaining letter reveals your destiny!</p>
+                </div>
               </div>
             </div>
           </motion.section>

@@ -1,3 +1,4 @@
+import { cn } from '@/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import type { LetterTileProps } from '../types';
@@ -49,7 +50,28 @@ export default function LetterTile({
   };
 
   const styles = getTileStyle();
-  const stepColor = nameIndex === 1 ? 'primary-container' : 'tertiary-container';
+
+  // Check if the letter is a valid alphabetic character
+  const isAlpha = /^[a-zA-Z]$/.test(letter);
+
+  // Static gradient classes based on nameIndex
+  const gradientClass =
+    nameIndex === 1
+      ? 'from-primary-container to-primary-container/70'
+      : 'from-tertiary-container to-tertiary-container/70';
+
+  if (!isAlpha) {
+    return (
+      <div
+        className={cn(
+          'text-on-surface/50 bg-surface-container/20 border-outline/10 flex h-14 w-14 items-center justify-center rounded-xl border text-lg font-bold',
+          className
+        )}
+      >
+        {letter}
+      </div>
+    );
+  }
 
   return (
     <motion.div className="relative">
@@ -104,9 +126,10 @@ export default function LetterTile({
       >
         {/* Background gradient effect */}
         <div
-          className={`absolute inset-0 rounded-xl bg-linear-to-br opacity-0 transition-opacity duration-300 group-hover:opacity-20 ${
-            !isCrossed ? `from-${stepColor} to-${stepColor}/70` : ''
-          }`}
+          className={cn(
+            'absolute inset-0 rounded-xl bg-linear-to-br opacity-0 transition-opacity duration-300 group-hover:opacity-20',
+            !isCrossed && gradientClass
+          )}
         />
 
         {/* Letter content */}

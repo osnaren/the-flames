@@ -474,9 +474,12 @@ export default function CanvasExperience({
             <div className="border-outline/30 bg-surface absolute inset-0 overflow-hidden rounded-xl border-2 shadow-2xl sm:rounded-2xl">
               {isDarkMode ? (
                 <Image
-                  src="assets/blackboard.jpg"
-                  className="pointer-events-none h-full w-full select-none"
+                  src="/assets/blackboard.jpg"
+                  className="pointer-events-none h-full w-full select-none object-cover"
                   alt="Blackboard background"
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1024px"
                 />
               ) : (
                 <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(180deg,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-size-[20px_20px] dark:bg-[linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.02)_1px,transparent_1px)]" />
@@ -643,10 +646,11 @@ export default function CanvasExperience({
 
             {/* Canvas Loading State */}
             {!isCanvasReady && (
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-surface/50 backdrop-blur-sm">
                 <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}>
                   <Sparkles className="text-primary h-8 w-8" />
                 </motion.div>
+                <p className="text-on-surface-variant text-sm font-medium">Preparing canvas...</p>
               </div>
             )}
           </motion.div>

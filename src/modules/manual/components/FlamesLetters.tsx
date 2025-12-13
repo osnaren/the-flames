@@ -38,6 +38,46 @@ export default function FlamesLetters({
     return 'active';
   };
 
+  // Static color mappings for each FLAMES letter (Tailwind requires static classes)
+  const flameColorMap: Record<string, { container: string; text: string; meaning: string; icon: string }> = {
+    F: {
+      container: 'bg-friendship-container/30 border-friendship-container hover:bg-friendship-container/40',
+      text: 'text-on-friendship-container',
+      meaning: 'text-on-friendship-container/80',
+      icon: 'text-friendship',
+    },
+    L: {
+      container: 'bg-love-container/30 border-love-container hover:bg-love-container/40',
+      text: 'text-on-love-container',
+      meaning: 'text-on-love-container/80',
+      icon: 'text-love',
+    },
+    A: {
+      container: 'bg-affection-container/30 border-affection-container hover:bg-affection-container/40',
+      text: 'text-on-affection-container',
+      meaning: 'text-on-affection-container/80',
+      icon: 'text-affection',
+    },
+    M: {
+      container: 'bg-marriage-container/30 border-marriage-container hover:bg-marriage-container/40',
+      text: 'text-on-marriage-container',
+      meaning: 'text-on-marriage-container/80',
+      icon: 'text-marriage',
+    },
+    E: {
+      container: 'bg-enemy-container/30 border-enemy-container hover:bg-enemy-container/40',
+      text: 'text-on-enemy-container',
+      meaning: 'text-on-enemy-container/80',
+      icon: 'text-enemy',
+    },
+    S: {
+      container: 'bg-siblings-container/30 border-siblings-container hover:bg-siblings-container/40',
+      text: 'text-on-siblings-container',
+      meaning: 'text-on-siblings-container/80',
+      icon: 'text-siblings',
+    },
+  };
+
   const getStatusColors = (letter: string, status: string) => {
     if (status === 'final-result') {
       return {
@@ -57,16 +97,9 @@ export default function FlamesLetters({
       };
     }
 
-    const flameData = flamesData.find((f) => f.letter === letter);
-    if (flameData) {
-      return {
-        container: cn(
-          `bg-${flameData.color}-container/30 border-${flameData.color}-container hover:bg-${flameData.color}-container/40`
-        ),
-        text: `text-on-${flameData.color}-container`,
-        meaning: `text-on-${flameData.color}-container/80`,
-        icon: `text-${flameData.color}`,
-      };
+    // Use the static color map
+    if (flameColorMap[letter]) {
+      return flameColorMap[letter];
     }
 
     return {
@@ -221,14 +254,16 @@ export default function FlamesLetters({
       )}
 
       <div className="mt-6 text-center">
-        <div className="bg-surface-container/50 inline-flex items-center space-x-2 rounded-full px-4 py-2">
-          <span className="text-on-surface-variant text-sm">Progress: {crossedLetters.size}/6 letters crossed</span>
-          <div className="bg-surface-variant h-2 w-16 overflow-hidden rounded-full">
+        <div className="bg-surface-container/50 border-outline/20 inline-flex items-center gap-3 rounded-full border px-4 py-2 backdrop-blur-sm">
+          <span className="text-on-surface-variant text-sm font-medium">
+            {crossedLetters.size === 5 ? 'Almost there!' : `${crossedLetters.size}/5 eliminated`}
+          </span>
+          <div className="bg-surface-variant h-2 w-20 overflow-hidden rounded-full">
             <motion.div
               className="bg-primary h-full rounded-full"
               initial={{ width: 0 }}
-              animate={{ width: `${(crossedLetters.size / 6) * 100}%` }}
-              transition={{ duration: 0.5 }}
+              animate={{ width: `${(crossedLetters.size / 5) * 100}%` }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
             />
           </div>
         </div>

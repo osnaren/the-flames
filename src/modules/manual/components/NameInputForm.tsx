@@ -73,7 +73,13 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
       <motion.div variants={containerVariants} initial="hidden" animate="visible" className="w-full max-w-md">
         <div className="bg-surface/80 border-outline/20 rounded-3xl border p-6 shadow-2xl backdrop-blur-xl sm:p-8">
           <motion.div variants={itemVariants} className="mb-8 text-center">
-            <Heart className="text-primary mx-auto mb-4 h-12 w-12" />
+            <motion.div
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="inline-block"
+            >
+              <Heart className="text-primary mx-auto mb-4 h-12 w-12" />
+            </motion.div>
             <h1 className="font-heading text-on-surface mb-2 text-3xl font-bold tracking-tight">FLAMES Manual Mode</h1>
             <p className="text-on-surface-variant">Discover your relationship destiny.</p>
           </motion.div>
@@ -136,9 +142,9 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
                       <Pointer className="h-5 w-5" />
                       <span className="font-semibold">Interactive</span>
                     </div>
-                    <p className="text-on-primary-container/80 mt-1 text-sm">Step-by-step reveal</p>
+                    <p className="text-on-primary-container/80 mt-1 text-sm">Click to cross out letters</p>
                   </div>
-                  <ArrowRight className="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:translate-x-full" />
+                  <ArrowRight className="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:translate-x-1" />
                 </Button>
 
                 <Button
@@ -153,9 +159,9 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
                       <Pen className="h-5 w-5" />
                       <span className="font-semibold">Creative</span>
                     </div>
-                    <p className="text-on-secondary-container/80 mt-1 text-sm">The old school way</p>
+                    <p className="text-on-secondary-container/80 mt-1 text-sm">Draw like pen on paper</p>
                   </div>
-                  <ArrowRight className="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:translate-x-full" />
+                  <ArrowRight className="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:translate-x-1" />
                 </Button>
               </div>
             </motion.div>
@@ -164,9 +170,9 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
               variants={itemVariants}
               className="bg-tertiary-container/20 border-tertiary-container/30 flex items-center space-x-3 rounded-xl border p-3"
             >
-              <Info className="text-tertiary-container h-5 w-5 shrink-0" />
+              <Info className="text-tertiary h-5 w-5 shrink-0" />
               <p className="text-on-surface-variant text-sm">
-                Names must be 2-20 characters long and contain only letters.
+                Names should be 2-20 characters and contain only letters.
               </p>
             </motion.div>
           </motion.form>

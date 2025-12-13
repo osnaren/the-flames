@@ -69,8 +69,9 @@ export default function CanvasTools({
                 : 'text-on-surface hover:bg-surface-container/50'
             )}
             aria-label={isErasing ? 'Switch to drawing mode' : 'Switch to erasing mode'}
+            aria-pressed={isErasing}
           >
-            {!isMobile && <span className="ml-1">{isErasing ? 'Erasing' : 'Draw'}</span>}
+            {!isMobile && <span className="ml-1">{isErasing ? 'Erasing' : 'Erase'}</span>}
           </Button>
 
           <Button
