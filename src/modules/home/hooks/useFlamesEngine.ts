@@ -150,13 +150,44 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
     const flamesResult = calculateFlamesResult(validName1, validName2);
 
     // Calculate remaining letters after removing common ones
-    const name1Letters = validName1.toLowerCase().split('');
-    const name2Letters = validName2.toLowerCase().split('');
-    const commonSet = new Set(common.map((l) => l.toLowerCase()));
+    // Only include alphabetic characters (consistent with FLAMES calculation)
+    const isLetter = (char: string) => /\p{L}/u.test(char);
+    const name1Letters = [...validName1.toLowerCase()].filter(isLetter);
+    const name2Letters = [...validName2.toLowerCase()].filter(isLetter);
 
-    // Remove common letters from both names
-    const remaining1 = name1Letters.filter((letter) => !commonSet.has(letter));
-    const remaining2 = name2Letters.filter((letter) => !commonSet.has(letter));
+    // Remove common letters from both names (one occurrence per match)
+    const remaining1: string[] = [];
+    const remaining2: string[] = [];
+    const usedCommon1 = new Map<string, number>();
+    const usedCommon2 = new Map<string, number>();
+
+    // Count how many times each common letter appears
+    for (const letter of common) {
+      const lowerLetter = letter.toLowerCase();
+      usedCommon1.set(lowerLetter, (usedCommon1.get(lowerLetter) || 0) + 1);
+      usedCommon2.set(lowerLetter, (usedCommon2.get(lowerLetter) || 0) + 1);
+    }
+
+    // Filter name1 letters, removing matched occurrences
+    for (const letter of name1Letters) {
+      const count = usedCommon1.get(letter) || 0;
+      if (count > 0) {
+        usedCommon1.set(letter, count - 1);
+      } else {
+        remaining1.push(letter);
+      }
+    }
+
+    // Filter name2 letters, removing matched occurrences
+    for (const letter of name2Letters) {
+      const count = usedCommon2.get(letter) || 0;
+      if (count > 0) {
+        usedCommon2.set(letter, count - 1);
+      } else {
+        remaining2.push(letter);
+      }
+    }
+
     const remainingCombined = [...remaining1, ...remaining2];
 
     return {
@@ -265,6 +296,8 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
         setRemainingLetters(gameData.remainingLetters);
         // Provide common letters up-front so the processor doesn't restart mid-animation
         setCommonLetters(gameData.commonLetters);
+        // Set result immediately so FlamesProcessor has the correct value from the start
+        setResult(gameData.result);
 
         // Bump runId so processors remount even if names repeat
         setRunId((id) => id + 1);

@@ -237,16 +237,21 @@ function FlamesProcessorComponent({
       const countStep = () => {
         if (count < safeRemainingCount) {
           count++;
-          setCountDisplay(count);
 
-          // Find next non-eliminated letter
+          // Find next non-eliminated letter first
           let nextPos = currentPositionRef.current;
           do {
             nextPos = (nextPos + 1) % 6;
           } while (eliminatedRef.current.has(nextPos));
 
           currentPositionRef.current = nextPos;
+          // Highlight the letter first
           setActiveFlamesIndex(nextPos);
+
+          // Show count number after a brief delay so letter highlights first
+          addTimeout(() => {
+            setCountDisplay(count);
+          }, 50);
 
           addTimeout(countStep, PROCESSOR_TIMING.COUNT_PER_LETTER);
         } else {

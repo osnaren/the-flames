@@ -7,12 +7,17 @@ import type { FlamesResult } from './types';
 
 /**
  * Schema for validating names in the FLAMES game
+ * Allows letters (including Unicode), spaces, hyphens, apostrophes, and dots
+ * The FLAMES calculation itself only uses alphabetic letters
  */
 export const nameSchema = z
   .string()
   .min(1, 'Name is required')
-  .regex(/^[a-zA-Z\s]+$/, 'Only letters and spaces allowed')
-  .transform((s) => s.trim());
+  .max(50, 'Name must be 50 characters or less')
+  .regex(/^[\p{L}\s'.'-]+$/u, 'Only letters, spaces, hyphens, apostrophes, and dots are allowed')
+  .transform((s) => s.trim())
+  .refine((s) => s.length > 0, 'Name cannot be empty after trimming')
+  .refine((s) => /[\p{L}]/u.test(s), 'Name must contain at least one letter');
 
 /**
  * Type for a character with its position
@@ -32,11 +37,12 @@ interface MatchedLettersResult {
 }
 
 /**
- * Normalize a name string for consistent comparisons
+ * Normalize a name string for consistent FLAMES calculations
  * - Lowercases
- * - Removes spaces
+ * - Removes all non-letter characters (spaces, hyphens, apostrophes, dots, etc.)
+ * Only alphabetic characters (including Unicode letters) are used in the FLAMES counting algorithm
  */
-const sanitizeName = (name: string): string => name.toLowerCase().replace(/\s+/g, '');
+const sanitizeName = (name: string): string => [...name.toLowerCase()].filter((char) => /\p{L}/u.test(char)).join('');
 
 /**
  * Find matches between two names and track matched positions
