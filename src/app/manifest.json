@@ -29,11 +29,7 @@
   "background_color": "#ffffff",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "categories": [
-    "games",
-    "entertainment",
-    "social"
-  ],
+  "categories": ["games", "entertainment", "social"],
   "lang": "en",
   "dir": "ltr",
   "prefer_related_applications": false,

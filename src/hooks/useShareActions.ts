@@ -1,5 +1,5 @@
-import { copyShareUrl, shareResult } from '@lib/share';
 import { FlamesResult, getResultData } from '@/utils/resultData';
+import { copyShareUrl, shareResult } from '@lib/share';
 import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 

@@ -217,12 +217,13 @@ export default function Header() {
             >
               Plot twist:
             </motion.span>{' '}
-            It&apos;s not magic (well, maybe a little ✨). The results aren&apos;t some secret prophecy—just good old-fashioned
-            letter-crossing chaos from playgrounds worldwide.
+            It&apos;s not magic (well, maybe a little ✨). The results aren&apos;t some secret prophecy—just good
+            old-fashioned letter-crossing chaos from playgrounds worldwide.
           </p>
           <p className="text-on-surface-variant/70 mx-auto mt-3 max-w-xl text-base italic">
-            But here&apos;s the real mystery: <span className="text-on-surface font-medium">who invented this?</span> No one knows. 
-            Could be ancient love gods. Could be a bored kid in math class. We prefer the divine magic theory. 🔮
+            But here&apos;s the real mystery: <span className="text-on-surface font-medium">who invented this?</span> No
+            one knows. Could be ancient love gods. Could be a bored kid in math class. We prefer the divine magic
+            theory. 🔮
           </p>
         </motion.div>
 

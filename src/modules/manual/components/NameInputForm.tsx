@@ -75,7 +75,7 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
           <motion.div variants={itemVariants} className="mb-8 text-center">
             <motion.div
               animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               className="inline-block"
             >
               <Heart className="text-primary mx-auto mb-4 h-12 w-12" />

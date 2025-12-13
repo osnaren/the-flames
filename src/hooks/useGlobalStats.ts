@@ -1,5 +1,5 @@
-import { generateMockData, GlobalStats } from '@modules/charts';
 import { NonNullFlamesResult } from '@/utils/resultData';
+import { generateMockData, GlobalStats } from '@modules/charts';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { getStatsWithTrends, getUserCountry, StatsError, TimeWindow } from '../lib/supabase';

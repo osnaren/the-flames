@@ -9,51 +9,51 @@ The following is a set of guidelines for contributing to The Flames. These are m
 1. **Fork the repository** on GitHub.
 2. **Clone your fork** locally:
 
-    ```bash
-    git clone https://github.com/your-username/the-flames.git
-    cd the-flames
-    ```
+   ```bash
+   git clone https://github.com/your-username/the-flames.git
+   cd the-flames
+   ```
 
 3. **Install dependencies**:
 
-    ```bash
-    npm install
-    ```
+   ```bash
+   npm install
+   ```
 
 4. **Set up environment variables**:
-    Copy `.env.example` to `.env.local` and fill in the required values.
+   Copy `.env.example` to `.env.local` and fill in the required values.
 
-    ```bash
-    cp .env.example .env.local
-    ```
+   ```bash
+   cp .env.example .env.local
+   ```
 
 5. **Start the development server**:
 
-    ```bash
-    npm run dev
-    ```
+   ```bash
+   npm run dev
+   ```
 
 ## Development Workflow
 
 1. Create a new branch for your feature or fix:
 
-    ```bash
-    git checkout -b feature/amazing-feature
-    ```
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
 
 2. Make your changes.
 3. Run linting and formatting checks:
 
-    ```bash
-    npm run lint
-    npm run format
-    ```
+   ```bash
+   npm run lint
+   npm run format
+   ```
 
 4. Run tests to ensure no regressions:
 
-    ```bash
-    npm test
-    ```
+   ```bash
+   npm test
+   ```
 
 ## Pull Request Process
 

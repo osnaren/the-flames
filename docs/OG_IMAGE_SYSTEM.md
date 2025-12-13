@@ -179,9 +179,9 @@ const colorScheme = OG_COLOR_SCHEMES.dark; // or .light
 Standard sizes defined:
 
 ```typescript
-OG_IMAGE_SIZES.default  // 1200x630 (standard OG)
-OG_IMAGE_SIZES.twitter  // 1200x628 (Twitter)
-OG_IMAGE_SIZES.square   // 1200x1200 (some platforms)
+OG_IMAGE_SIZES.default; // 1200x630 (standard OG)
+OG_IMAGE_SIZES.twitter; // 1200x628 (Twitter)
+OG_IMAGE_SIZES.square; // 1200x1200 (some platforms)
 ```
 
 ## Security

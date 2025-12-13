@@ -18,7 +18,14 @@
 import { ImageResponse } from 'next/og';
 import type { NextRequest } from 'next/server';
 
-import { isRedisConfigured, ogRateLimiter } from '@/lib/redis';
+import {
+  OG_CACHE_CONFIG,
+  OG_IMAGE_SIZES,
+  generateCacheControl,
+  getOGFonts,
+  sanitizeName,
+  validateResult,
+} from '@/lib/og';
 import {
   FlamesLetters,
   OGBackground,
@@ -29,14 +36,7 @@ import {
   OGResultTagline,
   OGTitle,
 } from '@/lib/og/components';
-import {
-  OG_CACHE_CONFIG,
-  OG_IMAGE_SIZES,
-  generateCacheControl,
-  getOGFonts,
-  sanitizeName,
-  validateResult,
-} from '@/lib/og';
+import { isRedisConfigured, ogRateLimiter } from '@/lib/redis';
 
 export const runtime = 'edge';
 
@@ -48,10 +48,7 @@ function FallbackImage() {
   return (
     <OGBackground result={null}>
       <FlamesLetters highlightLetter={null} />
-      <OGTitle
-        title="FLAMES Game"
-        subtitle="Discover Your Relationship Compatibility"
-      />
+      <OGTitle title="FLAMES Game" subtitle="Discover Your Relationship Compatibility" />
       <div
         style={{
           display: 'flex',

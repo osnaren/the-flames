@@ -12,9 +12,9 @@
 import { ImageResponse } from 'next/og';
 import type { NextRequest } from 'next/server';
 
-import { isRedisConfigured, ogRateLimiter } from '@/lib/redis';
 import { OG_CACHE_CONFIG, OG_IMAGE_SIZES, PAGE_OG_CONFIGS, generateCacheControl, getOGFonts } from '@/lib/og';
 import { FlamesLetters, OGBackground, OGBadgeRow, OGCustomIcon, OGFooter, OGTitle } from '@/lib/og/components';
+import { isRedisConfigured, ogRateLimiter } from '@/lib/redis';
 
 export const runtime = 'edge';
 

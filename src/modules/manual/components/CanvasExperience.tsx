@@ -475,7 +475,7 @@ export default function CanvasExperience({
               {isDarkMode ? (
                 <Image
                   src="/assets/blackboard.jpg"
-                  className="pointer-events-none h-full w-full select-none object-cover"
+                  className="pointer-events-none h-full w-full object-cover select-none"
                   alt="Blackboard background"
                   fill
                   priority
@@ -646,7 +646,7 @@ export default function CanvasExperience({
 
             {/* Canvas Loading State */}
             {!isCanvasReady && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-surface/50 backdrop-blur-sm">
+              <div className="bg-surface/50 absolute inset-0 flex flex-col items-center justify-center gap-3 backdrop-blur-sm">
                 <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}>
                   <Sparkles className="text-primary h-8 w-8" />
                 </motion.div>
