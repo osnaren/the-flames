@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+    <defs>
+        <pattern id="confetti" patternUnits="userSpaceOnUse" width="100" height="100">
+            <!-- Gold rectangles -->
+            <rect x="10" y="15" width="4" height="8" fill="#FFD700" transform="rotate(15 12 19)" opacity="0.7" />
+            <rect x="45" y="5" width="3" height="6" fill="#FFD700" transform="rotate(-20 46 8)" opacity="0.6" />
+            <rect x="80" y="25" width="5" height="10" fill="#FFD700" transform="rotate(45 82 30)" opacity="0.8" />
+
+            <!-- Rose/coral pieces -->
+            <rect x="25" y="45" width="4" height="8" fill="#FF6B6B" transform="rotate(-30 27 49)" opacity="0.7" />
+            <rect x="70" y="55" width="3" height="7" fill="#FF6B6B" transform="rotate(60 71 58)" opacity="0.6" />
+
+            <!-- Blue pieces -->
+            <rect x="55" y="35" width="4" height="8" fill="#87CEEB" transform="rotate(10 57 39)" opacity="0.5" />
+            <rect x="15" y="75" width="5" height="9" fill="#87CEEB" transform="rotate(-45 17 79)" opacity="0.7" />
+
+            <!-- White sparkles -->
+            <circle cx="35" cy="20" r="2" fill="#FFFFFF" opacity="0.8" />
+            <circle cx="90" cy="70" r="1.5" fill="#FFFFFF" opacity="0.6" />
+            <circle cx="5" cy="50" r="1" fill="#FFFFFF" opacity="0.7" />
+
+            <!-- More confetti -->
+            <rect x="60" y="80" width="4" height="8" fill="#FFD700" transform="rotate(30 62 84)" opacity="0.7" />
+            <rect x="40" y="65" width="3" height="6" fill="#FF6B6B" transform="rotate(-15 41 68)" opacity="0.5" />
+            <rect x="85" y="90" width="4" height="7" fill="#87CEEB" transform="rotate(25 87 93)" opacity="0.6" />
+        </pattern>
+    </defs>
+    <rect width="100" height="100" fill="url(#confetti)" />
+</svg>

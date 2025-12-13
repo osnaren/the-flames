@@ -1,29 +1,26 @@
+import SeasonalThemeSelector from '@/components/settings/SeasonalThemeSelector';
+import { cn } from '@/utils';
+import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { usePreferences } from '@hooks/usePreferences';
 import Toggle from '@ui/Toggle';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { ChevronUp, Flame, Moon, MousePointerClick, Settings, Sun, Volume2, VolumeX } from 'lucide-react';
+import { ChevronUp, Moon, MousePointerClick, Palette, Power, PowerOff, Settings, Sun } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { cn } from 'src/utils';
 
-interface FloatingControlPanelProps {
-  animationsEnabled: boolean;
-  setAnimationsEnabled: (enabled: boolean) => void;
-}
-
-export default function FloatingControlPanel({ animationsEnabled, setAnimationsEnabled }: FloatingControlPanelProps) {
+export default function FloatingControlPanel() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [exitingPanel, setExitingPanel] = useState(false);
   const prefersReducedMotion = useReducedMotion();
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  const [{ isDarkTheme, isSoundEnabled }, { toggleTheme, toggleSound, toggleAnimations }] = usePreferences();
+  const [{ isDarkTheme }, { toggleTheme, toggleAnimations }] = usePreferences();
+  const { shouldAnimate } = useAnimationPreferences();
 
   // Local wrapper for toggling animations to ensure parent state is updated too
   const handleToggleAnimations = useCallback(() => {
     toggleAnimations();
-    setAnimationsEnabled(!animationsEnabled);
-  }, [animationsEnabled, toggleAnimations, setAnimationsEnabled]);
+  }, [toggleAnimations]);
 
   // Handle scroll to top with proper focus management
   const handleScrollToTop = useCallback(() => {
@@ -123,37 +120,35 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
       inactiveIcon: Moon,
       active: !isDarkTheme,
       toggle: toggleTheme,
-      color: 'bg-gradient-to-r from-tertiary-container/30 to-tertiary/10',
+      color: 'bg-linear-to-r from-tertiary-container/30 to-tertiary/10',
       activeColor: 'text-primary text-glow-sm',
       inactiveColor: 'text-on-surface-variant',
       ariaLabel: isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme',
     },
     {
       label: 'Animations',
-      activeIcon: Flame,
-      inactiveIcon: Flame,
-      active: animationsEnabled,
+      activeIcon: Power,
+      inactiveIcon: PowerOff,
+      active: shouldAnimate,
       toggle: handleToggleAnimations,
-      color: 'bg-gradient-to-r from-primary-container/30 to-primary/10',
+      color: 'bg-linear-to-r from-primary-container/30 to-primary/10',
       activeColor: 'text-primary text-glow-sm',
       inactiveColor: 'text-on-surface-variant',
-      ariaLabel: animationsEnabled ? 'Turn off animations' : 'Turn on animations',
+      ariaLabel: shouldAnimate ? 'Turn off animations' : 'Turn on animations',
     },
-    {
-      label: 'Sound',
-      activeIcon: Volume2,
-      inactiveIcon: VolumeX,
-      active: isSoundEnabled,
-      toggle: toggleSound,
-      color: 'bg-gradient-to-r from-secondary-container/30 to-secondary/10',
-      activeColor: 'text-secondary text-glow-sm',
-      inactiveColor: 'text-on-surface-variant',
-      ariaLabel: isSoundEnabled ? 'Turn off sound' : 'Turn on sound',
-    },
+    // Disabled sound control for now
+    // {
+    //   label: 'Sound',
+    //   activeIcon: Volume2,
+    //   inactiveIcon: VolumeX,
+    //   active: isSoundEnabled,
+    //   toggle: toggleSound,
+    //   color: 'bg-linear-to-r from-secondary-container/30 to-secondary/10',
+    //   activeColor: 'text-secondary text-glow-sm',
+    //   inactiveColor: 'text-on-surface-variant',
+    //   ariaLabel: isSoundEnabled ? 'Turn off sound' : 'Turn on sound',
+    // },
   ];
-
-  // Only show animations if they're enabled and user doesn't prefer reduced motion
-  const shouldAnimate = animationsEnabled && !prefersReducedMotion;
 
   // Animation variants
   const panelVariants = {
@@ -163,7 +158,7 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
       borderRadius: '24px',
     },
     expanded: {
-      width: '280px',
+      width: '300px',
       height: 'auto',
       borderRadius: '16px',
     },
@@ -200,7 +195,7 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
       <motion.div
         ref={panelRef}
         className={cn(
-          'border-outline/20 from-surface-container-low/90 to-surface-container-high/80 overflow-hidden border bg-gradient-to-br backdrop-blur-lg',
+          'border-outline/20 from-surface-container-low/90 to-surface-container-high/80 overflow-hidden border bg-linear-to-br backdrop-blur-lg',
           isExpanded && 'shadow-lg',
           isExpanded && isDarkTheme && 'shadow-[0_0_15px_2px_rgba(255,182,144,0.15)]',
           isExpanded && !isDarkTheme && 'shadow-[0_0_15px_2px_rgba(0,0,0,0.1)]',
@@ -216,8 +211,7 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
           duration: prefersReducedMotion ? 0.2 : undefined,
         }}
         aria-label="Settings panel"
-        aria-modal={isExpanded}
-        aria-expanded={isExpanded}
+        role="region"
       >
         <motion.button
           ref={toggleButtonRef}
@@ -227,11 +221,12 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
           className={cn(
             'absolute z-20 flex items-center justify-center rounded-full transition-all',
             isExpanded
-              ? 'from-surface-container-high to-surface-container top-3 right-3 h-8 w-8 bg-gradient-to-br shadow-sm'
+              ? 'from-surface-container-high to-surface-container top-3 right-3 h-8 w-8 bg-linear-to-br shadow-sm'
               : 'inset-0 h-full w-full bg-transparent',
             'text-on-surface-variant hover:text-primary hover:bg-surface-container-low hover:text-glow-sm focus:ring-primary/50 focus:ring-2 focus:outline-none'
           )}
           aria-label={isExpanded ? 'Close settings' : 'Open settings'}
+          suppressHydrationWarning
         >
           {isExpanded ? (
             <ChevronUp size={18} />
@@ -250,7 +245,7 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
               exit="exit"
             >
               <motion.div variants={childVariants} className="mb-4 flex items-center justify-center">
-                <h3 className="from-primary via-primary-container to-error bg-gradient-to-r bg-clip-text text-center text-xs font-medium tracking-wider text-transparent uppercase">
+                <h3 className="from-primary via-primary-container to-error bg-linear-to-r bg-clip-text text-center text-xs font-medium tracking-wider text-transparent uppercase">
                   Settings
                 </h3>
               </motion.div>
@@ -272,6 +267,17 @@ export default function FloatingControlPanel({ animationsEnabled, setAnimationsE
                     />
                   </motion.div>
                 ))}
+
+                {/* Seasonal Theme Selector */}
+                <motion.div className="border-outline/20 mt-3 border-t pt-3" variants={childVariants}>
+                  <div className="mb-2 flex items-center gap-1.5">
+                    <Palette className="text-secondary h-3.5 w-3.5" />
+                    <span className="text-on-surface-variant text-[10px] font-medium tracking-wide uppercase">
+                      Seasonal Theme
+                    </span>
+                  </div>
+                  <SeasonalThemeSelector isExpanded={isExpanded} />
+                </motion.div>
 
                 <motion.div
                   className="border-outline/20 text-on-surface-variant mt-4 border-t pt-4 text-center text-xs"

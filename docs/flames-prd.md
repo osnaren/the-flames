@@ -1,5 +1,7 @@
 # The Flames App – Product Requirements Document (PRD)
 
+> **Note:** This is an internal planning document used during the initial development phase. It is preserved here for reference and historical context. Some features may have evolved or changed in the final implementation.
+
 ## 1. Overview & Vision
 
 **Product Name:**  
@@ -58,7 +60,7 @@ To create an experience that is nostalgic yet innovative, combining fun, visual 
 **Out-of-Scope:**
 
 - Full backend integration for global charts (to be revisited after MVP)
-- Extensive user authentication and data privacy management (app data remains anonymous)
+- Extensive user authentication and data privacy management (no personal data is stored)
 - Advanced analytics or AI-driven enhancements (future roadmap items)
 
 ---

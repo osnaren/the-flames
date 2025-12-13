@@ -1,0 +1,20 @@
+/* TEAM */
+Project: FLAMES Game
+Developer: osLabs
+Website: https://osnaren.com
+Location: India
+Twitter: @osnaren
+
+/* SITE */
+Last update: 2025/12/13
+Language: English
+Standards: HTML5, CSS3, JavaScript ES6+
+Framework: Next.js 16, React 19
+Styling: Tailwind CSS v4
+Animation: Framer Motion
+Database: Supabase
+Hosting: Vercel
+
+/* THANKS */
+The nostalgic FLAMES game that brought joy to classrooms everywhere.
+All the users who play and share their results.

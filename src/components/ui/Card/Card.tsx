@@ -37,8 +37,8 @@ export default function Card({ children, className = '', variant = 'default', el
 
   // Base styles
   const baseStyles = `
-    bg-gradient-to-br from-surface-container-lowest to-surface-container text-on-surface
-    dark:bg-gradient-to-br dark:from-surface-container-lowest dark:to-surface-container dark:text-on-surface
+    bg-linear-to-br from-surface-container-lowest to-surface-container text-on-surface
+    dark:bg-linear-to-br dark:from-surface-container-lowest dark:to-surface-container dark:text-on-surface
     rounded-xl
     transition-all duration-var(--duration)
     backdrop-blur-xs

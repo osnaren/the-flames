@@ -1,0 +1,423 @@
+/* Seasonal Theme Transitions */
+.theme-transitioning {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-transitioning * {
+  transition:
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Theme Variables */
+:root {
+  --theme-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Valentine Theme */
+.valentine-theme {
+  --heart-animation: heartbeat 2s ease-in-out infinite;
+  --romantic-glow: 0 0 20px rgba(255, 107, 157, 0.3);
+}
+
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.valentine-theme .flames-letter {
+  filter: drop-shadow(0 0 10px rgba(255, 107, 157, 0.3));
+  animation: var(--heart-animation);
+}
+
+.valentine-theme .result-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 107, 157, 0.1) 0%,
+    rgba(255, 142, 142, 0.1) 50%,
+    rgba(255, 64, 129, 0.1) 100%
+  );
+  border: 1px solid rgba(255, 107, 157, 0.2);
+  box-shadow: var(--romantic-glow);
+}
+
+.valentine-theme .badge-unlock {
+  animation: valentine-sparkle 1s ease-out;
+}
+
+@keyframes valentine-sparkle {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(0deg);
+    opacity: 1;
+    filter: brightness(1.5) drop-shadow(0 0 15px rgba(255, 107, 157, 0.8));
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Halloween Theme */
+.halloween-theme {
+  --glow-animation: spooky-glow 3s ease-in-out infinite alternate;
+  --float-animation: ghost-float 4s ease-in-out infinite;
+  --spooky-shadow: 0 0 30px rgba(255, 102, 0, 0.5), 0 0 60px rgba(155, 77, 202, 0.4);
+}
+
+@keyframes spooky-glow {
+  0% {
+    box-shadow:
+      0 0 20px rgba(255, 102, 0, 0.3),
+      0 0 40px rgba(155, 77, 202, 0.2);
+  }
+  100% {
+    box-shadow:
+      0 0 30px rgba(255, 102, 0, 0.5),
+      0 0 60px rgba(155, 77, 202, 0.4);
+  }
+}
+
+@keyframes ghost-float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+}
+
+.halloween-theme .flames-letter {
+  filter: drop-shadow(0 0 15px rgba(255, 102, 0, 0.5));
+  animation: var(--glow-animation);
+}
+
+.halloween-theme .result-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 102, 0, 0.1) 0%,
+    rgba(155, 77, 202, 0.1) 50%,
+    rgba(0, 255, 148, 0.1) 100%
+  );
+  border: 1px solid rgba(255, 102, 0, 0.3);
+  animation: var(--float-animation);
+  box-shadow: var(--spooky-shadow);
+}
+
+.halloween-theme .particle-bat {
+  animation: bat-fly 6s linear infinite;
+}
+
+@keyframes bat-fly {
+  0% {
+    transform: translateX(-100px) scaleX(1);
+  }
+  50% {
+    transform: translateX(50vw) scaleX(-1);
+  }
+  100% {
+    transform: translateX(calc(100vw + 100px)) scaleX(1);
+  }
+}
+
+.halloween-theme .badge-unlock {
+  animation: halloween-materialize 1.2s ease-out;
+}
+
+@keyframes halloween-materialize {
+  0% {
+    transform: scale(0) rotateY(180deg);
+    opacity: 0;
+    filter: brightness(0);
+  }
+  50% {
+    transform: scale(1.1) rotateY(0deg);
+    opacity: 0.8;
+    filter: brightness(1.5) drop-shadow(0 0 20px rgba(255, 102, 0, 0.8));
+  }
+  100% {
+    transform: scale(1) rotateY(0deg);
+    opacity: 1;
+    filter: brightness(1);
+  }
+}
+
+/* Christmas Theme */
+.christmas-theme {
+  --twinkle-animation: twinkle 2s ease-in-out infinite;
+  --snow-fall: snow-fall 10s linear infinite;
+  --sparkle-animation: sparkle 3s ease-in-out infinite;
+  --festive-glow: 0 0 15px rgba(220, 20, 60, 0.4), 0 0 25px rgba(34, 139, 34, 0.3);
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes snow-fall {
+  0% {
+    transform: translateY(-100vh) translateX(0px) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) translateX(100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle {
+  0%,
+  100% {
+    filter: brightness(1) drop-shadow(0 0 5px rgba(255, 215, 0, 0.3));
+  }
+  50% {
+    filter: brightness(1.3) drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
+  }
+}
+
+.christmas-theme .flames-letter {
+  filter: drop-shadow(0 0 10px rgba(220, 20, 60, 0.4));
+  animation: var(--twinkle-animation);
+}
+
+.christmas-theme .result-card {
+  background: linear-gradient(
+    135deg,
+    rgba(220, 20, 60, 0.1) 0%,
+    rgba(34, 139, 34, 0.1) 50%,
+    rgba(255, 215, 0, 0.1) 100%
+  );
+  border: 1px solid rgba(220, 20, 60, 0.2);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--festive-glow);
+}
+
+.christmas-theme .snowflake {
+  animation: var(--snow-fall);
+  animation-delay: calc(var(--delay) * 1s);
+}
+
+.christmas-theme .gold-accent {
+  animation: var(--sparkle-animation);
+}
+
+.christmas-theme .badge-unlock {
+  animation: christmas-twinkle 1.5s ease-out;
+}
+
+@keyframes christmas-twinkle {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  25% {
+    transform: scale(0.5) rotate(90deg);
+    opacity: 0.5;
+    filter: brightness(2) drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 1;
+    filter: brightness(1.5) drop-shadow(0 0 20px rgba(220, 20, 60, 0.6));
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+    opacity: 1;
+    filter: brightness(1);
+  }
+}
+
+.christmas-theme::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('/patterns/falling-snow.gif') repeat;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Default Theme */
+.default-theme {
+  --smooth-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.default-theme .flames-letter {
+  transition: var(--smooth-transition);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.default-theme .flames-letter:hover {
+  transform: translateY(-2px);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+.default-theme .result-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  backdrop-filter: blur(10px);
+  transition: var(--smooth-transition);
+}
+
+.default-theme .gradient-background {
+  background: linear-gradient(
+    135deg,
+    rgba(249, 115, 22, 0.1) 0%,
+    rgba(139, 92, 246, 0.1) 50%,
+    rgba(6, 182, 212, 0.1) 100%
+  );
+}
+
+.default-theme .badge-unlock {
+  animation: default-bounce 0.8s ease-out;
+}
+
+@keyframes default-bounce {
+  0% {
+    transform: scale(0) translateY(20px);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) translateY(-5px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(0px);
+    opacity: 1;
+  }
+}
+
+/* Universal Badge Animations */
+.badge-notification {
+  animation: badge-slide-in 0.6s ease-out;
+}
+
+@keyframes badge-slide-in {
+  0% {
+    transform: translateX(100%) scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0%) scale(1);
+    opacity: 1;
+  }
+}
+
+.badge-progress-bar {
+  transition: width 0.5s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.badge-progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: progress-shine 2s ease-out infinite;
+}
+
+@keyframes progress-shine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Accessibility and Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .valentine-theme .flames-letter,
+  .halloween-theme .flames-letter,
+  .christmas-theme .flames-letter,
+  .halloween-theme .result-card,
+  .christmas-theme .snowflake,
+  .christmas-theme .gold-accent,
+  .particle-bat {
+    animation: none !important;
+  }
+
+  .theme-transitioning,
+  .theme-transitioning * {
+    transition: none !important;
+  }
+
+  .badge-progress-bar::after {
+    animation: none !important;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .valentine-theme .flames-letter,
+  .halloween-theme .flames-letter,
+  .christmas-theme .flames-letter {
+    filter: none !important;
+  }
+
+  .valentine-theme .result-card,
+  .halloween-theme .result-card,
+  .christmas-theme .result-card {
+    border-width: 2px !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Focus States for Accessibility */
+.flames-letter:focus-visible,
+.result-card:focus-visible,
+.badge-unlock:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .valentine-theme,
+  .halloween-theme,
+  .christmas-theme,
+  .default-theme {
+    background: white !important;
+    color: black !important;
+  }
+
+  .flames-letter,
+  .result-card {
+    filter: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+  }
+}

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+    <!-- Decorative pot symbol -->
+    <ellipse cx="18" cy="35" rx="8" ry="10" fill="#CD853F" />
+    <ellipse cx="18" cy="28" rx="5" ry="3" fill="#FFFACD" />
+    <!-- Text -->
+    <text x="35" y="42" font-family="Georgia, serif" font-size="32" font-weight="bold" fill="#CD853F">Pongal</text>
+    <!-- Sun decoration -->
+    <circle cx="165" cy="30" r="10" fill="#FFD700" />
+    <g stroke="#FF8C00" stroke-width="2">
+        <line x1="165" y1="16" x2="165" y2="20" />
+        <line x1="165" y1="40" x2="165" y2="44" />
+        <line x1="151" y1="30" x2="155" y2="30" />
+        <line x1="175" y1="30" x2="179" y2="30" />
+    </g>
+</svg>

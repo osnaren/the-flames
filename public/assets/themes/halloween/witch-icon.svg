@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+    <!-- Witch hat -->
+    <polygon points="32,2 52,48 12,48" fill="#1a1a1a" />
+    <!-- Hat brim -->
+    <ellipse cx="32" cy="48" rx="26" ry="8" fill="#2D2D2D" />
+    <ellipse cx="32" cy="48" rx="20" ry="5" fill="#1a1a1a" />
+    <!-- Hat band -->
+    <rect x="18" y="38" width="28" height="6" fill="#7B1FA2" />
+    <!-- Buckle -->
+    <rect x="28" y="37" width="8" height="8" fill="#FFD700" rx="1" />
+    <rect x="30" y="39" width="4" height="4" fill="#1a1a1a" />
+    <!-- Stars decoration -->
+    <g fill="#FFD700" opacity="0.8">
+        <polygon points="20,20 21,24 18,22 22,22 19,24" />
+        <polygon points="44,26 45,30 42,28 46,28 43,30" />
+    </g>
+</svg>

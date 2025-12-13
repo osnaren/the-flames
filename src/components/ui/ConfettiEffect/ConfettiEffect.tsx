@@ -1,7 +1,6 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { FlamesResult } from '@features/flamesGame/flames.types';
-import { getResultVisuals } from '@features/flamesGame/resultVisuals';
+import { FlamesResult, getResultData } from '@/utils/resultData';
 import confetti from 'canvas-confetti';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
@@ -24,23 +23,21 @@ function ConfettiEffect({ result, isActive }: ConfettiEffectProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isLowEndDevice, setIsLowEndDevice] = useState(false);
 
+  // Detect low-end device on mount (client-side only)
+  useEffect(() => {
+    if (typeof navigator === 'undefined') return;
+    const isLowEnd =
+      (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    setIsLowEndDevice(isLowEnd);
+  }, []);
+
   // Use our custom hooks
   const deviceType = useDeviceType();
   const { shouldAnimate } = useAnimationPreferences();
 
   // Store a single confetti instance instead of multiple ones
   const confettiInstanceRef = useRef<confetti.CreateTypes | null>(null);
-
-  // Check device capabilities
-  useEffect(() => {
-    // Detect if likely a low-end device
-    setIsLowEndDevice(
-      // Check for CPU cores or low memory devices
-      (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
-        // Check if it's a mobile device
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    );
-  }, []);
 
   // Define cannon positions based on device type
   const cannonPositions = useCallback((): CannonPosition[] => {
@@ -107,7 +104,7 @@ function ConfettiEffect({ result, isActive }: ConfettiEffectProps) {
       if (!confettiInstanceRef.current || !result) return;
 
       setTimeout(() => {
-        const visualConfig = getResultVisuals(result);
+        const visualConfig = getResultData(result);
         const particleCount = isLowEndDevice
           ? Math.floor(visualConfig.particleCount * 0.6)
           : visualConfig.particleCount;
@@ -176,7 +173,7 @@ function ConfettiEffect({ result, isActive }: ConfettiEffectProps) {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-[60]"
+      className="pointer-events-none fixed inset-0 z-60"
       style={{ width: '100%', height: '100%' }}
       aria-hidden="true"
     />

@@ -1,5 +1,4 @@
-import { FlamesResult } from '@features/flamesGame/flames.types';
-import { resultMeanings } from '@features/flamesGame/flames.utils';
+import { FlamesResult, getResultData } from '@/utils/resultData';
 import { copyShareUrl, shareResult } from '@lib/share';
 import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -17,7 +16,7 @@ export function useShareActions(name1: string, name2: string, result: FlamesResu
       name1,
       name2,
       result,
-      resultText: resultMeanings[result].text,
+      resultText: getResultData(result).text,
     };
 
     try {
@@ -27,8 +26,7 @@ export function useShareActions(name1: string, name2: string, result: FlamesResu
       } else {
         setIsSharePopoverOpen(true);
       }
-    } catch (error) {
-      console.error('Share failed:', error);
+    } catch {
       toast.error('Failed to share result');
     }
   }, [name1, name2, result]);
@@ -37,8 +35,7 @@ export function useShareActions(name1: string, name2: string, result: FlamesResu
     try {
       await copyShareUrl(name1, name2);
       toast.success('Link copied to clipboard!');
-    } catch (error) {
-      console.error('Copy failed:', error);
+    } catch {
       toast.error('Failed to copy link');
     }
   }, [name1, name2]);

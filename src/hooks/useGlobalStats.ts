@@ -1,12 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
-import { 
-  getStatsWithTrends,
-  getUserCountry,
-  TimeWindow,
-  StatsError
-} from '../lib/supabase';
-import { GlobalStats } from '../components/layout/GlobalCharts/types';
+import { NonNullFlamesResult } from '@/utils/resultData';
+import { generateMockData, GlobalStats } from '@modules/charts';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { getStatsWithTrends, getUserCountry, StatsError, TimeWindow } from '../lib/supabase';
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const statsCache = new Map<string, { data: GlobalStats; timestamp: number }>();
@@ -15,10 +11,10 @@ const statsCache = new Map<string, { data: GlobalStats; timestamp: number }>();
 const DEFAULT_STATS: GlobalStats = {
   totalMatches: 0,
   todayMatches: 0,
-  popularNames: [],
   resultStats: [],
-  popularPairs: [],
-  regionalStats: null
+  recentMatches: [],
+  topCountries: [],
+  regionalStats: null,
 };
 
 export function useGlobalStats(timeWindow: TimeWindow = 'today') {
@@ -35,40 +31,54 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
       try {
         const country = await getUserCountry();
         setUserCountry(country);
-      } catch (error) {
-        console.error('Failed to detect country:', error);
-        // Don't set error state - country detection is non-critical
+      } catch {
+        // Country detection is non-critical - silent failure
       }
     };
     detectCountry();
   }, []);
 
   // Transform raw stats into our GlobalStats format with null checks
-  const transformStats = useCallback((rawStats: any): GlobalStats => {
-    if (!rawStats) {
+  const transformStats = useCallback((rawStats: unknown): GlobalStats => {
+    if (!rawStats || typeof rawStats !== 'object') {
       return DEFAULT_STATS;
     }
 
+    const stats = rawStats as Record<string, unknown>;
+
     return {
-      totalMatches: rawStats.total || 0,
-      todayMatches: rawStats.today || 0,
-      popularNames: (rawStats.names || []).map((name: any) => ({
-        name: name?.name || '',
-        count: name?.current_count || 0,
-        trend: Number(name?.trend_percentage || 0)
-      })),
-      resultStats: (rawStats.results || []).map((result: any) => ({
-        result: result?.result || '',
-        count: result?.current_count || 0,
-        trend: Number(result?.trend_percentage || 0)
-      })),
-      popularPairs: (rawStats.pairs || []).map((pair: any) => ({
-        name1: pair?.name1 || '',
-        name2: pair?.name2 || '',
-        result: pair?.result || '',
-        count: pair?.count || 0
-      })),
-      regionalStats: null // Will be populated separately if country is available
+      totalMatches: typeof stats.total === 'number' ? stats.total : 0,
+      todayMatches: typeof stats.today === 'number' ? stats.today : 0,
+      resultStats: (Array.isArray(stats.results) ? stats.results : []).map((result: unknown) => {
+        const resultObj = result as Record<string, unknown>;
+        return {
+          result:
+            typeof resultObj?.result === 'string'
+              ? (resultObj.result as NonNullFlamesResult)
+              : ('' as NonNullFlamesResult),
+          count: typeof resultObj?.current_count === 'number' ? resultObj.current_count : 0,
+          trend: typeof resultObj?.trend_percentage === 'number' ? Number(resultObj.trend_percentage) : 0,
+        };
+      }),
+      recentMatches: (Array.isArray(stats.recent) ? stats.recent : []).map((match: unknown) => {
+        const matchObj = match as Record<string, unknown>;
+        return {
+          result:
+            typeof matchObj?.result === 'string'
+              ? (matchObj.result as NonNullFlamesResult)
+              : ('' as NonNullFlamesResult),
+          country: typeof matchObj?.country === 'string' ? matchObj.country : null,
+          created_at: typeof matchObj?.created_at === 'string' ? matchObj.created_at : '',
+        };
+      }),
+      topCountries: (Array.isArray(stats.top_countries) ? stats.top_countries : []).map((country: unknown) => {
+        const countryObj = country as Record<string, unknown>;
+        return {
+          country: typeof countryObj?.country === 'string' ? countryObj.country : '',
+          count: typeof countryObj?.count === 'number' ? countryObj.count : 0,
+        };
+      }),
+      regionalStats: null, // Will be populated separately if country is available
     };
   }, []);
 
@@ -77,43 +87,47 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
     try {
       const cacheKey = `${timeWindow}-${userCountry || 'global'}`;
       const cached = statsCache.get(cacheKey);
-      
+
       // Return cached data if still valid
       if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
         setData(cached.data);
         setIsLoading(false);
         return;
       }
-      
+
       setIsLoading(true);
       setError(null);
 
+      // Check for mock data flag
+      if (process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true') {
+        const mockData = generateMockData();
+        setData(mockData);
+        setIsLoading(false);
+        return;
+      }
+
       // Fetch global stats
       const globalStats = await getStatsWithTrends(timeWindow);
-      let stats = transformStats(globalStats);
+      const stats = transformStats(globalStats);
 
       // If we have the user's country, fetch regional stats
       if (userCountry) {
         const regionalStats = await getStatsWithTrends(timeWindow, userCountry);
-        if (regionalStats) {
+        if (regionalStats && typeof regionalStats === 'object') {
+          const regional = regionalStats as Record<string, unknown>;
           stats.regionalStats = {
             country: userCountry,
-            names: (regionalStats.names || []).map((name: any) => ({
-              name: name?.name || '',
-              count: name?.current_count || 0,
-              trend: Number(name?.trend_percentage || 0)
-            })),
-            results: (regionalStats.results || []).map((result: any) => ({
-              result: result?.result || '',
-              count: result?.current_count || 0,
-              trend: Number(result?.trend_percentage || 0)
-            })),
-            pairs: (regionalStats.pairs || []).map((pair: any) => ({
-              name1: pair?.name1 || '',
-              name2: pair?.name2 || '',
-              result: pair?.result || '',
-              count: pair?.count || 0
-            }))
+            results: (Array.isArray(regional.results) ? regional.results : []).map((result: unknown) => {
+              const resultObj = result as Record<string, unknown>;
+              return {
+                result:
+                  typeof resultObj?.result === 'string'
+                    ? (resultObj.result as NonNullFlamesResult)
+                    : ('' as NonNullFlamesResult),
+                count: typeof resultObj?.current_count === 'number' ? resultObj.current_count : 0,
+                trend: typeof resultObj?.trend_percentage === 'number' ? Number(resultObj.trend_percentage) : 0,
+              };
+            }),
           };
         }
       }
@@ -121,12 +135,11 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
       setData(stats);
       setLastUpdate(Date.now());
       setRetryCount(0); // Reset retry count on success
-      
+
       // Update cache
       statsCache.set(cacheKey, { data: stats, timestamp: Date.now() });
     } catch (err) {
       const error = err as Error;
-      console.error('Error fetching stats:', error);
 
       // Handle specific error types
       if (error instanceof StatsError) {
@@ -149,10 +162,13 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
 
       // Implement retry logic for certain errors
       if (retryCount < 3 && !(error instanceof StatsError)) {
-        setRetryCount(prev => prev + 1);
-        setTimeout(() => {
-          fetchStats();
-        }, Math.pow(2, retryCount) * 1000); // Exponential backoff
+        setRetryCount((prev) => prev + 1);
+        setTimeout(
+          () => {
+            fetchStats();
+          },
+          Math.pow(2, retryCount) * 1000
+        ); // Exponential backoff
       }
     } finally {
       setIsLoading(false);
@@ -161,15 +177,27 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
 
   // Fetch stats when dependencies change
   useEffect(() => {
-    fetchStats();
-  }, [timeWindow, userCountry]);
+    // Guard against SSR
+    if (typeof window === 'undefined') return;
 
-  return { 
-    data, 
-    isLoading, 
+    fetchStats();
+
+    // Set up polling for live updates (every 30 seconds)
+    const intervalId = setInterval(() => {
+      if (!document.hidden) {
+        fetchStats();
+      }
+    }, 30000);
+
+    return () => clearInterval(intervalId);
+  }, [fetchStats, timeWindow, userCountry]);
+
+  return {
+    data,
+    isLoading,
     error,
     userCountry,
     refetch: fetchStats,
-    lastUpdate
+    lastUpdate,
   };
 }

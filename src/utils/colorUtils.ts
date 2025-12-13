@@ -17,17 +17,15 @@ export function colorToRgbaPrefix(colorString: string): string {
       g = 0,
       b = 0;
     if (color.length === 4) {
-      // #RGB format
       r = parseInt(color[1] + color[1], 16);
       g = parseInt(color[2] + color[2], 16);
       b = parseInt(color[3] + color[3], 16);
     } else if (color.length === 7) {
-      // #RRGGBB format
       r = parseInt(color.substring(1, 3), 16);
       g = parseInt(color.substring(3, 5), 16);
       b = parseInt(color.substring(5, 7), 16);
     }
-    return `rgba(${r}, ${g}, ${b}, `; // Note: Swapped g and b in the previous version, corrected here.
+    return `rgba(${r}, ${g}, ${b}, `;
   } else if (color.startsWith('rgb(')) {
     // rgb(r, g, b) format
     // Extract r, g, b values
@@ -44,6 +42,5 @@ export function colorToRgbaPrefix(colorString: string): string {
   }
 
   // Fallback for unhandled formats (e.g., hsl, hsla) or errors
-  console.warn(`Could not parse color string: ${colorString}. Falling back to black.`);
   return 'rgba(0, 0, 0, ';
 }

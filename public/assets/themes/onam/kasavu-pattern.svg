@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+    <!-- Kasavu (Kerala traditional gold border) pattern -->
+    <g opacity="0.4">
+        <!-- Horizontal gold stripes -->
+        <rect x="0" y="10" width="100" height="3" fill="#FFD54F" />
+        <rect x="0" y="16" width="100" height="1" fill="#FF9800" />
+        <rect x="0" y="85" width="100" height="3" fill="#FFD54F" />
+        <rect x="0" y="82" width="100" height="1" fill="#FF9800" />
+        <!-- Vertical stripes -->
+        <rect x="10" y="0" width="3" height="100" fill="#FFD54F" />
+        <rect x="16" y="0" width="1" height="100" fill="#FF9800" />
+        <rect x="85" y="0" width="3" height="100" fill="#FFD54F" />
+        <rect x="82" y="0" width="1" height="100" fill="#FF9800" />
+        <!-- Corner decorations -->
+        <circle cx="12" cy="12" r="4" fill="#FFD54F" />
+        <circle cx="88" cy="12" r="4" fill="#FFD54F" />
+        <circle cx="12" cy="88" r="4" fill="#FFD54F" />
+        <circle cx="88" cy="88" r="4" fill="#FFD54F" />
+    </g>
+</svg>

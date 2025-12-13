@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+    <defs>
+        <linearGradient id="pongalBg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#FFFEF2" />
+            <stop offset="50%" style="stop-color:#FFF8E7" />
+            <stop offset="100%" style="stop-color:#FFEFD5" />
+        </linearGradient>
+        <radialGradient id="pongalGlow1" cx="30%" cy="70%">
+            <stop offset="0%" style="stop-color:#CD853F;stop-opacity:0.15" />
+            <stop offset="100%" style="stop-color:#CD853F;stop-opacity:0" />
+        </radialGradient>
+        <radialGradient id="pongalGlow2" cx="70%" cy="30%">
+            <stop offset="0%" style="stop-color:#228B22;stop-opacity:0.1" />
+            <stop offset="100%" style="stop-color:#228B22;stop-opacity:0" />
+        </radialGradient>
+    </defs>
+    <rect width="800" height="600" fill="url(#pongalBg)" />
+    <circle cx="240" cy="420" r="200" fill="url(#pongalGlow1)" />
+    <circle cx="560" cy="180" r="180" fill="url(#pongalGlow2)" />
+</svg>

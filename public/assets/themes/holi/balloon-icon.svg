@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+    <!-- Water balloon -->
+    <ellipse cx="32" cy="34" rx="18" ry="22" fill="#E91E63" />
+    <!-- Balloon shine -->
+    <ellipse cx="24" cy="26" rx="6" ry="8" fill="#F48FB1" opacity="0.6" />
+    <!-- Balloon tie -->
+    <path d="M28 54 Q32 58 36 54 L34 56 Q32 60 30 56 Z" fill="#AD1457" />
+    <!-- Balloon knot -->
+    <ellipse cx="32" cy="55" rx="4" ry="2" fill="#C2185B" />
+    <!-- Water splash effect (balloon breaking) -->
+    <g opacity="0.5">
+        <circle cx="12" cy="38" r="4" fill="#2196F3" />
+        <circle cx="52" cy="32" r="5" fill="#64B5F6" />
+        <circle cx="18" cy="52" r="3" fill="#90CAF9" />
+        <circle cx="48" cy="48" r="4" fill="#42A5F5" />
+    </g>
+</svg>

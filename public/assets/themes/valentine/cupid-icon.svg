@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+    <!-- Cupid cherub -->
+    <!-- Body -->
+    <ellipse cx="32" cy="42" rx="12" ry="10" fill="#FFCC80" />
+    <!-- Head -->
+    <circle cx="32" cy="26" r="12" fill="#FFCC80" />
+    <!-- Hair -->
+    <path d="M22 20 Q24 12 32 14 Q40 12 42 20 Q44 16 40 14 Q32 10 24 14 Q20 16 22 20" fill="#FFB74D" />
+    <!-- Face -->
+    <circle cx="28" cy="25" r="2" fill="#5D4037" />
+    <circle cx="36" cy="25" r="2" fill="#5D4037" />
+    <path d="M28 30 Q32 34 36 30" stroke="#E91E63" stroke-width="1.5" fill="none" />
+    <!-- Blush -->
+    <circle cx="24" cy="28" r="3" fill="#F8BBD9" opacity="0.6" />
+    <circle cx="40" cy="28" r="3" fill="#F8BBD9" opacity="0.6" />
+    <!-- Wings -->
+    <path d="M20 36 Q8 28 12 20 Q16 24 20 28 Q14 32 12 36 Q16 34 20 36" fill="white" />
+    <path d="M44 36 Q56 28 52 20 Q48 24 44 28 Q50 32 52 36 Q48 34 44 36" fill="white" />
+    <!-- Bow -->
+    <path d="M48 46 Q56 42 60 48" stroke="#8B4513" stroke-width="3" fill="none" />
+    <line x1="48" y1="46" x2="60" y2="58" stroke="#8B4513" stroke-width="2" />
+    <!-- Arrow -->
+    <line x1="4" y1="50" x2="56" y2="50" stroke="#8B4513" stroke-width="2" />
+    <polygon points="4,50 10,46 10,54" fill="#E91E63" />
+    <!-- Arrow feathers -->
+    <path d="M54 48 L58 46 L56 50 L58 54 L54 52" fill="#F48FB1" />
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+    <!-- Pookalam (flower rangoli) pattern -->
+    <g opacity="0.4" transform="translate(50, 50)">
+        <!-- Outer ring of petals -->
+        <ellipse cx="0" cy="-35" rx="8" ry="14" fill="#FFD54F" />
+        <ellipse cx="0" cy="-35" rx="8" ry="14" fill="#FF9800" transform="rotate(45)" />
+        <ellipse cx="0" cy="-35" rx="8" ry="14" fill="#E91E63" transform="rotate(90)" />
+        <ellipse cx="0" cy="-35" rx="8" ry="14" fill="#9C27B0" transform="rotate(135)" />
+        <ellipse cx="0" cy="-35" rx="8" ry="14" fill="#FFD54F" transform="rotate(180)" />
+        <ellipse cx="0" cy="-35" rx="8" ry="14" fill="#FF9800" transform="rotate(225)" />
+        <ellipse cx="0" cy="-35" rx="8" ry="14" fill="#E91E63" transform="rotate(270)" />
+        <ellipse cx="0" cy="-35" rx="8" ry="14" fill="#9C27B0" transform="rotate(315)" />
+        <!-- Inner ring -->
+        <ellipse cx="0" cy="-20" rx="5" ry="10" fill="#4CAF50" transform="rotate(22.5)" />
+        <ellipse cx="0" cy="-20" rx="5" ry="10" fill="#4CAF50" transform="rotate(67.5)" />
+        <ellipse cx="0" cy="-20" rx="5" ry="10" fill="#4CAF50" transform="rotate(112.5)" />
+        <ellipse cx="0" cy="-20" rx="5" ry="10" fill="#4CAF50" transform="rotate(157.5)" />
+        <ellipse cx="0" cy="-20" rx="5" ry="10" fill="#4CAF50" transform="rotate(202.5)" />
+        <ellipse cx="0" cy="-20" rx="5" ry="10" fill="#4CAF50" transform="rotate(247.5)" />
+        <ellipse cx="0" cy="-20" rx="5" ry="10" fill="#4CAF50" transform="rotate(292.5)" />
+        <ellipse cx="0" cy="-20" rx="5" ry="10" fill="#4CAF50" transform="rotate(337.5)" />
+        <!-- Center -->
+        <circle cx="0" cy="0" r="8" fill="#D32F2F" />
+    </g>
+</svg>

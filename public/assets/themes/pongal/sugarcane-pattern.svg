@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+    <g opacity="0.3">
+        <!-- Sugarcane stalks -->
+        <rect x="20" y="10" width="6" height="80" rx="2" fill="#228B22" />
+        <rect x="20" y="25" width="6" height="2" fill="#1B5E1B" />
+        <rect x="20" y="45" width="6" height="2" fill="#1B5E1B" />
+        <rect x="20" y="65" width="6" height="2" fill="#1B5E1B" />
+
+        <rect x="74" y="10" width="6" height="80" rx="2" fill="#228B22" />
+        <rect x="74" y="30" width="6" height="2" fill="#1B5E1B" />
+        <rect x="74" y="55" width="6" height="2" fill="#1B5E1B" />
+        <rect x="74" y="75" width="6" height="2" fill="#1B5E1B" />
+
+        <!-- Leaves -->
+        <path d="M20 15 Q10 10 5 18" stroke="#90EE90" stroke-width="2" fill="none" />
+        <path d="M26 15 Q36 10 40 18" stroke="#90EE90" stroke-width="2" fill="none" />
+        <path d="M74 12 Q64 8 60 15" stroke="#90EE90" stroke-width="2" fill="none" />
+        <path d="M80 12 Q90 8 95 15" stroke="#90EE90" stroke-width="2" fill="none" />
+    </g>
+</svg>

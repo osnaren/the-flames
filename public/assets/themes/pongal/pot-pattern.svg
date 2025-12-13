@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+    <g opacity="0.35">
+        <!-- Pots arranged -->
+        <g transform="translate(30, 50)">
+            <ellipse cx="0" cy="12" rx="12" ry="5" fill="#8B4513" />
+            <path d="M-12 8 Q-14 0 -8 -8 L8 -8 Q14 0 12 8 Z" fill="#CD853F" />
+            <ellipse cx="0" cy="-8" rx="8" ry="2.5" fill="#DEB887" />
+            <ellipse cx="0" cy="-10" rx="5" ry="3" fill="#FFFACD" />
+        </g>
+        <g transform="translate(70, 50)">
+            <ellipse cx="0" cy="10" rx="10" ry="4" fill="#8B4513" />
+            <path d="M-10 6 Q-12 0 -6 -6 L6 -6 Q12 0 10 6 Z" fill="#CD853F" />
+            <ellipse cx="0" cy="-6" rx="6" ry="2" fill="#DEB887" />
+            <ellipse cx="0" cy="-8" rx="4" ry="2.5" fill="#FFFACD" />
+        </g>
+    </g>
+</svg>
