@@ -1,0 +1,7 @@
+# security.txt for FLAMES Game
+# See https://securitytxt.org/ for more information
+
+Contact: mailto:66naren@gmail.com
+Expires: 2025-12-31T23:59:59.000Z
+Preferred-Languages: en
+Canonical: https://theflames.app/.well-known/security.txt

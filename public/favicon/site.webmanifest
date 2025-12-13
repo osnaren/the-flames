@@ -1,6 +1,10 @@
 {
-  "name": "The Flames",
-  "short_name": "Flames",
+  "name": "FLAMES Game - Relationship Compatibility Calculator",
+  "short_name": "FLAMES",
+  "description": "Play the classic FLAMES game online! Discover your relationship compatibility with friends, love interests, and more.",
+  "start_url": "/",
+  "scope": "/",
+  "id": "/",
   "icons": [
     {
       "src": "/favicon/web-app-manifest-192x192.png",
@@ -13,9 +17,43 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/favicon/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
-  "theme_color": "#ffffff",
+  "theme_color": "#1a1a2e",
   "background_color": "#ffffff",
-  "display": "standalone"
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "categories": ["games", "entertainment", "social"],
+  "lang": "en",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Play FLAMES",
+      "short_name": "Play",
+      "description": "Start a new FLAMES game",
+      "url": "/",
+      "icons": [{ "src": "/favicon/favicon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Manual Mode",
+      "short_name": "Manual",
+      "description": "Play FLAMES manually",
+      "url": "/manual",
+      "icons": [{ "src": "/favicon/favicon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "How It Works",
+      "short_name": "Tutorial",
+      "description": "Learn how FLAMES works",
+      "url": "/how-it-works",
+      "icons": [{ "src": "/favicon/favicon-96x96.png", "sizes": "96x96" }]
+    }
+  ]
 }

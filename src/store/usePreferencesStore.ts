@@ -1,12 +1,26 @@
 import { create } from 'zustand';
 
+export type TransitionSpeed = 'instant' | 'fast' | 'normal' | 'slow';
+
 interface PreferencesState {
   isDarkTheme: boolean;
   animationsEnabled: boolean;
   isSoundEnabled: boolean;
   isHapticEnabled: boolean;
   volume: number;
-  seasonalTheme: 'auto' | 'valentine' | 'halloween' | 'christmas' | 'default';
+  seasonalTheme:
+    | 'auto'
+    | 'default'
+    | 'valentine'
+    | 'holi'
+    | 'onam'
+    | 'halloween'
+    | 'diwali'
+    | 'christmas'
+    | 'newYear'
+    | 'pongal';
+  transitionSpeed: TransitionSpeed;
+  hydrated: boolean;
 }
 
 interface PreferencesActions {
@@ -16,8 +30,41 @@ interface PreferencesActions {
   toggleHaptic: () => void;
   setVolume: (volume: number) => void;
   setSeasonalTheme: (theme: PreferencesState['seasonalTheme']) => void;
+  setTransitionSpeed: (speed: TransitionSpeed) => void;
   init: () => void;
+  cleanup: () => void;
 }
+
+// Transition duration mapping (in seconds)
+export const TRANSITION_DURATIONS: Record<TransitionSpeed, number> = {
+  instant: 0,
+  fast: 0.15,
+  normal: 0.3,
+  slow: 0.75,
+};
+
+// Helper to safely access localStorage (SSR-safe)
+const safeLocalStorage = {
+  getItem: (key: string): string | null => {
+    if (typeof window === 'undefined') return null;
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  setItem: (key: string, value: string): void => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // Ignore storage errors (e.g., quota exceeded, private browsing)
+    }
+  },
+};
+
+// Module-level variable to store cleanup function (avoids global namespace pollution)
+let themeCleanup: (() => void) | null = null;
 
 export const usePreferencesStore = create<PreferencesState & PreferencesActions>((set) => ({
   isDarkTheme: false,
@@ -26,69 +73,150 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
   isHapticEnabled: true,
   volume: 0.7,
   seasonalTheme: 'auto',
+  transitionSpeed: 'slow',
+  hydrated: false,
   toggleTheme: () =>
     set((s) => {
       const newTheme = !s.isDarkTheme;
-      localStorage.setItem('theme', newTheme ? 'dark' : 'light');
-      if (newTheme) {
-        document.documentElement.classList.add('dark');
-        document.documentElement.setAttribute('data-theme', 'dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.setAttribute('data-theme', 'light');
+      safeLocalStorage.setItem('theme', newTheme ? 'dark' : 'light');
+      if (typeof document !== 'undefined') {
+        if (newTheme) {
+          document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
       }
       return { isDarkTheme: newTheme };
     }),
   toggleAnimations: () =>
     set((s) => {
       const value = !s.animationsEnabled;
-      localStorage.setItem('animations', String(value));
+      safeLocalStorage.setItem('animations', String(value));
       return { animationsEnabled: value };
     }),
   toggleSound: () =>
     set((s) => {
       const value = !s.isSoundEnabled;
-      localStorage.setItem('sound', String(value));
+      safeLocalStorage.setItem('sound', String(value));
       return { isSoundEnabled: value };
     }),
   toggleHaptic: () =>
     set((s) => {
       const value = !s.isHapticEnabled;
-      localStorage.setItem('haptic', String(value));
+      safeLocalStorage.setItem('haptic', String(value));
       return { isHapticEnabled: value };
     }),
   setVolume: (volume: number) =>
     set(() => {
       const clampedVolume = Math.max(0, Math.min(1, volume));
-      localStorage.setItem('volume', String(clampedVolume));
+      safeLocalStorage.setItem('volume', String(clampedVolume));
       return { volume: clampedVolume };
     }),
   setSeasonalTheme: (theme: PreferencesState['seasonalTheme']) =>
     set(() => {
-      localStorage.setItem('seasonalTheme', theme);
+      safeLocalStorage.setItem('seasonalTheme', theme);
       return { seasonalTheme: theme };
     }),
+  setTransitionSpeed: (speed: TransitionSpeed) =>
+    set(() => {
+      safeLocalStorage.setItem('transitionSpeed', speed);
+      return { transitionSpeed: speed };
+    }),
   init: () => {
-    const storedTheme = localStorage.getItem('theme');
-    const storedAnimations = localStorage.getItem('animations');
-    const storedSound = localStorage.getItem('sound');
-    const storedHaptic = localStorage.getItem('haptic');
-    const storedVolume = localStorage.getItem('volume');
-    const storedSeasonalTheme = localStorage.getItem('seasonalTheme');
+    // Guard against SSR
+    if (typeof window === 'undefined') return;
 
-    if (storedTheme === 'dark') {
+    const storedTheme = safeLocalStorage.getItem('theme');
+    const storedAnimations = safeLocalStorage.getItem('animations');
+    const storedSound = safeLocalStorage.getItem('sound');
+    const storedHaptic = safeLocalStorage.getItem('haptic');
+    const storedVolume = safeLocalStorage.getItem('volume');
+    const storedSeasonalTheme = safeLocalStorage.getItem('seasonalTheme');
+    const storedTransitionSpeed = safeLocalStorage.getItem('transitionSpeed');
+
+    // Determine the actual theme that should be applied
+    let isDarkTheme: boolean;
+
+    if (storedTheme) {
+      // If user has explicitly set a preference, use it
+      isDarkTheme = storedTheme === 'dark';
+    } else {
+      // Check if inline script already set dark mode (system preference or first visit)
+      // This syncs the store with what the inline script determined
+      const hasInlineScriptSetDark = document.documentElement.classList.contains('dark');
+
+      // If inline script didn't set dark mode, check system preference directly
+      // This handles the case where inline script failed or wasn't run
+      // Use short-circuit evaluation to avoid unnecessary matchMedia call
+      isDarkTheme = hasInlineScriptSetDark || window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    // Sync DOM with determined theme state
+    // This ensures consistency even if inline script ran or failed
+    if (isDarkTheme) {
       document.documentElement.classList.add('dark');
       document.documentElement.setAttribute('data-theme', 'dark');
     } else {
+      document.documentElement.classList.remove('dark');
       document.documentElement.setAttribute('data-theme', 'light');
     }
+
     set({
-      isDarkTheme: storedTheme === 'dark',
+      isDarkTheme,
       animationsEnabled: storedAnimations !== 'false',
       isSoundEnabled: storedSound !== 'false',
       isHapticEnabled: storedHaptic !== 'false',
       volume: storedVolume ? parseFloat(storedVolume) : 0.7,
       seasonalTheme: (storedSeasonalTheme as PreferencesState['seasonalTheme']) || 'auto',
+      transitionSpeed: (storedTransitionSpeed as TransitionSpeed) || 'normal',
+      hydrated: true,
     });
+
+    // Listen for system preference changes (only if user hasn't set explicit preference)
+    if (!storedTheme && typeof window !== 'undefined') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+      const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+        // Only update if user still hasn't set an explicit preference
+        const currentStoredTheme = safeLocalStorage.getItem('theme');
+        if (!currentStoredTheme) {
+          const newIsDark = e.matches;
+          set({ isDarkTheme: newIsDark });
+
+          if (newIsDark) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme', 'light');
+          }
+        }
+      };
+
+      // Helper to add/remove listener
+      // Modern browsers (Chrome 76+, Firefox 67+, Safari 12.1+) support addEventListener
+      const addListener = () => {
+        mediaQuery.addEventListener('change', handleSystemThemeChange);
+      };
+
+      const removeListener = () => {
+        mediaQuery.removeEventListener('change', handleSystemThemeChange);
+      };
+
+      // Add listener
+      addListener();
+
+      // Store cleanup function reference (module-level to avoid global namespace pollution)
+      themeCleanup = removeListener;
+    }
+  },
+  cleanup: () => {
+    // Clean up system preference listener (idempotent - safe to call multiple times)
+    if (themeCleanup) {
+      themeCleanup();
+      themeCleanup = null;
+    }
   },
 }));

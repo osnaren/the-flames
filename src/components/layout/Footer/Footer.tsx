@@ -1,18 +1,21 @@
+'use client';
+
 import Logo from '@components/ui/Logo';
+import { FOOTER_CONFIG } from '@config/navigation';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { motion, useScroll, useTransform, Variants } from 'framer-motion';
 import { ExternalLink, Heart, Sparkles, TrendingUp } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { FOOTER_CONFIG } from './config';
+import Link from 'next/link';
+import { memo } from 'react';
 import type { FooterLinkProps } from './types';
 
-export default function Footer() {
+function Footer() {
   const { shouldAnimate, prefersReducedMotion } = useAnimationPreferences();
   const { scrollYProgress } = useScroll();
 
-  // Enhanced scroll-based effects
-  const footerOpacity = useTransform(scrollYProgress, [0.6, 0.9], [0, 1]);
-  const footerY = useTransform(scrollYProgress, [0.8, 1], [50, 0]);
+  // Enhanced scroll-based effects - use wider range to work on shorter pages
+  const footerOpacity = useTransform(scrollYProgress, [0.3, 0.7], [0.8, 1]);
+  const footerY = useTransform(scrollYProgress, [0.5, 0.9], [20, 0]);
 
   // Animation variants
   const containerVariants: Variants = {
@@ -91,7 +94,7 @@ export default function Footer() {
 
     if (to) {
       return (
-        <Link to={to} className={linkClass} title={description} {...props}>
+        <Link href={to} className={linkClass} title={description} {...props}>
           {content}
         </Link>
       );
@@ -128,7 +131,7 @@ export default function Footer() {
 
           {/* Floating particles effect */}
           <motion.div
-            className="bg-primary/30 absolute top-4 right-1/4 h-2 w-2 rounded-full blur-sm"
+            className="bg-primary/30 absolute top-4 right-1/4 h-2 w-2 rounded-full blur-sm will-change-transform"
             animate={{
               y: [0, -20, 0],
               opacity: [0.3, 0.8, 0.3],
@@ -140,7 +143,7 @@ export default function Footer() {
             }}
           />
           <motion.div
-            className="bg-secondary/40 absolute top-8 left-1/3 h-1.5 w-1.5 rounded-full blur-sm"
+            className="bg-secondary/40 absolute top-8 left-1/3 h-1.5 w-1.5 rounded-full blur-sm will-change-transform"
             animate={{
               y: [0, -15, 0],
               x: [0, 10, 0],
@@ -195,11 +198,11 @@ export default function Footer() {
 
           {/* Navigation Section */}
           <motion.div variants={itemVariants} className="lg:col-span-1">
-            <h3 className="text-on-surface mb-4 flex items-center gap-2 font-semibold">
-              <Sparkles className="text-primary h-4 w-4" />
+            <h3 className="text-on-surface mb-4 flex items-center gap-2 font-semibold" id="footer-nav-heading">
+              <Sparkles className="text-primary h-4 w-4" aria-hidden="true" />
               Navigation
             </h3>
-            <nav className="space-y-3">
+            <nav className="space-y-3" aria-labelledby="footer-nav-heading">
               {FOOTER_CONFIG.navigation.primary.map((link) => (
                 <div key={link.to}>
                   <FooterLink to={link.to} description={link.description}>
@@ -219,11 +222,11 @@ export default function Footer() {
 
           {/* Resources Section */}
           <motion.div variants={itemVariants} className="lg:col-span-1">
-            <h3 className="text-on-surface mb-4 flex items-center gap-2 font-semibold">
-              <ExternalLink className="text-primary h-4 w-4" />
+            <h3 className="text-on-surface mb-4 flex items-center gap-2 font-semibold" id="footer-resources-heading">
+              <ExternalLink className="text-primary h-4 w-4" aria-hidden="true" />
               Resources
             </h3>
-            <nav className="space-y-3">
+            <nav className="space-y-3" aria-labelledby="footer-resources-heading">
               {FOOTER_CONFIG.external.map((link) => (
                 <div key={link.href}>
                   <FooterLink href={link.href} external={true} icon={link.icon} description={link.description}>
@@ -237,20 +240,24 @@ export default function Footer() {
           {/* Stats Section */}
           {FOOTER_CONFIG.showStats && (
             <motion.div variants={itemVariants} className="lg:col-span-1">
-              <h3 className="text-on-surface mb-4 flex items-center gap-2 font-semibold">
-                <TrendingUp className="text-primary h-4 w-4" />
+              <h3 className="text-on-surface mb-4 flex items-center gap-2 font-semibold" id="footer-stats-heading">
+                <TrendingUp className="text-primary h-4 w-4" aria-hidden="true" />
                 Our Impact
               </h3>
-              <div className="grid grid-cols-2 gap-3">
-                {FOOTER_CONFIG.stats.map((stat, _index) => (
+              <div className="grid grid-cols-2 gap-3" role="list" aria-labelledby="footer-stats-heading">
+                {FOOTER_CONFIG.stats.map((stat) => (
                   <motion.div
                     key={stat.label}
                     variants={statsVariants}
                     whileHover={{ scale: 1.05 }}
                     className="bg-surface-container-low/50 border-outline/10 group hover:border-primary/20 rounded-lg border p-3 transition-colors"
+                    role="listitem"
                   >
                     <div className="flex flex-col items-center text-center">
-                      <stat.icon className="text-primary mb-1 h-5 w-5 transition-transform group-hover:scale-110" />
+                      <stat.icon
+                        className="text-primary mb-1 h-5 w-5 transition-transform group-hover:scale-110"
+                        aria-hidden="true"
+                      />
                       <div className="text-on-surface text-sm font-bold">{stat.value}</div>
                       <div className="text-on-surface-variant text-xs leading-tight">{stat.label}</div>
                     </div>
@@ -289,10 +296,12 @@ export default function Footer() {
                   repeat: Infinity,
                   ease: 'easeInOut',
                 }}
+                aria-hidden="true"
               >
                 <Heart className="text-error h-4 w-4 fill-current drop-shadow-sm" />
               </motion.div>
-              <span>at OSLabs 🇮🇳</span>
+              <span className="sr-only">love</span>
+              <span>for love calculations</span>
             </motion.div>
           </div>
 
@@ -313,13 +322,16 @@ export default function Footer() {
       {/* Decorative bottom accent */}
       {shouldAnimate && (
         <motion.div
-          className="from-primary via-secondary to-tertiary absolute right-0 bottom-0 left-0 h-1 bg-linear-to-r opacity-60"
+          className="from-primary via-secondary to-tertiary absolute right-0 bottom-0 left-0 h-1 bg-linear-to-r opacity-60 will-change-transform"
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
-          transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
           viewport={{ once: true }}
         />
       )}
     </motion.footer>
   );
 }
+
+// Memoize Footer to prevent unnecessary re-renders
+export default memo(Footer);

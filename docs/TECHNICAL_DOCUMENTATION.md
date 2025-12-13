@@ -2,7 +2,7 @@
 
 ## Overview
 
-The FLAMES game is a React-based web application that calculates relationship compatibility using the traditional FLAMES algorithm. This documentation covers the enhanced version with mobile responsiveness, performance optimization, error handling, and comprehensive API endpoints.
+The FLAMES game is a Next.js-based web application that calculates relationship compatibility using the traditional FLAMES algorithm. This documentation covers the enhanced version with mobile responsiveness, performance optimization, error handling, and comprehensive API endpoints.
 
 ## Architecture
 
@@ -10,12 +10,12 @@ The FLAMES game is a React-based web application that calculates relationship co
 
 ```
 src/
-├── api/                    # API endpoints and business logic
-│   └── flames.ts          # Main FLAMES calculation API
-├── components/            # React components
-│   ├── ui/               # UI components
-│   │   ├── SeasonalBackground/
-│   │   └── MobileOptimizedSeasonalBackground/
+├── app/                  # Next.js App Router
+│   ├── api/              # API Routes
+│   ├── layout.tsx        # Root layout
+│   └── page.tsx          # Home page
+├── components/           # React components
+│   ├── core/             # Shared UI components
 │   ├── gamification/     # Gamification features
 │   └── settings/         # Settings components
 ├── hooks/                # Custom React hooks
@@ -116,7 +116,6 @@ export class RateLimitError extends Error {
 interface FlamesApiRequest {
   name1: string;
   name2: string;
-  anon?: boolean;
 }
 ```
 
@@ -134,7 +133,6 @@ interface FlamesApiResponse {
     result: 'F' | 'L' | 'A' | 'M' | 'E' | 'S';
     resultMeaning: string;
     tagline: string;
-    anonymous: boolean;
   };
   error?: {
     code: string;
@@ -323,8 +321,8 @@ npm run dev
 # Production build
 npm run build
 
-# Testing
-npm run test
+# Start production server
+npm run start
 
 # Linting
 npm run lint
@@ -332,18 +330,12 @@ npm run lint
 
 ### Framework Integration
 
-The API can be integrated with various frameworks:
+The application is built on Next.js 16:
 
 ```typescript
-// Express.js
-app.post('/api/flames', createFlamesEndpoint());
-
-// Vercel
-export default createFlamesEndpoint();
-
-// Next.js
-export default function handler(req, res) {
-  return createFlamesEndpoint()(req, res);
+// API Route (App Router)
+export async function POST(request: Request) {
+  // ... implementation
 }
 ```
 

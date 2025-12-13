@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+    <!-- Kerala Elephant (decorated for festival) -->
+    <!-- Body -->
+    <ellipse cx="32" cy="36" rx="18" ry="14" fill="#555" />
+    <!-- Head -->
+    <circle cx="16" cy="28" r="12" fill="#555" />
+    <!-- Trunk -->
+    <path d="M8 32 Q4 40 8 50 Q12 52 14 48 Q10 40 12 34" fill="#666" stroke="#555" stroke-width="1" />
+    <!-- Ears -->
+    <ellipse cx="8" cy="24" rx="6" ry="8" fill="#777" />
+    <!-- Legs -->
+    <rect x="18" y="44" width="6" height="16" rx="2" fill="#555" />
+    <rect x="28" y="44" width="6" height="16" rx="2" fill="#555" />
+    <rect x="38" y="44" width="6" height="16" rx="2" fill="#555" />
+    <rect x="48" y="42" width="6" height="14" rx="2" fill="#555" />
+    <!-- Tail -->
+    <path d="M50 36 Q56 40 54 48" stroke="#555" stroke-width="3" fill="none" />
+    <!-- Eye -->
+    <circle cx="14" cy="26" r="2" fill="#1a1a1a" />
+    <circle cx="14" cy="26" r="0.8" fill="white" />
+    <!-- Tusk -->
+    <path d="M10 36 Q6 42 8 46" stroke="#FFFDE7" stroke-width="3" stroke-linecap="round" />
+    <!-- Festival decoration - Nettipattam (headgear) -->
+    <path d="M6 18 Q16 8 26 18" fill="#FFD700" />
+    <circle cx="16" cy="14" r="4" fill="#D32F2F" />
+    <circle cx="10" cy="18" r="2" fill="#4CAF50" />
+    <circle cx="22" cy="18" r="2" fill="#4CAF50" />
+    <!-- Body decorations -->
+    <rect x="24" y="30" width="16" height="12" fill="#FFD700" opacity="0.7" rx="2" />
+    <rect x="26" y="32" width="12" height="8" fill="#D32F2F" opacity="0.8" rx="1" />
+</svg>

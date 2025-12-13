@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+    <!-- Kolam pattern - traditional dots and curves -->
+    <g stroke="#CD853F" stroke-width="2" fill="none">
+        <!-- Outer circle -->
+        <circle cx="32" cy="32" r="28" />
+        <!-- Inner circles -->
+        <circle cx="32" cy="32" r="18" />
+        <circle cx="32" cy="32" r="8" />
+        <!-- Curved petals -->
+        <path d="M32 4 Q44 20 32 32 Q20 20 32 4" />
+        <path d="M60 32 Q44 44 32 32 Q44 20 60 32" />
+        <path d="M32 60 Q20 44 32 32 Q44 44 32 60" />
+        <path d="M4 32 Q20 20 32 32 Q20 44 4 32" />
+    </g>
+    <!-- Dots -->
+    <circle cx="32" cy="32" r="3" fill="#CD853F" />
+    <circle cx="32" cy="14" r="2" fill="#FF8C00" />
+    <circle cx="50" cy="32" r="2" fill="#FF8C00" />
+    <circle cx="32" cy="50" r="2" fill="#FF8C00" />
+    <circle cx="14" cy="32" r="2" fill="#FF8C00" />
+</svg>

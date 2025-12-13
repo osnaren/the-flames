@@ -1,7 +1,6 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { FlamesResult } from '@features/flamesGame/flames.types';
-import { getResultData } from '@features/flamesGame/resultData';
+import { FlamesResult, getResultData } from '@/utils/resultData';
 import confetti from 'canvas-confetti';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
@@ -22,13 +21,16 @@ interface CannonPosition {
  */
 function ConfettiEffect({ result, isActive }: ConfettiEffectProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isLowEndDevice] = useState(() => {
-    if (typeof navigator === 'undefined') return false;
-    return (
+  const [isLowEndDevice, setIsLowEndDevice] = useState(false);
+
+  // Detect low-end device on mount (client-side only)
+  useEffect(() => {
+    if (typeof navigator === 'undefined') return;
+    const isLowEnd =
       (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    );
-  });
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    setIsLowEndDevice(isLowEnd);
+  }, []);
 
   // Use our custom hooks
   const deviceType = useDeviceType();

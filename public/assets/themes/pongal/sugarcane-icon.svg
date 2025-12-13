@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+    <!-- Sugarcane stalk -->
+    <rect x="28" y="8" width="8" height="52" rx="2" fill="#228B22" />
+    <!-- Segments -->
+    <rect x="28" y="14" width="8" height="2" fill="#1B5E1B" />
+    <rect x="28" y="24" width="8" height="2" fill="#1B5E1B" />
+    <rect x="28" y="34" width="8" height="2" fill="#1B5E1B" />
+    <rect x="28" y="44" width="8" height="2" fill="#1B5E1B" />
+    <rect x="28" y="54" width="8" height="2" fill="#1B5E1B" />
+    <!-- Leaves -->
+    <path d="M28 10 Q18 8 10 16" stroke="#90EE90" stroke-width="3" fill="none" />
+    <path d="M36 10 Q46 8 54 16" stroke="#90EE90" stroke-width="3" fill="none" />
+    <path d="M28 6 Q20 2 14 6" stroke="#90EE90" stroke-width="2" fill="none" />
+    <path d="M36 6 Q44 2 50 6" stroke="#90EE90" stroke-width="2" fill="none" />
+    <!-- Highlight -->
+    <rect x="30" y="10" width="2" height="48" fill="#32CD32" opacity="0.4" />
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+    <!-- Stars pattern -->
+    <g fill="#FFD700" opacity="0.4">
+        <polygon points="20,10 22,16 28,16 23,20 25,26 20,22 15,26 17,20 12,16 18,16" />
+        <polygon points="70,25 71.5,29 76,29 72.5,32 74,36 70,33 66,36 67.5,32 64,29 68.5,29"
+            transform="scale(0.8) translate(8, 5)" />
+        <polygon points="40,55 42,61 48,61 43,65 45,71 40,67 35,71 37,65 32,61 38,61" />
+        <polygon points="85,70 86.5,74 91,74 87.5,77 89,81 85,78 81,81 82.5,77 79,74 83.5,74"
+            transform="scale(0.7) translate(35, 25)" />
+        <!-- Small stars -->
+        <circle cx="15" cy="45" r="2" />
+        <circle cx="55" cy="20" r="1.5" />
+        <circle cx="75" cy="85" r="2" />
+        <circle cx="30" cy="80" r="1.5" />
+        <circle cx="90" cy="40" r="1.5" />
+    </g>
+</svg>

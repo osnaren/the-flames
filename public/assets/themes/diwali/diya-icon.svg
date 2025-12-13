@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+    <!-- Diya (oil lamp) base -->
+    <ellipse cx="32" cy="52" rx="18" ry="6" fill="#8B4513" />
+    <path d="M14 48 Q10 40 18 32 L46 32 Q54 40 50 48 Z" fill="#CD853F" />
+    <!-- Oil surface -->
+    <ellipse cx="32" cy="34" rx="14" ry="4" fill="#DAA520" />
+    <!-- Wick holder -->
+    <rect x="30" y="26" width="4" height="8" fill="#8B4513" />
+    <!-- Flame -->
+    <ellipse cx="32" cy="18" rx="6" ry="10" fill="#FFD700" />
+    <ellipse cx="32" cy="16" rx="4" ry="7" fill="#FFA500" />
+    <ellipse cx="32" cy="14" rx="2" ry="4" fill="#FF6347" />
+    <!-- Flame glow -->
+    <circle cx="32" cy="18" r="14" fill="#FFD700" opacity="0.2" />
+    <!-- Decorative dots on base -->
+    <circle cx="22" cy="44" r="2" fill="#FFD700" />
+    <circle cx="32" cy="46" r="2" fill="#FFD700" />
+    <circle cx="42" cy="44" r="2" fill="#FFD700" />
+</svg>

@@ -1,3 +1,6 @@
+'use client';
+
+import * as Sentry from '@sentry/nextjs';
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import Button from '../ui/Button';
@@ -19,5 +22,9 @@ function Fallback({ error, resetErrorBoundary }: { error: Error; resetErrorBound
 }
 
 export default function GlobalErrorBoundary({ children }: Props) {
-  return <ErrorBoundary FallbackComponent={Fallback}>{children}</ErrorBoundary>;
+  return (
+    <ErrorBoundary FallbackComponent={Fallback} onError={(error) => Sentry.captureException(error)}>
+      {children}
+    </ErrorBoundary>
+  );
 }

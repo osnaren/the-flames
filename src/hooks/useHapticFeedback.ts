@@ -57,8 +57,13 @@ export function useHapticFeedback() {
     canVibrate: false,
   });
 
-  // Detect haptic capabilities on mount
+  // Detect haptic capabilities on mount (client-side only)
   useEffect(() => {
+    // Skip detection if not in browser environment
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+      return;
+    }
+
     const detectCapabilities = (): HapticCapabilities => {
       const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       const hasVibrationAPI = 'vibrate' in navigator;
@@ -80,10 +85,7 @@ export function useHapticFeedback() {
       };
     };
 
-    // Defer state update to avoid synchronous setState in effect warning
-    setTimeout(() => {
-      setCapabilities(detectCapabilities());
-    }, 0);
+    setCapabilities(detectCapabilities());
   }, []);
 
   // Trigger haptic feedback
@@ -132,8 +134,8 @@ export function useHapticFeedback() {
               }
             }
           }
-        } catch (error) {
-          console.warn('Haptic feedback failed:', error);
+        } catch {
+          // Haptic feedback failed, ignore
         }
       };
 
@@ -203,18 +205,15 @@ export function useHapticFeedback() {
     celebration: () => triggerHaptic('celebration'),
   };
 
-  // Test haptic functionality
   const testHaptic = useCallback(async () => {
     if (!capabilities.canVibrate) {
-      console.warn('Haptic feedback not available on this device');
       return false;
     }
 
     try {
       await triggerHaptic('medium');
       return true;
-    } catch (error) {
-      console.warn('Haptic test failed:', error);
+    } catch {
       return false;
     }
   }, [capabilities, triggerHaptic]);

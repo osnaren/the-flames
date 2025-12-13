@@ -1,8 +1,7 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
+import { FlamesResult, resultData } from '@/utils/resultData';
 import { motion, Variants } from 'framer-motion';
 import { memo, useMemo } from 'react'; // Removed unused useEffect, useState
-import { FlamesResult } from '../../../features/flamesGame/flames.types';
-import { resultData } from '../../../features/flamesGame/resultData';
 
 interface SlotMachineLetterProps {
   letter: string;

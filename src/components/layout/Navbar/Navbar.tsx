@@ -1,18 +1,27 @@
-import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
+'use client';
+
 import Logo from '@components/ui/Logo';
+import { NAVBAR_CONFIG } from '@config/navigation';
+import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import FloatingControlPanel from '@layout/FloatingControlPanel';
 import { motion, useScroll, useTransform, Variants } from 'framer-motion';
-import { BarChart3, BookOpen, Menu, Wand2 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import MobileMenu from './MobileMenu';
+import { Menu } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { usePathname } from 'next/navigation';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import NavItem from './NavItem';
 
-export default function Navbar() {
+// Lazy load MobileMenu since it's not needed on initial render
+const MobileMenu = dynamic(() => import('./MobileMenu'), {
+  ssr: false,
+  loading: () => null,
+});
+
+function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const { pathname } = useLocation();
+  const pathname = usePathname();
   const { prefersReducedMotion } = useAnimationPreferences();
 
   // For scroll direction detection
@@ -134,7 +143,7 @@ export default function Navbar() {
     <>
       <motion.header
         ref={navbarRef}
-        className="fixed top-0 right-0 left-0 z-30 overflow-hidden transition-all duration-300"
+        className="fixed top-0 right-0 left-0 z-30 overflow-hidden transition-all duration-300 will-change-transform"
         style={{
           backdropFilter: prefersReducedMotion ? 'blur(12px)' : `blur(${blur}px)`,
           WebkitBackdropFilter: prefersReducedMotion ? 'blur(12px)' : `blur(${blur}px)`,
@@ -149,9 +158,10 @@ export default function Navbar() {
           className="absolute inset-0"
           style={{
             background: isScrolled
-              ? 'linear-gradient(135deg, hsl(var(--surface) / var(--tw-bg-opacity)) 0%, hsl(var(--surface-container-low) / var(--tw-bg-opacity)) 50%, hsl(var(--surface) / var(--tw-bg-opacity)) 100%)'
+              ? 'hsl(var(--surface) / 0.95)'
               : 'linear-gradient(135deg, hsl(var(--surface) / 0.7) 0%, hsl(var(--surface-container-low) / 0.75) 50%, hsl(var(--surface) / 0.7) 100%)',
-            opacity: prefersReducedMotion ? (isScrolled ? 0.95 : 0.7) : backgroundOpacity,
+            opacity: prefersReducedMotion ? (isScrolled ? 1 : 0.7) : backgroundOpacity,
+            boxShadow: isScrolled ? '0 4px 20px -2px hsl(var(--shadow) / 0.1)' : 'none',
           }}
         />
 
@@ -187,14 +197,17 @@ export default function Navbar() {
             {/* Enhanced Desktop Navigation Links */}
             <nav className="hidden items-center space-x-2 md:flex" role="navigation" aria-label="Main navigation">
               <motion.div className="flex items-center space-x-2" variants={contentVariants}>
-                <NavItem
-                  label="How it Works"
-                  icon={BookOpen}
-                  to="/how-it-works"
-                  isActive={pathname === '/how-it-works'}
-                />
-                <NavItem label="Global Charts" icon={BarChart3} to="/charts" isActive={pathname === '/charts'} />
-                <NavItem label="Manual Mode" icon={Wand2} to="/manual" isActive={pathname === '/manual'} />
+                {NAVBAR_CONFIG.items
+                  .filter((item) => !item.mobileOnly)
+                  .map((item) => (
+                    <NavItem
+                      key={item.path}
+                      label={item.label}
+                      icon={item.icon}
+                      to={item.path}
+                      isActive={pathname === item.path}
+                    />
+                  ))}
               </motion.div>
             </nav>
 
@@ -243,29 +256,28 @@ export default function Navbar() {
         {/* Subtle animated accent line */}
         {!prefersReducedMotion && (
           <motion.div
-            className="from-primary via-secondary to-tertiary absolute bottom-0 left-0 h-0.5 bg-linear-to-r"
+            className="from-primary via-secondary to-tertiary absolute bottom-0 left-0 h-0.5 bg-linear-to-r will-change-transform"
             initial={{ scaleX: 0, originX: 0 }}
             animate={{
               scaleX: isScrolled ? 1 : 0,
               opacity: isScrolled ? 0.6 : 0,
             }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
           />
         )}
       </motion.header>
 
-      {/* Enhanced space filler with dynamic height */}
-      <motion.div
-        className="transition-all duration-300"
-        style={{ height: isScrolled ? '64px' : '56px' }}
-        aria-hidden="true"
-      />
+      {/* Enhanced space filler with fixed height to prevent CLS */}
+      <div className="h-14 md:h-16" aria-hidden="true" />
 
       {/* Mobile menu */}
-      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} pathname={pathname} />
+      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} pathname={pathname || ''} />
 
       {/* Floating Control Panel - now positioned independently outside the navbar */}
       <FloatingControlPanel />
     </>
   );
 }
+
+// Memoize Navbar to prevent unnecessary re-renders
+export default memo(Navbar);

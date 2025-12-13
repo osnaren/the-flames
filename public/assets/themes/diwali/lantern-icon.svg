@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+    <!-- Lantern body -->
+    <rect x="16" y="16" width="32" height="40" rx="4" fill="#D81B60" />
+    <!-- Decorative patterns on lantern -->
+    <rect x="20" y="20" width="24" height="8" fill="#FFB300" />
+    <rect x="20" y="32" width="24" height="4" fill="#FFB300" />
+    <rect x="20" y="40" width="24" height="8" fill="#FFB300" />
+    <!-- Cutout patterns -->
+    <circle cx="24" cy="24" r="2" fill="#FFFBF0" />
+    <circle cx="32" cy="24" r="2" fill="#FFFBF0" />
+    <circle cx="40" cy="24" r="2" fill="#FFFBF0" />
+    <circle cx="24" cy="44" r="2" fill="#FFFBF0" />
+    <circle cx="32" cy="44" r="2" fill="#FFFBF0" />
+    <circle cx="40" cy="44" r="2" fill="#FFFBF0" />
+    <!-- Top hook -->
+    <path d="M32 16 L32 8 Q32 4 36 4 L40 4" stroke="#8B4513" stroke-width="3" fill="none" />
+    <!-- Bottom tassel -->
+    <rect x="30" y="56" width="4" height="6" fill="#FFD700" />
+    <!-- Glow effect -->
+    <ellipse cx="32" cy="36" rx="20" ry="24" fill="#FFD700" opacity="0.15" />
+</svg>

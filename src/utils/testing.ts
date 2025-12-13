@@ -1,4 +1,4 @@
-import { calculateFlames, flamesApi, FlamesApiRequest } from '../api/flames';
+import { calculateFlamesResult, findCommonLetters } from '@/modules/home/utils';
 import { validateFlamesInput } from './validation';
 
 // Test data sets
@@ -59,7 +59,7 @@ export function testValidation(): TestResult[] {
   const results: TestResult[] = [];
 
   // Test valid names
-  TEST_CASES.valid.forEach(({ name1, name2 }, _index) => {
+  TEST_CASES.valid.forEach(({ name1, name2 }) => {
     const start = performance.now();
     try {
       const result = validateFlamesInput(name1, name2);
@@ -80,7 +80,7 @@ export function testValidation(): TestResult[] {
   });
 
   // Test invalid names
-  TEST_CASES.invalid.forEach(({ name1, name2 }, _index) => {
+  TEST_CASES.invalid.forEach(({ name1, name2 }) => {
     const start = performance.now();
     try {
       const result = validateFlamesInput(name1, name2);
@@ -112,24 +112,19 @@ export function testFlamesCalculation(): TestResult[] {
   TEST_CASES.valid.forEach(({ name1, name2 }) => {
     const start = performance.now();
     try {
-      const result = calculateFlames(name1, name2);
+      const result = calculateFlamesResult(name1, name2);
+      const commonLetters = findCommonLetters(name1, name2);
       const duration = performance.now() - start;
 
       // Validate result structure
-      const isValid =
-        result.result &&
-        ['F', 'L', 'A', 'M', 'E', 'S'].includes(result.result) &&
-        Array.isArray(result.commonLetters) &&
-        Array.isArray(result.flamesLetters) &&
-        typeof result.finalCount === 'number';
+      const isValid = result !== null && ['F', 'L', 'A', 'M', 'E', 'S'].includes(result);
 
       results.push({
         passed: isValid,
         duration,
         result: {
-          result: result.result,
-          commonLetters: result.commonLetters.length,
-          finalCount: result.finalCount,
+          result,
+          commonLettersCount: commonLetters.length,
         },
       });
     } catch (error) {
@@ -145,17 +140,21 @@ export function testFlamesCalculation(): TestResult[] {
 }
 
 /**
- * Test the API endpoint
+ * Test the API endpoint (requires running server)
  */
-export async function testFlamesApi(): Promise<TestResult[]> {
+export async function testFlamesApi(baseUrl: string = '/api/flames'): Promise<TestResult[]> {
   const results: TestResult[] = [];
 
   // Test valid requests
   for (const { name1, name2 } of TEST_CASES.valid) {
     const start = performance.now();
     try {
-      const request: FlamesApiRequest = { name1, name2 };
-      const result = await flamesApi(request);
+      const response = await fetch(baseUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name1, name2 }),
+      });
+      const result = await response.json();
       const duration = performance.now() - start;
 
       results.push({
@@ -176,8 +175,12 @@ export async function testFlamesApi(): Promise<TestResult[]> {
   for (const { name1, name2 } of TEST_CASES.invalid) {
     const start = performance.now();
     try {
-      const request: FlamesApiRequest = { name1, name2 };
-      const result = await flamesApi(request);
+      const response = await fetch(baseUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name1, name2 }),
+      });
+      const result = await response.json();
       const duration = performance.now() - start;
 
       results.push({
@@ -255,7 +258,7 @@ export function benchmarkFlamesCalculation(testLevel: keyof typeof PERFORMANCE_T
   for (let i = 0; i < iterations; i++) {
     const start = performance.now();
     try {
-      calculateFlames(testCase.name1, testCase.name2);
+      calculateFlamesResult(testCase.name1, testCase.name2);
       times.push(performance.now() - start);
     } catch (error) {
       return {
@@ -288,15 +291,14 @@ export function benchmarkFlamesCalculation(testLevel: keyof typeof PERFORMANCE_T
 }
 
 /**
- * Run all tests
+ * Run all tests (unit tests only - API tests require server)
  */
-export async function runAllTests(): Promise<{
+export function runUnitTests(): {
   validation: TestResult[];
   flamesCalculation: TestResult[];
-  flamesApi: TestResult[];
   benchmarks: BenchmarkResult[];
-}> {
-  console.log('🧪 Running comprehensive test suite...');
+} {
+  console.log('🧪 Running unit test suite...');
 
   const start = performance.now();
 
@@ -306,9 +308,6 @@ export async function runAllTests(): Promise<{
 
   console.log('🔥 Running FLAMES calculation tests...');
   const flamesCalculation = testFlamesCalculation();
-
-  console.log('🌐 Running API tests...');
-  const flamesApi = await testFlamesApi();
 
   // Performance benchmarks
   console.log('⚡ Running performance benchmarks...');
@@ -325,8 +324,36 @@ export async function runAllTests(): Promise<{
   return {
     validation,
     flamesCalculation,
-    flamesApi,
     benchmarks,
+  };
+}
+
+/**
+ * Run all tests including API tests (requires running server)
+ */
+export async function runAllTests(apiBaseUrl?: string): Promise<{
+  validation: TestResult[];
+  flamesCalculation: TestResult[];
+  flamesApi: TestResult[];
+  benchmarks: BenchmarkResult[];
+}> {
+  console.log('🧪 Running comprehensive test suite...');
+
+  const start = performance.now();
+
+  // Unit tests
+  const unitTests = runUnitTests();
+
+  // API tests
+  console.log('🌐 Running API tests...');
+  const flamesApi = await testFlamesApi(apiBaseUrl);
+
+  const totalTime = performance.now() - start;
+  console.log(`✅ Full test suite completed in ${totalTime.toFixed(2)}ms`);
+
+  return {
+    ...unitTests,
+    flamesApi,
   };
 }
 

@@ -1,8 +1,10 @@
-import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
+'use client';
+
+import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { motion, Variants } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
+import Link from 'next/link';
 import { memo } from 'react';
-import { Link } from 'react-router-dom';
 
 const MotionLink = motion.create(Link);
 
@@ -187,7 +189,7 @@ function NavItem({
   if (to) {
     return (
       <motion.div variants={motionVariants} initial="initial" animate="animate" whileHover="hover" whileTap="tap">
-        <MotionLink to={to} className={baseClasses} aria-current={isActive ? 'page' : undefined}>
+        <MotionLink href={to} className={baseClasses} aria-current={isActive ? 'page' : undefined}>
           <BackgroundElement isActive={isActive} shouldAnimate={shouldAnimate} />
           <span className="relative z-10 flex items-center">{content}</span>
         </MotionLink>

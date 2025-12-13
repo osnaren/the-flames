@@ -1,4 +1,4 @@
-import { FlamesResult } from '@features/flamesGame/flames.types';
+import { FlamesResult } from '@/utils/resultData';
 import { useCallback, useEffect, useState } from 'react';
 
 interface PairingEntry {
@@ -7,7 +7,6 @@ interface PairingEntry {
   name2: string;
   result: FlamesResult;
   timestamp: number;
-  anonymous: boolean;
 }
 
 interface Badge {
@@ -214,16 +213,16 @@ export function usePairingHistory() {
         setBadges(updatedBadges);
         try {
           localStorage.setItem(BADGES_KEY, JSON.stringify(updatedBadges));
-        } catch (error) {
-          console.error('Error saving badges:', error);
+        } catch {
+          // localStorage save failed - badges will be recalculated on next visit
         }
       }
     },
     [badges]
   );
 
-  // Load data from localStorage on mount
-  useEffect(() => {
+  // Load data from localStorage
+  const loadFromStorage = useCallback(() => {
     try {
       const savedHistory = localStorage.getItem(STORAGE_KEY);
       const savedBadges = localStorage.getItem(BADGES_KEY);
@@ -244,21 +243,49 @@ export function usePairingHistory() {
         }));
         setBadges(initialBadges);
       }
-    } catch (error) {
-      console.error('Error loading pairing history:', error);
+    } catch {
+      // localStorage load failed - start fresh
     }
   }, [calculateStats]);
 
+  // Initial load and event listeners
+  useEffect(() => {
+    // Guard against SSR
+    if (typeof window === 'undefined') return;
+
+    // Initial load
+    loadFromStorage();
+
+    // Listen for storage changes (cross-tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY || e.key === BADGES_KEY) {
+        loadFromStorage();
+      }
+    };
+
+    // Listen for local updates (same-tab)
+    const handleLocalUpdate = () => {
+      loadFromStorage();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('flames-history-update', handleLocalUpdate);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('flames-history-update', handleLocalUpdate);
+    };
+  }, [loadFromStorage]);
+
   // Add a new pairing to history
   const addPairing = useCallback(
-    (name1: string, name2: string, result: FlamesResult, anonymous: boolean = false) => {
+    (name1: string, name2: string, result: FlamesResult) => {
       const newEntry: PairingEntry = {
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        name1: anonymous ? '' : name1,
-        name2: anonymous ? '' : name2,
+        name1,
+        name2,
         result,
         timestamp: Date.now(),
-        anonymous,
       };
 
       const updatedHistory = [newEntry, ...history].slice(0, 100); // Keep only last 100 entries
@@ -268,8 +295,12 @@ export function usePairingHistory() {
       // Save to localStorage
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
-      } catch (error) {
-        console.error('Error saving pairing history:', error);
+        // Dispatch custom event for other components (e.g., RecentMatchesSection)
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('flames-history-update'));
+        }
+      } catch {
+        // localStorage save failed - history persists in memory
       }
 
       // Check for new badges
@@ -290,8 +321,12 @@ export function usePairingHistory() {
     });
     try {
       localStorage.removeItem(STORAGE_KEY);
-    } catch (error) {
-      console.error('Error clearing history:', error);
+      // Dispatch custom event for other components (e.g., RecentMatchesSection)
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('flames-history-update'));
+      }
+    } catch {
+      // localStorage clear failed - state is already cleared
     }
   }, []);
 

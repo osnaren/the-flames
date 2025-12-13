@@ -1,4 +1,13 @@
-export type SeasonalTheme = 'valentine' | 'halloween' | 'christmas' | 'default';
+export type SeasonalTheme =
+  | 'default'
+  | 'valentine'
+  | 'halloween'
+  | 'christmas'
+  | 'newYear'
+  | 'diwali'
+  | 'holi'
+  | 'onam'
+  | 'pongal';
 
 export interface ThemeColors {
   primary: string;
@@ -16,11 +25,56 @@ export interface ThemeColors {
   border: string;
 }
 
+// Particle shapes for all seasonal themes
+export type ParticleShape =
+  | 'circle'
+  | 'heart'
+  | 'star'
+  | 'snowflake'
+  | 'pumpkin'
+  | 'bat'
+  | 'flame'
+  // New Year
+  | 'firework'
+  | 'confetti'
+  | 'champagne'
+  // Diwali
+  | 'diya'
+  | 'rangoli'
+  | 'sparkler'
+  // Holi
+  | 'colorSplash'
+  | 'gulal'
+  | 'waterBalloon'
+  // Onam
+  | 'flower'
+  | 'banana'
+  | 'umbrella'
+  // Pongal
+  | 'sugarcane'
+  | 'pot'
+  | 'kolam'
+  // Emoji-based particles (rendered as text)
+  | 'emoji';
+
+// Mapping of themes to their emojis for emoji particles
+export const THEME_EMOJIS: Record<SeasonalTheme, string[]> = {
+  default: [],
+  valentine: ['❤️', '💕', '💗', '💖', '🌹'],
+  halloween: ['🎃', '🦇', '👻', '🕷️', '💀'],
+  christmas: ['❄️', '🎄', '⭐', '🎁', '🔔'],
+  newYear: ['🎆', '🎇', '✨', '🥂', '🎉'],
+  diwali: ['🪔', '✨', '🎆', '🌟', '🎇'],
+  holi: ['🎨', '💜', '💙', '💚', '💛', '🧡', '❤️'],
+  onam: ['🌸', '🌺', '🌼', '🪷', '🌻'],
+  pongal: ['🍯', '🌾', '☀️', '🪴', '🎍'],
+};
+
 export interface ParticleConfig {
   enabled: boolean;
   count: number;
   colors: string[];
-  shapes: ('circle' | 'heart' | 'star' | 'snowflake' | 'pumpkin' | 'bat')[];
+  shapes: ParticleShape[];
   size: {
     min: number;
     max: number;
@@ -66,11 +120,14 @@ export interface SeasonalThemeConfig {
   id: SeasonalTheme;
   name: string;
   description: string;
+  emoji: string; // For carousel display
+  region?: 'global' | 'india' | 'western'; // Cultural region
   dateRange: {
     start: { month: number; day: number };
     end: { month: number; day: number };
   };
   colors: ThemeColors;
+  darkModeColors?: Partial<ThemeColors>; // Override colors for dark mode
   backgroundEffects: BackgroundEffects;
   soundTheme: SoundTheme;
   customCSS?: string;

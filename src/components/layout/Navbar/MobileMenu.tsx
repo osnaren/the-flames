@@ -1,9 +1,12 @@
+'use client';
+
 import Logo from '@components/ui/Logo';
+import { NAVBAR_CONFIG } from '@config/navigation';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
-import { BarChart3, BookOpen, Flame, Wand2, X } from 'lucide-react';
-import { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 import NavItem from './NavItem';
 
 interface MobileMenuProps {
@@ -13,14 +16,20 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProps) {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { prefersReducedMotion } = useAnimationPreferences();
   const menuRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  // Use state for year to avoid hydration mismatch
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
 
   // Handle navigation and close menu with enhanced feedback
   const handleNavigation = (path: string) => {
-    navigate(path);
+    router.push(path);
     onClose();
   };
 
@@ -140,36 +149,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
   };
 
   // Navigation items with enhanced configuration
-  const navItems = [
-    {
-      label: 'Home',
-      icon: Flame,
-      path: '/',
-      isActive: pathname === '/',
-      description: 'Play the FLAMES game',
-    },
-    {
-      label: 'How it Works',
-      icon: BookOpen,
-      path: '/how-it-works',
-      isActive: pathname === '/how-it-works',
-      description: 'Learn about FLAMES',
-    },
-    {
-      label: 'Global Charts',
-      icon: BarChart3,
-      path: '/charts',
-      isActive: pathname === '/charts',
-      description: 'View global statistics',
-    },
-    {
-      label: 'Manual Mode',
-      icon: Wand2,
-      path: '/manual',
-      isActive: pathname === '/manual',
-      description: 'Step-by-step calculation',
-    },
-  ];
+  const navItems = NAVBAR_CONFIG.items;
 
   return (
     <AnimatePresence>
@@ -194,7 +174,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
           {/* Enhanced menu panel with modern styling */}
           <motion.div
             ref={menuRef}
-            className="bg-surface/95 border-outline/20 absolute top-0 right-0 h-full w-80 overflow-hidden border-l shadow-2xl backdrop-blur-xl"
+            className="bg-surface/95 border-outline/20 absolute top-0 right-0 h-full w-80 overflow-hidden border-l shadow-2xl backdrop-blur-xl will-change-transform"
             variants={menuVariants}
           >
             {/* Enhanced gradient overlay for depth */}
@@ -248,14 +228,14 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
             {/* Enhanced navigation section */}
             <nav className="relative px-6 py-6" role="navigation" aria-label="Mobile navigation">
               <motion.div className="space-y-3" variants={containerVariants} initial="hidden" animate="visible">
-                {navItems.map((item, _index) => (
+                {navItems.map((item) => (
                   <motion.div key={item.path} variants={itemVariants} className="group">
                     {/* Enhanced nav item wrapper */}
                     <div className="relative">
                       <NavItem
                         label={item.label}
                         icon={item.icon}
-                        isActive={item.isActive}
+                        isActive={pathname === item.path}
                         onClick={() => handleNavigation(item.path)}
                         mobileOnly
                         className="w-full justify-start"
@@ -311,7 +291,7 @@ export default function MobileMenu({ isOpen, onClose, pathname }: MobileMenuProp
                 </motion.div>
 
                 <div className="text-center">
-                  <p className="text-on-surface-variant/70 text-sm">© {new Date().getFullYear()} OSLabs</p>
+                  <p className="text-on-surface-variant/70 text-sm">© {currentYear ?? '2025'} osLabs</p>
                   <motion.p
                     className="text-on-surface-variant/50 mt-1 text-xs"
                     initial={{ opacity: 0 }}

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Traditional Pongal Pot -->
+  <ellipse cx="32" cy="52" rx="20" ry="8" fill="#8B4513"/>
+  <path d="M12 48 Q8 32 16 20 L48 20 Q56 32 52 48 Z" fill="#CD853F"/>
+  <!-- Pot rim -->
+  <ellipse cx="32" cy="20" rx="16" ry="4" fill="#DEB887"/>
+  <!-- Overflowing rice/milk -->
+  <ellipse cx="32" cy="18" rx="12" ry="6" fill="#FFFACD"/>
+  <ellipse cx="28" cy="14" rx="6" ry="4" fill="#FFF8DC"/>
+  <ellipse cx="36" cy="12" rx="5" ry="3" fill="#FFFACD"/>
+  <!-- Steam lines -->
+  <path d="M26 8 Q24 4 26 0" stroke="#FFFFFF" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <path d="M32 6 Q30 2 32 -2" stroke="#FFFFFF" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <path d="M38 8 Q40 4 38 0" stroke="#FFFFFF" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <!-- Pot decoration -->
+  <path d="M16 34 Q32 38 48 34" stroke="#DEB887" stroke-width="2" fill="none"/>
+</svg>
