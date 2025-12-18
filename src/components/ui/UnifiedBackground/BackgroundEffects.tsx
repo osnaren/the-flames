@@ -5,6 +5,7 @@
 
 'use client';
 
+import { useDeviceCapabilities } from '@/hooks/useDeviceCapabilities';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo } from 'react';
 
@@ -56,12 +57,13 @@ const GradientOrb = memo(function GradientOrb({
   return (
     <motion.div
       key={keyId}
-      className="absolute rounded-full blur-3xl"
+      className="absolute rounded-full blur-3xl will-change-transform"
       style={{
         width: size,
         height: size,
         ...position,
         background: color,
+        transform: 'translate3d(0,0,0)', // Force GPU acceleration
       }}
       animate={{
         scale: animation.scale,
@@ -203,6 +205,9 @@ const DefaultOrbs = memo(function DefaultOrbs({
   accentColor,
   isDarkTheme,
 }: DefaultOrbsProps) {
+  const { isMobile, isLowPowerMode } = useDeviceCapabilities();
+
+  // Reduce orbs on mobile/low power to just 2
   const orbs: OrbConfig[] = [
     {
       size: 400,
@@ -229,31 +234,37 @@ const DefaultOrbs = memo(function DefaultOrbs({
       duration: 10,
       delay: 1,
     },
-    {
-      size: 300,
-      position: { left: '55%', top: '55%' },
-      color: isDarkTheme ? `${accentColor}45` : `${accentColor}55`,
-      animation: {
-        scale: [1, 1.2, 1],
-        opacity: isDarkTheme ? [0.35, 0.6, 0.35] : [0.45, 0.7, 0.45],
-      },
-      duration: 12,
-      delay: 2,
-    },
-    {
-      size: 280,
-      position: { left: '10%', bottom: '15%' },
-      color: isDarkTheme ? `${accentColor}40` : `${primaryColor}50`,
-      animation: {
-        scale: [1, 1.15, 1],
-        opacity: isDarkTheme ? [0.3, 0.5, 0.3] : [0.4, 0.6, 0.4],
-        x: [0, 20, 0],
-        y: [0, -15, 0],
-      },
-      duration: 14,
-      delay: 3,
-    },
   ];
+
+  // Add extra orbs only for desktop/high power
+  if (!isMobile && !isLowPowerMode) {
+    orbs.push(
+      {
+        size: 300,
+        position: { left: '55%', top: '55%' },
+        color: isDarkTheme ? `${accentColor}45` : `${accentColor}55`,
+        animation: {
+          scale: [1, 1.2, 1],
+          opacity: isDarkTheme ? [0.35, 0.6, 0.35] : [0.45, 0.7, 0.45],
+        },
+        duration: 12,
+        delay: 2,
+      },
+      {
+        size: 280,
+        position: { left: '10%', bottom: '15%' },
+        color: isDarkTheme ? `${accentColor}40` : `${primaryColor}50`,
+        animation: {
+          scale: [1, 1.15, 1],
+          opacity: isDarkTheme ? [0.3, 0.5, 0.3] : [0.4, 0.6, 0.4],
+          x: [0, 20, 0],
+          y: [0, -15, 0],
+        },
+        duration: 14,
+        delay: 3,
+      }
+    );
+  }
 
   return (
     <>
@@ -321,27 +332,36 @@ function BackgroundEffects({
   pulsing,
   resultColors,
 }: BackgroundEffectsProps) {
+  const { isMobile, isLowPowerMode } = useDeviceCapabilities();
+  const showHeavyEffects = !isMobile && !isLowPowerMode;
+
   return (
     <>
       {/* Noise Texture */}
       <div className="absolute inset-0 bg-[url('/assets/noise.webp')] opacity-5 dark:opacity-[0.03]" />
 
-      {/* Radial Glow Effects */}
-      <RadialGlow
-        primaryColor={primaryColor}
-        secondaryColor={secondaryColor}
-        accentColor={accentColor}
-        isDarkTheme={isDarkTheme}
-      />
+      {/* Radial Glow Effects - Only on desktop/high power */}
+      {showHeavyEffects && (
+        <RadialGlow
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
+          accentColor={accentColor}
+          isDarkTheme={isDarkTheme}
+        />
+      )}
 
       {/* Pattern Overlay */}
       {overlayPattern && <PatternOverlay pattern={overlayPattern} opacity={overlayOpacity} />}
 
-      {/* Light Mode Shimmer */}
-      {!isDarkTheme && shouldAnimate && <ShimmerEffect primaryColor={primaryColor} secondaryColor={secondaryColor} />}
+      {/* Light Mode Shimmer - Only on desktop/high power */}
+      {!isDarkTheme && shouldAnimate && showHeavyEffects && (
+        <ShimmerEffect primaryColor={primaryColor} secondaryColor={secondaryColor} />
+      )}
 
-      {/* Pulsing Overlay */}
-      {pulsing && shouldAnimate && <PulsingOverlay primaryColor={primaryColor} isDarkTheme={isDarkTheme} />}
+      {/* Pulsing Overlay - Only on desktop/high power */}
+      {pulsing && shouldAnimate && showHeavyEffects && (
+        <PulsingOverlay primaryColor={primaryColor} isDarkTheme={isDarkTheme} />
+      )}
 
       {/* Ambient Orbs */}
       <AnimatePresence mode="wait">

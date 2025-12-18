@@ -162,7 +162,7 @@ export function useParticleSystem({
   const config = useMemo((): ParticleSystemConfig => {
     let intensityMultiplier = intensity === 'high' ? 1.5 : intensity === 'low' ? 0.5 : 1;
 
-    if (isMobile) intensityMultiplier *= 0.6;
+    if (isMobile) intensityMultiplier *= 0.3; // Reduced from 0.6 for better performance
     if (isLowPowerMode) intensityMultiplier *= 0.5;
 
     // Base config from seasonal theme
@@ -358,9 +358,13 @@ export function useParticleSystem({
         ctx.fillStyle = p.color;
         ctx.strokeStyle = p.color;
 
-        // Glow effect
-        ctx.shadowBlur = isDarkTheme ? 20 : 30;
-        ctx.shadowColor = p.color;
+        // Glow effect - Disable on mobile/low power for performance
+        if (!isMobile && !isLowPowerMode) {
+          ctx.shadowBlur = isDarkTheme ? 20 : 30;
+          ctx.shadowColor = p.color;
+        } else {
+          ctx.shadowBlur = 0;
+        }
 
         // Draw the shape
         drawParticleShape(ctx, p.shape, p.size, p.emoji);
@@ -374,7 +378,9 @@ export function useParticleSystem({
 
     // Resize Handler
     const handleResize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // Cap DPR to 1 on mobile/low power to reduce canvas size significantly
+      const maxDpr = isMobile || isLowPowerMode ? 1 : 2;
+      const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
     };
@@ -387,7 +393,7 @@ export function useParticleSystem({
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationIdRef.current);
     };
-  }, [shouldAnimate, config, frameInterval, isDarkTheme, canvasRef]);
+  }, [shouldAnimate, config, frameInterval, isDarkTheme, canvasRef, isMobile, isLowPowerMode]);
 
   return { config, canvasColors };
 }
