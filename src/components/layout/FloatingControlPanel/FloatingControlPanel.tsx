@@ -1,10 +1,24 @@
 import SeasonalThemeSelector from '@/components/settings/SeasonalThemeSelector';
+import { MusicPlayer } from '@/components/ui/MusicPlayer';
+import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { cn } from '@/utils';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import { usePreferences } from '@hooks/usePreferences';
 import Toggle from '@ui/Toggle';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { ChevronUp, Moon, MousePointerClick, Palette, Power, PowerOff, Settings, Sun } from 'lucide-react';
+import {
+  ChevronUp,
+  Moon,
+  MousePointerClick,
+  Music2,
+  Palette,
+  Power,
+  PowerOff,
+  Settings,
+  Sun,
+  Volume2,
+  VolumeX,
+} from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function FloatingControlPanel() {
@@ -16,6 +30,7 @@ export default function FloatingControlPanel() {
 
   const [{ isDarkTheme }, { toggleTheme, toggleAnimations }] = usePreferences();
   const { shouldAnimate } = useAnimationPreferences();
+  const { isSoundEnabled, toggleSound } = usePreferencesStore();
 
   // Local wrapper for toggling animations to ensure parent state is updated too
   const handleToggleAnimations = useCallback(() => {
@@ -136,18 +151,17 @@ export default function FloatingControlPanel() {
       inactiveColor: 'text-on-surface-variant',
       ariaLabel: shouldAnimate ? 'Turn off animations' : 'Turn on animations',
     },
-    // Disabled sound control for now
-    // {
-    //   label: 'Sound',
-    //   activeIcon: Volume2,
-    //   inactiveIcon: VolumeX,
-    //   active: isSoundEnabled,
-    //   toggle: toggleSound,
-    //   color: 'bg-linear-to-r from-secondary-container/30 to-secondary/10',
-    //   activeColor: 'text-secondary text-glow-sm',
-    //   inactiveColor: 'text-on-surface-variant',
-    //   ariaLabel: isSoundEnabled ? 'Turn off sound' : 'Turn on sound',
-    // },
+    {
+      label: 'Sound',
+      activeIcon: Volume2,
+      inactiveIcon: VolumeX,
+      active: isSoundEnabled,
+      toggle: toggleSound,
+      color: 'bg-linear-to-r from-secondary-container/30 to-secondary/10',
+      activeColor: 'text-secondary text-glow-sm',
+      inactiveColor: 'text-on-surface-variant',
+      ariaLabel: isSoundEnabled ? 'Turn off sound effects' : 'Turn on sound effects',
+    },
   ];
 
   // Animation variants
@@ -277,6 +291,17 @@ export default function FloatingControlPanel() {
                     </span>
                   </div>
                   <SeasonalThemeSelector isExpanded={isExpanded} />
+                </motion.div>
+
+                {/* Music Player */}
+                <motion.div className="border-outline/20 mt-3 border-t pt-3" variants={childVariants}>
+                  <div className="mb-2 flex items-center gap-1.5">
+                    <Music2 className="text-secondary h-3.5 w-3.5" />
+                    <span className="text-on-surface-variant text-[10px] font-medium tracking-wide uppercase">
+                      Background Music
+                    </span>
+                  </div>
+                  <MusicPlayer isExpanded={isExpanded} tabIndex={isExpanded ? 0 : -1} />
                 </motion.div>
 
                 <motion.div

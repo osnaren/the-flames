@@ -1,23 +1,34 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
+import { SoundId } from '@/config/sound';
 import { useSeasonalTheme } from '@/themes/seasonal/useSeasonalTheme';
 import { useHapticFeedback } from './useHapticFeedback';
 import { usePairingHistory } from './usePairingHistory';
-import { useSoundEffects } from './useSoundEffects';
+import { useSoundSystem } from './useSoundSystem';
 
 /**
  * Comprehensive integration hook that combines all game systems
  * Provides unified methods for game events with sound, haptic, and visual feedback
+ *
+ * Features:
+ * - Integrated sound and haptic feedback for all game events
+ * - Theme-aware celebration intensities
+ * - Badge unlock detection and celebration
+ * - Debounced event handlers to prevent duplicate triggers
+ * - Performance optimized with memoization
  */
 export function useGameIntegration() {
-  const { playSound, playSoundSequence } = useSoundEffects();
+  const { playSound, playSoundSequence } = useSoundSystem();
   const { hapticFeedback, triggerHapticSequence } = useHapticFeedback();
   const { getNewlyUnlockedBadges } = usePairingHistory();
   const { currentThemeConfig } = useSeasonalTheme();
 
+  // Prevent duplicate badge celebrations
+  const celebratedBadgesRef = useRef<Set<string>>(new Set());
+
   // Form submission with feedback
   const handleFormSubmit = useCallback(async () => {
-    await Promise.all([playSound('formSubmit'), hapticFeedback.tap()]);
+    await Promise.all([playSound('formSubmit' as SoundId), hapticFeedback.tap()]);
   }, [playSound, hapticFeedback]);
 
   // Letter striking animation with feedback
@@ -25,7 +36,7 @@ export function useGameIntegration() {
     async (letterIndex: number, _totalLetters: number) => {
       const delay = letterIndex * 100; // Stagger the feedback
 
-      await Promise.all([playSound('letterStrike', { delay }), hapticFeedback.letterStrike()]);
+      await Promise.all([playSound('letterStrike' as SoundId, { delay }), hapticFeedback.letterStrike()]);
     },
     [playSound, hapticFeedback]
   );
@@ -36,7 +47,7 @@ export function useGameIntegration() {
       const intensity = Math.min(1, currentStep / totalSteps);
 
       await Promise.all([
-        playSound('flamesCount', {
+        playSound('flamesCount' as SoundId, {
           playbackRate: 0.8 + intensity * 0.4, // Speed up as we progress
           volume: 0.3 + intensity * 0.4,
         }),
@@ -63,8 +74,8 @@ export function useGameIntegration() {
 
       // Sound sequence for dramatic effect
       await playSoundSequence([
-        { effect: 'resultReveal', delay: 0 },
-        { effect: 'success', delay: 500, options: { volume: 0.8 } },
+        { effect: 'resultReveal' as SoundId, delay: 0 },
+        { effect: 'success' as SoundId, delay: 500, options: { volume: 0.8 } },
       ]);
 
       // Haptic sequence for result
@@ -78,12 +89,18 @@ export function useGameIntegration() {
 
   // Badge unlock celebration
   const handleBadgeUnlock = useCallback(
-    async (_badgeId: string) => {
+    async (badgeId: string) => {
+      // Prevent duplicate celebrations
+      if (celebratedBadgesRef.current.has(badgeId)) {
+        return;
+      }
+      celebratedBadgesRef.current.add(badgeId);
+
       // Extra special feedback for badge unlocks
       await playSoundSequence([
-        { effect: 'badgeUnlock', delay: 0 },
-        { effect: 'success', delay: 200 },
-        { effect: 'success', delay: 400, options: { playbackRate: 1.2 } },
+        { effect: 'badgeUnlock' as SoundId, delay: 0 },
+        { effect: 'success' as SoundId, delay: 200 },
+        { effect: 'sparkle' as SoundId, delay: 400, options: { playbackRate: 1.2 } },
       ]);
 
       await triggerHapticSequence([
@@ -96,10 +113,18 @@ export function useGameIntegration() {
 
   // UI interaction feedback
   const handleUIInteraction = useCallback(
-    async (type: 'click' | 'hover' | 'success' | 'error') => {
+    async (type: 'click' | 'hover' | 'success' | 'error' | 'toggle') => {
+      const soundMap: Record<string, SoundId> = {
+        click: 'click',
+        hover: 'hover',
+        success: 'success',
+        error: 'error',
+        toggle: 'toggle',
+      };
+
       await Promise.all([
-        playSound(type),
-        type === 'click'
+        playSound(soundMap[type] as SoundId),
+        type === 'click' || type === 'toggle'
           ? hapticFeedback.tap()
           : type === 'success'
             ? hapticFeedback.success()
@@ -113,14 +138,17 @@ export function useGameIntegration() {
 
   // Game reset with gentle feedback
   const handleGameReset = useCallback(async () => {
-    await Promise.all([playSound('click', { volume: 0.5 }), hapticFeedback.tap()]);
+    await Promise.all([playSound('click' as SoundId, { volume: 0.5 }), hapticFeedback.tap()]);
   }, [playSound, hapticFeedback]);
 
   // Check for newly unlocked badges and celebrate
   useEffect(() => {
     const newBadges = getNewlyUnlockedBadges();
     newBadges.forEach((badge) => {
-      handleBadgeUnlock(badge.id);
+      // Use setTimeout to prevent blocking the main thread
+      setTimeout(() => {
+        handleBadgeUnlock(badge.id);
+      }, 0);
     });
   }, [getNewlyUnlockedBadges, handleBadgeUnlock]);
 
@@ -159,12 +187,12 @@ export function useGameIntegration() {
     // Convenience methods
     celebrate: (intensity: 'low' | 'medium' | 'high' = 'medium') => {
       const multiplier = { low: 0.5, medium: 1, high: 1.5 }[intensity];
-      return Promise.all([playSound('success', { volume: 0.6 * multiplier }), hapticFeedback.celebration()]);
+      return Promise.all([playSound('success' as SoundId, { volume: 0.6 * multiplier }), hapticFeedback.celebration()]);
     },
 
     notify: (type: 'info' | 'warning' | 'error' = 'info') => {
       return Promise.all([
-        playSound(type === 'error' ? 'error' : 'success', {
+        playSound((type === 'error' ? 'error' : 'success') as SoundId, {
           volume: type === 'error' ? 0.7 : 0.5,
         }),
         type === 'error' ? hapticFeedback.error() : hapticFeedback.notification(),
@@ -172,10 +200,8 @@ export function useGameIntegration() {
     },
 
     feedback: (action: 'tap' | 'select' | 'press' | 'success' | 'error') => {
-      return Promise.all([
-        playSound(action === 'tap' || action === 'select' || action === 'press' ? 'click' : action),
-        hapticFeedback[action](),
-      ]);
+      const soundId = (action === 'tap' || action === 'select' || action === 'press' ? 'click' : action) as SoundId;
+      return Promise.all([playSound(soundId), hapticFeedback[action]()]);
     },
   };
 }
