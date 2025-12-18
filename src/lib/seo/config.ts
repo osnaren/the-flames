@@ -22,9 +22,12 @@ export const siteConfig = {
   publisher: 'osLabs',
   keywords: [
     'FLAMES game',
+    'the flames',
+    'flames games',
     'FLAMES calculator',
     'relationship game',
     'love calculator',
+    'relationship calculator',
     'friendship test',
     'compatibility test',
     'name compatibility',

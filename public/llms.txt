@@ -10,6 +10,7 @@ FLAMES Game is a modern web application that brings the classic schoolyard relat
 
 - **Type**: Free online game / web application
 - **Category**: Entertainment, Games, Relationship
+- **Keywords**: the flames, flames games, flames calculator, love calculator, relationship calculator
 - **Audience**: Anyone curious about relationship compatibility
 - **Cost**: Free, no registration required
 - **Privacy**: No personal data stored

@@ -3,11 +3,12 @@ import { memo } from 'react';
 function SEOContentComponent() {
   return (
     <article className="prose prose-pink dark:prose-invert sr-only mx-auto mt-16 max-w-2xl px-4 pb-12 text-center md:text-left">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">What is FLAMES Game?</h2>
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">What is the FLAMES Game?</h2>
       <p className="text-gray-600 dark:text-gray-300">
-        FLAMES is a classic childhood game that predicts the relationship compatibility between two people. The acronym
-        FLAMES stands for Friends, Lovers, Affection, Marriage, Enemies, and Siblings. It's a fun way to see what the
-        future might hold for you and your crush!
+        The FLAMES game is a classic childhood relationship calculator that predicts the compatibility between two
+        people. Often searched as "flames games" or "love calculator", the acronym FLAMES stands for Friends, Lovers,
+        Affection, Marriage, Enemies, and Siblings. It's a fun, nostalgic way to see what the future might hold for you
+        and your crush!
       </p>
 
       <h3 className="mt-6 text-xl font-semibold text-gray-800 dark:text-gray-100">How to Play FLAMES Online</h3>
