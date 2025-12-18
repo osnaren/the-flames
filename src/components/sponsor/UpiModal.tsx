@@ -58,7 +58,7 @@ const UpiPaymentContent: React.FC<{
   // State for amount handling
   const [selectedAmount, setSelectedAmount] = useState<string>('');
   const [customAmount, setCustomAmount] = useState<string>('');
-  const [note, setNote] = useState<string>('Support ShadySide App');
+  const [note, setNote] = useState<string>('Support The Flames App');
 
   // Compute the final amount to use
   const finalAmount = selectedAmount === 'custom' ? customAmount : selectedAmount;
@@ -74,11 +74,9 @@ const UpiPaymentContent: React.FC<{
 
   // Generate QR code when necessary values change
   useEffect(() => {
-    // Defer state updates to avoid synchronous setState in effect warning
-    const timer = setTimeout(() => {
-      setIsLoadingQr(true);
-      setQrCodeDataUrl(null);
-    }, 0);
+    let isMounted = true;
+    setIsLoadingQr(true);
+    setQrCodeDataUrl(null);
 
     // Only include amount if it has a valid value
     const upiParams: UPIIntentParams = {
@@ -95,15 +93,21 @@ const UpiPaymentContent: React.FC<{
 
     upiqr(upiParams)
       .then((res) => {
-        setQrCodeDataUrl(res.qr);
-        setIsLoadingQr(false);
+        if (isMounted) {
+          setQrCodeDataUrl(res.qr);
+          setIsLoadingQr(false);
+        }
       })
       .catch(() => {
-        toast.error('Could not generate QR code.');
-        setIsLoadingQr(false);
+        if (isMounted) {
+          toast.error('Could not generate QR code.');
+          setIsLoadingQr(false);
+        }
       });
 
-    return () => clearTimeout(timer);
+    return () => {
+      isMounted = false;
+    };
   }, [upiId, upiName, currency, note, finalAmount]);
 
   // Handle amount button click
@@ -199,7 +203,7 @@ const UpiPaymentContent: React.FC<{
       </div>
 
       {/* Amount Selection & Note Container */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 px-4">
         <fieldset>
           <legend className="text-on-surface mb-2 block text-sm font-medium">Quick Support</legend>
           <div className="grid grid-cols-2 gap-2" id="quick-support-group" role="group" aria-label="Quick Support">
@@ -301,7 +305,7 @@ const UpiDialog: React.FC<UpiModalProps> = ({ isOpen, onOpenChange, upiId, upiNa
             ❤️ Support via UPI
           </DialogTitle>
           <DialogDescription className="text-center">
-            Scan the QR with any UPI app or copy the ID below. Thanks a ton for helping keep ShadySide cool! 😎
+            Scan the QR with any UPI app or copy the ID below. Thanks a ton for helping keep The Flames cool! 😎
           </DialogDescription>
         </DialogHeader>
 
@@ -342,7 +346,7 @@ const UpiDrawer: React.FC<UpiModalProps> = ({ isOpen, onOpenChange, upiId, upiNa
         <DrawerHeader className="text-left">
           <DrawerTitle className="flex items-center gap-2">❤️ Support via UPI</DrawerTitle>
           <DrawerDescription>
-            Scan the QR with any UPI app or copy the ID below. Thanks a ton for helping keep ShadySide cool! 😎
+            Scan the QR with any UPI app or copy the ID below. Thanks a ton for helping keep The Flames cool! 😎
           </DrawerDescription>
         </DrawerHeader>
 
