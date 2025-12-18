@@ -82,9 +82,9 @@ export const baseMetadata: Metadata = {
   },
   manifest: '/favicon/site.webmanifest',
   alternates: {
-    canonical: siteConfig.url,
+    canonical: '/',
     languages: {
-      'en-US': siteConfig.url,
+      'en-US': '/',
     },
   },
   verification: {},
@@ -130,6 +130,9 @@ export function generatePageMetadata(options: {
     keywords: [...siteConfig.keywords, ...keywords],
     alternates: {
       canonical: url,
+      languages: {
+        'en-US': url,
+      },
     },
     openGraph: {
       title,

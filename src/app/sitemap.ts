@@ -12,7 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Static pages with their SEO priorities and change frequencies
   const staticPages: MetadataRoute.Sitemap = [
     {
-      url: BASE_URL,
+      url: `${BASE_URL}/`,
       lastModified: currentDate,
       changeFrequency: 'daily',
       priority: 1.0,
