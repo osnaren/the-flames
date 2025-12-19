@@ -1,3 +1,4 @@
+import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FLAMES_DATA, PROCESSOR_TIMING } from '../../constants';
@@ -41,6 +42,7 @@ function FlamesProcessorComponent({
   shouldAnimate,
   runId,
 }: FlamesProcessorProps) {
+  const { letterStrike, flamesCounting, resultReveal, uiInteraction } = useGameIntegration();
   const [phase, setPhase] = useState<ProcessingPhase>('names-reveal');
   const [struckLetters, setStruckLetters] = useState<Set<number>>(new Set());
   const [activeFlamesIndex, setActiveFlamesIndex] = useState<number | null>(null);
@@ -192,6 +194,11 @@ function FlamesProcessorComponent({
         addTimeout(() => {
           setStruckLetters(new Set(allIndices.map(({ name, idx }) => name * 100 + idx)));
 
+          // Play sound for each struck letter
+          allIndices.forEach((_, index) => {
+            letterStrike(index, allIndices.length);
+          });
+
           // Move to counting after strike duration
           addTimeout(() => setPhase('counting'), strikeAnimationDuration);
         }, PROCESSOR_TIMING.STRIKE_DELAY);
@@ -210,6 +217,9 @@ function FlamesProcessorComponent({
         break;
 
       case 'result-reveal':
+        if (result) {
+          resultReveal(result);
+        }
         addTimeout(() => {
           setPhase('complete');
           onCompleteRef.current();
@@ -251,6 +261,7 @@ function FlamesProcessorComponent({
           // Show count number after a brief delay so letter highlights first
           addTimeout(() => {
             setCountDisplay(count);
+            flamesCounting(count, safeRemainingCount);
           }, 50);
 
           addTimeout(countStep, PROCESSOR_TIMING.COUNT_PER_LETTER);
@@ -285,7 +296,7 @@ function FlamesProcessorComponent({
     };
 
     runCountingRound();
-  }, [safeRemainingCount, addTimeout]);
+  }, [addTimeout, safeRemainingCount, flamesCounting]);
 
   const resultData = result ? FLAMES_DATA.find((f) => f.letter === result) : null;
 
@@ -602,7 +613,10 @@ function FlamesProcessorComponent({
                 exit={{ opacity: 0 }}
               >
                 <button
-                  onClick={handleSkip}
+                  onClick={() => {
+                    uiInteraction('click');
+                    handleSkip();
+                  }}
                   className="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
                   Skip animation →

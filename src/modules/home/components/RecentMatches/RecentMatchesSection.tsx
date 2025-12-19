@@ -6,6 +6,7 @@
 
 import { RECENT_MATCHES_CONFIG } from '@/config/recentMatches';
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
+import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronUp, History, Trash2 } from 'lucide-react';
 import { memo, useCallback, useEffect, useState } from 'react';
@@ -25,6 +26,7 @@ interface SectionHeaderProps {
   onClearAll: () => void;
   shouldAnimate: boolean;
   showExpandButton: boolean;
+  playSound: (id: 'whoosh' | 'delete' | 'click') => void;
 }
 
 function SectionHeader({
@@ -35,21 +37,25 @@ function SectionHeader({
   onClearAll,
   shouldAnimate,
   showExpandButton,
+  playSound,
 }: SectionHeaderProps) {
   const [isConfirmingClear, setIsConfirmingClear] = useState(false);
 
   const handleClearClick = useCallback(() => {
+    playSound('click');
     setIsConfirmingClear(true);
-  }, []);
+  }, [playSound]);
 
   const handleConfirmClear = useCallback(() => {
+    playSound('delete');
     onClearAll();
     setIsConfirmingClear(false);
-  }, [onClearAll]);
+  }, [onClearAll, playSound]);
 
   const handleCancelClear = useCallback(() => {
+    playSound('click');
     setIsConfirmingClear(false);
-  }, []);
+  }, [playSound]);
 
   return (
     <div className="mb-3 flex items-center justify-between">
@@ -118,13 +124,16 @@ function SectionHeader({
         {/* Expand/Collapse button */}
         {showExpandButton && (
           <button
-            onClick={onToggleExpand}
+            onClick={() => {
+              playSound('whoosh');
+              onToggleExpand();
+            }}
             className="text-on-surface-variant/60 hover:text-primary hover:bg-primary/10 focus-visible:ring-primary/50 rounded-lg p-1.5 transition-colors duration-150 focus-visible:ring-2 focus-visible:outline-none"
             aria-label={isExpanded ? 'Show less' : 'Show more'}
             aria-expanded={isExpanded}
             type="button"
           >
-            <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
+            <motion.div animate={{ rotate: isExpanded ? 360 : 0 }} transition={{ duration: 0.2 }}>
               {isExpanded ? (
                 <ChevronUp className="h-4 w-4" aria-hidden="true" />
               ) : (
@@ -148,6 +157,7 @@ function RecentMatchesSection({
   className = '',
 }: RecentMatchesSectionProps) {
   const { shouldAnimate } = useAnimationPreferences();
+  const { sound } = useGameIntegration();
   const { displayMatches, totalCount, isLoading, hasMatches, removeMatch, clearAllMatches, getDisplayMatches } =
     useRecentMatches();
 
@@ -244,6 +254,7 @@ function RecentMatchesSection({
             onClearAll={clearAllMatches}
             shouldAnimate={shouldAnimate}
             showExpandButton={showExpandButton}
+            playSound={(id) => sound.playSound(id)}
           />
         )}
 

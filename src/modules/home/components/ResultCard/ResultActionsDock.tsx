@@ -3,6 +3,7 @@ import { BarChart3, Link2, RotateCcw, Share2, Sparkles } from 'lucide-react';
 import { memo, useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 
+import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { cn } from '@/utils';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 
@@ -97,14 +98,36 @@ function ResultActionsDock({
   className,
 }: ResultActionsDockProps) {
   const { shouldAnimate } = useAnimationPreferences();
+  const { uiInteraction, gameReset } = useGameIntegration();
 
   const handleCopyLink = useCallback(() => {
+    uiInteraction('click');
     onCopyLink();
     toast.success('Link copied to clipboard!', {
       icon: '🔗',
       duration: 2000,
     });
-  }, [onCopyLink]);
+  }, [onCopyLink, uiInteraction]);
+
+  const handleRetry = useCallback(() => {
+    gameReset();
+    onRetry();
+  }, [gameReset, onRetry]);
+
+  const handleShare = useCallback(() => {
+    uiInteraction('click');
+    onShare();
+  }, [uiInteraction, onShare]);
+
+  const handleManual = useCallback(() => {
+    uiInteraction('click');
+    onNavigateToManual?.();
+  }, [uiInteraction, onNavigateToManual]);
+
+  const handleStats = useCallback(() => {
+    uiInteraction('click');
+    onNavigateToStats?.();
+  }, [uiInteraction, onNavigateToStats]);
 
   if (!isVisible) return null;
 
@@ -128,19 +151,19 @@ function ResultActionsDock({
       )}
     >
       {/* Primary Actions */}
-      <DockButton icon={RotateCcw} label="Reset" onClick={onRetry} variant="secondary" delay={0} />
+      <DockButton icon={RotateCcw} label="Reset" onClick={handleRetry} variant="secondary" delay={0} />
 
-      <DockButton icon={Share2} label="Share" onClick={onShare} variant="primary" delay={0.05} />
+      <DockButton icon={Share2} label="Share" onClick={handleShare} variant="primary" delay={0.05} />
 
       <DockButton icon={Link2} label="Copy" onClick={handleCopyLink} variant="info" delay={0.15} />
 
       {/* Optional Actions */}
       {onNavigateToManual && (
-        <DockButton icon={Sparkles} label="Manual" onClick={onNavigateToManual} variant="warning" delay={0.2} />
+        <DockButton icon={Sparkles} label="Manual" onClick={handleManual} variant="warning" delay={0.2} />
       )}
 
       {onNavigateToStats && (
-        <DockButton icon={BarChart3} label="Charts" onClick={onNavigateToStats} variant="info" delay={0.25} />
+        <DockButton icon={BarChart3} label="Charts" onClick={handleStats} variant="info" delay={0.25} />
       )}
     </motion.div>
   );

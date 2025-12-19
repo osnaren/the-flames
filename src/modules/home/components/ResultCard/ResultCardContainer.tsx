@@ -4,6 +4,7 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 import SharePopover from '@/components/ui/SharePopover';
+import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import type { FlamesResult, GameStage, NonNullFlamesResult } from '../../types';
 
@@ -37,6 +38,7 @@ function ResultCardContainer({
   onNavigateToStats,
 }: ResultCardContainerProps) {
   const { shouldAnimate, prefersReducedMotion } = useAnimationPreferences();
+  const { uiInteraction } = useGameIntegration();
   const resultCardRef = useRef<HTMLDivElement>(null);
   const [isSharePopoverOpen, setIsSharePopoverOpen] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
@@ -122,6 +124,7 @@ function ResultCardContainer({
       const shareSuccess = await shareAsImage(imageBlob, name1, name2, result);
 
       if (shareSuccess) {
+        uiInteraction('success');
         toast.success('Shared successfully!', { id: 'capture' });
       } else {
         // Fallback to download if share fails
@@ -133,14 +136,16 @@ function ResultCardContainer({
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        uiInteraction('success');
         toast.success('Image downloaded!', { id: 'capture' });
       }
     } catch {
+      uiInteraction('error');
       toast.error('Failed to create image. Try again.', { id: 'capture' });
     } finally {
       setIsCapturing(false);
     }
-  }, [result, name1, name2]);
+  }, [result, name1, name2, uiInteraction]);
 
   // Handle copy link
   const handleCopyLink = useCallback(async () => {
@@ -152,9 +157,10 @@ function ResultCardContainer({
       }
       // Toast is already shown in ResultActionsDock
     } catch {
+      uiInteraction('error');
       toast.error('Failed to copy link');
     }
-  }, [name1, name2]);
+  }, [name1, name2, uiInteraction]);
 
   // Share popover data
   const shareData = {

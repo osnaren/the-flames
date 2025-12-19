@@ -1,3 +1,4 @@
+import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { validateFlamesInput, validateName } from '@/utils/validation';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
@@ -33,6 +34,7 @@ function InputFormComponent({
 }: InputFormProps) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [focusedField, setFocusedField] = useState<'name1' | 'name2' | null>(null);
+  const { formSubmit, uiInteraction, sound } = useGameIntegration();
 
   // Individual field validation
   const validateField = useCallback((fieldName: 'name1' | 'name2', value: string) => {
@@ -118,10 +120,11 @@ function InputFormComponent({
       setErrors(validationErrors);
 
       if (name1Result.isValid && name2Result.isValid && combinedResult.isValid) {
+        formSubmit();
         onSubmit(e);
       }
     },
-    [onSubmit, isProcessing, name1, name2]
+    [onSubmit, isProcessing, name1, name2, formSubmit]
   );
 
   return (
@@ -193,7 +196,10 @@ function InputFormComponent({
                   type="text"
                   value={name1}
                   onChange={handleName1Change}
-                  onFocus={() => setFocusedField('name1')}
+                  onFocus={() => {
+                    sound.playSound('pop');
+                    setFocusedField('name1');
+                  }}
                   onBlur={() => handleBlur('name1')}
                   aria-describedby={errors.name1?.length ? 'name1-error' : undefined}
                   aria-invalid={errors.name1?.length ? 'true' : undefined}
@@ -257,7 +263,10 @@ function InputFormComponent({
                   type="text"
                   value={name2}
                   onChange={handleName2Change}
-                  onFocus={() => setFocusedField('name2')}
+                  onFocus={() => {
+                    sound.playSound('pop');
+                    setFocusedField('name2');
+                  }}
                   onBlur={() => handleBlur('name2')}
                   aria-describedby={errors.name2?.length ? 'name2-error' : undefined}
                   aria-invalid={errors.name2?.length ? 'true' : undefined}
@@ -314,6 +323,7 @@ function InputFormComponent({
           <motion.button
             type="submit"
             disabled={!isFormValid || isProcessing}
+            onClick={() => isFormValid && !isProcessing && uiInteraction('click')}
             className="group relative w-full overflow-hidden rounded-xl bg-linear-to-r from-pink-500 via-rose-500 to-red-500 px-6 py-4 font-bold text-white shadow-lg transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale"
             whileHover={
               shouldAnimate && isFormValid && !isProcessing
