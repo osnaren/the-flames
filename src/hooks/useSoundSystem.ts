@@ -13,7 +13,7 @@
  * - Browser autoplay policy handling
  */
 
-import { BGM_TRACKS, SOUND_ASSETS, SoundId } from '@/config/sound';
+import { BGM_TRACKS, cycleTrackInTheme, getTracksForTheme, SOUND_ASSETS, SoundId, THEME_GROUPS } from '@/config/sound';
 import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
@@ -28,21 +28,41 @@ class AudioManager {
   private mountCount = 0;
   private audioContext: AudioContext | null = null;
   private isUserInteracted = false;
+  private wasPlayingBeforeHidden = false;
+  private isDucking = false;
+  private onTrackEndedCallback: (() => void) | null = null;
+  private playOperationId = 0;
+
+  private handleInteraction = () => {
+    this.isUserInteracted = true;
+    this.initAudioContext();
+    document.removeEventListener('click', this.handleInteraction);
+    document.removeEventListener('touchstart', this.handleInteraction);
+    document.removeEventListener('keydown', this.handleInteraction);
+  };
+
+  private handleVisibilityChange = () => {
+    if (document.hidden) {
+      if (this.bgmElement && !this.bgmElement.paused) {
+        this.wasPlayingBeforeHidden = true;
+        this.bgmElement.pause();
+      } else {
+        this.wasPlayingBeforeHidden = false;
+      }
+    } else {
+      if (this.wasPlayingBeforeHidden && this.bgmElement) {
+        this.bgmElement.play().catch(() => {});
+      }
+    }
+  };
 
   private constructor() {
     // Private constructor for singleton
     if (typeof window !== 'undefined') {
-      // Track user interaction for autoplay policy
-      const handleInteraction = () => {
-        this.isUserInteracted = true;
-        this.initAudioContext();
-        document.removeEventListener('click', handleInteraction);
-        document.removeEventListener('touchstart', handleInteraction);
-        document.removeEventListener('keydown', handleInteraction);
-      };
-      document.addEventListener('click', handleInteraction, { once: true });
-      document.addEventListener('touchstart', handleInteraction, { once: true });
-      document.addEventListener('keydown', handleInteraction, { once: true });
+      document.addEventListener('click', this.handleInteraction, { once: true });
+      document.addEventListener('touchstart', this.handleInteraction, { once: true });
+      document.addEventListener('keydown', this.handleInteraction, { once: true });
+      document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
 
@@ -61,6 +81,19 @@ class AudioManager {
     this.mountCount--;
     if (this.mountCount <= 0) {
       this.cleanup();
+    }
+  }
+
+  setDucking(enabled: boolean, globalVolume: number): void {
+    if (this.isDucking === enabled) return;
+    this.isDucking = enabled;
+    this.setVolume(globalVolume);
+  }
+
+  setOnTrackEnded(callback: () => void): void {
+    this.onTrackEndedCallback = callback;
+    if (this.bgmElement) {
+      this.bgmElement.onended = callback;
     }
   }
 
@@ -170,6 +203,9 @@ class AudioManager {
     const asset = SOUND_ASSETS[id];
     if (!asset || asset.category !== 'bgm') return;
 
+    // Increment operation ID to invalidate any pending play operations
+    const opId = ++this.playOperationId;
+
     // Already playing this track
     if (this.bgmElement && this.currentBgmId === id && !this.bgmElement.paused) {
       return;
@@ -180,6 +216,11 @@ class AudioManager {
       await this.fadeOutBGM();
     }
 
+    // Check if this operation is still valid (no newer play/pause/stop calls)
+    if (opId !== this.playOperationId) {
+      return;
+    }
+
     // Clear any pending fade
     if (this.fadeInterval) {
       clearInterval(this.fadeInterval);
@@ -188,8 +229,19 @@ class AudioManager {
 
     // Create new BGM element
     const audio = new Audio(asset.src);
-    audio.loop = true;
-    const targetVolume = (asset.volume || 0.4) * globalVolume;
+    audio.loop = false; // Handle looping manually for playlist support
+    audio.onended = () => {
+      if (this.onTrackEndedCallback) {
+        this.onTrackEndedCallback();
+      } else if (asset.loop) {
+        // Fallback to simple looping if no callback
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      }
+    };
+
+    const duckingMultiplier = this.isDucking ? 0.2 : 1;
+    const targetVolume = (asset.volume || 0.4) * globalVolume * duckingMultiplier;
     audio.volume = fadeIn ? 0 : targetVolume;
 
     this.bgmElement = audio;
@@ -200,15 +252,27 @@ class AudioManager {
 
       // Fade in
       if (fadeIn) {
-        await this.fadeVolume(audio, 0, targetVolume, 1000);
+        // Check opId again before starting fade in, just in case
+        if (opId === this.playOperationId) {
+          await this.fadeVolume(audio, 0, targetVolume, 1000);
+        }
       }
     } catch {
       // Autoplay blocked - will retry on user interaction
-      this.currentBgmId = id; // Keep track for later
+      // Only update state if we are still the active operation
+      if (opId === this.playOperationId) {
+        this.currentBgmId = id;
+      }
     }
   }
 
   private async fadeVolume(audio: HTMLAudioElement, from: number, to: number, duration: number): Promise<void> {
+    // Clear any existing fade interval to prevent conflicts
+    if (this.fadeInterval) {
+      clearInterval(this.fadeInterval);
+      this.fadeInterval = null;
+    }
+
     return new Promise((resolve) => {
       const steps = 20;
       const stepDuration = duration / steps;
@@ -244,12 +308,18 @@ class AudioManager {
   }
 
   pauseBGM(): void {
+    // Invalidate any pending play operations
+    this.playOperationId++;
+
     if (this.bgmElement && !this.bgmElement.paused) {
       this.bgmElement.pause();
     }
   }
 
   async resumeBGM(): Promise<void> {
+    // Invalidate any pending play operations (though resume is usually safe)
+    this.playOperationId++;
+
     if (this.bgmElement && this.bgmElement.paused) {
       try {
         await this.bgmElement.play();
@@ -260,6 +330,9 @@ class AudioManager {
   }
 
   stopBGM(): void {
+    // Invalidate any pending play operations
+    this.playOperationId++;
+
     if (this.bgmElement) {
       this.bgmElement.pause();
       this.bgmElement.currentTime = 0;
@@ -272,7 +345,8 @@ class AudioManager {
     if (this.bgmElement && this.currentBgmId) {
       const asset = SOUND_ASSETS[this.currentBgmId as SoundId];
       if (asset) {
-        this.bgmElement.volume = (asset.volume || 0.4) * volume;
+        const duckingMultiplier = this.isDucking ? 0.2 : 1;
+        this.bgmElement.volume = (asset.volume || 0.4) * volume * duckingMultiplier;
       }
     }
   }
@@ -303,6 +377,9 @@ class AudioManager {
   }
 
   stopAllSounds(): void {
+    // Invalidate any pending play operations
+    this.playOperationId++;
+
     // Stop all SFX
     this.audioCache.forEach((audio) => {
       audio.pause();
@@ -314,6 +391,13 @@ class AudioManager {
   }
 
   cleanup(): void {
+    if (typeof window !== 'undefined') {
+      document.removeEventListener('click', this.handleInteraction);
+      document.removeEventListener('touchstart', this.handleInteraction);
+      document.removeEventListener('keydown', this.handleInteraction);
+      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    }
+
     // Clear fade interval
     if (this.fadeInterval) {
       clearInterval(this.fadeInterval);
@@ -407,15 +491,22 @@ export function useSoundSystem() {
     const manager = getManager();
     const themeToCheck = musicTheme === 'auto' ? seasonalTheme : musicTheme;
 
-    // Map theme to BGM ID
-    let targetBgmId: SoundId = 'bgm_default';
-    const potentialId = `bgm_${themeToCheck}` as SoundId;
+    // Get tracks for the theme
+    const tracks = getTracksForTheme(themeToCheck);
+    if (tracks.length === 0) return;
 
-    if (potentialId in SOUND_ASSETS && SOUND_ASSETS[potentialId as SoundId].category === 'bgm') {
-      targetBgmId = potentialId;
+    // Default to first track of the theme
+    let targetBgmId: SoundId = tracks[0].id as SoundId;
+
+    // If current track is already in this theme, keep playing it (don't reset to first track)
+    const currentId = manager.getCurrentBGMId();
+    if (currentId) {
+      const currentTrack = BGM_TRACKS.find((t) => t.id === currentId);
+      if (currentTrack && currentTrack.themeGroup === themeToCheck) {
+        targetBgmId = currentId as SoundId;
+      }
     }
 
-    const currentId = manager.getCurrentBGMId();
     if (currentId !== targetBgmId) {
       manager.playBGM(targetBgmId, volume);
     }
@@ -503,6 +594,24 @@ export function useSoundSystem() {
     manager.stopAllSounds();
   }, [getManager]);
 
+  // Set ducking state
+  const setDucking = useCallback(
+    (enabled: boolean) => {
+      const manager = getManager();
+      manager.setDucking(enabled, volume);
+    },
+    [volume, getManager]
+  );
+
+  // Set track ended callback
+  const setOnTrackEnded = useCallback(
+    (callback: () => void) => {
+      const manager = getManager();
+      manager.setOnTrackEnded(callback);
+    },
+    [getManager]
+  );
+
   // Get BGM state for UI
   const getBGMState = useCallback(() => {
     const manager = getManager();
@@ -518,6 +627,29 @@ export function useSoundSystem() {
   // Available BGM tracks for UI
   const availableTracks = useMemo(() => BGM_TRACKS, []);
 
+  // Available theme groups for UI
+  const themeGroups = useMemo(() => THEME_GROUPS, []);
+
+  // Get tracks for a specific theme group
+  const getThemeTracks = useCallback((themeGroup: string) => {
+    return getTracksForTheme(themeGroup);
+  }, []);
+
+  // Cycle track within current theme
+  const cycleTrack = useCallback(
+    async (direction: 'next' | 'prev') => {
+      const manager = getManager();
+      const currentId = manager.getCurrentBGMId();
+      if (!currentId) return;
+
+      const newTrack = cycleTrackInTheme(currentId, direction);
+      if (newTrack && newTrack.id !== currentId) {
+        await playBGM(newTrack.id as SoundId, true);
+      }
+    },
+    [getManager, playBGM]
+  );
+
   return {
     // SFX
     playSound,
@@ -530,9 +662,14 @@ export function useSoundSystem() {
     resumeBGM,
     getBGMState,
     availableTracks,
+    themeGroups,
+    getThemeTracks,
+    cycleTrack,
 
     // Global
     stopAllSounds,
+    setDucking,
+    setOnTrackEnded,
 
     // State
     isEnabled: isSoundEnabled,
