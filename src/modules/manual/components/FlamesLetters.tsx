@@ -1,3 +1,5 @@
+import { useGameIntegration } from '@/hooks/useGameIntegration';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { cn } from '@/utils';
 import { motion } from 'framer-motion';
 import { Crown, Sparkles } from 'lucide-react';
@@ -12,6 +14,8 @@ export default function FlamesLetters({
   correctResult = null,
 }: FlamesLettersProps) {
   const [showResultCelebration, setShowResultCelebration] = useState(false);
+  const { sound } = useGameIntegration();
+  const { hapticFeedback } = useHapticFeedback();
 
   const flamesData = [
     { letter: 'F', meaning: 'Friends', icon: '🤝🏼', color: 'friendship' },
@@ -26,10 +30,14 @@ export default function FlamesLetters({
   useEffect(() => {
     if (userResult) {
       setShowResultCelebration(true);
+      // Play sparkle sound for celebration
+      sound.playSound('sparkle', { volume: 0.6 });
+      // Trigger celebration haptic
+      hapticFeedback.celebration();
       const timer = setTimeout(() => setShowResultCelebration(false), 3000);
       return () => clearTimeout(timer);
     }
-  }, [userResult]);
+  }, [userResult, sound, hapticFeedback]);
 
   // Status tracking for each FLAMES letter
   const getLetterStatus = (letter: string) => {
@@ -136,15 +144,20 @@ export default function FlamesLetters({
           return (
             <motion.button
               key={flame.letter}
-              onClick={() => onLetterToggle?.(flame.letter)}
+              onClick={() => {
+                // Trigger haptic on letter toggle
+                hapticFeedback.counting();
+                onLetterToggle?.(flame.letter);
+              }}
               aria-label={`${flame.meaning} (${flame.letter}): ${status === 'crossed-out' ? 'Crossed out' : status === 'final-result' ? 'Final result' : 'Active - Click to cross out'}`}
               aria-pressed={status === 'crossed-out'}
               disabled={isFinalResult}
               className={cn(
                 'relative overflow-hidden rounded-2xl border-2 p-4 text-center transition-all duration-300',
                 'focus:ring-primary focus:ring-2 focus:ring-offset-2 focus:outline-none',
+                'min-h-20 touch-manipulation',
                 colors.container,
-                isFinalResult ? 'z-10 scale-110' : 'hover:scale-105',
+                isFinalResult ? 'z-10 scale-110' : 'hover:scale-105 active:scale-95',
                 onLetterToggle ? 'cursor-pointer' : 'cursor-default'
               )}
               initial={{ opacity: 0, y: 20, scale: 0.8 }}
