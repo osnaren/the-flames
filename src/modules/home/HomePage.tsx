@@ -1,6 +1,7 @@
 'use client';
 
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
+import { useSoundSystem } from '@/hooks/useSoundSystem';
 import { useBackgroundStore } from '@/store/useBackgroundStore';
 import { AnimatePresence, motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
@@ -51,6 +52,7 @@ function ResultPlaceholder() {
 function HomePage() {
   const { shouldAnimate } = useAnimationPreferences();
   const { setBackgroundState } = useBackgroundStore();
+  const { resumeThemeBGM, isGameActive } = useSoundSystem();
 
   // References for scrolling
   const containerRef = useRef<HTMLDivElement>(null);
@@ -61,6 +63,16 @@ function HomePage() {
     { name1, name2, result, stage, runId, commonLetters, remainingLetters, isProcessing },
     { setName1, setName2, handleSubmit, resetGame, onFlamesAnimationComplete },
   ] = useFlamesEngine();
+
+  // Resume theme BGM when navigating away from game page if game was in progress
+  useEffect(() => {
+    return () => {
+      // On unmount, if game was in progress, resume theme BGM
+      if (isGameActive()) {
+        resumeThemeBGM();
+      }
+    };
+  }, [isGameActive, resumeThemeBGM]);
 
   // Sync game state with background system
   useEffect(() => {

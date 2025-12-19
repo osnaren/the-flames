@@ -33,6 +33,10 @@ class AudioManager {
   private onTrackEndedCallback: (() => void) | null = null;
   private playOperationId = 0;
 
+  // Game state tracking for BGM management
+  private isGameInProgress = false;
+  private suspendedBgmId: string | null = null;
+
   private handleInteraction = () => {
     this.isUserInteracted = true;
     this.initAudioContext();
@@ -340,6 +344,54 @@ class AudioManager {
     this.currentBgmId = null;
   }
 
+  /**
+   * Suspend theme BGM for game processing.
+   * Stops the current theme BGM and remembers it for later resumption.
+   * During suspension, theme auto-play is disabled.
+   */
+  async suspendThemeBGM(): Promise<void> {
+    this.isGameInProgress = true;
+
+    // Remember current BGM if it's a theme track (not a result track)
+    if (this.currentBgmId && !this.currentBgmId.startsWith('bgm_result_')) {
+      this.suspendedBgmId = this.currentBgmId;
+    }
+
+    // Fade out and stop current BGM
+    if (this.bgmElement && !this.bgmElement.paused) {
+      await this.fadeOutBGM();
+    }
+
+    this.stopBGM();
+  }
+
+  /**
+   * Resume theme BGM after game ends.
+   * Restores the previously suspended theme BGM.
+   */
+  async resumeThemeBGM(globalVolume: number = 1): Promise<void> {
+    this.isGameInProgress = false;
+
+    // Stop any result BGM that might be playing
+    if (this.currentBgmId?.startsWith('bgm_result_')) {
+      await this.fadeOutBGM();
+      this.stopBGM();
+    }
+
+    // Restore previously suspended theme BGM if we have one
+    if (this.suspendedBgmId) {
+      await this.playBGM(this.suspendedBgmId as SoundId, globalVolume, true);
+      this.suspendedBgmId = null;
+    }
+  }
+
+  /**
+   * Check if game is in progress (theme BGM suspended)
+   */
+  isGameActive(): boolean {
+    return this.isGameInProgress;
+  }
+
   setVolume(volume: number): void {
     // Update BGM volume
     if (this.bgmElement && this.currentBgmId) {
@@ -489,6 +541,10 @@ export function useSoundSystem() {
     if (!isBGMEnabled || !isInitializedRef.current) return;
 
     const manager = getManager();
+
+    // Don't auto-play theme BGM if game is in progress
+    if (manager.isGameActive()) return;
+
     const themeToCheck = musicTheme === 'auto' ? seasonalTheme : musicTheme;
 
     // Get tracks for the theme
@@ -650,6 +706,26 @@ export function useSoundSystem() {
     [getManager, playBGM]
   );
 
+  // Suspend theme BGM for game processing
+  const suspendThemeBGM = useCallback(async () => {
+    const manager = getManager();
+    await manager.suspendThemeBGM();
+  }, [getManager]);
+
+  // Resume theme BGM after game ends
+  const resumeThemeBGM = useCallback(async () => {
+    if (!isBGMEnabled) return;
+
+    const manager = getManager();
+    await manager.resumeThemeBGM(volume);
+  }, [isBGMEnabled, volume, getManager]);
+
+  // Check if game is in progress
+  const isGameActive = useCallback(() => {
+    const manager = getManager();
+    return manager.isGameActive();
+  }, [getManager]);
+
   return {
     // SFX
     playSound,
@@ -665,6 +741,11 @@ export function useSoundSystem() {
     themeGroups,
     getThemeTracks,
     cycleTrack,
+
+    // Game state management
+    suspendThemeBGM,
+    resumeThemeBGM,
+    isGameActive,
 
     // Global
     stopAllSounds,

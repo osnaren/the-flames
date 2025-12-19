@@ -2,6 +2,7 @@
 
 import Button from '@/components/ui/Button';
 import { useGameIntegration } from '@/hooks/useGameIntegration';
+import { useSoundSystem } from '@/hooks/useSoundSystem';
 import { calculateFlamesResult } from '@modules/home/utils';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Download, RotateCcw, Share, SquareArrowOutUpRight } from 'lucide-react';
@@ -25,6 +26,7 @@ export default function ClickExperience({
   const [crossedLetters, setCrossedLetters] = useState<Set<string>>(new Set());
   const [flamesCrossedLetters, setFlamesCrossedLetters] = useState<Set<string>>(new Set());
   const { letterStrike, resultReveal, uiInteraction, sound } = useGameIntegration();
+  const { resumeThemeBGM } = useSoundSystem();
   const hasPlayedResultSound = useRef(false);
 
   // Calculate the correct FLAMES result for validation
@@ -89,14 +91,21 @@ export default function ClickExperience({
     setCrossedLetters(new Set());
     setFlamesCrossedLetters(new Set());
     hasPlayedResultSound.current = false;
+
+    // Resume theme BGM if result BGM was playing
+    await resumeThemeBGM();
+
     await uiInteraction('toggle');
     toast.success('Reset completed!');
-  }, [uiInteraction]);
+  }, [uiInteraction, resumeThemeBGM]);
 
   const handleBack = useCallback(async () => {
+    // Resume theme BGM if result BGM was playing
+    await resumeThemeBGM();
+
     await sound.playSound('whoosh', { volume: 0.5 });
     onBack();
-  }, [sound, onBack]);
+  }, [sound, onBack, resumeThemeBGM]);
 
   // Get user's current result from FLAMES letters
   const userResult = useMemo(() => {
