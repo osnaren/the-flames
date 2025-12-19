@@ -1,11 +1,12 @@
 'use client';
 
 import Button from '@/components/ui/Button';
+import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { calculateFlamesResult } from '@modules/home/utils';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Download, RotateCcw, Share, SquareArrowOutUpRight } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import type { ClickExperienceProps } from '../types';
 import FlamesLetters from './FlamesLetters';
@@ -23,6 +24,8 @@ export default function ClickExperience({
 }: ClickExperienceProps) {
   const [crossedLetters, setCrossedLetters] = useState<Set<string>>(new Set());
   const [flamesCrossedLetters, setFlamesCrossedLetters] = useState<Set<string>>(new Set());
+  const { letterStrike, resultReveal, uiInteraction, sound } = useGameIntegration();
+  const hasPlayedResultSound = useRef(false);
 
   // Calculate the correct FLAMES result for validation
   const correctResult = useMemo(() => {
@@ -48,35 +51,52 @@ export default function ClickExperience({
       nameIndex: 2 as const,
     }));
 
-  const toggleLetter = useCallback((letterId: string) => {
-    setCrossedLetters((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(letterId)) {
-        newSet.delete(letterId);
-      } else {
-        newSet.add(letterId);
-      }
-      return newSet;
-    });
-  }, []);
+  const toggleLetter = useCallback(
+    (letterId: string) => {
+      setCrossedLetters((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(letterId)) {
+          newSet.delete(letterId);
+        } else {
+          newSet.add(letterId);
+          // Play letter strike sound when crossing out (not when uncrossing)
+          letterStrike(newSet.size, name1.length + name2.length);
+        }
+        return newSet;
+      });
+    },
+    [letterStrike, name1.length, name2.length]
+  );
 
-  const toggleFlamesLetter = useCallback((letter: string) => {
-    setFlamesCrossedLetters((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(letter)) {
-        newSet.delete(letter);
-      } else {
-        newSet.add(letter);
-      }
-      return newSet;
-    });
-  }, []);
+  const toggleFlamesLetter = useCallback(
+    (letter: string) => {
+      setFlamesCrossedLetters((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(letter)) {
+          newSet.delete(letter);
+        } else {
+          newSet.add(letter);
+          // Play flames count sound when eliminating FLAMES letters
+          sound.playSound('flamesCount', { volume: 0.6, playbackRate: 0.9 + newSet.size * 0.1 });
+        }
+        return newSet;
+      });
+    },
+    [sound]
+  );
 
-  const handleReset = useCallback(() => {
+  const handleReset = useCallback(async () => {
     setCrossedLetters(new Set());
     setFlamesCrossedLetters(new Set());
+    hasPlayedResultSound.current = false;
+    await uiInteraction('toggle');
     toast.success('Reset completed!');
-  }, []);
+  }, [uiInteraction]);
+
+  const handleBack = useCallback(async () => {
+    await sound.playSound('whoosh', { volume: 0.5 });
+    onBack();
+  }, [sound, onBack]);
 
   // Get user's current result from FLAMES letters
   const userResult = useMemo(() => {
@@ -102,12 +122,17 @@ export default function ClickExperience({
 
   // Show final result effect
   useEffect(() => {
-    if (userResult && isCorrectResult) {
-      toast.success(`Congratulations! The result is ${correctResult}! 🎉`);
-    } else if (userResult && !isCorrectResult) {
-      toast.error(`Not quite right. Try again! The correct answer is ${correctResult}.`);
+    if (userResult && !hasPlayedResultSound.current) {
+      hasPlayedResultSound.current = true;
+      if (isCorrectResult) {
+        resultReveal(userResult);
+        toast.success(`Congratulations! The result is ${correctResult}! 🎉`);
+      } else {
+        uiInteraction('error');
+        toast.error(`Not quite right. Try again! The correct answer is ${correctResult}.`);
+      }
     }
-  }, [userResult, isCorrectResult, correctResult]);
+  }, [userResult, isCorrectResult, correctResult, resultReveal, uiInteraction]);
 
   return (
     <div className="bg-background min-h-screen p-4">
@@ -125,7 +150,7 @@ export default function ClickExperience({
             variant="outline"
             size="sm"
             icon={ArrowLeft}
-            onClick={onBack}
+            onClick={handleBack}
             className="text-on-surface hover:bg-surface-container/50"
           >
             Back to Input
