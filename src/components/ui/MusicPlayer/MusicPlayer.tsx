@@ -6,19 +6,22 @@
  * A compact music player with rotating disc animation and playback controls.
  * Features:
  * - Rotating vinyl disc animation when playing
- * - Track selection dropdown
+ * - Theme group selection dropdown
+ * - Track cycling within theme groups via prev/next
  * - Play/Pause toggle
  * - Volume control slider
  * - Responsive design
  */
 
-import { BGM_TRACKS, SoundId } from '@/config/sound';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/shadcn/select';
+import { BGM_TRACKS, getTracksForTheme, SoundId, THEME_GROUPS } from '@/config/sound';
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { useSoundSystem } from '@/hooks/useSoundSystem';
 import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { cn } from '@/utils';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, Disc3, Music2, Pause, Play, Volume2, VolumeX } from 'lucide-react';
+import { Disc3, Music2, Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
 interface MusicPlayerProps {
@@ -34,16 +37,22 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0 }: Mu
   const { shouldAnimate } = useAnimationPreferences();
   const { isBGMEnabled, musicTheme, volume, toggleBGM, setMusicTheme, setVolume } = usePreferencesStore();
   const { playBGM, getBGMState, pauseBGM, resumeBGM } = useSoundSystem();
+  const { hapticFeedback } = useHapticFeedback();
 
-  const [isTrackSelectorOpen, setIsTrackSelectorOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
-  const trackSelectorRef = useRef<HTMLDivElement>(null);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const volumeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Get current track info
-  const currentTrack =
-    BGM_TRACKS.find((track) => track.id === `bgm_${musicTheme === 'auto' ? 'default' : musicTheme}`) || BGM_TRACKS[0];
+  // Get current theme group
+  const currentThemeGroup =
+    THEME_GROUPS.find((tg) => tg.id === (musicTheme === 'auto' ? 'default' : musicTheme)) || THEME_GROUPS[0];
+
+  // Get tracks for current theme group
+  const themeTracks = getTracksForTheme(currentThemeGroup.id);
+
+  // Get current track (based on index within theme)
+  const currentTrack = themeTracks[currentTrackIndex] || themeTracks[0] || BGM_TRACKS[0];
 
   // Update playing state
   useEffect(() => {
@@ -57,24 +66,18 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0 }: Mu
     return () => clearInterval(interval);
   }, [getBGMState]);
 
-  // Close track selector on outside click
+  // Reset track index when theme changes
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (trackSelectorRef.current && !trackSelectorRef.current.contains(event.target as Node)) {
-        setIsTrackSelectorOpen(false);
-      }
-    };
-
-    if (isTrackSelectorOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [isTrackSelectorOpen]);
+    setCurrentTrackIndex(0);
+  }, [musicTheme]);
 
   // Handle play/pause toggle
   const handlePlayPause = useCallback(async () => {
+    hapticFeedback.tap();
+
     if (!isBGMEnabled) {
       toggleBGM();
+      setIsPlaying(true);
       return;
     }
 
@@ -82,25 +85,58 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0 }: Mu
       pauseBGM();
       setIsPlaying(false);
     } else {
-      await resumeBGM();
+      // Ensure we have a track playing
+      const state = getBGMState();
+      if (!state.currentTrackId) {
+        await playBGM(currentTrack.id as SoundId, true);
+      } else {
+        await resumeBGM();
+      }
       setIsPlaying(true);
     }
-  }, [isBGMEnabled, isPlaying, toggleBGM, pauseBGM, resumeBGM]);
+  }, [isBGMEnabled, isPlaying, toggleBGM, pauseBGM, resumeBGM, playBGM, getBGMState, currentTrack.id, hapticFeedback]);
 
-  // Handle track selection
-  const handleTrackSelect = useCallback(
-    async (trackId: string) => {
-      // Extract theme from track ID (e.g., 'bgm_valentine' -> 'valentine')
-      const theme = trackId.replace('bgm_', '') as typeof musicTheme;
-      setMusicTheme(theme);
-      setIsTrackSelectorOpen(false);
+  // Handle theme selection
+  const handleThemeSelect = useCallback(
+    async (themeId: string) => {
+      hapticFeedback.select();
+      setMusicTheme(themeId as typeof musicTheme);
+      setCurrentTrackIndex(0);
+
+      // Note: We don't call playBGM here anymore because the useSoundSystem hook
+      // watches for musicTheme changes and will automatically play the correct track.
+      // This prevents race conditions where both components try to play audio simultaneously.
 
       if (isBGMEnabled) {
-        await playBGM(trackId as SoundId, true);
         setIsPlaying(true);
       }
     },
-    [setMusicTheme, playBGM, isBGMEnabled]
+    [setMusicTheme, isBGMEnabled, hapticFeedback]
+  );
+
+  // Handle next/prev track within theme
+  const cycleTrack = useCallback(
+    async (direction: 'next' | 'prev') => {
+      if (themeTracks.length <= 1) return;
+
+      hapticFeedback.select();
+
+      let newIndex: number;
+      if (direction === 'next') {
+        newIndex = (currentTrackIndex + 1) % themeTracks.length;
+      } else {
+        newIndex = (currentTrackIndex - 1 + themeTracks.length) % themeTracks.length;
+      }
+
+      setCurrentTrackIndex(newIndex);
+      const newTrack = themeTracks[newIndex];
+
+      if (newTrack && isBGMEnabled) {
+        await playBGM(newTrack.id as SoundId, true);
+        setIsPlaying(true);
+      }
+    },
+    [themeTracks, currentTrackIndex, playBGM, isBGMEnabled, hapticFeedback]
   );
 
   // Handle volume change
@@ -196,112 +232,142 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0 }: Mu
 
         {/* Controls */}
         <div className="flex flex-1 flex-col gap-1.5">
-          {/* Track Selector */}
-          <div className="relative" ref={trackSelectorRef}>
-            <button
-              onClick={() => setIsTrackSelectorOpen(!isTrackSelectorOpen)}
-              className={cn(
-                'flex w-full items-center justify-between rounded-lg px-2 py-1',
-                'bg-surface-container-high/50 hover:bg-surface-container-highest/50',
-                'text-on-surface transition-colors',
-                'focus:ring-primary/50 focus:ring-2 focus:outline-none'
-              )}
-              aria-expanded={isTrackSelectorOpen}
-              aria-haspopup="listbox"
+          {/* Theme Selector */}
+          <Select value={currentThemeGroup.id} onValueChange={handleThemeSelect}>
+            <SelectTrigger
+              className="bg-surface-container-high/50 hover:bg-surface-container-highest/50 focus:ring-primary/50 h-7 w-full border-none px-2 py-1 text-xs font-medium"
               tabIndex={isExpanded ? tabIndex : -1}
             >
-              <span className="flex items-center gap-1.5 text-xs font-medium">
-                <span>{currentTrack.icon}</span>
-                <span>{currentTrack.label}</span>
-              </span>
-              <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', isTrackSelectorOpen && 'rotate-180')} />
-            </button>
-
-            {/* Track Dropdown */}
-            <AnimatePresence>
-              {isTrackSelectorOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  className="border-outline/20 bg-surface-container absolute top-full right-0 left-0 z-10 mt-1 overflow-hidden rounded-lg border shadow-lg"
-                  role="listbox"
-                >
-                  {BGM_TRACKS.map((track) => (
-                    <button
-                      key={track.id}
-                      onClick={() => handleTrackSelect(track.id)}
-                      className={cn(
-                        'flex w-full items-center gap-2 px-2.5 py-1.5 text-left text-xs',
-                        'hover:bg-primary/10 transition-colors',
-                        currentTrack.id === track.id && 'bg-primary/20 font-medium'
-                      )}
-                      role="option"
-                      aria-selected={currentTrack.id === track.id}
-                      tabIndex={isExpanded ? 0 : -1}
-                    >
-                      <span>{track.icon}</span>
-                      <div className="flex-1">
-                        <span className="text-on-surface">{track.label}</span>
-                        {track.seasonal && <span className="text-on-surface-variant ml-1 text-[9px]">(Seasonal)</span>}
+              <div className="flex items-center gap-1.5">
+                <span>{currentThemeGroup.icon}</span>
+                <span>{currentThemeGroup.label}</span>
+                {themeTracks.length > 1 && (
+                  <span className="text-on-surface-variant text-[9px]">
+                    ({currentTrackIndex + 1}/{themeTracks.length})
+                  </span>
+                )}
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              {THEME_GROUPS.map((themeGroup) => {
+                const trackCount = getTracksForTheme(themeGroup.id).length;
+                return (
+                  <SelectItem key={themeGroup.id} value={themeGroup.id} className="text-xs">
+                    <div className="flex w-full items-center gap-2">
+                      <span>{themeGroup.icon}</span>
+                      <div className="flex flex-1 items-center gap-1">
+                        <span>{themeGroup.label}</span>
+                        {themeGroup.seasonal && <span className="text-muted-foreground text-[9px]">(Seasonal)</span>}
+                        {trackCount > 1 && (
+                          <span className="text-muted-foreground text-[9px]">• {trackCount} tracks</span>
+                        )}
                       </div>
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                    </div>
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
 
           {/* Playback Controls */}
-          <div className="flex items-center justify-between">
-            {/* Play/Pause Button */}
-            <button
-              onClick={handlePlayPause}
-              className={cn(
-                'flex h-7 w-7 items-center justify-center rounded-full',
-                'bg-primary/20 hover:bg-primary/30 text-primary',
-                'focus:ring-primary/50 transition-all focus:ring-2 focus:outline-none',
-                shouldAnimate && 'hover:scale-105 active:scale-95'
-              )}
-              aria-label={isPlaying ? 'Pause music' : 'Play music'}
-              tabIndex={isExpanded ? tabIndex : -1}
-            >
-              {isPlaying ? (
-                <Pause className="h-3.5 w-3.5" fill="currentColor" />
-              ) : (
-                <Play className="ml-0.5 h-3.5 w-3.5" fill="currentColor" />
-              )}
-            </button>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1">
+              {/* Prev Button - Touch-optimized */}
+              <button
+                onClick={() => cycleTrack('prev')}
+                disabled={themeTracks.length <= 1}
+                className={cn(
+                  'flex h-8 w-8 touch-manipulation items-center justify-center rounded-full',
+                  'hover:bg-surface-container-highest/50 active:bg-surface-container-highest/70',
+                  'text-on-surface-variant hover:text-on-surface',
+                  'focus:ring-primary/50 transition-colors focus:ring-2 focus:outline-none',
+                  themeTracks.length <= 1 && 'cursor-not-allowed opacity-30'
+                )}
+                aria-label="Previous track"
+                title={themeTracks.length > 1 ? 'Previous track in theme' : 'Only one track in this theme'}
+                tabIndex={isExpanded ? tabIndex : -1}
+              >
+                <SkipBack className="h-4 w-4" fill="currentColor" />
+              </button>
 
-            {/* Volume Control */}
+              {/* Play/Pause Button - Touch-optimized */}
+              <button
+                onClick={handlePlayPause}
+                className={cn(
+                  'flex h-10 w-10 touch-manipulation items-center justify-center rounded-full',
+                  'bg-primary/20 hover:bg-primary/30 active:bg-primary/40 text-primary',
+                  'focus:ring-primary/50 transition-all focus:ring-2 focus:outline-none',
+                  shouldAnimate && 'hover:scale-105 active:scale-95'
+                )}
+                aria-label={isPlaying ? 'Pause music' : 'Play music'}
+                tabIndex={isExpanded ? tabIndex : -1}
+              >
+                {isPlaying ? (
+                  <Pause className="h-5 w-5" fill="currentColor" />
+                ) : (
+                  <Play className="ml-0.5 h-5 w-5" fill="currentColor" />
+                )}
+              </button>
+
+              {/* Next Button - Touch-optimized */}
+              <button
+                onClick={() => cycleTrack('next')}
+                disabled={themeTracks.length <= 1}
+                className={cn(
+                  'flex h-8 w-8 touch-manipulation items-center justify-center rounded-full',
+                  'hover:bg-surface-container-highest/50 active:bg-surface-container-highest/70',
+                  'text-on-surface-variant hover:text-on-surface',
+                  'focus:ring-primary/50 transition-colors focus:ring-2 focus:outline-none',
+                  themeTracks.length <= 1 && 'cursor-not-allowed opacity-30'
+                )}
+                aria-label="Next track"
+                title={themeTracks.length > 1 ? 'Next track in theme' : 'Only one track in this theme'}
+                tabIndex={isExpanded ? tabIndex : -1}
+              >
+                <SkipForward className="h-4 w-4" fill="currentColor" />
+              </button>
+            </div>
+
+            {/* Volume Control - Touch-friendly */}
             <div
               className="relative flex items-center"
               onMouseEnter={handleVolumeHover}
               onMouseLeave={handleVolumeLeave}
+              onTouchStart={handleVolumeHover}
             >
               <button
-                onClick={toggleBGM}
+                onClick={() => {
+                  hapticFeedback.tap();
+                  toggleBGM();
+                }}
+                onTouchEnd={(e) => {
+                  // Prevent double-tap zoom on mobile
+                  e.preventDefault();
+                }}
                 className={cn(
-                  'flex h-6 w-6 items-center justify-center rounded-full',
-                  'hover:bg-surface-container-highest/50 text-on-surface-variant hover:text-on-surface',
-                  'focus:ring-primary/50 transition-colors focus:ring-2 focus:outline-none'
+                  'flex h-8 w-8 items-center justify-center rounded-full',
+                  'hover:bg-surface-container-highest/50 active:bg-surface-container-highest/70',
+                  'text-on-surface-variant hover:text-on-surface',
+                  'focus:ring-primary/50 transition-colors focus:ring-2 focus:outline-none',
+                  'touch-manipulation' // Improves touch responsiveness
                 )}
                 aria-label={isBGMEnabled ? 'Mute music' : 'Unmute music'}
                 tabIndex={isExpanded ? tabIndex : -1}
               >
-                {isBGMEnabled && volume > 0 ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+                {isBGMEnabled && volume > 0 ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
               </button>
 
-              {/* Volume Slider */}
+              {/* Volume Slider - Touch-friendly */}
               <AnimatePresence>
                 {showVolumeSlider && (
                   <motion.div
                     initial={{ opacity: 0, x: -10, scale: 0.9 }}
                     animate={{ opacity: 1, x: 0, scale: 1 }}
                     exit={{ opacity: 0, x: -10, scale: 0.9 }}
-                    className="bg-surface-container-high absolute right-full mr-2 flex items-center gap-2 rounded-lg px-2 py-1.5 shadow-lg"
+                    className="bg-surface-container-high absolute right-full mr-2 flex items-center gap-2 rounded-lg px-3 py-2 shadow-lg"
                     onMouseEnter={handleVolumeHover}
                     onMouseLeave={handleVolumeLeave}
+                    onTouchStart={handleVolumeHover}
                   >
                     <input
                       type="range"
@@ -310,11 +376,12 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0 }: Mu
                       step="0.05"
                       value={volume}
                       onChange={handleVolumeChange}
-                      className="accent-primary h-1 w-16 cursor-pointer"
+                      onTouchEnd={() => hapticFeedback.select()}
+                      className="accent-primary h-2 w-20 cursor-pointer touch-manipulation"
                       aria-label="Volume control"
                       tabIndex={isExpanded ? 0 : -1}
                     />
-                    <span className="text-on-surface-variant w-6 text-right text-[10px]">
+                    <span className="text-on-surface-variant w-7 text-right text-[11px] font-medium">
                       {Math.round(volume * 100)}%
                     </span>
                   </motion.div>
@@ -333,7 +400,10 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0 }: Mu
           className="text-on-surface-variant mt-2 flex items-center gap-1.5 text-[10px]"
         >
           <Music2 className="h-3 w-3" />
-          <span>Now playing: {currentTrack.description}</span>
+          <span>
+            Now playing: {currentTrack.label}
+            {themeTracks.length > 1 && ` (${currentTrackIndex + 1}/${themeTracks.length})`}
+          </span>
         </motion.div>
       )}
     </div>
