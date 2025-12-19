@@ -3,6 +3,7 @@
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
+import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { AnimatePresence, motion, useInView } from 'framer-motion';
 import { Flame, Play, RefreshCcw, Target, Zap } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -27,6 +28,7 @@ const FLAMES_MEANINGS: Record<string, { title: string; color: string }> = {
  */
 export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
   const { shouldAnimate } = useAnimationPreferences();
+  const { sound, uiInteraction, resultReveal } = useGameIntegration();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentPosition, setCurrentPosition] = useState(-1);
   const [eliminatedLetters, setEliminatedLetters] = useState<number[]>([]);
@@ -62,6 +64,12 @@ export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
       count++;
       setCountDisplay(count);
 
+      // Play counting sound
+      sound.playSound('flamesCount', {
+        volume: 0.3 + (count / remainingCount) * 0.3,
+        playbackRate: 0.9 + (count / remainingCount) * 0.3,
+      });
+
       // Move to next active letter
       let nextIndex = activeIndex;
       do {
@@ -74,6 +82,8 @@ export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
       if (count >= remainingCount) {
         clearInterval(countInterval);
         setTimeout(() => {
+          // Play letter strike sound when eliminating
+          sound.playSound('letterStrike', { volume: 0.6 });
           setEliminatedLetters((prev) => [...prev, nextIndex]);
           setCountDisplay(0);
 
@@ -81,6 +91,8 @@ export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
           const remaining = FLAMES_LETTERS.filter((_, idx) => !eliminatedLetters.includes(idx) && idx !== nextIndex);
           if (remaining.length === 1) {
             const resultIdx = FLAMES_LETTERS.findIndex((l) => l === remaining[0]);
+            // Play result reveal sounds
+            resultReveal(remaining[0]);
             setResult(remaining[0]);
             setCurrentPosition(resultIdx);
             setIsPlaying(false);
@@ -100,10 +112,12 @@ export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
     if (!hasStarted) {
       setHasStarted(true);
     }
+    uiInteraction('click');
     setIsPlaying(true);
   };
 
   const handleReset = () => {
+    uiInteraction('toggle');
     setIsPlaying(false);
     setCurrentPosition(-1);
     setEliminatedLetters([]);
