@@ -1,8 +1,10 @@
 import Button from '@/components/ui/Button';
 import { useDeviceType } from '@/hooks/useDeviceType';
+import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { cn } from '@/utils';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Download, Eraser, Share, Trash2 } from 'lucide-react';
+import { useCallback } from 'react';
 import type { CanvasToolsProps } from '../types';
 
 export default function CanvasTools({
@@ -17,6 +19,32 @@ export default function CanvasTools({
 }: CanvasToolsProps) {
   const deviceType = useDeviceType();
   const isMobile = deviceType === 'mobile';
+  const { sound, uiInteraction } = useGameIntegration();
+
+  const handleBack = useCallback(async () => {
+    await sound.playSound('whoosh', { volume: 0.5 });
+    onBack();
+  }, [sound, onBack]);
+
+  const handleErase = useCallback(async () => {
+    await uiInteraction('toggle');
+    onErase();
+  }, [uiInteraction, onErase]);
+
+  const handleClear = useCallback(async () => {
+    await sound.playSound('delete', { volume: 0.6 });
+    onClear();
+  }, [sound, onClear]);
+
+  const handleShare = useCallback(async () => {
+    await uiInteraction('click');
+    onShare();
+  }, [uiInteraction, onShare]);
+
+  const handleSave = useCallback(async () => {
+    await uiInteraction('click');
+    onSave();
+  }, [uiInteraction, onSave]);
 
   const toolsVariants = {
     hidden: { opacity: 0, y: isMobile ? 20 : -20 },
@@ -48,7 +76,7 @@ export default function CanvasTools({
             variant="ghost"
             size={isMobile ? 'sm' : 'sm'}
             icon={ArrowLeft}
-            onClick={onBack}
+            onClick={handleBack}
             className="text-on-surface hover:bg-surface-container/50 shrink-0"
             aria-label="Go back to input"
           >
@@ -61,7 +89,7 @@ export default function CanvasTools({
             variant="ghost"
             size={isMobile ? 'sm' : 'sm'}
             icon={Eraser}
-            onClick={onErase}
+            onClick={handleErase}
             className={cn(
               'shrink-0 transition-all duration-200',
               isErasing
@@ -78,7 +106,7 @@ export default function CanvasTools({
             variant="ghost"
             size={isMobile ? 'sm' : 'sm'}
             icon={Trash2}
-            onClick={onClear}
+            onClick={handleClear}
             className="text-on-surface hover:bg-surface-container/50 hover:text-error shrink-0 transition-all duration-200"
             aria-label="Clear canvas"
           >
@@ -91,7 +119,7 @@ export default function CanvasTools({
             variant="ghost"
             size={isMobile ? 'sm' : 'sm'}
             icon={Share}
-            onClick={onShare}
+            onClick={handleShare}
             disabled={isSharing}
             className="text-on-surface hover:bg-surface-container/50 shrink-0 transition-all duration-200 disabled:opacity-50"
             aria-label="Share image"
@@ -103,7 +131,7 @@ export default function CanvasTools({
             variant="ghost"
             size={isMobile ? 'sm' : 'sm'}
             icon={Download}
-            onClick={onSave}
+            onClick={handleSave}
             disabled={isSaving}
             className="text-on-surface hover:bg-surface-container/50 shrink-0 transition-all duration-200 disabled:opacity-50"
             aria-label="Save image"
