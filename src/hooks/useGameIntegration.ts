@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef } from 'react';
-
 import { SoundId } from '@/config/sound';
+import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { useSeasonalTheme } from '@/themes/seasonal/useSeasonalTheme';
+import { useCallback, useEffect, useRef } from 'react';
 import { useHapticFeedback } from './useHapticFeedback';
 import { usePairingHistory } from './usePairingHistory';
 import { useSoundSystem } from './useSoundSystem';
@@ -18,18 +18,20 @@ import { useSoundSystem } from './useSoundSystem';
  * - Performance optimized with memoization
  */
 export function useGameIntegration() {
-  const { playSound, playSoundSequence } = useSoundSystem();
+  const { playSound, playSoundSequence, setDucking, playBGM } = useSoundSystem();
   const { hapticFeedback, triggerHapticSequence } = useHapticFeedback();
   const { getNewlyUnlockedBadges } = usePairingHistory();
   const { currentThemeConfig } = useSeasonalTheme();
+  const { musicTheme, seasonalTheme } = usePreferencesStore();
 
   // Prevent duplicate badge celebrations
   const celebratedBadgesRef = useRef<Set<string>>(new Set());
 
   // Form submission with feedback
   const handleFormSubmit = useCallback(async () => {
+    setDucking(true);
     await Promise.all([playSound('formSubmit' as SoundId), hapticFeedback.tap()]);
-  }, [playSound, hapticFeedback]);
+  }, [playSound, hapticFeedback, setDucking]);
 
   // Letter striking animation with feedback
   const handleLetterStrike = useCallback(
@@ -72,6 +74,22 @@ export function useGameIntegration() {
 
       const celebrationType = celebrationMap[result] || 'notification';
 
+      // Map result to BGM
+      const bgmMap: Record<string, SoundId> = {
+        L: 'bgm_result_love',
+        M: 'bgm_result_marriage',
+        A: 'bgm_result_affection',
+        F: 'bgm_result_friendship',
+        S: 'bgm_result_sibling',
+        E: 'bgm_result_enemy',
+      };
+
+      const resultBgm = bgmMap[result];
+      if (resultBgm) {
+        setDucking(false); // Restore volume for result BGM
+        playBGM(resultBgm, true);
+      }
+
       // Sound sequence for dramatic effect
       await playSoundSequence([
         { effect: 'resultReveal' as SoundId, delay: 0 },
@@ -84,7 +102,7 @@ export function useGameIntegration() {
         { pattern: celebrationType, delay: 300 },
       ]);
     },
-    [playSoundSequence, triggerHapticSequence]
+    [playSoundSequence, triggerHapticSequence, playBGM, setDucking]
   );
 
   // Badge unlock celebration
@@ -113,18 +131,19 @@ export function useGameIntegration() {
 
   // UI interaction feedback
   const handleUIInteraction = useCallback(
-    async (type: 'click' | 'hover' | 'success' | 'error' | 'toggle') => {
+    async (type: 'click' | 'hover' | 'success' | 'error' | 'toggle' | 'select') => {
       const soundMap: Record<string, SoundId> = {
         click: 'click',
         hover: 'hover',
         success: 'success',
         error: 'error',
         toggle: 'toggle',
+        select: 'click',
       };
 
       await Promise.all([
         playSound(soundMap[type] as SoundId),
-        type === 'click' || type === 'toggle'
+        type === 'click' || type === 'toggle' || type === 'select'
           ? hapticFeedback.tap()
           : type === 'success'
             ? hapticFeedback.success()
@@ -138,8 +157,18 @@ export function useGameIntegration() {
 
   // Game reset with gentle feedback
   const handleGameReset = useCallback(async () => {
+    setDucking(false);
+
+    // Revert to theme BGM
+    const themeToCheck = musicTheme === 'auto' ? seasonalTheme : musicTheme;
+    const targetBgmId = `bgm_${themeToCheck}` as SoundId;
+    // We don't check if it exists here, playBGM handles invalid IDs gracefully or we can fallback
+    // But playBGM doesn't fallback automatically if ID is invalid in hook, but AudioManager does check asset existence.
+    // Let's just try to play it.
+    playBGM(targetBgmId, true);
+
     await Promise.all([playSound('click' as SoundId, { volume: 0.5 }), hapticFeedback.tap()]);
-  }, [playSound, hapticFeedback]);
+  }, [playSound, hapticFeedback, setDucking, playBGM, musicTheme, seasonalTheme]);
 
   // Check for newly unlocked badges and celebrate
   useEffect(() => {
