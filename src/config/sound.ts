@@ -26,6 +26,17 @@ export interface BGMTrack {
   description: string;
   icon?: string;
   seasonal?: boolean;
+  /** Theme group this track belongs to */
+  themeGroup: 'default' | 'chill' | 'valentine' | 'halloween' | 'christmas';
+}
+
+/** Theme group configuration for UI */
+export interface ThemeGroup {
+  id: string;
+  label: string;
+  icon: string;
+  description: string;
+  seasonal?: boolean;
 }
 
 // ============================================================================
@@ -38,7 +49,7 @@ export const SOUND_ASSETS = {
   // -------------------------------------------------------------------------
   bgm_default: {
     id: 'bgm_default',
-    src: '/sounds/bgm-default.mp3',
+    src: '/sounds/bgm/mischief-makers.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.35,
@@ -47,7 +58,7 @@ export const SOUND_ASSETS = {
   },
   bgm_valentine: {
     id: 'bgm_valentine',
-    src: '/sounds/bgm-valentine.mp3',
+    src: '/sounds/bgm/bgm-valentine.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.35,
@@ -56,7 +67,7 @@ export const SOUND_ASSETS = {
   },
   bgm_halloween: {
     id: 'bgm_halloween',
-    src: '/sounds/bgm-halloween.mp3',
+    src: '/sounds/bgm/bgm-halloween.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.35,
@@ -65,7 +76,7 @@ export const SOUND_ASSETS = {
   },
   bgm_christmas: {
     id: 'bgm_christmas',
-    src: '/sounds/bgm-christmas.mp3',
+    src: '/sounds/bgm/bgm-christmas.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.35,
@@ -74,12 +85,70 @@ export const SOUND_ASSETS = {
   },
   bgm_chill: {
     id: 'bgm_chill',
-    src: '/sounds/bgm-chill.mp3',
+    src: '/sounds/bgm/bgm-chill.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.3,
     label: 'Chill',
     description: 'Relaxing lo-fi beats',
+  },
+
+  // -------------------------------------------------------------------------
+  // Result BGM
+  // -------------------------------------------------------------------------
+  bgm_result_love: {
+    id: 'bgm_result_love',
+    src: '/sounds/bgm/bgm-result-love.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.4,
+    label: 'Love Result',
+    description: 'Romantic celebration',
+  },
+  bgm_result_friendship: {
+    id: 'bgm_result_friendship',
+    src: '/sounds/bgm/bgm-result-friendship.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.4,
+    label: 'Friendship Result',
+    description: 'Upbeat friendship tune',
+  },
+  bgm_result_marriage: {
+    id: 'bgm_result_marriage',
+    src: '/sounds/bgm/bgm-result-marriage.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.4,
+    label: 'Marriage Result',
+    description: 'Wedding march style',
+  },
+  bgm_result_enemy: {
+    id: 'bgm_result_enemy',
+    src: '/sounds/bgm/bgm-result-enemy.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.4,
+    label: 'Enemy Result',
+    description: 'Dramatic tension',
+  },
+  bgm_result_sibling: {
+    id: 'bgm_result_sibling',
+    src: '/sounds/bgm/bgm-result-sibling.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.4,
+    label: 'Sibling Result',
+    description: 'Playful tune',
+  },
+  bgm_result_affection: {
+    id: 'bgm_result_affection',
+    src: '/sounds/bgm/bgm-result-affection.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.4,
+    label: 'Affection Result',
+    description: 'Sweet melody',
   },
 
   // -------------------------------------------------------------------------
@@ -134,16 +203,16 @@ export const SOUND_ASSETS = {
     label: 'Error',
     description: 'Error notification',
   },
-  calculating: {
-    id: 'calculating',
-    src: '/sounds/calculating.mp3',
-    category: 'sfx',
-    volume: 0.35,
-    loop: true,
-    preload: true,
-    label: 'Calculating',
-    description: 'Processing animation sound',
-  },
+  // calculating: {
+  //   id: 'calculating',
+  //   src: '/sounds/calculating.mp3',
+  //   category: 'sfx',
+  //   volume: 0.35,
+  //   loop: true,
+  //   preload: true,
+  //   label: 'Calculating',
+  //   description: 'Processing animation sound',
+  // },
   resultReveal: {
     id: 'resultReveal',
     src: '/sounds/reveal.mp3',
@@ -171,15 +240,15 @@ export const SOUND_ASSETS = {
     label: 'Flames Count',
     description: 'Counting step sound',
   },
-  badgeUnlock: {
-    id: 'badgeUnlock',
-    src: '/sounds/badge-unlock.mp3',
-    category: 'sfx',
-    volume: 0.6,
-    preload: true,
-    label: 'Badge Unlock',
-    description: 'Achievement celebration',
-  },
+  // badgeUnlock: {
+  //   id: 'badgeUnlock',
+  //   src: '/sounds/badge-unlock.mp3',
+  //   category: 'sfx',
+  //   volume: 0.6,
+  //   preload: true,
+  //   label: 'Badge Unlock',
+  //   description: 'Achievement celebration',
+  // },
   formSubmit: {
     id: 'formSubmit',
     src: '/sounds/form-submit.mp3',
@@ -226,51 +295,134 @@ export const SOUND_ASSETS = {
     label: 'Pop',
     description: 'Bubble pop sound',
   },
+  delete: {
+    id: 'delete',
+    src: '/sounds/delete.mp3',
+    category: 'sfx',
+    volume: 0.5,
+    preload: true,
+    label: 'Delete',
+    description: 'Item deletion sound',
+  },
 } as const;
 
 export type SoundId = keyof typeof SOUND_ASSETS;
 
 // ============================================================================
-// BGM TRACKS FOR UI SELECTION
+// THEME GROUPS FOR UI SELECTION
+// ============================================================================
+
+export const THEME_GROUPS: ThemeGroup[] = [
+  { id: 'default', label: 'Romantic', icon: '💕', description: 'Playful romantic melodies' },
+  { id: 'chill', label: 'Chill', icon: '🎧', description: 'Relaxing lo-fi beats' },
+  { id: 'valentine', label: 'Valentine', icon: '❤️', description: 'Soft romantic ballads', seasonal: true },
+  { id: 'halloween', label: 'Spooky', icon: '🎃', description: 'Playful spooky tunes', seasonal: true },
+  { id: 'christmas', label: 'Festive', icon: '🎄', description: 'Holiday jingles', seasonal: true },
+];
+
+// ============================================================================
+// BGM TRACKS FOR UI SELECTION (Multiple tracks per theme)
 // ============================================================================
 
 export const BGM_TRACKS: BGMTrack[] = [
+  // Default theme tracks
   {
     id: 'bgm_default',
-    label: 'Romantic',
+    label: 'Mischief Makers',
     description: 'Playful romantic melody',
     icon: '💕',
     seasonal: false,
+    themeGroup: 'default',
   },
+  // Chill theme tracks
   {
     id: 'bgm_chill',
-    label: 'Chill',
+    label: 'Lo-Fi Dreams',
     description: 'Relaxing lo-fi beats',
     icon: '🎧',
     seasonal: false,
+    themeGroup: 'chill',
   },
+  // Valentine theme tracks
   {
     id: 'bgm_valentine',
-    label: 'Valentine',
+    label: 'Love Ballad',
     description: 'Soft romantic ballad',
     icon: '❤️',
     seasonal: true,
+    themeGroup: 'valentine',
   },
+  // Halloween theme tracks
   {
     id: 'bgm_halloween',
-    label: 'Spooky',
+    label: 'Spooky Night',
     description: 'Playful spooky tune',
     icon: '🎃',
     seasonal: true,
+    themeGroup: 'halloween',
   },
+  // Christmas theme tracks
   {
     id: 'bgm_christmas',
-    label: 'Festive',
-    description: 'Holiday jingle',
+    label: 'Holiday Jingle',
+    description: 'Festive holiday jingle',
     icon: '🎄',
     seasonal: true,
+    themeGroup: 'christmas',
   },
 ];
+
+/** Get tracks for a specific theme group */
+export function getTracksForTheme(themeGroup: string): BGMTrack[] {
+  return BGM_TRACKS.filter((track) => track.themeGroup === themeGroup);
+}
+
+/** Get the current track index within its theme group */
+export function getTrackIndexInTheme(trackId: string): number {
+  const track = BGM_TRACKS.find((t) => t.id === trackId);
+  if (!track) return 0;
+  const themeTracks = getTracksForTheme(track.themeGroup);
+  return themeTracks.findIndex((t) => t.id === trackId);
+}
+
+/** Get next/prev track within the same theme group */
+export function cycleTrackInTheme(currentTrackId: string, direction: 'next' | 'prev'): BGMTrack | null {
+  const currentTrack = BGM_TRACKS.find((t) => t.id === currentTrackId);
+  if (!currentTrack) return null;
+
+  const themeTracks = getTracksForTheme(currentTrack.themeGroup);
+  if (themeTracks.length <= 1) return currentTrack;
+
+  const currentIndex = themeTracks.findIndex((t) => t.id === currentTrackId);
+  let newIndex: number;
+
+  if (direction === 'next') {
+    newIndex = (currentIndex + 1) % themeTracks.length;
+  } else {
+    newIndex = (currentIndex - 1 + themeTracks.length) % themeTracks.length;
+  }
+
+  return themeTracks[newIndex];
+}
+
+/** Map seasonal theme to music theme */
+export function getMatchingMusicTheme(
+  seasonalTheme: string
+): 'default' | 'chill' | 'valentine' | 'halloween' | 'christmas' {
+  const themeMap: Record<string, 'default' | 'chill' | 'valentine' | 'halloween' | 'christmas'> = {
+    valentine: 'valentine',
+    halloween: 'halloween',
+    christmas: 'christmas',
+    newYear: 'christmas',
+    diwali: 'default',
+    holi: 'default',
+    onam: 'default',
+    pongal: 'default',
+    default: 'default',
+    auto: 'default',
+  };
+  return themeMap[seasonalTheme] || 'default';
+}
 
 // ============================================================================
 // SFX SOUNDS FOR REFERENCE
