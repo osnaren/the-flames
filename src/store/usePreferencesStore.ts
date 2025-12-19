@@ -1,3 +1,4 @@
+import { getMatchingMusicTheme } from '@/config/sound';
 import { create } from 'zustand';
 
 export type TransitionSpeed = 'instant' | 'fast' | 'normal' | 'slow';
@@ -20,7 +21,7 @@ interface PreferencesState {
     | 'christmas'
     | 'newYear'
     | 'pongal';
-  musicTheme: 'auto' | 'default' | 'valentine' | 'halloween' | 'christmas';
+  musicTheme: 'auto' | 'default' | 'chill' | 'valentine' | 'halloween' | 'christmas';
   transitionSpeed: TransitionSpeed;
   hydrated: boolean;
 }
@@ -127,8 +128,14 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
       return { volume: clampedVolume };
     }),
   setSeasonalTheme: (theme: PreferencesState['seasonalTheme']) =>
-    set(() => {
+    set((state) => {
       safeLocalStorage.setItem('seasonalTheme', theme);
+      // Auto-sync music theme when seasonal theme changes (if music theme is set to 'auto')
+      if (state.musicTheme === 'auto' || theme !== 'auto') {
+        const matchingMusicTheme = getMatchingMusicTheme(theme);
+        safeLocalStorage.setItem('musicTheme', matchingMusicTheme);
+        return { seasonalTheme: theme, musicTheme: matchingMusicTheme };
+      }
       return { seasonalTheme: theme };
     }),
   setMusicTheme: (theme: PreferencesState['musicTheme']) =>
