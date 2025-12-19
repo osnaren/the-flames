@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { usePairingHistory } from '@/hooks/usePairingHistory';
-import { useSoundEffects } from '@/hooks/useSoundEffects';
+import { useSoundSystem } from '@/hooks/useSoundSystem';
 
 interface Badge {
   id: string;
@@ -61,7 +61,7 @@ const CATEGORY_ICONS = {
 
 export function BadgeShowcase({ isVisible, onClose }: BadgeShowcaseProps) {
   const { badges, stats } = usePairingHistory();
-  const { playSound } = useSoundEffects();
+  const { playSound } = useSoundSystem();
   const { hapticFeedback } = useHapticFeedback();
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');

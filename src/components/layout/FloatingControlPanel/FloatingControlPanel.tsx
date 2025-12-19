@@ -1,5 +1,7 @@
 import SeasonalThemeSelector from '@/components/settings/SeasonalThemeSelector';
 import { MusicPlayer } from '@/components/ui/MusicPlayer';
+import { useGameIntegration } from '@/hooks/useGameIntegration';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { cn } from '@/utils';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
@@ -11,11 +13,13 @@ import {
   Moon,
   MousePointerClick,
   Music2,
+  Music2 as MusicIcon,
   Palette,
   Power,
   PowerOff,
   Settings,
   Sun,
+  Vibrate,
   Volume2,
   VolumeX,
 } from 'lucide-react';
@@ -30,7 +34,9 @@ export default function FloatingControlPanel() {
 
   const [{ isDarkTheme }, { toggleTheme, toggleAnimations }] = usePreferences();
   const { shouldAnimate } = useAnimationPreferences();
-  const { isSoundEnabled, toggleSound } = usePreferencesStore();
+  const { isSoundEnabled, isBGMEnabled, isHapticEnabled, toggleSound, toggleBGM, toggleHaptic } = usePreferencesStore();
+  const { uiInteraction } = useGameIntegration();
+  const { hapticFeedback } = useHapticFeedback();
 
   // Local wrapper for toggling animations to ensure parent state is updated too
   const handleToggleAnimations = useCallback(() => {
@@ -117,14 +123,29 @@ export default function FloatingControlPanel() {
   useEffect(() => {
     if (!isExpanded) return;
 
-    const handleClickOutside = (event: MouseEvent) => {
-      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+    const handleClickOutside = (event: PointerEvent) => {
+      const target = event.target as Element;
+
+      // Check if click is inside panel
+      if (panelRef.current && panelRef.current.contains(target)) {
+        return;
+      }
+
+      // Check if click is inside a portal (like Select dropdown)
+      // We check for various Radix UI attributes to catch portals
+      const isInsidePortal =
+        target.closest('[data-radix-popper-content-wrapper]') ||
+        target.closest('[role="listbox"]') ||
+        target.closest('[data-radix-select-viewport]') ||
+        target.closest('[data-radix-portal]');
+
+      if (!isInsidePortal) {
         setIsExpanded(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('pointerdown', handleClickOutside);
+    return () => document.removeEventListener('pointerdown', handleClickOutside);
   }, [isExpanded]);
 
   // Controls configuration
@@ -151,16 +172,36 @@ export default function FloatingControlPanel() {
       inactiveColor: 'text-on-surface-variant',
       ariaLabel: shouldAnimate ? 'Turn off animations' : 'Turn on animations',
     },
+  ];
+
+  // Mini audio controls configuration (SFX, Music, Haptics)
+  const audioControls = [
     {
-      label: 'Sound',
-      activeIcon: Volume2,
+      id: 'sfx',
+      icon: Volume2,
       inactiveIcon: VolumeX,
       active: isSoundEnabled,
       toggle: toggleSound,
-      color: 'bg-linear-to-r from-secondary-container/30 to-secondary/10',
-      activeColor: 'text-secondary text-glow-sm',
-      inactiveColor: 'text-on-surface-variant',
+      label: 'SFX',
       ariaLabel: isSoundEnabled ? 'Turn off sound effects' : 'Turn on sound effects',
+    },
+    {
+      id: 'music',
+      icon: MusicIcon,
+      inactiveIcon: MusicIcon,
+      active: isBGMEnabled,
+      toggle: toggleBGM,
+      label: 'Music',
+      ariaLabel: isBGMEnabled ? 'Turn off music' : 'Turn on music',
+    },
+    {
+      id: 'haptics',
+      icon: Vibrate,
+      inactiveIcon: Vibrate,
+      active: isHapticEnabled,
+      toggle: toggleHaptic,
+      label: 'Haptics',
+      ariaLabel: isHapticEnabled ? 'Turn off haptic feedback' : 'Turn on haptic feedback',
     },
   ];
 
@@ -229,13 +270,17 @@ export default function FloatingControlPanel() {
       >
         <motion.button
           ref={toggleButtonRef}
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={() => {
+            hapticFeedback.tap();
+            uiInteraction('toggle');
+            setIsExpanded(!isExpanded);
+          }}
           whileHover={{ scale: shouldAnimate ? 1.1 : 1 }}
           whileTap={{ scale: shouldAnimate ? 0.9 : 1 }}
           className={cn(
-            'absolute z-20 flex items-center justify-center rounded-full transition-all',
+            'absolute z-20 flex touch-manipulation items-center justify-center rounded-full transition-all',
             isExpanded
-              ? 'from-surface-container-high to-surface-container top-3 right-3 h-8 w-8 bg-linear-to-br shadow-sm'
+              ? 'from-surface-container-high to-surface-container top-3 right-3 h-10 w-10 bg-linear-to-br shadow-sm'
               : 'inset-0 h-full w-full bg-transparent',
             'text-on-surface-variant hover:text-primary hover:bg-surface-container-low hover:text-glow-sm focus:ring-primary/50 focus:ring-2 focus:outline-none'
           )}
@@ -281,6 +326,40 @@ export default function FloatingControlPanel() {
                     />
                   </motion.div>
                 ))}
+
+                {/* Audio Controls Row (SFX, Music, Haptics) */}
+                <motion.div variants={childVariants}>
+                  <div className="from-secondary-container/30 to-secondary/10 flex items-center justify-between rounded-lg bg-linear-to-r px-3 py-2">
+                    <span className="text-on-surface-variant text-xs font-medium">Audio</span>
+                    <div className="flex items-center gap-1">
+                      {audioControls.map((control) => {
+                        const Icon = control.active ? control.icon : control.inactiveIcon;
+                        return (
+                          <button
+                            key={control.id}
+                            onClick={() => {
+                              hapticFeedback.tap();
+                              uiInteraction('toggle');
+                              control.toggle();
+                            }}
+                            className={cn(
+                              'flex h-9 w-9 touch-manipulation items-center justify-center rounded-md transition-all',
+                              'focus:ring-primary/50 focus:ring-2 focus:outline-none',
+                              control.active
+                                ? 'bg-secondary/20 text-secondary text-glow-sm hover:bg-secondary/30 active:bg-secondary/40'
+                                : 'text-on-surface-variant hover:bg-surface-container-highest/50 active:bg-surface-container-highest/70 hover:text-on-surface opacity-50'
+                            )}
+                            aria-label={control.ariaLabel}
+                            title={control.label}
+                            tabIndex={isExpanded ? 0 : -1}
+                          >
+                            <Icon className="h-4 w-4" />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </motion.div>
 
                 {/* Seasonal Theme Selector */}
                 <motion.div className="border-outline/20 mt-3 border-t pt-3" variants={childVariants}>
