@@ -1,3 +1,5 @@
+import { useGameIntegration } from '@/hooks/useGameIntegration';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { cn } from '@/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
@@ -21,13 +23,20 @@ export default function LetterTile({
 }: LetterTileProps) {
   const [particles, setParticles] = useState<Particle[]>([]);
   const [isHovered, setIsHovered] = useState(false);
+  const { sound } = useGameIntegration();
+  const { hapticFeedback } = useHapticFeedback();
 
   const handleClick = () => {
     if (onToggle) {
+      // Trigger haptic feedback first for immediate response
+      hapticFeedback.letterStrike();
       onToggle();
 
       // Create particle effect when crossing out
       if (!isCrossed) {
+        // Play sound effect for letter strike
+        sound.playSound('letterStrike', { volume: 0.5 });
+
         const newParticles: Particle[] = Array.from({ length: 8 }, (_, i) => ({
           id: Date.now() + i,
           x: 50 + (Math.random() - 0.5) * 40,
@@ -39,6 +48,12 @@ export default function LetterTile({
         setTimeout(() => setParticles([]), 1200);
       }
     }
+  };
+
+  const handleHoverStart = () => {
+    setIsHovered(true);
+    // Play subtle hover sound
+    sound.playSound('hover', { volume: 0.2 });
   };
 
   const getTileStyle = () => {
@@ -106,11 +121,18 @@ export default function LetterTile({
 
       <motion.button
         onClick={handleClick}
-        onHoverStart={() => setIsHovered(true)}
+        onHoverStart={handleHoverStart}
         onHoverEnd={() => setIsHovered(false)}
-        className={`group relative h-14 w-14 rounded-xl text-lg font-bold transition-all duration-300 ${
-          isCrossed ? styles.crossed : styles.base
-        } ${styles.hover} ${className} focus:ring-primary focus:ring-2 focus:ring-offset-2 focus:outline-none`}
+        onTouchStart={() => setIsHovered(true)}
+        onTouchEnd={() => setIsHovered(false)}
+        className={cn(
+          'group relative h-14 min-h-11 w-14 min-w-11 rounded-xl text-lg font-bold',
+          'touch-manipulation transition-all duration-300',
+          isCrossed ? styles.crossed : styles.base,
+          styles.hover,
+          className,
+          'focus:ring-primary focus:ring-2 focus:ring-offset-2 focus:outline-none'
+        )}
         whileHover={{ scale: 1.15, y: -6, rotate: [0, -5, 5, 0] }}
         whileTap={{ scale: 0.9 }}
         initial={{ opacity: 0, y: 20, scale: 0.8 }}
