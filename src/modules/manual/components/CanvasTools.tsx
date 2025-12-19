@@ -3,7 +3,7 @@ import { useDeviceType } from '@/hooks/useDeviceType';
 import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { cn } from '@/utils';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Download, Eraser, Share, Trash2 } from 'lucide-react';
+import { ArrowLeft, Download, Eraser, Redo2, Share, Trash2, Undo2 } from 'lucide-react';
 import { useCallback } from 'react';
 import type { CanvasToolsProps } from '../types';
 
@@ -14,6 +14,10 @@ export default function CanvasTools({
   onBack,
   onShare,
   onSave,
+  onUndo,
+  onRedo,
+  canUndo = false,
+  canRedo = false,
   isSharing = false,
   isSaving = false,
 }: CanvasToolsProps) {
@@ -45,6 +49,20 @@ export default function CanvasTools({
     await uiInteraction('click');
     onSave();
   }, [uiInteraction, onSave]);
+
+  const handleUndo = useCallback(async () => {
+    if (onUndo && canUndo) {
+      await sound.playSound('pop', { volume: 0.4 });
+      onUndo();
+    }
+  }, [sound, onUndo, canUndo]);
+
+  const handleRedo = useCallback(async () => {
+    if (onRedo && canRedo) {
+      await sound.playSound('pop', { volume: 0.4 });
+      onRedo();
+    }
+  }, [sound, onRedo, canRedo]);
 
   const toolsVariants = {
     hidden: { opacity: 0, y: isMobile ? 20 : -20 },
@@ -84,6 +102,37 @@ export default function CanvasTools({
           </Button>
 
           <div className={cn('bg-outline/30 w-px', isMobile ? 'h-6' : 'h-4 sm:h-6')} />
+
+          {/* Undo/Redo buttons */}
+          {onUndo && (
+            <Button
+              variant="ghost"
+              size={isMobile ? 'sm' : 'sm'}
+              icon={Undo2}
+              onClick={handleUndo}
+              disabled={!canUndo}
+              className="text-on-surface hover:bg-surface-container/50 shrink-0 transition-all duration-200 disabled:opacity-30"
+              aria-label="Undo last action"
+            >
+              {!isMobile && <span className="ml-1">Undo</span>}
+            </Button>
+          )}
+
+          {onRedo && (
+            <Button
+              variant="ghost"
+              size={isMobile ? 'sm' : 'sm'}
+              icon={Redo2}
+              onClick={handleRedo}
+              disabled={!canRedo}
+              className="text-on-surface hover:bg-surface-container/50 shrink-0 transition-all duration-200 disabled:opacity-30"
+              aria-label="Redo last action"
+            >
+              {!isMobile && <span className="ml-1">Redo</span>}
+            </Button>
+          )}
+
+          {(onUndo || onRedo) && <div className={cn('bg-outline/30 w-px', isMobile ? 'h-6' : 'h-4 sm:h-6')} />}
 
           <Button
             variant="ghost"

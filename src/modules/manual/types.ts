@@ -96,6 +96,10 @@ export interface CanvasToolsProps {
   onBack: () => void;
   onShare: () => void;
   onSave: () => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
   isSharing?: boolean;
   isSaving?: boolean;
 }
