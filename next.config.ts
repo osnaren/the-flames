@@ -99,6 +99,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' data: blob: https:",
               "worker-src 'self' blob:",
               "connect-src 'self' https://*.supabase.co https://fonts.googleapis.com https://va.vercel-scripts.com https://vercel.live wss://*.supabase.co https://*.sentry.io https://cdn.jsdelivr.net https://unpkg.com https://lottie.host",
+              "frame-src 'self' https://vercel.live",
               "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self'",
