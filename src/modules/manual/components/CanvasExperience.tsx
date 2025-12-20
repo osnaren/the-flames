@@ -359,7 +359,8 @@ export default function CanvasExperience({
 
       // Draw the temp canvas scaled to fit the new canvas size
       ctx.save();
-      ctx.scale(dpr, dpr);
+      // Note: Context is already scaled by setupCanvas, so we don't need to scale again
+      // We just need to draw into the CSS dimensions
       ctx.drawImage(
         tempCanvas,
         0,
