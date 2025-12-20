@@ -322,7 +322,7 @@ export default function FloatingControlPanel() {
                       inactiveColor={control.inactiveColor}
                       backgroundColor={control.color}
                       ariaLabel={control.ariaLabel}
-                      tabIndex={isExpanded ? 0 : -1}
+                      tabIndex={0}
                     />
                   </motion.div>
                 ))}
@@ -351,7 +351,7 @@ export default function FloatingControlPanel() {
                             )}
                             aria-label={control.ariaLabel}
                             title={control.label}
-                            tabIndex={isExpanded ? 0 : -1}
+                            tabIndex={0}
                           >
                             <Icon className="h-4 w-4" />
                           </button>
@@ -391,7 +391,7 @@ export default function FloatingControlPanel() {
                     className="hover:bg-surface-container-lowest hover:text-on-surface hover:text-glow-sm focus:ring-primary/50 flex w-full items-center justify-center gap-1.5 rounded-md px-3 py-2 transition-colors focus:ring-2 focus:outline-none"
                     aria-label="Jump to top of page"
                     onClick={handleScrollToTop}
-                    tabIndex={isExpanded ? 0 : -1}
+                    tabIndex={0}
                   >
                     <MousePointerClick size={14} />
                     <span>Jump to top</span>

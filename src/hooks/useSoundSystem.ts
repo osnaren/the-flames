@@ -460,6 +460,13 @@ class AudioManager {
       document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     }
 
+    // Stop all active looping sounds
+    this.activeLoopingSounds.forEach((audio) => {
+      audio.pause();
+      audio.remove();
+    });
+    this.activeLoopingSounds.clear();
+
     // Clear fade interval
     if (this.fadeInterval) {
       clearInterval(this.fadeInterval);

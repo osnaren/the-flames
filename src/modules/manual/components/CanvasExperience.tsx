@@ -390,6 +390,12 @@ export default function CanvasExperience({
         saveCanvasContent();
       }
 
+      // Clear undo/redo history on resize as ImageData dimensions will be invalid
+      undoHistoryRef.current = [];
+      redoHistoryRef.current = [];
+      setCanUndo(false);
+      setCanRedo(false);
+
       isResizingRef.current = true;
 
       const rect = container.getBoundingClientRect();
