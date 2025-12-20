@@ -95,7 +95,7 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com https://vercel.live",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com https://*.cdn.office.net data:",
+              "font-src 'self' https://fonts.gstatic.com data:",
               "img-src 'self' data: blob: https:",
               "worker-src 'self' blob:",
               "connect-src 'self' https://*.supabase.co https://fonts.googleapis.com https://va.vercel-scripts.com https://vercel.live wss://*.supabase.co https://*.sentry.io https://cdn.jsdelivr.net https://unpkg.com https://lottie.host",
