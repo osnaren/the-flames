@@ -131,7 +131,7 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
     set((state) => {
       safeLocalStorage.setItem('seasonalTheme', theme);
       // Auto-sync music theme when seasonal theme changes (if music theme is set to 'auto')
-      if (state.musicTheme === 'auto' || theme !== 'auto') {
+      if (state.musicTheme === 'auto') {
         const matchingMusicTheme = getMatchingMusicTheme(theme);
         safeLocalStorage.setItem('musicTheme', matchingMusicTheme);
         return { seasonalTheme: theme, musicTheme: matchingMusicTheme };
