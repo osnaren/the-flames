@@ -87,12 +87,17 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0 }: Mu
     } else {
       // Ensure we have a track playing
       const state = getBGMState();
-      if (!state.currentTrackId) {
-        await playBGM(currentTrack.id as SoundId, true);
-      } else {
-        await resumeBGM();
+      try {
+        if (!state.currentTrackId) {
+          await playBGM(currentTrack.id as SoundId, true);
+        } else {
+          await resumeBGM();
+        }
+        setIsPlaying(true);
+      } catch {
+        // Failed to play (e.g. autoplay blocked)
+        setIsPlaying(false);
       }
-      setIsPlaying(true);
     }
   }, [isBGMEnabled, isPlaying, toggleBGM, pauseBGM, resumeBGM, playBGM, getBGMState, currentTrack.id, hapticFeedback]);
 
