@@ -32,6 +32,7 @@ class AudioManager {
   private isDucking = false;
   private onTrackEndedCallback: (() => void) | null = null;
   private playOperationId = 0;
+  private activeLoopingSounds: Set<HTMLAudioElement> = new Set();
 
   // Game state tracking for BGM management
   private isGameInProgress = false;
@@ -197,6 +198,8 @@ class AudioManager {
         playbackAudio.addEventListener('ended', () => {
           playbackAudio.remove();
         });
+      } else {
+        this.activeLoopingSounds.add(playbackAudio);
       }
     } catch {
       // Ignore autoplay errors - user hasn't interacted yet
@@ -437,6 +440,13 @@ class AudioManager {
       audio.pause();
       audio.currentTime = 0;
     });
+
+    // Stop all active looping sounds
+    this.activeLoopingSounds.forEach((audio) => {
+      audio.pause();
+      audio.remove();
+    });
+    this.activeLoopingSounds.clear();
 
     // Stop BGM
     this.stopBGM();
