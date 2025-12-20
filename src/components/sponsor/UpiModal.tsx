@@ -293,7 +293,6 @@ const UpiPaymentContent: React.FC<{
           height={24}
           className="w-24"
           loading="lazy"
-          style={{ width: 'auto', height: 'auto' }}
         />
       </div>
     </div>
