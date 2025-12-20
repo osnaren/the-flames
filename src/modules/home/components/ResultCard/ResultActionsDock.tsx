@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { BarChart3, Link2, RotateCcw, Share2, Sparkles } from 'lucide-react';
+import { BarChart3, ImageDown, Link2, RotateCcw, Share2 } from 'lucide-react';
 import { memo, useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 
@@ -91,8 +91,9 @@ function DockButton({ icon: Icon, label, onClick, variant = 'secondary', delay =
 function ResultActionsDock({
   onRetry,
   onShare,
+  onShareAsImage,
   onCopyLink,
-  onNavigateToManual,
+  onNavigateToManual: _onNavigateToManual, // Future feature - currently commented out in UI
   onNavigateToStats,
   isVisible,
   className,
@@ -119,10 +120,10 @@ function ResultActionsDock({
     onShare();
   }, [uiInteraction, onShare]);
 
-  const handleManual = useCallback(() => {
+  const handleShareAsImage = useCallback(() => {
     uiInteraction('click');
-    onNavigateToManual?.();
-  }, [uiInteraction, onNavigateToManual]);
+    onShareAsImage();
+  }, [uiInteraction, onShareAsImage]);
 
   const handleStats = useCallback(() => {
     uiInteraction('click');
@@ -155,12 +156,14 @@ function ResultActionsDock({
 
       <DockButton icon={Share2} label="Share" onClick={handleShare} variant="primary" delay={0.05} />
 
+      <DockButton icon={ImageDown} label="Save Image" onClick={handleShareAsImage} variant="success" delay={0.1} />
+
       <DockButton icon={Link2} label="Copy" onClick={handleCopyLink} variant="info" delay={0.15} />
 
       {/* Optional Actions */}
-      {onNavigateToManual && (
+      {/* {onNavigateToManual && (
         <DockButton icon={Sparkles} label="Manual" onClick={handleManual} variant="warning" delay={0.2} />
-      )}
+      )} */}
 
       {onNavigateToStats && (
         <DockButton icon={BarChart3} label="Charts" onClick={handleStats} variant="info" delay={0.25} />
