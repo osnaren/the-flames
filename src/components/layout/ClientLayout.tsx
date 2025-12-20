@@ -24,15 +24,13 @@ interface ClientLayoutProps {
 }
 
 /**
- * Client-side layout wrapper with dynamic imports for non-critical components
- * This allows us to use ssr: false for components that require client-only rendering
+ * Provides the client-only application layout and global client-side providers.
  *
- * Background Strategy:
- * - UnifiedBackground: Single, highly optimized component that handles:
- *   - Seasonal themes (Valentine, Halloween, etc.)
- *   - Game states (Processing, Result)
- *   - Device capabilities (Mobile optimization via intensity prop)
- *   - Reduced motion preferences
+ * Renders client-side initializers and controllers together with a dynamic background,
+ * page transition wrapper, and sponsor floating action button around the supplied children.
+ *
+ * @param children - The page content to render inside the layout
+ * @returns The layout element containing providers, dynamic background, page transitions, and sponsor UI
  */
 export default function ClientLayout({ children }: ClientLayoutProps) {
   return (

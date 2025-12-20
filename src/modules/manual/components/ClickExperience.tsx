@@ -13,6 +13,20 @@ import type { ClickExperienceProps } from '../types';
 import FlamesLetters from './FlamesLetters';
 import LetterTile from './LetterTile';
 
+/**
+ * Interactive FLAMES "click-to-cross" experience component that lets users cross matching letters from two names,
+ * perform FLAMES elimination, and receive result feedback with audio and UI effects.
+ *
+ * @param name1 - First participant's name displayed and used for letter matching
+ * @param name2 - Second participant's name displayed and used for letter matching
+ * @param onBack - Callback invoked when user navigates back to the input screen
+ * @param onShare - Callback invoked when the Share action is triggered
+ * @param onSave - Callback invoked when the Save action is triggered
+ * @param onResultChange - Callback invoked whenever the current FLAMES result changes; receives `'F' | 'L' | 'A' | 'M' | 'E' | 'S' | null`
+ * @param isSharing - When true, disables the Share button and shows a loading state (default: false)
+ * @param isSaving - When true, disables the Save button and shows a loading state (default: false)
+ * @returns The ClickExperience UI as a JSX element
+ */
 export default function ClickExperience({
   name1,
   name2,

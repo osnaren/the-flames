@@ -13,6 +13,19 @@ interface Particle {
   targetY: number;
 }
 
+/**
+ * Renders an interactive letter tile that can be crossed out, shows a name index badge, and displays visual, haptic, and audio feedback on user interaction.
+ *
+ * When toggled, the component invokes `onToggle`. Crossing a letter triggers haptic feedback and plays a strike sound while rendering a short particle and cross-out animation; hovering plays a subtle hover sound and shows a temporary hover visual. Non-alphabetic `letter` values render a simplified static tile.
+ *
+ * @param letter - The character to display in the tile; only single A–Z/a–z characters render the full interactive tile.
+ * @param index - Zero-based position used to stagger entrance animation timing.
+ * @param nameIndex - Small numeric badge shown on the tile (e.g., step or order indicator).
+ * @param isCrossed - Whether the tile is currently crossed out; controls cross-out visuals and animations.
+ * @param onToggle - Optional callback invoked when the tile is pressed to toggle its crossed state.
+ * @param className - Optional additional CSS classes applied to the tile container.
+ * @returns A JSX element representing the interactive letter tile.
+ */
 export default function LetterTile({
   letter,
   index,

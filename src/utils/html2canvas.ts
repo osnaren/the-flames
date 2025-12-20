@@ -17,8 +17,10 @@ let cachedHtml2Canvas: ((element: HTMLElement, options?: Html2CanvasOptions) => 
   null;
 
 /**
- * Dynamically imports html2canvas-pro and returns the function
- * Uses dynamic import to ensure proper ESM module resolution
+ * Load and return the html2canvas-pro capture function using dynamic imports.
+ *
+ * @returns A function that captures an `HTMLElement` and resolves to an `HTMLCanvasElement`.
+ * @throws If executed outside a browser environment (no `window`), or if the module does not export a callable capture function.
  */
 async function loadHtml2Canvas(): Promise<
   (element: HTMLElement, options?: Html2CanvasOptions) => Promise<HTMLCanvasElement>
@@ -75,12 +77,11 @@ async function loadHtml2Canvas(): Promise<
 }
 
 /**
- * Captures an HTML element as a canvas
- * This is the main export - use this instead of importing html2canvas directly
+ * Captures the provided HTMLElement and produces a canvas rendering of it.
  *
- * @param element - The HTML element to capture
- * @param options - html2canvas options
- * @returns Promise resolving to an HTMLCanvasElement
+ * @param element - The HTML element to capture.
+ * @param options - Optional html2canvas configuration.
+ * @returns An HTMLCanvasElement containing the rendered capture of `element`.
  */
 export async function captureElement(element: HTMLElement, options?: Html2CanvasOptions): Promise<HTMLCanvasElement> {
   const html2canvas = await loadHtml2Canvas();
@@ -88,13 +89,13 @@ export async function captureElement(element: HTMLElement, options?: Html2Canvas
 }
 
 /**
- * Captures an HTML element and returns it as a Blob
+ * Capture an HTML element and produce binary image data.
  *
  * @param element - The HTML element to capture
- * @param options - html2canvas options
- * @param imageType - Image MIME type (default: 'image/png')
- * @param quality - Image quality for JPEG (0-1)
- * @returns Promise resolving to a Blob or null
+ * @param options - html2canvas options to control capture behavior
+ * @param imageType - Image MIME type to encode (default: 'image/png')
+ * @param quality - Image quality for formats that support it (0 to 1, default: 1.0)
+ * @returns A `Blob` containing the encoded image, or `null` if encoding failed
  */
 export async function captureElementAsBlob(
   element: HTMLElement,
@@ -116,13 +117,13 @@ export async function captureElementAsBlob(
 }
 
 /**
- * Captures an HTML element and returns it as a data URL
+ * Capture an HTML element to a data URL.
  *
- * @param element - The HTML element to capture
- * @param options - html2canvas options
- * @param imageType - Image MIME type (default: 'image/png')
- * @param quality - Image quality for JPEG (0-1)
- * @returns Promise resolving to a data URL string
+ * @param element - The HTML element to capture.
+ * @param options - Optional html2canvas-pro capture options.
+ * @param imageType - Image MIME type to use for the output (default: 'image/png').
+ * @param quality - Image quality for lossy formats like 'image/jpeg', between 0 and 1 (default: 0.9).
+ * @returns A data URL string containing the captured image.
  */
 export async function captureElementAsDataUrl(
   element: HTMLElement,

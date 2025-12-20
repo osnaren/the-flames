@@ -85,8 +85,21 @@ function DockButton({ icon: Icon, label, onClick, variant = 'secondary', delay =
 }
 
 /**
- * Dock component for result card action buttons
- * Displayed as a floating dock below the result card
+ * Render a floating dock of action buttons for the result card.
+ *
+ * Provides buttons for retrying, sharing, saving the result as an image, copying a link,
+ * and optionally navigating to statistics or a manual.
+ *
+ * @param onRetry - Called when the Reset button is activated.
+ * @param onShare - Called when the Share button is activated.
+ * @param onShareAsImage - Called when the Save Image button is activated.
+ * @param onCopyLink - Called when the Copy button is activated.
+ * @param onNavigateToManual - Reserved for a future Manual action; currently unused in the UI.
+ * @param onNavigateToStats - If provided, called when the Charts button is activated.
+ * @param isVisible - Controls whether the dock is rendered.
+ * @param className - Optional additional container class names.
+ *
+ * @returns The dock element when visible, otherwise `null`.
  */
 function ResultActionsDock({
   onRetry,

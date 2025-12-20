@@ -42,6 +42,16 @@ interface SharePopoverProps {
   isCapturingImage?: boolean;
 }
 
+/**
+ * Renders a modal popover that lets users share or save a generated result card.
+ *
+ * Provides social sharing (X/Twitter, Telegram, WhatsApp), downloads the result card,
+ * copies a shareable link, and optionally triggers the device share sheet for an image.
+ *
+ * @param onShareAsImage - Optional callback invoked to capture/share the result card as an image.
+ * @param isCapturingImage - When true, indicates an ongoing capture operation and shows a loading state for the "Share Image" action.
+ * @returns The share popover UI when `isOpen` is true; otherwise nothing is rendered. 
+ */
 export default function SharePopover({
   isOpen,
   onClose,

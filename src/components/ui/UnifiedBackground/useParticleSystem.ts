@@ -105,7 +105,21 @@ interface UseParticleSystemReturn {
   canvasColors: string[];
 }
 
-// --- Main Hook ---
+/**
+ * Creates and manages a particle system rendered into the provided canvas and exposes the active configuration and color palette.
+ *
+ * The hook derives a runtime ParticleSystemConfig from the provided theme configuration, variant, result code, intensity, and device/theme capabilities, and drives particle creation and animation on the referenced canvas element.
+ *
+ * @param canvasRef - Ref object pointing to the target canvas element where particles will be rendered
+ * @param themeParticleConfig - Seasonal/theme-driven base configuration for particles (counts, colors, shapes, size, speed, opacity, direction, animation)
+ * @param variant - Behavioral preset for the system; affects overrides (e.g., 'default', 'processing', 'result')
+ * @param result - Optional result code used when `variant` is 'result' to select result-specific colors and shapes
+ * @param intensity - Intensity hint ('low' | 'medium' | 'high') that scales particle count and activity
+ * @param currentTheme - Active seasonal theme key used to select emojis and theme-specific fallbacks
+ * @returns An object containing:
+ *  - `config`: The computed ParticleSystemConfig used by the particle engine
+ *  - `canvasColors`: The current array of RGBA color strings used to render particles
+ */
 
 export function useParticleSystem({
   canvasRef,

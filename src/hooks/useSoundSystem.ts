@@ -502,6 +502,30 @@ class AudioManager {
   }
 }
 
+/**
+ * React hook that exposes a complete sound system API for playing and controlling sound effects (SFX) and background music (BGM) while syncing with user preferences and app lifecycle.
+ *
+ * The hook mounts a singleton AudioManager, preloads assets, reacts to preference changes (sound enabled, BGM enabled, global volume, and theme selection), and provides helpers for SFX playback, BGM control (play, pause, resume, stop, cycle, suspend/resume for game activity), global controls (stop all, ducking), and diagnostic BGM state access.
+ *
+ * @returns An object with the sound system API:
+ *  - playSound(id, options): Play an SFX with optional volume, playbackRate, delay, and loop.
+ *  - playSoundSequence(sequence): Play a series of SFX with per-item delays and options.
+ *  - playBGM(id, fadeIn?): Play a BGM track with optional fade-in.
+ *  - stopBGM(), pauseBGM(), resumeBGM(): BGM controls.
+ *  - getBGMState(): Returns { isPlaying, currentTrackId, progress, currentTime, duration } for UI.
+ *  - availableTracks: Array of all BGM tracks.
+ *  - themeGroups: Available theme group identifiers.
+ *  - getThemeTracks(themeGroup): Get tracks for a theme group.
+ *  - cycleTrack(direction): Cycle to the next or previous track within the current theme.
+ *  - suspendThemeBGM(), resumeThemeBGM(): Temporarily suspend or restore theme BGM for game processing.
+ *  - isGameActive(): Returns whether a game is in progress.
+ *  - stopAllSounds(): Stop all SFX and BGM.
+ *  - setDucking(enabled): Enable or disable ducking of BGM.
+ *  - setOnTrackEnded(callback): Register a callback for when a BGM track ends.
+ *  - isEnabled: Whether sound effects are enabled.
+ *  - isBGMEnabled: Whether BGM is enabled.
+ *  - volume: Current global volume setting.
+ */
 export function useSoundSystem() {
   const { isSoundEnabled, isBGMEnabled, volume, seasonalTheme, musicTheme } = usePreferencesStore();
 

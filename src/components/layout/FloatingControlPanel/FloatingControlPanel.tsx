@@ -25,6 +25,17 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+/**
+ * Render a floating, collapsible settings panel that exposes theme and animation toggles,
+ * mini audio controls (SFX, music, haptics), a seasonal theme selector, a background music player,
+ * and a "Jump to top" action.
+ *
+ * The panel manages focus and keyboard accessibility (focus trapping, Escape to close, auto-focus on open),
+ * closes on outside pointer interactions (excluding common portal elements), respects reduced-motion preferences,
+ * and emits UI/haptic interactions when controls are used.
+ *
+ * @returns The rendered FloatingControlPanel element containing the settings UI.
+ */
 export default function FloatingControlPanel() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [exitingPanel, setExitingPanel] = useState(false);

@@ -35,6 +35,19 @@ const getViewportHeight = () => {
 // Maximum undo history size
 const MAX_UNDO_HISTORY = 20;
 
+/**
+ * Render an interactive themed drawing canvas experience with letter tiles, FLAMES UI, undo/redo, eraser mode, and responsive controls.
+ *
+ * @param name1 - First name displayed as decorative letter tiles
+ * @param name2 - Second name displayed as decorative letter tiles
+ * @param onBack - Callback invoked when the user navigates back
+ * @param onShare - Callback invoked when the user triggers sharing
+ * @param onSave - Callback invoked when the user saves the canvas
+ * @param canvasRef - Ref to the canvas element used for drawing and external control
+ * @param isSharing - Whether a share action is in progress (affects tool UI)
+ * @param isSaving - Whether a save action is in progress (affects tool UI)
+ * @returns The React element that provides the full canvas experience UI
+ */
 export default function CanvasExperience({
   name1,
   name2,

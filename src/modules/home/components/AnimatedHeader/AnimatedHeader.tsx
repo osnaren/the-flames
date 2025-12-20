@@ -35,6 +35,13 @@ const letterVariants: Variants = {
   },
 };
 
+/**
+ * Renders the animated FLAMES header with interactive letters, hover tooltips, and decorative effects.
+ *
+ * @param shouldAnimate - Enables entrance animations, hover interactions (including sound), tooltips, and decorative floating elements when true.
+ * @param stage - Current game stage; when `stage` is `'processing'` or `'result'` the header renders in a compact state (scaled down and with reduced/hidden decorations).
+ * @returns The animated header element for the FLAMES title.
+ */
 function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const { sound } = useGameIntegration();

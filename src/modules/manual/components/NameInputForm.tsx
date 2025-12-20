@@ -25,6 +25,17 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
+/**
+ * Render a name input form for collecting two names and submitting a chosen experience mode.
+ *
+ * The form validates inputs, provides UI feedback on errors, plays focus/submit sounds via the game integration hook,
+ * and invokes `onNamesSubmit` with trimmed names and the selected experience mode when submission succeeds.
+ *
+ * @param onNamesSubmit - Callback invoked after successful validation with `(name1, name2, experienceMode)` where `experienceMode` is `'click'` or `'canvas'`.
+ * @param initialName1 - Optional initial value to prefill the first name input (default: empty string).
+ * @param initialName2 - Optional initial value to prefill the second name input (default: empty string).
+ * @returns A JSX element containing the name inputs, experience selection buttons, and validation note.
+ */
 export default function NameInputForm({ onNamesSubmit, initialName1 = '', initialName2 = '' }: NameInputFormProps) {
   const [name1, setName1] = useState(initialName1);
   const [name2, setName2] = useState(initialName2);

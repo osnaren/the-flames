@@ -6,12 +6,9 @@ import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { useEffect, useRef } from 'react';
 
 /**
- * Global Sound Controller
+ * Maintain persistent background music playback, advance the playlist when a track ends, and synchronize playback with the user's music theme preference.
  *
- * Manages:
- * - Global audio persistence (keeps AudioManager mounted)
- * - Playlist logic (auto-advance to next track)
- * - Theme synchronization
+ * Registers a track-ended handler that, when a standard BGM track finishes and BGM is enabled, selects a random different track and starts it. On first mount (if BGM is enabled and nothing is playing), selects and starts the appropriate theme track (falls back to `bgm_default` if the theme-specific track is missing). This component is headless and returns null.
  */
 export default function SoundController() {
   const { playBGM, setOnTrackEnded, getBGMState } = useSoundSystem();

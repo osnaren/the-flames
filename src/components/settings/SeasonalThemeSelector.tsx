@@ -85,6 +85,14 @@ interface SeasonalThemeSelectorProps {
   isExpanded: boolean;
 }
 
+/**
+ * Render a horizontal carousel of seasonal theme options with previous/next controls and keyboard navigation.
+ *
+ * Selecting a theme sets it as the manual theme (overriding auto-detection) and records UI interaction events.
+ *
+ * @param isExpanded - When true, theme cards and navigation buttons are focusable; when false, they are removed from tab order.
+ * @returns The rendered seasonal theme selector element.
+ */
 function SeasonalThemeSelector({ isExpanded }: SeasonalThemeSelectorProps) {
   const { currentTheme, detectedTheme, setManualTheme, themes } = useSeasonalTheme();
   const { shouldAnimate } = useAnimationPreferences();

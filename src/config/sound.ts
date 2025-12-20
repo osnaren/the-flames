@@ -372,12 +372,22 @@ export const BGM_TRACKS: BGMTrack[] = [
   },
 ];
 
-/** Get tracks for a specific theme group */
+/**
+ * Retrieve all background-music tracks for the specified theme group.
+ *
+ * @param themeGroup - Theme group identifier ('default' | 'chill' | 'valentine' | 'halloween' | 'christmas')
+ * @returns An array of BGMTrack entries whose themeGroup matches `themeGroup`
+ */
 export function getTracksForTheme(themeGroup: string): BGMTrack[] {
   return BGM_TRACKS.filter((track) => track.themeGroup === themeGroup);
 }
 
-/** Get the current track index within its theme group */
+/**
+ * Determine the position of a BGM track within its theme group's track list.
+ *
+ * @param trackId - The id of the BGM track to locate
+ * @returns The zero-based index of the track within its theme group's list; returns `0` if no matching track is found
+ */
 export function getTrackIndexInTheme(trackId: string): number {
   const track = BGM_TRACKS.find((t) => t.id === trackId);
   if (!track) return 0;
@@ -385,7 +395,16 @@ export function getTrackIndexInTheme(trackId: string): number {
   return themeTracks.findIndex((t) => t.id === trackId);
 }
 
-/** Get next/prev track within the same theme group */
+/**
+ * Cycle to the next or previous BGM track within the same theme group.
+ *
+ * If `currentTrackId` does not match any track, the function returns `null`.
+ * If the matched theme group contains only the current track, the current track is returned.
+ *
+ * @param currentTrackId - The id of the current BGM track.
+ * @param direction - 'next' to advance forward, 'prev' to move backward.
+ * @returns The adjacent `BGMTrack` in the same theme group according to `direction`, the original track if it's the only one in the group, or `null` when no track matches `currentTrackId`.
+ */
 export function cycleTrackInTheme(currentTrackId: string, direction: 'next' | 'prev'): BGMTrack | null {
   const currentTrack = BGM_TRACKS.find((t) => t.id === currentTrackId);
   if (!currentTrack) return null;
@@ -405,7 +424,12 @@ export function cycleTrackInTheme(currentTrackId: string, direction: 'next' | 'p
   return themeTracks[newIndex];
 }
 
-/** Map seasonal theme to music theme */
+/**
+ * Map a seasonal theme identifier to the corresponding music theme.
+ *
+ * @param seasonalTheme - Seasonal theme key (for example: 'valentine', 'halloween', 'christmas', 'newYear', or other locale/event keys)
+ * @returns One of 'default', 'chill', 'valentine', 'halloween', or 'christmas' representing the matched music theme; returns 'default' when no specific match exists.
+ */
 export function getMatchingMusicTheme(
   seasonalTheme: string
 ): 'default' | 'chill' | 'valentine' | 'halloween' | 'christmas' {
@@ -438,20 +462,41 @@ export const SFX_SOUNDS = Object.entries(SOUND_ASSETS)
 
 // ============================================================================
 // HELPER FUNCTIONS
-// ============================================================================
+/**
+ * Retrieves the sound asset configuration for the given sound id.
+ *
+ * @param id - The sound asset id (a key of `SOUND_ASSETS`)
+ * @returns The matching `SoundAsset`
+ */
 
 export function getSoundAsset(id: SoundId): SoundAsset {
   return SOUND_ASSETS[id];
 }
 
+/**
+ * Retrieve all configured background music assets.
+ *
+ * @returns An array of sound assets whose `category` is `'bgm'`.
+ */
 export function getBGMAssets(): SoundAsset[] {
   return Object.values(SOUND_ASSETS).filter((asset) => asset.category === 'bgm');
 }
 
+/**
+ * Get all configured sound assets that belong to the sound effects (SFX) category.
+ *
+ * @returns All `SoundAsset` entries whose `category` is `'sfx'`.
+ */
 export function getSFXAssets(): SoundAsset[] {
   return Object.values(SOUND_ASSETS).filter((asset) => asset.category === 'sfx');
 }
 
+/**
+ * Determines whether the given sound asset id refers to a background music asset.
+ *
+ * @param id - The sound asset id to check.
+ * @returns `true` if the asset exists and its category is `bgm`, `false` otherwise.
+ */
 export function isBGMTrack(id: string): boolean {
   return id in SOUND_ASSETS && SOUND_ASSETS[id as SoundId].category === 'bgm';
 }

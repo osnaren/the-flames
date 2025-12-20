@@ -59,6 +59,17 @@ const CATEGORY_ICONS = {
   discovery: Star,
 };
 
+/**
+ * Render the badge collection modal with filtering, sorting, progress indicators, and sharing controls.
+ *
+ * Displays badges (grouped by category and rarity), allows filtering by category or unlocked status,
+ * sorting by date/rarity/category, and provides badge details, progress display for locked badges,
+ * and share functionality for unlocked badges.
+ *
+ * @param isVisible - Whether the badge showcase modal is visible
+ * @param onClose - Callback invoked when the modal should be closed
+ * @returns A React element representing the badge showcase modal, or `null` when `isVisible` is false
+ */
 export function BadgeShowcase({ isVisible, onClose }: BadgeShowcaseProps) {
   const { badges, stats } = usePairingHistory();
   const { playSound } = useSoundSystem();

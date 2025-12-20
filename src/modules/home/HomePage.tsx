@@ -46,8 +46,12 @@ function ResultPlaceholder() {
 }
 
 /**
- * HomePage - Main FLAMES game page
- * Features streamlined stage management and beautiful animations
+ * Render the client-side FLAMES game page with stage-driven UI and coordinated background and audio behavior.
+ *
+ * Manages the input, processing, and result stages and their animated transitions; synchronizes the current stage
+ * and result with the background system; resumes the theme background music on unmount if a game was active;
+ * scrolls the result card into view when results appear; and wires form submission, processor completion, and
+ * recent-match replay interactions to the game engine.
  */
 function HomePage() {
   const { shouldAnimate } = useAnimationPreferences();

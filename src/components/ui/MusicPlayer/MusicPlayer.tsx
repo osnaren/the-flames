@@ -33,6 +33,16 @@ interface MusicPlayerProps {
   tabIndex?: number;
 }
 
+/**
+ * Render the MusicPlayer UI with a rotating disc, theme-based track selection, playback controls, and volume management.
+ *
+ * The component integrates with user preferences and the sound system to play/pause/resume background music, cycle tracks within the active theme, and persist volume and theme selections. It also provides a hover/touch-activated volume slider and cleans up internal timeouts on unmount.
+ *
+ * @param isExpanded - When true, interactive controls are focusable; when false, controls are removed from tab order
+ * @param className - Additional CSS classes applied to the root container
+ * @param tabIndex - Base tabIndex applied to interactive controls when `isExpanded` is true
+ * @returns The MusicPlayer React element
+ */
 function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0 }: MusicPlayerProps) {
   const { shouldAnimate } = useAnimationPreferences();
   const { isBGMEnabled, musicTheme, volume, toggleBGM, setMusicTheme, setVolume } = usePreferencesStore();

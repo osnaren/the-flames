@@ -23,6 +23,15 @@ interface FormErrors {
   general?: string[];
 }
 
+/**
+ * Render the FLAMES input form for two names, including validation, focus visuals, and submission handling.
+ *
+ * Calls the integration's `formSubmit()` before invoking the provided `onSubmit` when both names pass validation.
+ * Plays a 'pop' sound when either input receives focus. Manages and displays field-specific and general validation errors,
+ * disables interaction while `isProcessing` is true, and provides animated UI affordances when `shouldAnimate` is enabled.
+ *
+ * @returns The component's JSX element (the complete input form).
+ */
 function InputFormComponent({
   name1,
   name2,

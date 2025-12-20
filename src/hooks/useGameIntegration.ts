@@ -7,16 +7,14 @@ import { usePairingHistory } from './usePairingHistory';
 import { useSoundSystem } from './useSoundSystem';
 
 /**
- * Comprehensive integration hook that combines all game systems
- * Provides unified methods for game events with sound, haptic, and visual feedback
+ * Integrates sound, haptic, and theme-aware visual feedback and exposes unified handlers for game events.
  *
- * Features:
- * - Integrated sound and haptic feedback for all game events
- * - Theme-aware celebration intensities
- * - Badge unlock detection and celebration
- * - Debounced event handlers to prevent duplicate triggers
- * - Performance optimized with memoization
- * - Game-aware BGM management (suspends theme BGM during processing)
+ * Returns an API that provides:
+ * - access to low-level subsystems: `sound` (playSound, playSoundSequence), `haptic` (hapticFeedback, triggerHapticSequence), and `theme` (currentThemeConfig);
+ * - integrated, theme-aware event handlers: `formSubmit`, `letterStrike`, `flamesCounting`, `resultReveal`, `badgeUnlock`, `uiInteraction`, `gameReset`, and `themeAwareFeedback`;
+ * - convenience helpers: `celebrate`, `notify`, and `feedback`.
+ *
+ * @returns An object containing subsystem access, integrated event handlers, and convenience feedback helpers used by the game UI.
  */
 export function useGameIntegration() {
   const { playSound, playSoundSequence, playBGM, suspendThemeBGM, resumeThemeBGM } = useSoundSystem();

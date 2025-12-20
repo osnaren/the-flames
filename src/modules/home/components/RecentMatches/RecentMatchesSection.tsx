@@ -29,6 +29,19 @@ interface SectionHeaderProps {
   playSound: (id: 'whoosh' | 'delete' | 'click') => void;
 }
 
+/**
+ * Renders the header for the Recent Matches section, including title, numeric badge, clear-all controls, and an optional expand/collapse action.
+ *
+ * @param totalCount - Total number of recent matches; shown as a small numeric badge when greater than zero.
+ * @param isExpanded - Whether the matches list is currently expanded; affects the expand/collapse button state and icon.
+ * @param hasMatches - Whether there are any matches to display; controls visibility of the clear-all control.
+ * @param onToggleExpand - Callback invoked to toggle the expanded state of the matches list.
+ * @param onClearAll - Callback invoked to clear all recent matches when the user confirms.
+ * @param shouldAnimate - Whether entry/exit animations should be applied to header elements.
+ * @param showExpandButton - Whether to render the expand/collapse button.
+ * @param playSound - Function to play UI sounds; called with 'whoosh', 'delete', or 'click' for respective user actions.
+ * @returns The rendered header element for the Recent Matches section.
+ */
 function SectionHeader({
   totalCount,
   isExpanded,
@@ -148,7 +161,15 @@ function SectionHeader({
 }
 
 /**
- * Main Recent Matches Section component
+ * Displays the Recent Matches section, including header controls, a paginated list of match items, loading/empty states, and interactive animations.
+ *
+ * Shows a loading skeleton while matches load, renders a header with clear/expand controls (and sound callbacks), lists recent matches (with an optional "plus more" expand button), and listens for global 'flames-delete-match' events to remove matches.
+ *
+ * @param displayCount - Number of matches to show when the list is collapsed (defaults to RECENT_MATCHES_CONFIG.DEFAULT_DISPLAY_COUNT)
+ * @param onMatchClick - Optional callback invoked with a match when the user clicks a match (only called when replay is enabled via configuration)
+ * @param showHeader - Whether to render the section header (defaults to true)
+ * @param className - Additional CSS classes applied to the outer container
+ * @returns The rendered Recent Matches section React element
  */
 function RecentMatchesSection({
   displayCount = RECENT_MATCHES_CONFIG.DEFAULT_DISPLAY_COUNT,

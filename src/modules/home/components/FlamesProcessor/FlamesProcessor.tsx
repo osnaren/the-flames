@@ -32,6 +32,24 @@ const containerVariants: Variants = {
   },
 };
 
+/**
+ * Renders an animated FLAMES processing UI that visualizes name analysis, common-letter striking, counting/elimination, and final result reveal.
+ *
+ * The component drives a multi-phase animation sequence (names reveal → striking → counting → result reveal → complete),
+ * coordinates timers and sound/interaction hooks from useGameIntegration, and calls `onComplete` when the sequence finishes
+ * or is skipped.
+ *
+ * @param name1 - First name to analyze (displayed and used for common-letter matching)
+ * @param name2 - Second name to analyze (displayed and used for common-letter matching)
+ * @param commonLetters - Letters identified as common between the two names (case-insensitive)
+ * @param remainingCount - Number used for the counting/elimination step (minimum treated as 1)
+ * @param result - Final FLAMES result letter (used to look up display data and play result reveal)
+ * @param onComplete - Callback invoked once the processing sequence finishes or the user skips the animation
+ * @param shouldAnimate - When true the full animated sequence runs; when false the component immediately completes
+ * @param runId - Optional run identifier used to reset and restart the animation when it changes
+ *
+ * @returns The rendered FLAMES processor UI as a React element
+ */
 function FlamesProcessorComponent({
   name1,
   name2,

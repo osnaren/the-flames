@@ -15,7 +15,11 @@ export const DEFAULT_CAPTURE_OPTIONS: Partial<Html2CanvasOptions> = {
 };
 
 /**
- * Removes animations/transitions that can distort html2canvas snapshots.
+ * Disable CSS animations, transitions, and inline transforms/opacities on an element and its descendants to stabilize html2canvas snapshots.
+ *
+ * This will set `animation` and `transition` to `none` for the root and all descendant elements, clear inline `transform`, and reset inline `opacity` (except for an element with id `watermark`, whose opacity is left unchanged).
+ *
+ * @param root - The root HTMLElement whose subtree will be normalized for capture
  */
 export function stripAnimationsForSnapshot(root: HTMLElement): void {
   const elements = [root, ...Array.from(root.querySelectorAll('*'))] as HTMLElement[];
@@ -36,10 +40,12 @@ export function stripAnimationsForSnapshot(root: HTMLElement): void {
 }
 
 /**
- * Prepares a cloned element for html2canvas-pro capture
- * html2canvas-pro handles oklch/oklab/lab colors natively, so we only need to:
- * - Strip animations that could interfere with the snapshot
- * - Show the watermark if needed
+ * Prepares a cloned element for html2canvas-pro capture by disabling animations, enabling an optional watermark, and adjusting styles that do not render reliably in canvas.
+ *
+ * @param clonedElement - The cloned root element that will be captured.
+ * @param options - Optional settings.
+ * @param options.showWatermark - When explicitly false, leaves any watermark hidden; otherwise ensures the watermark is visible.
+ * @param options.watermarkSelector - CSS selector used to find the watermark inside the cloned element (default: `#watermark`).
  */
 export function prepareForCapture(
   clonedElement: HTMLElement,
@@ -118,8 +124,10 @@ export function prepareElementForCapture(
 }
 
 /**
- * Safely downloads a blob as a file
- * Uses modern download approach without document.write
+ * Trigger a browser download for the provided Blob using the given filename.
+ *
+ * @param blob - The binary data to download as a file
+ * @param filename - The desired filename for the downloaded file
  */
 export function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
@@ -139,7 +147,10 @@ export function downloadBlob(blob: Blob, filename: string): void {
 }
 
 /**
- * Safely downloads a data URL as a file
+ * Triggers a browser download of the given data URL using the provided filename.
+ *
+ * @param dataUrl - Data URL to download (e.g. `"data:image/png;base64,..."`)
+ * @param filename - Filename to use for the downloaded file
  */
 export function downloadDataUrl(dataUrl: string, filename: string): void {
   const link = document.createElement('a');
@@ -156,7 +167,15 @@ export function downloadDataUrl(dataUrl: string, filename: string): void {
 }
 
 /**
- * Converts a data URL to a Blob
+ * Create a Blob from a base64-encoded data URL.
+ *
+ * The returned Blob uses the MIME type declared in the data URL header; if no MIME type is present, `image/png` is used.
+ *
+ * @param dataUrl - A data URL in the form `data:[<mime>][;base64],<data>` containing base64-encoded content.
+ * @returns A Blob representing the decoded binary data with the determined MIME type.
+ * @throws Error if `dataUrl` is falsy or does not start with `data:`.
+ * @throws Error if the data URL cannot be split into header and payload.
+ * @throws Error if base64 decoding fails.
  */
 export function dataUrlToBlob(dataUrl: string): Blob {
   if (!dataUrl || !dataUrl.startsWith('data:')) {
@@ -186,7 +205,9 @@ export function dataUrlToBlob(dataUrl: string): Blob {
 }
 
 /**
- * Checks if Web Share API with file sharing is available
+ * Detects whether the current environment supports sharing files via the Web Share API.
+ *
+ * @returns `true` if file sharing via the Web Share API is supported, `false` otherwise.
  */
 export function canShareFiles(): boolean {
   if (typeof navigator === 'undefined') return false;
@@ -202,8 +223,14 @@ export function canShareFiles(): boolean {
 }
 
 /**
- * Shares an image blob via Web Share API
- * Returns true if shared successfully, false if share was cancelled or failed
+ * Share an image Blob using the Web Share API with optional metadata.
+ *
+ * @param blob - The image data to share as a Blob.
+ * @param options - Optional share metadata.
+ * @param options.filename - Suggested filename for the shared file; defaults to `flames-result-<timestamp>.png`.
+ * @param options.title - Share title; defaults to "🔥 FLAMES Result".
+ * @param options.text - Share text; defaults to "Check out my FLAMES result! 🔥✨".
+ * @returns `true` if the share completed or the user cancelled the share, `false` if sharing failed or the environment does not support file sharing.
  */
 export async function shareImageBlob(
   blob: Blob,
@@ -239,7 +266,15 @@ export async function shareImageBlob(
 }
 
 /**
- * Shares an image via Web Share API, with fallback to clipboard
+ * Attempts to share an image using the Web Share API and falls back to copying a provided URL to the clipboard.
+ *
+ * @param imageData - The image to share; either a Blob or a data URL string.
+ * @param options - Optional sharing metadata and fallback behavior.
+ * @param options.filename - Suggested filename for the shared file.
+ * @param options.title - Title used by the native share dialog.
+ * @param options.text - Text used by the native share dialog.
+ * @param options.fallbackUrl - URL to copy to the clipboard if native sharing is unavailable or fails.
+ * @returns An object with `success` indicating whether sharing or the clipboard fallback succeeded, and `method` set to `'share'`, `'clipboard'`, or `'none'`.
  */
 export async function shareImageWithFallback(
   imageData: Blob | string,

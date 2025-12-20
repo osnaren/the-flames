@@ -23,8 +23,12 @@ const FLAMES_MEANINGS: Record<string, { title: string; color: string }> = {
 };
 
 /**
- * Enhanced Step 3 component showing the FLAMES elimination simulation
- * with sophisticated counting and striking animations
+ * Interactive FLAMES-style elimination component that cycles through letters and eliminates one per counting cycle until a final letter remains.
+ *
+ * Plays counting and strike sound effects and reports UI interactions and the final result through the game integration hooks.
+ *
+ * @param remainingCount - Number of counts per elimination cycle used to advance and remove letters
+ * @returns The React element that renders the interactive FLAMES simulation
  */
 export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
   const { shouldAnimate } = useAnimationPreferences();

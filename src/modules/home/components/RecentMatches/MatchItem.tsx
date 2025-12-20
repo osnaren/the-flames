@@ -13,8 +13,18 @@ import { memo, useCallback, useState } from 'react';
 import type { MatchItemProps } from './types';
 
 /**
- * Individual match item with hover effects and actions
- */
+ * Renders a single match entry with interactive hover animations, replay action, and a delete workflow.
+ *
+ * Renders match metadata (players, result, relative time), shows replay and delete controls on hover or touch,
+ * and presents an inline delete confirmation overlay when deletion is initiated.
+ *
+ * @param match - Match data used to populate the item (players, result, timestamps, id, etc.).
+ * @param index - Zero-based index used to stagger entrance animations.
+ * @param onClick - Optional callback invoked with `match` when the item is activated (replay).
+ * @param shouldAnimate - When true, enables entrance and hover animations.
+ * @returns The React element for the match item.
+ *
+ * Note: Confirming deletion dispatches a `CustomEvent` named 'flames-delete-match' with `{ detail: { id: match.id } }`.
 function MatchItem({ match, index, onClick, shouldAnimate }: MatchItemProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);

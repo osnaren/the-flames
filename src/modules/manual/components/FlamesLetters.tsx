@@ -6,6 +6,21 @@ import { Crown, Sparkles } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import type { FlamesLettersProps } from '../types';
 
+/**
+ * Render an interactive FLAMES letter selection UI with per-letter status, celebratory effects, and progress.
+ *
+ * Displays six FLAMES buttons (F, L, A, M, E, S) that reflect three states: active, crossed-out, and final result.
+ * When a final result is set, the component triggers a celebration (visual sparkles, sound, and haptic) and highlights the final letter.
+ * If both `userResult` and `correctResult` are provided, a validation message is shown indicating whether the selection is correct.
+ * A compact progress summary and animated progress bar show how many letters have been eliminated.
+ *
+ * @param crossedLetters - Set of letters that have been eliminated (rendered as crossed-out).
+ * @param onLetterToggle - Optional callback invoked with the letter when a non-final letter is clicked.
+ * @param className - Optional additional CSS classes applied to the root container.
+ * @param userResult - Currently selected final letter (causes final-result styling and celebration when present).
+ * @param correctResult - Correct final letter used to compute and display validation feedback when provided.
+ * @returns The FLAMES selection React element, including letter buttons, validation feedback, and a progress bar.
+ */
 export default function FlamesLetters({
   crossedLetters = new Set(),
   onLetterToggle,

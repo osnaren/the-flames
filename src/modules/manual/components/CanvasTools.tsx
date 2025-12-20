@@ -7,6 +7,25 @@ import { ArrowLeft, Download, Eraser, Redo2, Share, Trash2, Undo2 } from 'lucide
 import { useCallback } from 'react';
 import type { CanvasToolsProps } from '../types';
 
+/**
+ * Renders a responsive canvas toolbar with drawing controls and wires user actions to provided callbacks.
+ *
+ * The toolbar includes back, undo/redo (optional), erase toggle, clear, share, and save controls; it adapts layout for mobile vs desktop and reflects action availability and in-progress states.
+ *
+ * @param isErasing - Whether the canvas is currently in erasing mode.
+ * @param onErase - Callback invoked when the erase toggle is activated.
+ * @param onClear - Callback invoked to clear the canvas.
+ * @param onBack - Callback invoked to navigate back to the input view.
+ * @param onShare - Callback invoked to share the canvas image.
+ * @param onSave - Callback invoked to save the canvas image.
+ * @param onUndo - Optional callback invoked to undo the last action; if omitted, the undo control is not rendered.
+ * @param onRedo - Optional callback invoked to redo the last undone action; if omitted, the redo control is not rendered.
+ * @param canUndo - Whether an undo action is currently available; controls the undo button enabled state.
+ * @param canRedo - Whether a redo action is currently available; controls the redo button enabled state.
+ * @param isSharing - Whether a share operation is in progress; disables the share button when true.
+ * @param isSaving - Whether a save operation is in progress; disables the save button when true.
+ * @returns A JSX element containing the animated toolbar.
+ */
 export default function CanvasTools({
   isErasing,
   onErase,

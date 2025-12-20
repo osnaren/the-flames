@@ -25,9 +25,19 @@ interface ResultCardContainerProps {
 }
 
 /**
- * Container component for the Result Card
- * Manages state and actions for the result display and sharing
- * Now includes hero transition for dramatic result reveal
+ * Renders the result card UI, manages hero transition, sharing and capture flows, and exposes result-related actions.
+ *
+ * Manages local state for the hero reveal animation, share popover and image-capture flow; wires sharing, copy-link,
+ * retry and navigation callbacks into the ResultCardDisplay, ResultActionsDock and SharePopover.
+ *
+ * @param result - The computed FLAMES result (may be null while not in result stage)
+ * @param stage - Current game stage; controls visibility of the result card and transition behavior
+ * @param name1 - First player's name (optional; used for share text and URLs)
+ * @param name2 - Second player's name (optional; used for share text and URLs)
+ * @param onRetry - Callback invoked when the user requests to retry the game
+ * @param onNavigateToManual - Callback invoked to navigate to the game manual
+ * @param onNavigateToStats - Callback invoked to navigate to the stats view
+ * @returns The rendered result card container element
  */
 function ResultCardContainer({
   result,
