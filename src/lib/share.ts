@@ -1,6 +1,6 @@
-import html2canvas from 'html2canvas';
-
 import type { NonNullFlamesResult } from '@/lib/og';
+import { DEFAULT_CAPTURE_OPTIONS, downloadDataUrl, prepareElementForCapture } from '@/utils/canvasColor';
+import { captureElementAsDataUrl } from '@/utils/html2canvas';
 
 export interface ShareData {
   name1: string;
@@ -176,40 +176,25 @@ export const shareOnLinkedIn = (data: ShareData): void => {
  * Downloads the result card as an image
  */
 export const downloadResultCard = async (element: HTMLElement): Promise<void> => {
-  try {
-    const canvas = await html2canvas(element, {
-      scale: 2, // Good resolution
-      useCORS: true,
-      backgroundColor: '#1a1a2e', // Dark background
-      logging: false,
-      imageTimeout: 15000,
-      foreignObjectRendering: false,
-      onclone: (_document, clonedElement) => {
-        // Ensure watermark is visible
-        const watermark = clonedElement.querySelector('#watermark') as HTMLElement;
-        if (watermark) {
-          watermark.style.display = 'flex';
-          watermark.style.opacity = '1';
-        }
+  if (!element) {
+    throw new Error('No element provided for capture');
+  }
 
-        // Remove animations
-        const allElements = clonedElement.querySelectorAll('*');
-        allElements.forEach((el) => {
-          if (el instanceof HTMLElement) {
-            el.style.animation = 'none';
-            el.style.transition = 'none';
-          }
+  try {
+    const dataUrl = await captureElementAsDataUrl(element, {
+      ...DEFAULT_CAPTURE_OPTIONS,
+      backgroundColor: '#1a1a2e', // Dark background
+      onclone: (clonedDoc, clonedElement) => {
+        prepareElementForCapture(clonedDoc, clonedElement as HTMLElement, {
+          showWatermark: true,
+          watermarkSelector: '#watermark',
         });
       },
     });
-    const dataUrl = canvas.toDataURL('image/png');
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    link.download = `flames-result-${Date.now()}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } catch {
+
+    downloadDataUrl(dataUrl, `flames-result-${Date.now()}.png`);
+  } catch (error) {
+    console.error('downloadResultCard failed:', error);
     throw new Error('Failed to generate result card image.');
   }
 };
