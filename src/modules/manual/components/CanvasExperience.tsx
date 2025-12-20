@@ -32,6 +32,9 @@ const getViewportHeight = () => {
   return 600; // Fallback for SSR
 };
 
+// Maximum undo history size
+const MAX_UNDO_HISTORY = 20;
+
 export default function CanvasExperience({
   name1,
   name2,
@@ -46,6 +49,13 @@ export default function CanvasExperience({
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const lastCoordinates = useRef({ x: 0, y: 0 });
 
+  // Refs for canvas state preservation
+  const canvasImageDataRef = useRef<ImageData | null>(null);
+  const undoHistoryRef = useRef<ImageData[]>([]);
+  const redoHistoryRef = useRef<ImageData[]>([]);
+  const isResizingRef = useRef(false);
+  const lastCanvasDimensionsRef = useRef<{ width: number; height: number } | null>(null);
+
   const deviceType = useDeviceType();
   const isMobile = deviceType === 'mobile';
   const isTablet = deviceType === 'tablet';
@@ -57,6 +67,9 @@ export default function CanvasExperience({
   const [isErasing, setIsErasing] = useState(false);
   const [canvasHeight, setCanvasHeight] = useState('600px');
   const [isCanvasReady, setIsCanvasReady] = useState(false);
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
+  const [showMobileHint, setShowMobileHint] = useState(true);
 
   // Calculate responsive canvas height with mobile viewport fixes
   useEffect(() => {
@@ -220,33 +233,203 @@ export default function CanvasExperience({
     [isMobile]
   );
 
-  // Setup canvas with enhanced responsive properties
-  const setupCanvas = useCallback(() => {
+  // Save canvas state for undo functionality
+  const saveToUndoHistory = useCallback(() => {
     const canvas = canvasRef.current;
-    const container = canvasContainerRef.current;
-    if (!canvas || !container) return;
+    if (!canvas) return;
 
-    const rect = container.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap DPR for performance on mobile
-
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    canvas.style.width = `${rect.width}px`;
-    canvas.style.height = `${rect.height}px`;
-
-    const ctx = canvas.getContext('2d', {
-      alpha: true,
-      willReadFrequently: false, // Performance optimization
-    });
-
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    ctx.scale(dpr, dpr);
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
+    try {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      undoHistoryRef.current.push(imageData);
 
-    setIsCanvasReady(true);
+      // Limit history size
+      if (undoHistoryRef.current.length > MAX_UNDO_HISTORY) {
+        undoHistoryRef.current.shift();
+      }
+
+      // Clear redo history when new action is performed
+      redoHistoryRef.current = [];
+
+      setCanUndo(undoHistoryRef.current.length > 0);
+      setCanRedo(false);
+    } catch {
+      // Ignore errors (e.g., canvas not ready)
+    }
   }, [canvasRef]);
+
+  // Undo last action
+  const handleUndo = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || undoHistoryRef.current.length === 0) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Save current state to redo history
+    try {
+      const currentState = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      redoHistoryRef.current.push(currentState);
+    } catch {
+      // Ignore
+    }
+
+    // Restore previous state
+    const previousState = undoHistoryRef.current.pop();
+    if (previousState) {
+      ctx.putImageData(previousState, 0, 0);
+    }
+
+    setCanUndo(undoHistoryRef.current.length > 0);
+    setCanRedo(redoHistoryRef.current.length > 0);
+  }, [canvasRef]);
+
+  // Redo last undone action
+  const handleRedo = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || redoHistoryRef.current.length === 0) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Save current state to undo history
+    try {
+      const currentState = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      undoHistoryRef.current.push(currentState);
+    } catch {
+      // Ignore
+    }
+
+    // Restore redo state
+    const redoState = redoHistoryRef.current.pop();
+    if (redoState) {
+      ctx.putImageData(redoState, 0, 0);
+    }
+
+    setCanUndo(undoHistoryRef.current.length > 0);
+    setCanRedo(redoHistoryRef.current.length > 0);
+  }, [canvasRef]);
+
+  // Save canvas content before resize
+  const saveCanvasContent = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    try {
+      // Store the current dimensions
+      lastCanvasDimensionsRef.current = {
+        width: canvas.width,
+        height: canvas.height,
+      };
+      // Get and store image data
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      canvasImageDataRef.current = imageData;
+      return imageData;
+    } catch {
+      return null;
+    }
+  }, [canvasRef]);
+
+  // Restore canvas content after resize
+  const restoreCanvasContent = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !canvasImageDataRef.current || !lastCanvasDimensionsRef.current) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    try {
+      // Create a temporary canvas to hold the old content
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = lastCanvasDimensionsRef.current.width;
+      tempCanvas.height = lastCanvasDimensionsRef.current.height;
+      const tempCtx = tempCanvas.getContext('2d');
+      if (!tempCtx) return;
+
+      // Put the saved image data on temp canvas
+      tempCtx.putImageData(canvasImageDataRef.current, 0, 0);
+
+      // Scale the DPR for proper drawing
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      // Draw the temp canvas scaled to fit the new canvas size
+      ctx.save();
+      // Note: Context is already scaled by setupCanvas, so we don't need to scale again
+      // We just need to draw into the CSS dimensions
+      ctx.drawImage(
+        tempCanvas,
+        0,
+        0,
+        lastCanvasDimensionsRef.current.width,
+        lastCanvasDimensionsRef.current.height,
+        0,
+        0,
+        canvas.width / dpr,
+        canvas.height / dpr
+      );
+      ctx.restore();
+    } catch {
+      // If restoration fails, that's okay - just start fresh
+    }
+  }, [canvasRef]);
+
+  // Setup canvas with enhanced responsive properties - PRESERVES CONTENT
+  const setupCanvas = useCallback(
+    (preserveContent = false) => {
+      const canvas = canvasRef.current;
+      const container = canvasContainerRef.current;
+      if (!canvas || !container) return;
+
+      // Save content before resizing if needed
+      if (preserveContent && isCanvasReady) {
+        saveCanvasContent();
+      }
+
+      // Clear undo/redo history on resize as ImageData dimensions will be invalid
+      undoHistoryRef.current = [];
+      redoHistoryRef.current = [];
+      setCanUndo(false);
+      setCanRedo(false);
+
+      isResizingRef.current = true;
+
+      const rect = container.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap DPR for performance on mobile
+
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+
+      const ctx = canvas.getContext('2d', {
+        alpha: true,
+        willReadFrequently: true, // Enable for getImageData
+      });
+
+      if (!ctx) {
+        isResizingRef.current = false;
+        return;
+      }
+
+      ctx.scale(dpr, dpr);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      // Restore content after resize if we had content
+      if (preserveContent && canvasImageDataRef.current) {
+        restoreCanvasContent();
+      }
+
+      isResizingRef.current = false;
+      setIsCanvasReady(true);
+    },
+    [canvasRef, isCanvasReady, saveCanvasContent, restoreCanvasContent]
+  );
 
   // Enhanced drawing event handlers with better touch support
   const handleMouseDown = useCallback(
@@ -257,6 +440,9 @@ export default function CanvasExperience({
 
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
+
+      // Save state for undo before starting new stroke
+      saveToUndoHistory();
 
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -271,7 +457,7 @@ export default function CanvasExperience({
         drawWithEffect(x, y, ctx);
       }
     },
-    [canvasRef, isCanvasReady, isErasing, eraseWithEffect, drawWithEffect]
+    [canvasRef, isCanvasReady, isErasing, eraseWithEffect, drawWithEffect, saveToUndoHistory]
   );
 
   const handleMouseMove = useCallback(
@@ -303,15 +489,27 @@ export default function CanvasExperience({
     lastCoordinates.current = { x: 0, y: 0 };
   }, []);
 
-  // Touch event handlers with better mobile support
+  // Touch event handlers with better mobile support - Native events for passive: false support
   const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      e.preventDefault();
+    (e: TouchEvent | React.TouchEvent) => {
+      // Only prevent default if touch is on the canvas (allows page scroll from edges)
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+
+      // Hide mobile hint on first touch
+      if (showMobileHint) {
+        setShowMobileHint(false);
+      }
+
       const canvas = canvasRef.current;
       if (!canvas || !isCanvasReady) return;
 
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
+
+      // Save state for undo before starting new stroke
+      saveToUndoHistory();
 
       const rect = canvas.getBoundingClientRect();
       const touch = e.touches[0];
@@ -327,13 +525,15 @@ export default function CanvasExperience({
         drawWithEffect(x, y, ctx);
       }
     },
-    [canvasRef, isCanvasReady, isErasing, eraseWithEffect, drawWithEffect]
+    [canvasRef, isCanvasReady, isErasing, eraseWithEffect, drawWithEffect, saveToUndoHistory, showMobileHint]
   );
 
   const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
+    (e: TouchEvent | React.TouchEvent) => {
       if (!isDrawing) return;
-      e.preventDefault();
+      if (e.cancelable) {
+        e.preventDefault();
+      }
 
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -360,6 +560,28 @@ export default function CanvasExperience({
     lastCoordinates.current = { x: 0, y: 0 };
   }, []);
 
+  // Attach non-passive touch listeners
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // We need to cast the handlers to any because React types don't perfectly match native EventListener types
+    // but the event objects are compatible for our usage
+    const onTouchStart = (e: TouchEvent) => handleTouchStart(e);
+    const onTouchMove = (e: TouchEvent) => handleTouchMove(e);
+    const onTouchEnd = (_e: TouchEvent) => handleTouchEnd();
+
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+    canvas.addEventListener('touchend', onTouchEnd);
+
+    return () => {
+      canvas.removeEventListener('touchstart', onTouchStart);
+      canvas.removeEventListener('touchmove', onTouchMove);
+      canvas.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [handleTouchStart, handleTouchMove, handleTouchEnd, canvasRef]);
+
   // Right-click to toggle erase mode
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -381,24 +603,33 @@ export default function CanvasExperience({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    // Save state for undo before clearing
+    saveToUndoHistory();
+
     const ctx = canvas.getContext('2d');
     if (ctx) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
-  }, [canvasRef]);
+  }, [canvasRef, saveToUndoHistory]);
 
-  // Initialize canvas on mount and resize
+  // Initialize canvas on mount and handle resize with content preservation
   useEffect(() => {
     const initCanvas = () => {
-      setupCanvas();
+      setupCanvas(false); // Initial setup - no content to preserve
     };
 
     // Initial setup with a small delay to ensure DOM is ready
     const timer = setTimeout(initCanvas, 150);
 
+    let resizeTimeout: ReturnType<typeof setTimeout>;
     const handleResize = () => {
-      // Debounce resize events
-      setTimeout(setupCanvas, 150);
+      // Clear existing timeout
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+
+      // Debounce resize events and preserve content
+      resizeTimeout = setTimeout(() => {
+        setupCanvas(true); // Preserve content on resize
+      }, 200);
     };
 
     window.addEventListener('resize', handleResize);
@@ -406,10 +637,30 @@ export default function CanvasExperience({
 
     return () => {
       clearTimeout(timer);
+      if (resizeTimeout) clearTimeout(resizeTimeout);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('orientationchange', handleResize);
     };
   }, [setupCanvas]);
+
+  // Prevent scroll events from affecting canvas when drawing
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Prevent wheel scroll on canvas
+    const handleWheel = (e: WheelEvent) => {
+      // Allow scroll if it's not a drawing action
+      if (!isDrawing) return;
+      e.preventDefault();
+    };
+
+    canvas.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      canvas.removeEventListener('wheel', handleWheel);
+    };
+  }, [canvasRef, isDrawing]);
 
   return (
     <div
@@ -440,6 +691,10 @@ export default function CanvasExperience({
             onBack={onBack}
             onShare={onShare}
             onSave={onSave}
+            onUndo={handleUndo}
+            onRedo={handleRedo}
+            canUndo={canUndo}
+            canRedo={canRedo}
             isSharing={isSharing}
             isSaving={isSaving}
           />
@@ -610,9 +865,6 @@ export default function CanvasExperience({
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
               onContextMenu={handleContextMenu}
               style={{
                 cursor: getCursorStyle(),
@@ -653,6 +905,30 @@ export default function CanvasExperience({
                 <p className="text-on-surface-variant text-sm font-medium">Preparing canvas...</p>
               </div>
             )}
+
+            {/* Mobile Drawing Hint - shows only once on first load */}
+            <AnimatePresence>
+              {isMobile && isCanvasReady && showMobileHint && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="pointer-events-none absolute inset-0 flex items-center justify-center"
+                >
+                  <motion.div
+                    initial={{ scale: 0.9, y: 10 }}
+                    animate={{ scale: 1, y: 0 }}
+                    exit={{ scale: 0.9, y: -10, opacity: 0 }}
+                    className="bg-surface/95 border-outline/20 rounded-2xl border p-4 text-center shadow-xl backdrop-blur-xl"
+                  >
+                    <div className="mb-2 text-2xl">👆</div>
+                    <p className="text-on-surface text-sm font-medium">Tap and draw on the canvas</p>
+                    <p className="text-on-surface-variant mt-1 text-xs">Use the toolbar below for more options</p>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </div>
       </div>
@@ -666,6 +942,10 @@ export default function CanvasExperience({
           onBack={onBack}
           onShare={onShare}
           onSave={onSave}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          canUndo={canUndo}
+          canRedo={canRedo}
           isSharing={isSharing}
           isSaving={isSaving}
         />

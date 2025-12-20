@@ -50,7 +50,7 @@
   - Support Seasonal Themes (`src/styles/seasonal-themes.css`) via `data-theme` attribute.
 - **Specific Visuals**:
   - **Name Connectors**: Implement multi-layer animations (Glow -> Energy Flow -> Heart -> Particles).
-  - **Feedback**: Use `useHapticFeedback` and `useSoundEffects` for interactions.
+  - **Feedback**: Use `useHapticFeedback` and `useSoundSystem` for interactions.
 
 ## 5. Data & Validation
 

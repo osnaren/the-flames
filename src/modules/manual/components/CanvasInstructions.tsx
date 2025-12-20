@@ -54,6 +54,16 @@ const InstructionsContent: React.FC = () => (
         </div>
 
         <div className="flex items-start">
+          <span className="mr-3 text-base sm:text-lg">↩️</span>
+          <div>
+            <strong className="text-on-surface">Undo & Redo:</strong>
+            <p className="text-xs sm:text-sm">
+              Made a mistake? Use the Undo button to revert your last stroke. Use Redo to bring it back.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-start">
           <span className="mr-3 text-base sm:text-lg">🔄</span>
           <div>
             <strong className="text-on-surface">Clear Canvas:</strong>
@@ -68,7 +78,8 @@ const InstructionsContent: React.FC = () => (
           <div>
             <strong className="text-on-surface">Touch Support:</strong>
             <p className="text-xs sm:text-sm">
-              On mobile devices, tap and drag to draw. Use right-click or erase button to toggle modes.
+              On mobile devices, tap and drag to draw. The canvas captures touch gestures - scroll the page from outside
+              the canvas area.
             </p>
           </div>
         </div>
@@ -97,7 +108,8 @@ const InstructionsContent: React.FC = () => (
 
     <div className="border-primary-container/20 bg-primary-container/10 mt-4 rounded-xl border p-3 sm:mt-6 sm:p-4">
       <p className="text-on-surface-variant text-center text-xs sm:text-sm">
-        <strong>💡 Pro Tip:</strong> The canvas adapts to your current theme preference - light or dark mode!
+        <strong>💡 Pro Tip:</strong> The canvas adapts to your current theme preference - light or dark mode! Your
+        drawings are preserved when you resize or rotate your device.
       </p>
     </div>
   </div>

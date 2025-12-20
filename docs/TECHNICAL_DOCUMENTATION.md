@@ -21,7 +21,7 @@ src/
 ├── hooks/                # Custom React hooks
 │   ├── useDeviceCapabilities.ts    # Device detection
 │   ├── usePerformanceMonitor.ts    # Performance monitoring
-│   ├── useSoundEffects.ts          # Audio system
+│   ├── useSoundSystem.ts           # Audio system
 │   ├── useHapticFeedback.ts        # Haptic feedback
 │   └── useGameIntegration.ts       # System integration
 ├── themes/               # Seasonal theme system
@@ -164,16 +164,20 @@ The enhanced algorithm provides detailed information:
 ### Audio System
 
 ```typescript
-interface SoundEffects {
-  formSubmit: () => Promise<void>;
-  letterStrike: () => Promise<void>;
-  flamesCount: () => Promise<void>;
-  resultReveal: () => Promise<void>;
-  badgeUnlock: () => Promise<void>;
-  hover: () => Promise<void>;
-  click: () => Promise<void>;
-  error: () => Promise<void>;
-  success: () => Promise<void>;
+interface SoundSystem {
+  // SFX
+  playSound: (id: SoundId, options?: SoundOptions) => Promise<void>;
+  playSoundSequence: (sequence: SoundSequence[]) => Promise<void>;
+  
+  // BGM
+  playBGM: (id: SoundId, fadeIn?: boolean) => Promise<void>;
+  stopBGM: () => void;
+  pauseBGM: () => void;
+  resumeBGM: () => Promise<void>;
+  
+  // State
+  getBGMState: () => BGMState;
+  stopAllSounds: () => void;
 }
 ```
 

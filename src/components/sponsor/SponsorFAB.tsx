@@ -1,5 +1,6 @@
 'use client';
 
+import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { Button } from '@shadcn/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@shadcn/tooltip';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
@@ -13,11 +14,13 @@ import UpiModal from './UpiModal';
 const SponsorFAB: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isUpiModalOpen, setIsUpiModalOpen] = useState(false);
+  const { sound } = useGameIntegration();
   const fabRef = useRef<HTMLDivElement>(null);
   const menuId = 'sponsor-fab-menu';
 
   const toggleFab = (event: React.MouseEvent | React.TouchEvent) => {
     event.stopPropagation();
+    sound.playSound('pop');
     setIsOpen((prev) => !prev);
   };
 

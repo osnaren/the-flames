@@ -1,3 +1,4 @@
+import { getMatchingMusicTheme } from '@/config/sound';
 import { create } from 'zustand';
 
 export type TransitionSpeed = 'instant' | 'fast' | 'normal' | 'slow';
@@ -5,7 +6,8 @@ export type TransitionSpeed = 'instant' | 'fast' | 'normal' | 'slow';
 interface PreferencesState {
   isDarkTheme: boolean;
   animationsEnabled: boolean;
-  isSoundEnabled: boolean;
+  isSoundEnabled: boolean; // Controls SFX
+  isBGMEnabled: boolean; // Controls Background Music
   isHapticEnabled: boolean;
   volume: number;
   seasonalTheme:
@@ -19,6 +21,7 @@ interface PreferencesState {
     | 'christmas'
     | 'newYear'
     | 'pongal';
+  musicTheme: 'auto' | 'default' | 'chill' | 'valentine' | 'halloween' | 'christmas';
   transitionSpeed: TransitionSpeed;
   hydrated: boolean;
 }
@@ -27,9 +30,11 @@ interface PreferencesActions {
   toggleTheme: () => void;
   toggleAnimations: () => void;
   toggleSound: () => void;
+  toggleBGM: () => void;
   toggleHaptic: () => void;
   setVolume: (volume: number) => void;
   setSeasonalTheme: (theme: PreferencesState['seasonalTheme']) => void;
+  setMusicTheme: (theme: PreferencesState['musicTheme']) => void;
   setTransitionSpeed: (speed: TransitionSpeed) => void;
   init: () => void;
   cleanup: () => void;
@@ -70,9 +75,11 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
   isDarkTheme: false,
   animationsEnabled: true,
   isSoundEnabled: true,
+  isBGMEnabled: true,
   isHapticEnabled: true,
   volume: 0.7,
   seasonalTheme: 'auto',
+  musicTheme: 'auto',
   transitionSpeed: 'slow',
   hydrated: false,
   toggleTheme: () =>
@@ -102,6 +109,12 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
       safeLocalStorage.setItem('sound', String(value));
       return { isSoundEnabled: value };
     }),
+  toggleBGM: () =>
+    set((s) => {
+      const value = !s.isBGMEnabled;
+      safeLocalStorage.setItem('bgm', String(value));
+      return { isBGMEnabled: value };
+    }),
   toggleHaptic: () =>
     set((s) => {
       const value = !s.isHapticEnabled;
@@ -115,9 +128,20 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
       return { volume: clampedVolume };
     }),
   setSeasonalTheme: (theme: PreferencesState['seasonalTheme']) =>
-    set(() => {
+    set((state) => {
       safeLocalStorage.setItem('seasonalTheme', theme);
+      // Auto-sync music theme when seasonal theme changes (if music theme is set to 'auto')
+      if (state.musicTheme === 'auto') {
+        const matchingMusicTheme = getMatchingMusicTheme(theme);
+        safeLocalStorage.setItem('musicTheme', matchingMusicTheme);
+        return { seasonalTheme: theme, musicTheme: matchingMusicTheme };
+      }
       return { seasonalTheme: theme };
+    }),
+  setMusicTheme: (theme: PreferencesState['musicTheme']) =>
+    set(() => {
+      safeLocalStorage.setItem('musicTheme', theme);
+      return { musicTheme: theme };
     }),
   setTransitionSpeed: (speed: TransitionSpeed) =>
     set(() => {
@@ -131,9 +155,11 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
     const storedTheme = safeLocalStorage.getItem('theme');
     const storedAnimations = safeLocalStorage.getItem('animations');
     const storedSound = safeLocalStorage.getItem('sound');
+    const storedBGM = safeLocalStorage.getItem('bgm');
     const storedHaptic = safeLocalStorage.getItem('haptic');
     const storedVolume = safeLocalStorage.getItem('volume');
     const storedSeasonalTheme = safeLocalStorage.getItem('seasonalTheme');
+    const storedMusicTheme = safeLocalStorage.getItem('musicTheme');
     const storedTransitionSpeed = safeLocalStorage.getItem('transitionSpeed');
 
     // Determine the actual theme that should be applied
@@ -167,9 +193,11 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
       isDarkTheme,
       animationsEnabled: storedAnimations !== 'false',
       isSoundEnabled: storedSound !== 'false',
+      isBGMEnabled: storedBGM !== 'false',
       isHapticEnabled: storedHaptic !== 'false',
       volume: storedVolume ? parseFloat(storedVolume) : 0.7,
       seasonalTheme: (storedSeasonalTheme as PreferencesState['seasonalTheme']) || 'auto',
+      musicTheme: (storedMusicTheme as PreferencesState['musicTheme']) || 'auto',
       transitionSpeed: (storedTransitionSpeed as TransitionSpeed) || 'normal',
       hydrated: true,
     });

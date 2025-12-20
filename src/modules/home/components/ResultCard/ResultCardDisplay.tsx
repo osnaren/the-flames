@@ -15,6 +15,7 @@ import {
   ANIMATION_STAGES,
   ANIMATION_STAGES_WITH_HERO,
   getRandomResultContent,
+  RESULT_COLORS,
   RESULT_GRADIENTS,
   RESULT_ICONS,
   RESULT_LABELS,
@@ -134,7 +135,10 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
           )}
 
           {/* Main Card */}
-          <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-black/30">
+          <div
+            className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-black/30"
+            data-capture-target="card-bg"
+          >
             {/* Animated gradient background */}
             <motion.div
               className={cn('absolute inset-0 bg-linear-to-br opacity-15', gradient.from, gradient.to)}
@@ -286,9 +290,21 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
                 }}
                 className={cn(
                   'font-heading mb-4 text-4xl font-extrabold tracking-tight sm:text-5xl',
-                  'bg-clip-text text-transparent drop-shadow-sm',
-                  gradient.text
+                  'drop-shadow-sm',
+                  // Use standard text color for better compatibility, gradient applied via style
+                  'bg-clip-text text-transparent'
                 )}
+                data-capture-target="result-title"
+                data-result-color={RESULT_COLORS[strictResult].primary}
+                style={{
+                  // Explicitly set gradient for html2canvas compatibility
+                  backgroundImage: `linear-gradient(to right, ${RESULT_COLORS[strictResult].primary}, ${RESULT_COLORS[strictResult].secondary})`,
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                  color: 'transparent',
+                  // Ensure it's visible even if bg-clip fails (fallback color)
+                  textShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                }}
               >
                 {label.toUpperCase()}
               </motion.h2>

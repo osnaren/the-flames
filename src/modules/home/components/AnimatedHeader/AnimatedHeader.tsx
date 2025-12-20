@@ -1,3 +1,4 @@
+import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { memo, useState } from 'react';
 import { FLAMES_LETTERS } from '../../constants';
@@ -36,6 +37,7 @@ const letterVariants: Variants = {
 
 function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const { sound } = useGameIntegration();
 
   const isCompact = stage === 'processing' || stage === 'result';
 
@@ -70,7 +72,12 @@ function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) 
             key={item.char}
             variants={letterVariants}
             className="group relative cursor-pointer"
-            onHoverStart={() => shouldAnimate && setHoveredIndex(index)}
+            onHoverStart={() => {
+              if (shouldAnimate) {
+                sound.playSound('hover');
+                setHoveredIndex(index);
+              }
+            }}
             onHoverEnd={() => shouldAnimate && setHoveredIndex(null)}
             whileHover={
               shouldAnimate

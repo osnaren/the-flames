@@ -162,8 +162,23 @@ export function useParticleSystem({
   const config = useMemo((): ParticleSystemConfig => {
     let intensityMultiplier = intensity === 'high' ? 1.5 : intensity === 'low' ? 0.5 : 1;
 
-    if (isMobile) intensityMultiplier *= 0.3; // Reduced from 0.6 for better performance
+    // Performance scaling
+    if (isMobile) intensityMultiplier *= 0.4;
     if (isLowPowerMode) intensityMultiplier *= 0.5;
+
+    // Size scaling for different devices
+    const sizeScale = isMobile ? 0.6 : isLowPowerMode ? 0.8 : 1;
+    const scaledSize = {
+      min: Math.max(1, Math.round(themeParticleConfig.size.min * sizeScale)),
+      max: Math.max(2, Math.round(themeParticleConfig.size.max * sizeScale)),
+    };
+
+    // Speed scaling - slightly faster on mobile for more dynamic feel with fewer particles
+    const speedScale = isMobile ? 1.2 : 1;
+    const scaledSpeed = {
+      min: themeParticleConfig.speed.min * speedScale,
+      max: themeParticleConfig.speed.max * speedScale,
+    };
 
     // Base config from seasonal theme
     let particleConfig: ParticleSystemConfig = {
@@ -171,8 +186,8 @@ export function useParticleSystem({
       count: Math.floor(themeParticleConfig.count * intensityMultiplier),
       colors: canvasColors.length > 0 ? canvasColors : themeParticleConfig.colors,
       shapes: themeParticleConfig.shapes,
-      size: themeParticleConfig.size,
-      speed: themeParticleConfig.speed,
+      size: scaledSize,
+      speed: scaledSpeed,
       direction: themeParticleConfig.direction,
       opacity: themeParticleConfig.opacity,
       animation: themeParticleConfig.animation,
@@ -180,24 +195,26 @@ export function useParticleSystem({
 
     // Overrides based on Variant
     if (variant === 'processing') {
+      const processingSize = isMobile ? { min: 1, max: 3 } : { min: 2, max: 6 };
       particleConfig = {
         enabled: true,
         count: Math.floor(50 * intensityMultiplier),
         colors: ['rgba(249, 115, 22, 0.8)', 'rgba(234, 88, 12, 0.7)', 'rgba(254, 215, 170, 0.6)'],
         shapes: ['flame', 'circle'] as ParticleShape[],
-        size: { min: 2, max: 6 },
+        size: processingSize,
         speed: { min: 2, max: 5 },
         direction: 'up',
         opacity: { min: 0.4, max: 0.8 },
         animation: 'sparkle',
       };
     } else if (variant === 'result' && result) {
+      const resultSize = isMobile ? { min: 2, max: 5 } : { min: 3, max: 8 };
       particleConfig = {
         enabled: true,
         count: Math.floor(60 * intensityMultiplier),
         colors: RESULT_COLORS[result] || ['rgba(255, 255, 255, 0.8)'],
         shapes: RESULT_SHAPES[result] || ['circle'],
-        size: { min: 3, max: 8 },
+        size: resultSize,
         speed: { min: 1, max: 3 },
         direction: 'up',
         opacity: { min: 0.5, max: 0.9 },
@@ -358,12 +375,16 @@ export function useParticleSystem({
         ctx.fillStyle = p.color;
         ctx.strokeStyle = p.color;
 
-        // Glow effect - Disable on mobile/low power for performance
-        if (!isMobile && !isLowPowerMode) {
-          ctx.shadowBlur = isDarkTheme ? 20 : 30;
+        // Glow effect - Reduced on mobile for performance, disabled on low power
+        if (isLowPowerMode) {
+          ctx.shadowBlur = 0;
+        } else if (isMobile) {
+          // Subtle glow on mobile - enough for polish without performance hit
+          ctx.shadowBlur = isDarkTheme ? 4 : 6;
           ctx.shadowColor = p.color;
         } else {
-          ctx.shadowBlur = 0;
+          ctx.shadowBlur = isDarkTheme ? 15 : 20;
+          ctx.shadowColor = p.color;
         }
 
         // Draw the shape
@@ -378,8 +399,10 @@ export function useParticleSystem({
 
     // Resize Handler
     const handleResize = () => {
-      // Cap DPR to 1 on mobile/low power to reduce canvas size significantly
-      const maxDpr = isMobile || isLowPowerMode ? 1 : 2;
+      // Use appropriate DPR for crisp rendering
+      // Mobile: cap at 1.5 for balance between quality and performance
+      // Desktop: cap at 2 for high quality
+      const maxDpr = isMobile ? 1.5 : isLowPowerMode ? 1 : 2;
       const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;

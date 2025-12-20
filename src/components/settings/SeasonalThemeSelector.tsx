@@ -2,6 +2,7 @@
 
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/shadcn/carousel';
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
+import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { SeasonalTheme, SeasonalThemeConfig } from '@/themes/seasonal/types';
 import { useSeasonalTheme } from '@/themes/seasonal/useSeasonalTheme';
 import { cn } from '@/utils';
@@ -87,6 +88,7 @@ interface SeasonalThemeSelectorProps {
 function SeasonalThemeSelector({ isExpanded }: SeasonalThemeSelectorProps) {
   const { currentTheme, detectedTheme, setManualTheme, themes } = useSeasonalTheme();
   const { shouldAnimate } = useAnimationPreferences();
+  const { uiInteraction } = useGameIntegration();
   const [api, setApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
@@ -125,11 +127,12 @@ function SeasonalThemeSelector({ isExpanded }: SeasonalThemeSelectorProps) {
 
   const handleThemeSelect = useCallback(
     (themeId: SeasonalTheme) => {
+      uiInteraction('select');
       // Always set the manual theme, even for 'default'
       // This ensures we override auto-detection when user explicitly chooses 'default'
       setManualTheme(themeId);
     },
-    [setManualTheme]
+    [setManualTheme, uiInteraction]
   );
 
   // Get ordered theme configs - defined before getVisibleTheme
@@ -144,6 +147,7 @@ function SeasonalThemeSelector({ isExpanded }: SeasonalThemeSelectorProps) {
 
   const handleScrollPrev = useCallback(() => {
     if (!api) return;
+    uiInteraction('click');
     api.scrollPrev();
     // After scrolling, select the newly visible theme
     setTimeout(() => {
@@ -152,10 +156,11 @@ function SeasonalThemeSelector({ isExpanded }: SeasonalThemeSelectorProps) {
         handleThemeSelect(themeId);
       }
     }, 150);
-  }, [api, getVisibleTheme, currentTheme, handleThemeSelect]);
+  }, [api, getVisibleTheme, currentTheme, handleThemeSelect, uiInteraction]);
 
   const handleScrollNext = useCallback(() => {
     if (!api) return;
+    uiInteraction('click');
     api.scrollNext();
     // After scrolling, select the newly visible theme
     setTimeout(() => {
@@ -164,7 +169,7 @@ function SeasonalThemeSelector({ isExpanded }: SeasonalThemeSelectorProps) {
         handleThemeSelect(themeId);
       }
     }, 150);
-  }, [api, getVisibleTheme, currentTheme, handleThemeSelect]);
+  }, [api, getVisibleTheme, currentTheme, handleThemeSelect, uiInteraction]);
 
   // Keyboard navigation for the whole selector
   const handleKeyDown = useCallback(

@@ -5,6 +5,7 @@
 'use client';
 
 import { RECENT_MATCHES_CONFIG } from '@/config/recentMatches';
+import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Clock, Play, Trash2, X } from 'lucide-react';
@@ -18,15 +19,17 @@ function MatchItem({ match, index, onClick, shouldAnimate }: MatchItemProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const isTouch = useMediaQuery('(hover: none)');
+  const { uiInteraction, sound } = useGameIntegration();
   const { ANIMATION } = RECENT_MATCHES_CONFIG;
 
   const showActions = isHovered || isTouch;
 
   const handleClick = useCallback(() => {
     if (onClick && !isDeleting) {
+      uiInteraction('click');
       onClick(match);
     }
-  }, [onClick, match, isDeleting]);
+  }, [onClick, match, isDeleting, uiInteraction]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -38,24 +41,33 @@ function MatchItem({ match, index, onClick, shouldAnimate }: MatchItemProps) {
     [handleClick]
   );
 
-  const handleDelete = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsDeleting(true);
-  }, []);
+  const handleDelete = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      uiInteraction('click');
+      setIsDeleting(true);
+    },
+    [uiInteraction]
+  );
 
-  const handleCancelDelete = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsDeleting(false);
-  }, []);
+  const handleCancelDelete = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      uiInteraction('click');
+      setIsDeleting(false);
+    },
+    [uiInteraction]
+  );
 
   const handleConfirmDelete = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
+      sound.playSound('delete');
       // Parent will handle deletion via removeMatch
       const deleteEvent = new CustomEvent('flames-delete-match', { detail: { id: match.id } });
       window.dispatchEvent(deleteEvent);
     },
-    [match.id]
+    [match.id, sound]
   );
 
   // Animation variants

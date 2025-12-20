@@ -38,9 +38,18 @@ interface SharePopoverProps {
   onClose: () => void;
   resultCardRef: React.RefObject<HTMLElement | null>;
   shareData: ShareData;
+  onShareAsImage?: () => void;
+  isCapturingImage?: boolean;
 }
 
-export default function SharePopover({ isOpen, onClose, resultCardRef, shareData }: SharePopoverProps) {
+export default function SharePopover({
+  isOpen,
+  onClose,
+  resultCardRef,
+  shareData,
+  onShareAsImage,
+  isCapturingImage,
+}: SharePopoverProps) {
   const popoverRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
@@ -92,6 +101,12 @@ export default function SharePopover({ isOpen, onClose, resultCardRef, shareData
       toast.error('Failed to download result card', { id: 'download' });
     }
   }, [resultCardRef, onClose]);
+
+  const handleShareImage = useCallback(() => {
+    if (!onShareAsImage) return;
+    onShareAsImage();
+    onClose();
+  }, [onClose, onShareAsImage]);
 
   const handleCopyLink = useCallback(async () => {
     try {
@@ -247,12 +262,29 @@ export default function SharePopover({ isOpen, onClose, resultCardRef, shareData
 
               {/* Download & Copy */}
               <motion.div variants={childVariants}>
-                <h4 className="mb-3 text-sm font-medium text-gray-600 dark:text-gray-400">Save & Copy</h4>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button variant="secondary" icon={Download} onClick={handleDownload}>
+                <h4 className="mb-3 text-sm font-medium text-gray-600 dark:text-gray-400">Save & Share Image</h4>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <Button
+                    variant="secondary"
+                    icon={Download}
+                    onClick={handleDownload}
+                    aria-label="Download result card"
+                  >
                     Download
                   </Button>
-                  <Button variant="outline" icon={Copy} onClick={handleCopyLink}>
+
+                  <Button
+                    variant="primary"
+                    icon={Share2}
+                    onClick={handleShareImage}
+                    disabled={!onShareAsImage}
+                    isLoading={Boolean(isCapturingImage)}
+                    aria-label="Share image via device share sheet"
+                  >
+                    Share Image
+                  </Button>
+
+                  <Button variant="outline" icon={Copy} onClick={handleCopyLink} aria-label="Copy link to clipboard">
                     Copy Link
                   </Button>
                 </div>

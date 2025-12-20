@@ -1,6 +1,16 @@
-import html2canvas from 'html2canvas';
 import { createRoot } from 'react-dom/client';
 import toast from 'react-hot-toast';
+
+import {
+  canShareFiles,
+  dataUrlToBlob,
+  DEFAULT_CAPTURE_OPTIONS,
+  downloadDataUrl,
+  prepareElementForCapture,
+  shareImageBlob,
+} from '@/utils/canvasColor';
+import { captureElementAsDataUrl } from '@/utils/html2canvas';
+
 import ClickResultImage from './components/ClickResultImage';
 import { getResultData } from './resultData';
 import type { FlamesResult } from './types';
@@ -10,16 +20,9 @@ import type { FlamesResult } from './types';
  * @param imageDataUrl - The data URL of the image to save.
  * @param filename - The desired filename for the downloaded image.
  */
-export const saveImage = (imageDataUrl: string, filename: string) => {
+export const saveImage = (imageDataUrl: string, filename: string): void => {
   try {
-    const link = document.createElement('a');
-    link.href = imageDataUrl;
-    link.download = filename;
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    // Don't show success toast here as it's handled in the calling function
+    downloadDataUrl(imageDataUrl, filename);
   } catch {
     throw new Error('Failed to save image');
   }
@@ -31,39 +34,30 @@ export const saveImage = (imageDataUrl: string, filename: string) => {
  * @param name1 - First name.
  * @param name2 - Second name.
  */
-export const shareImage = async (imageDataUrl: string, name1: string, name2: string) => {
-  try {
-    // Check if Web Share API is available and supports files
-    if (navigator.share && navigator.canShare) {
-      const response = await fetch(imageDataUrl);
-      const blob = await response.blob();
-      const file = new File([blob], `${name1}_${name2}-FLAMES.png`, { type: 'image/png' });
+export const shareImage = async (imageDataUrl: string, name1: string, name2: string): Promise<void> => {
+  const blob = dataUrlToBlob(imageDataUrl);
 
-      if (navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          title: 'FLAMES Result',
-          text: `Check out the FLAMES result for ${name1} and ${name2}!`,
-          files: [file],
-        });
-        return;
-      }
-    }
+  // Try native file sharing first
+  if (canShareFiles()) {
+    const shared = await shareImageBlob(blob, {
+      filename: `${name1}_${name2}-FLAMES.png`,
+      title: 'FLAMES Result',
+      text: `Check out the FLAMES result for ${name1} and ${name2}!`,
+    });
 
-    // Fallback: Copy link to clipboard or show share options
-    if (navigator.clipboard && window.isSecureContext) {
-      const shareUrl =
-        window.location.origin + `/manual?name1=${encodeURIComponent(name1)}&name2=${encodeURIComponent(name2)}`;
-      await navigator.clipboard.writeText(shareUrl);
-      toast.success('Share link copied to clipboard!');
-    } else {
-      throw new Error('Web Share API not supported and clipboard access denied');
-    }
-  } catch (error) {
-    if (error instanceof Error && error.name === 'AbortError') {
-      // User cancelled the share
+    if (shared) {
       return;
     }
-    throw new Error('Failed to share result');
+  }
+
+  // Fallback: Copy link to clipboard
+  if (navigator.clipboard && window.isSecureContext) {
+    const shareUrl =
+      window.location.origin + `/manual?name1=${encodeURIComponent(name1)}&name2=${encodeURIComponent(name2)}`;
+    await navigator.clipboard.writeText(shareUrl);
+    toast.success('Share link copied to clipboard!');
+  } else {
+    throw new Error('Web Share API not supported and clipboard access denied');
   }
 };
 
@@ -134,26 +128,30 @@ export const generateClickResultImage = async (
   result: FlamesResult | string
 ): Promise<string> => {
   const isDarkMode =
-    document.documentElement.classList.contains('dark') || window.matchMedia('(prefers-color-scheme: dark)').matches;
+    typeof document !== 'undefined' &&
+    (document.documentElement.classList.contains('dark') || window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+  const backgroundColor = isDarkMode ? '#1e293b' : '#ffffff';
 
   // Create a completely isolated container to avoid CSS inheritance
   const container = document.createElement('div');
-  container.style.position = 'absolute';
-  container.style.left = '-9999px';
-  container.style.top = '-9999px';
-  container.style.width = '600px';
-  container.style.height = 'auto';
-  container.style.backgroundColor = isDarkMode ? '#1e293b' : '#ffffff';
-
-  // Reset all CSS properties to avoid oklch inheritance
-  container.style.color = isDarkMode ? '#f8fafc' : '#1e293b';
-  container.style.fontFamily = 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  container.style.fontSize = '16px';
-  container.style.lineHeight = '1.5';
-  container.style.boxSizing = 'border-box';
-
-  // Remove any inherited CSS classes that might contain oklch
-  container.className = '';
+  container.style.cssText = `
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+    width: 600px;
+    height: auto;
+    background-color: ${backgroundColor};
+    color: ${isDarkMode ? '#f8fafc' : '#1e293b'};
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+  `;
 
   document.body.appendChild(container);
 
@@ -166,13 +164,11 @@ export const generateClickResultImage = async (
   });
 
   try {
-    // Generate canvas from the container with specific options to avoid CSS issues
-    const canvas = await html2canvas(container, {
-      useCORS: true,
-      backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
-      scale: 2, // Higher resolution
-      logging: false, // Disable logging for production
-      allowTaint: true, // Allow tainted canvases
+    // Generate canvas from the container with optimized options
+    const dataUrl = await captureElementAsDataUrl(container, {
+      ...DEFAULT_CAPTURE_OPTIONS,
+      backgroundColor,
+      allowTaint: true, // Allow tainted canvases for this use case
       ignoreElements: (element) => {
         // Ignore elements that might have problematic CSS
         const classList = element.classList;
@@ -183,22 +179,16 @@ export const generateClickResultImage = async (
           element.tagName === 'STYLE'
         );
       },
-      onclone: (clonedDoc) => {
-        // Remove any style elements that might contain oklch
-        const styleElements = clonedDoc.querySelectorAll('style, link[rel="stylesheet"]');
-        styleElements.forEach((el) => {
-          const content = el.textContent || '';
-          if (content.includes('oklch') || content.includes('oklab')) {
-            el.remove();
-          }
+      onclone: (clonedDoc, clonedElement) => {
+        prepareElementForCapture(clonedDoc, clonedElement, {
+          showWatermark: false, // No watermark in manual mode
         });
 
         // Ensure the cloned container has explicit styles
-        const clonedContainer = clonedDoc.querySelector('div');
-        if (clonedContainer) {
-          clonedContainer.style.backgroundColor = isDarkMode ? '#1e293b' : '#ffffff';
-          clonedContainer.style.color = isDarkMode ? '#f8fafc' : '#1e293b';
-          clonedContainer.style.fontFamily = 'Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+        if (clonedElement instanceof HTMLElement) {
+          clonedElement.style.backgroundColor = backgroundColor;
+          clonedElement.style.color = isDarkMode ? '#f8fafc' : '#1e293b';
+          clonedElement.style.fontFamily = 'Inter, -apple-system, BlinkMacSystemFont, sans-serif';
         }
       },
     });
@@ -207,8 +197,8 @@ export const generateClickResultImage = async (
     root.unmount();
     document.body.removeChild(container);
 
-    return canvas.toDataURL('image/png', 0.9);
-  } catch {
+    return dataUrl;
+  } catch (error) {
     // Cleanup on error
     try {
       root.unmount();
@@ -216,6 +206,8 @@ export const generateClickResultImage = async (
     } catch {
       // Ignore cleanup errors
     }
+
+    console.error('html2canvas failed, using fallback:', error);
 
     // If html2canvas fails due to oklch or other issues, use fallback
     try {

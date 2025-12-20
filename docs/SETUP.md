@@ -115,7 +115,7 @@ src/
 ├── hooks/               # Custom React hooks
 │   ├── useDeviceCapabilities.ts
 │   ├── usePerformanceMonitor.ts
-│   ├── useSoundEffects.ts
+│   ├── useSoundSystem.ts
 │   ├── useHapticFeedback.ts
 │   └── useGameIntegration.ts
 ├── themes/              # Seasonal themes

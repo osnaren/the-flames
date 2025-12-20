@@ -1,8 +1,10 @@
 import Button from '@/components/ui/Button';
 import { useDeviceType } from '@/hooks/useDeviceType';
+import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { cn } from '@/utils';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Download, Eraser, Share, Trash2 } from 'lucide-react';
+import { ArrowLeft, Download, Eraser, Redo2, Share, Trash2, Undo2 } from 'lucide-react';
+import { useCallback } from 'react';
 import type { CanvasToolsProps } from '../types';
 
 export default function CanvasTools({
@@ -12,11 +14,55 @@ export default function CanvasTools({
   onBack,
   onShare,
   onSave,
+  onUndo,
+  onRedo,
+  canUndo = false,
+  canRedo = false,
   isSharing = false,
   isSaving = false,
 }: CanvasToolsProps) {
   const deviceType = useDeviceType();
   const isMobile = deviceType === 'mobile';
+  const { sound, uiInteraction } = useGameIntegration();
+
+  const handleBack = useCallback(async () => {
+    await sound.playSound('whoosh', { volume: 0.5 });
+    onBack();
+  }, [sound, onBack]);
+
+  const handleErase = useCallback(async () => {
+    await uiInteraction('toggle');
+    onErase();
+  }, [uiInteraction, onErase]);
+
+  const handleClear = useCallback(async () => {
+    await sound.playSound('delete', { volume: 0.6 });
+    onClear();
+  }, [sound, onClear]);
+
+  const handleShare = useCallback(async () => {
+    await uiInteraction('click');
+    onShare();
+  }, [uiInteraction, onShare]);
+
+  const handleSave = useCallback(async () => {
+    await uiInteraction('click');
+    onSave();
+  }, [uiInteraction, onSave]);
+
+  const handleUndo = useCallback(async () => {
+    if (onUndo && canUndo) {
+      await sound.playSound('pop', { volume: 0.4 });
+      onUndo();
+    }
+  }, [sound, onUndo, canUndo]);
+
+  const handleRedo = useCallback(async () => {
+    if (onRedo && canRedo) {
+      await sound.playSound('pop', { volume: 0.4 });
+      onRedo();
+    }
+  }, [sound, onRedo, canRedo]);
 
   const toolsVariants = {
     hidden: { opacity: 0, y: isMobile ? 20 : -20 },
@@ -48,7 +94,7 @@ export default function CanvasTools({
             variant="ghost"
             size={isMobile ? 'sm' : 'sm'}
             icon={ArrowLeft}
-            onClick={onBack}
+            onClick={handleBack}
             className="text-on-surface hover:bg-surface-container/50 shrink-0"
             aria-label="Go back to input"
           >
@@ -57,11 +103,42 @@ export default function CanvasTools({
 
           <div className={cn('bg-outline/30 w-px', isMobile ? 'h-6' : 'h-4 sm:h-6')} />
 
+          {/* Undo/Redo buttons */}
+          {onUndo && (
+            <Button
+              variant="ghost"
+              size={isMobile ? 'sm' : 'sm'}
+              icon={Undo2}
+              onClick={handleUndo}
+              disabled={!canUndo}
+              className="text-on-surface hover:bg-surface-container/50 shrink-0 transition-all duration-200 disabled:opacity-30"
+              aria-label="Undo last action"
+            >
+              {!isMobile && <span className="ml-1">Undo</span>}
+            </Button>
+          )}
+
+          {onRedo && (
+            <Button
+              variant="ghost"
+              size={isMobile ? 'sm' : 'sm'}
+              icon={Redo2}
+              onClick={handleRedo}
+              disabled={!canRedo}
+              className="text-on-surface hover:bg-surface-container/50 shrink-0 transition-all duration-200 disabled:opacity-30"
+              aria-label="Redo last action"
+            >
+              {!isMobile && <span className="ml-1">Redo</span>}
+            </Button>
+          )}
+
+          {(onUndo || onRedo) && <div className={cn('bg-outline/30 w-px', isMobile ? 'h-6' : 'h-4 sm:h-6')} />}
+
           <Button
             variant="ghost"
             size={isMobile ? 'sm' : 'sm'}
             icon={Eraser}
-            onClick={onErase}
+            onClick={handleErase}
             className={cn(
               'shrink-0 transition-all duration-200',
               isErasing
@@ -78,7 +155,7 @@ export default function CanvasTools({
             variant="ghost"
             size={isMobile ? 'sm' : 'sm'}
             icon={Trash2}
-            onClick={onClear}
+            onClick={handleClear}
             className="text-on-surface hover:bg-surface-container/50 hover:text-error shrink-0 transition-all duration-200"
             aria-label="Clear canvas"
           >
@@ -91,7 +168,7 @@ export default function CanvasTools({
             variant="ghost"
             size={isMobile ? 'sm' : 'sm'}
             icon={Share}
-            onClick={onShare}
+            onClick={handleShare}
             disabled={isSharing}
             className="text-on-surface hover:bg-surface-container/50 shrink-0 transition-all duration-200 disabled:opacity-50"
             aria-label="Share image"
@@ -103,7 +180,7 @@ export default function CanvasTools({
             variant="ghost"
             size={isMobile ? 'sm' : 'sm'}
             icon={Download}
-            onClick={onSave}
+            onClick={handleSave}
             disabled={isSaving}
             className="text-on-surface hover:bg-surface-container/50 shrink-0 transition-all duration-200 disabled:opacity-50"
             aria-label="Save image"

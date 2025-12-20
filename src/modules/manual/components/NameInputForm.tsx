@@ -1,4 +1,5 @@
 import Button from '@/components/ui/Button';
+import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { motion } from 'framer-motion';
 import { ArrowRight, Heart, Info, Pen, Pointer } from 'lucide-react';
 import { useState } from 'react';
@@ -28,26 +29,33 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
   const [name1, setName1] = useState(initialName1);
   const [name2, setName2] = useState(initialName2);
   const [isLoading, setIsLoading] = useState(false);
+  const { uiInteraction, formSubmit, sound } = useGameIntegration();
 
-  const performSubmit = (experienceMode: 'click' | 'canvas') => {
+  const performSubmit = async (experienceMode: 'click' | 'canvas') => {
     if (isLoading) return;
 
     const error1 = validateNameInput(name1);
     if (error1) {
       toast.error(`Name 1: ${error1}`);
+      await uiInteraction('error');
       return;
     }
 
     const error2 = validateNameInput(name2);
     if (error2) {
       toast.error(`Name 2: ${error2}`);
+      await uiInteraction('error');
       return;
     }
 
     if (name1.toLowerCase() === name2.toLowerCase()) {
       toast.error('Names cannot be the same');
+      await uiInteraction('error');
       return;
     }
+
+    // Play form submit sound
+    await formSubmit();
 
     setIsLoading(true);
     setTimeout(() => {
@@ -56,10 +64,14 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
     }, 500);
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleInputFocus = () => {
+    sound.playSound('pop');
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isFormValid) {
-      performSubmit('click');
+      await performSubmit('click');
     }
   };
 
@@ -95,6 +107,7 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
                   type="text"
                   value={name1}
                   onChange={(e) => setName1(e.target.value)}
+                  onFocus={handleInputFocus}
                   placeholder="Enter first name..."
                   className="bg-surface-container border-outline/30 text-on-surface placeholder-on-surface-variant focus:ring-primary/50 focus:border-primary hover:border-primary/50 w-full rounded-xl border px-4 py-3 transition-all duration-200 focus:ring-2 focus:outline-none"
                   maxLength={20}
@@ -110,6 +123,7 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
                   type="text"
                   value={name2}
                   onChange={(e) => setName2(e.target.value)}
+                  onFocus={handleInputFocus}
                   placeholder="Enter second name..."
                   className="bg-surface-container border-outline/30 text-on-surface placeholder-on-surface-variant focus:ring-primary/50 focus:border-primary hover:border-primary/50 w-full rounded-xl border px-4 py-3 transition-all duration-200 focus:ring-2 focus:outline-none"
                   maxLength={20}
