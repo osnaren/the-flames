@@ -159,17 +159,30 @@ export function downloadDataUrl(dataUrl: string, filename: string): void {
  * Converts a data URL to a Blob
  */
 export function dataUrlToBlob(dataUrl: string): Blob {
-  const [header, base64Data] = dataUrl.split(',');
-  const mimeMatch = header.match(/:(.*?);/);
-  const mime = mimeMatch ? mimeMatch[1] : 'image/png';
-  const binary = atob(base64Data);
-  const array = new Uint8Array(binary.length);
-
-  for (let i = 0; i < binary.length; i++) {
-    array[i] = binary.charCodeAt(i);
+  if (!dataUrl || !dataUrl.startsWith('data:')) {
+    throw new Error('Invalid data URL');
   }
 
-  return new Blob([array], { type: mime });
+  const [header, base64Data] = dataUrl.split(',');
+  if (!header || !base64Data) {
+    throw new Error('Invalid data URL format');
+  }
+
+  const mimeMatch = header.match(/:(.*?);/);
+  const mime = mimeMatch ? mimeMatch[1] : 'image/png';
+  
+  try {
+    const binary = atob(base64Data);
+    const array = new Uint8Array(binary.length);
+
+    for (let i = 0; i < binary.length; i++) {
+      array[i] = binary.charCodeAt(i);
+    }
+
+    return new Blob([array], { type: mime });
+  } catch (e) {
+    throw new Error('Failed to decode base64 data');
+  }
 }
 
 /**
