@@ -321,7 +321,7 @@ export const THEME_GROUPS: ThemeGroup[] = [
 ];
 
 // ============================================================================
-// BGM TRACKS FOR UI SELECTION (Multiple tracks per theme)
+// BGM TRACKS FOR UI SELECTION (Supports multiple tracks per theme)
 // ============================================================================
 
 export const BGM_TRACKS: BGMTrack[] = [
