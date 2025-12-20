@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 
 import SharePopover from '@/components/ui/SharePopover';
 import { useGameIntegration } from '@/hooks/useGameIntegration';
+import { canShareFiles, downloadBlob } from '@/utils/canvasColor';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import type { FlamesResult, GameStage, NonNullFlamesResult } from '../../types';
 
@@ -121,25 +122,25 @@ function ResultCardContainer({
         return;
       }
 
-      const shareSuccess = await shareAsImage(imageBlob, name1, name2, result);
+      // Check if sharing is supported before attempting
+      const shareSupported = canShareFiles();
+      const shareSuccess = shareSupported ? await shareAsImage(imageBlob, name1, name2, result) : false;
 
       if (shareSuccess) {
         uiInteraction('success');
         toast.success('Shared successfully!', { id: 'capture' });
-      } else {
-        // Fallback to download if share fails
-        const url = URL.createObjectURL(imageBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `flames-result-${Date.now()}.png`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        uiInteraction('success');
-        toast.success('Image downloaded!', { id: 'capture' });
+        return;
       }
-    } catch {
+
+      // Fallback to download if share fails or unsupported
+      const filename = `flames-result-${Date.now()}.png`;
+      downloadBlob(imageBlob, filename);
+      uiInteraction('success');
+      toast.success(shareSupported ? 'Sharing unavailable, image downloaded!' : 'Image downloaded!', {
+        id: 'capture',
+      });
+    } catch (error) {
+      console.error('Share as image failed:', error);
       uiInteraction('error');
       toast.error('Failed to create image. Try again.', { id: 'capture' });
     } finally {
@@ -219,6 +220,8 @@ function ResultCardContainer({
               onClose={() => setIsSharePopoverOpen(false)}
               resultCardRef={resultCardRef}
               shareData={shareData}
+              onShareAsImage={handleShareAsImage}
+              isCapturingImage={isCapturing}
             />
           </motion.div>
         )}
