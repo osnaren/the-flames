@@ -380,7 +380,7 @@ export default function FloatingControlPanel() {
                       Background Music
                     </span>
                   </div>
-                  <MusicPlayer isExpanded={isExpanded} tabIndex={isExpanded ? 0 : -1} />
+                  <MusicPlayer isExpanded={isExpanded} tabIndex={0} />
                 </motion.div>
 
                 <motion.div
