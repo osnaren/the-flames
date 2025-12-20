@@ -123,9 +123,15 @@ function FlamesProcessorComponent({
     isCancelledRef.current = true;
     timeoutsRef.current.forEach(clearTimeout);
     timeoutsRef.current = [];
+
+    // Ensure result BGM plays even when skipping
+    if (result) {
+      resultReveal(result);
+    }
+
     setPhase('complete');
     onCompleteRef.current();
-  }, []);
+  }, [result, resultReveal]);
 
   // Helper to add timeout and track it
   const addTimeout = useCallback((callback: () => void, delay: number) => {
