@@ -17,7 +17,7 @@ const SponsorFAB = dynamic(() => import('@components/sponsor/SponsorFAB'), {
 });
 
 // Web Vitals reporter - only in development or when analytics is needed
-const WebVitalsReporter = dynamic(() => import('@/components/performance/WebVitalsReporter'), { ssr: false });
+// const WebVitalsReporter = dynamic(() => import('@/components/performance/WebVitalsReporter'), { ssr: false });
 
 interface ClientLayoutProps {
   children: ReactNode;
@@ -39,7 +39,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
     <>
       <PreferencesInitializer />
       <SoundController />
-      <WebVitalsReporter />
+      {/* <WebVitalsReporter /> */}
       <div className="from-customBg-1 to-customBg-2 relative flex min-h-screen flex-col bg-linear-to-br transition-colors duration-500">
         <UnifiedBackground />
         <PageTransition>{children}</PageTransition>
