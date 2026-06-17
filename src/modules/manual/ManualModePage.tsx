@@ -14,6 +14,10 @@ const ManualMode = dynamic(() => import('./ManualMode'), {
 function ManualModePage() {
   return (
     <div className="min-h-screen">
+      <header className="sr-only">
+        <h1>Manual FLAMES Mode</h1>
+        <p>Play the classic FLAMES game by crossing out shared letters and counting the remaining letters yourself.</p>
+      </header>
       <ErrorBoundary>
         <ManualMode />
       </ErrorBoundary>
