@@ -524,13 +524,33 @@ export function useSoundSystem() {
     const manager = getManager();
     manager.mount();
 
-    // Preload sounds
-    manager.preloadSounds();
-
     return () => {
       manager.unmount();
     };
   }, [getManager]);
+
+  // Preload optional audio only after user intent. This keeps the initial page payload focused on visible content.
+  useEffect(() => {
+    if (typeof window === 'undefined' || (!isSoundEnabled && !isBGMEnabled)) return;
+
+    const manager = getManager();
+    const preloadOnInteraction = () => {
+      manager.preloadSounds();
+      document.removeEventListener('click', preloadOnInteraction);
+      document.removeEventListener('touchstart', preloadOnInteraction);
+      document.removeEventListener('keydown', preloadOnInteraction);
+    };
+
+    document.addEventListener('click', preloadOnInteraction, { once: true });
+    document.addEventListener('touchstart', preloadOnInteraction, { once: true });
+    document.addEventListener('keydown', preloadOnInteraction, { once: true });
+
+    return () => {
+      document.removeEventListener('click', preloadOnInteraction);
+      document.removeEventListener('touchstart', preloadOnInteraction);
+      document.removeEventListener('keydown', preloadOnInteraction);
+    };
+  }, [isSoundEnabled, isBGMEnabled, getManager]);
 
   // Handle volume changes
   useEffect(() => {
