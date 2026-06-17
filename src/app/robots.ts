@@ -51,6 +51,31 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: 'Google-Extended',
         allow: '/',
       },
+      {
+        // OpenAI user-triggered browsing and retrieval
+        userAgent: 'ChatGPT-User',
+        allow: '/',
+      },
+      {
+        // Perplexity answer and citation crawler
+        userAgent: 'PerplexityBot',
+        allow: '/',
+      },
+      {
+        // Apple AI training opt-in policy
+        userAgent: 'Applebot-Extended',
+        allow: '/',
+      },
+      {
+        // ByteDance crawler
+        userAgent: 'Bytespider',
+        allow: '/',
+      },
+      {
+        // Social preview and AI retrieval crawlers
+        userAgent: ['FacebookBot', 'Amazonbot'],
+        allow: '/',
+      },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,
     host: BASE_URL,
