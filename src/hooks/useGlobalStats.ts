@@ -162,10 +162,9 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
 
       // Implement retry logic for certain errors
       if (retryCount < 3 && !(error instanceof StatsError)) {
-        setRetryCount((prev) => prev + 1);
         setTimeout(
           () => {
-            fetchStats();
+            setRetryCount((prev) => prev + 1);
           },
           Math.pow(2, retryCount) * 1000
         ); // Exponential backoff
