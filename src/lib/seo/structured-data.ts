@@ -1,4 +1,4 @@
-import { faqData, siteConfig } from './config';
+import { siteConfig } from './config';
 
 /**
  * Structured Data Generator for JSON-LD
@@ -82,13 +82,6 @@ export function generateWebApplicationSchema() {
       price: '0',
       priceCurrency: 'USD',
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '1250',
-      bestRating: '5',
-      worstRating: '1',
-    },
     author: {
       '@type': 'Organization',
       name: siteConfig.author.name,
@@ -100,7 +93,7 @@ export function generateWebApplicationSchema() {
     },
     inLanguage: siteConfig.language,
     isAccessibleForFree: true,
-    screenshot: `${siteConfig.url}/og-image.png`,
+    screenshot: `${siteConfig.url}${siteConfig.ogImage}`,
     featureList: [
       'Free online FLAMES game',
       'Instant relationship compatibility results',
@@ -139,24 +132,6 @@ export function generateGameSchema() {
 }
 
 /**
- * FAQ Schema
- */
-export function generateFAQSchema(faqs: typeof faqData = faqData) {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqs.map((faq) => ({
-      '@type': 'Question',
-      name: faq.question,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: faq.answer,
-      },
-    })),
-  };
-}
-
-/**
  * BreadcrumbList Schema
  */
 export function generateBreadcrumbSchema(breadcrumbs: Array<{ name: string; url: string }>) {
@@ -169,70 +144,6 @@ export function generateBreadcrumbSchema(breadcrumbs: Array<{ name: string; url:
       name: item.name,
       item: item.url.startsWith('http') ? item.url : `${siteConfig.url}${item.url}`,
     })),
-  };
-}
-
-/**
- * HowTo Schema for the How It Works page
- */
-export function generateHowToSchema() {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'HowTo',
-    name: 'How to Play FLAMES Game',
-    description: 'Step-by-step guide on how to play the classic FLAMES relationship compatibility game online.',
-    image: `${siteConfig.url}/og-image.png`,
-    totalTime: 'PT1M',
-    estimatedCost: {
-      '@type': 'MonetaryAmount',
-      currency: 'USD',
-      value: '0',
-    },
-    supply: [],
-    tool: [
-      {
-        '@type': 'HowToTool',
-        name: 'Web browser',
-      },
-    ],
-    step: [
-      {
-        '@type': 'HowToStep',
-        name: 'Enter the first name',
-        text: 'Type your name in the first input field.',
-        position: 1,
-      },
-      {
-        '@type': 'HowToStep',
-        name: 'Enter the second name',
-        text: "Type your partner's or friend's name in the second input field.",
-        position: 2,
-      },
-      {
-        '@type': 'HowToStep',
-        name: 'Remove common letters',
-        text: 'The game automatically identifies and removes letters that appear in both names.',
-        position: 3,
-      },
-      {
-        '@type': 'HowToStep',
-        name: 'Count remaining letters',
-        text: 'The total count of remaining letters is calculated.',
-        position: 4,
-      },
-      {
-        '@type': 'HowToStep',
-        name: 'Eliminate FLAMES letters',
-        text: "Using the count, letters are eliminated from 'FLAMES' until one remains.",
-        position: 5,
-      },
-      {
-        '@type': 'HowToStep',
-        name: 'Get your result',
-        text: 'The final letter reveals your relationship: F=Friends, L=Lovers, A=Affection, M=Marriage, E=Enemies, S=Siblings.',
-        position: 6,
-      },
-    ],
   };
 }
 

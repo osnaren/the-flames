@@ -7,7 +7,7 @@ export const siteConfig = {
   name: 'FLAMES Game',
   shortName: 'FLAMES',
   description:
-    'Play the classic FLAMES game online! Discover your relationship compatibility with friends, love interests, and more. Fun, free, and instant results.',
+    'Play the classic FLAMES game online for free. Enter two names to get a quick relationship compatibility result: Friends, Love, Affection, Marriage, Enemies, or Siblings.',
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://theflames.app',
   ogImage: '/og/og.png',
   twitterImage: '/og/og.png',
@@ -53,11 +53,14 @@ export const socialLinks = {
  */
 export const pagesSEO = {
   home: {
-    title: 'FLAMES Game - Free Online Relationship Compatibility Calculator',
+    title: 'FLAMES Game Online - Free Relationship Calculator',
     description:
-      'Play the classic FLAMES game online for free! Enter two names and discover your relationship compatibility - Friends, Lovers, Affection, Marriage, Enemies, or Siblings. Fun, instant results!',
+      'Play the classic FLAMES game online for free. Enter two names for an instant relationship result: Friends, Love, Affection, Marriage, Enemies, or Siblings.',
     keywords: [
       'FLAMES game',
+      'flames online',
+      'flame game',
+      'flames game online',
       'online FLAMES calculator',
       'free love calculator',
       'relationship compatibility',
@@ -121,9 +124,7 @@ export const pagesSEO = {
 export const structuredDataTypes = {
   webApplication: 'WebApplication',
   organization: 'Organization',
-  faqPage: 'FAQPage',
   breadcrumbList: 'BreadcrumbList',
-  howTo: 'HowTo',
   game: 'Game',
 } as const;
 
