@@ -257,6 +257,7 @@ function HomePage() {
             initial={shouldAnimate ? { opacity: 0 } : { opacity: 1 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2, duration: 0.6 }}
+            className="sr-only"
           >
             <SEOContent />
           </motion.div>
