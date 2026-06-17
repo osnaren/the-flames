@@ -15,7 +15,14 @@ export function ErrorCodes() {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="400" className="w-full space-y-6">
-          <div className="scrollbar-hide overflow-x-auto pb-2">
+          {/* Required for Safari keyboard access to the horizontally scrollable tab list. */}
+          { }
+          <div
+            className="scrollbar-hide overflow-x-auto pb-2"
+            role="region"
+            tabIndex={0}
+            aria-label="Error code options"
+          >
             <TabsList className="flex h-max w-max gap-2 bg-transparent p-0">
               {apiDocsConfig.errorCodes.map((error) => (
                 <TabsTrigger

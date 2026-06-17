@@ -51,6 +51,7 @@ function FlamesProcessorComponent({
   const [showSkip, setShowSkip] = useState(false);
   const [countDisplay, setCountDisplay] = useState(0);
   const [showFlames, setShowFlames] = useState(false);
+  const [skipFlamesInitialAnimation, setSkipFlamesInitialAnimation] = useState(false);
 
   // Refs for tracking state across async callbacks
   const currentPositionRef = useRef<number>(-1);
@@ -58,7 +59,6 @@ function FlamesProcessorComponent({
   const remainingIndicesRef = useRef<number[]>([0, 1, 2, 3, 4, 5]);
   const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
   const isCancelledRef = useRef(false);
-  const flamesAnimatedRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
 
   // Keep onComplete ref up to date without triggering effects
@@ -157,7 +157,6 @@ function FlamesProcessorComponent({
     currentPositionRef.current = -1;
     eliminatedRef.current = new Set();
     remainingIndicesRef.current = [0, 1, 2, 3, 4, 5];
-    flamesAnimatedRef.current = false;
 
     // Reset all UI state
     setPhase('names-reveal');
@@ -168,6 +167,7 @@ function FlamesProcessorComponent({
     setShowSkip(false);
     setCountDisplay(0);
     setShowFlames(false);
+    setSkipFlamesInitialAnimation(false);
 
     // Start sequence
     addTimeout(() => setShowSkip(true), 1500);
@@ -178,62 +178,6 @@ function FlamesProcessorComponent({
       timeoutsRef.current = [];
     };
   }, [shouldAnimate, addTimeout, runId]);
-
-  // Phase transition logic
-  useEffect(() => {
-    if (isCancelledRef.current || !shouldAnimate) return;
-
-    switch (phase) {
-      case 'names-reveal':
-        addTimeout(() => setPhase('striking'), PROCESSOR_TIMING.NAMES_REVEAL);
-        break;
-
-      case 'striking': {
-        // Calculate strike indices
-        const { indices1, indices2 } = getStrikeIndices();
-        const allIndices = [
-          ...indices1.map((i) => ({ name: 1, idx: i })),
-          ...indices2.map((i) => ({ name: 2, idx: i })),
-        ];
-
-        // Strike letters after delay
-        addTimeout(() => {
-          setStruckLetters(new Set(allIndices.map(({ name, idx }) => name * 100 + idx)));
-
-          // Play sound for each struck letter
-          allIndices.forEach((_, index) => {
-            letterStrike(index, allIndices.length);
-          });
-
-          // Move to counting after strike duration
-          addTimeout(() => setPhase('counting'), strikeAnimationDuration);
-        }, PROCESSOR_TIMING.STRIKE_DELAY);
-        break;
-      }
-
-      case 'counting':
-        setShowFlames(true);
-        flamesAnimatedRef.current = false;
-
-        // Wait for FLAMES to animate in, then start counting
-        addTimeout(() => {
-          flamesAnimatedRef.current = true;
-          startEliminationProcess();
-        }, 600);
-        break;
-
-      case 'result-reveal':
-        if (result) {
-          resultReveal(result);
-        }
-        addTimeout(() => {
-          setPhase('complete');
-          onCompleteRef.current();
-        }, PROCESSOR_TIMING.RESULT_REVEAL);
-        break;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, shouldAnimate]); // Only re-run when phase changes
 
   // Counting logic
   const startEliminationProcess = useCallback(() => {
@@ -303,6 +247,62 @@ function FlamesProcessorComponent({
 
     runCountingRound();
   }, [addTimeout, safeRemainingCount, flamesCounting]);
+
+  // Phase transition logic
+  useEffect(() => {
+    if (isCancelledRef.current || !shouldAnimate) return;
+
+    switch (phase) {
+      case 'names-reveal':
+        addTimeout(() => setPhase('striking'), PROCESSOR_TIMING.NAMES_REVEAL);
+        break;
+
+      case 'striking': {
+        // Calculate strike indices
+        const { indices1, indices2 } = getStrikeIndices();
+        const allIndices = [
+          ...indices1.map((i) => ({ name: 1, idx: i })),
+          ...indices2.map((i) => ({ name: 2, idx: i })),
+        ];
+
+        // Strike letters after delay
+        addTimeout(() => {
+          setStruckLetters(new Set(allIndices.map(({ name, idx }) => name * 100 + idx)));
+
+          // Play sound for each struck letter
+          allIndices.forEach((_, index) => {
+            letterStrike(index, allIndices.length);
+          });
+
+          // Move to counting after strike duration
+          addTimeout(() => setPhase('counting'), strikeAnimationDuration);
+        }, PROCESSOR_TIMING.STRIKE_DELAY);
+        break;
+      }
+
+      case 'counting':
+        setShowFlames(true);
+        setSkipFlamesInitialAnimation(false);
+
+        // Wait for FLAMES to animate in, then start counting
+        addTimeout(() => {
+          setSkipFlamesInitialAnimation(true);
+          startEliminationProcess();
+        }, 600);
+        break;
+
+      case 'result-reveal':
+        if (result) {
+          resultReveal(result);
+        }
+        addTimeout(() => {
+          setPhase('complete');
+          onCompleteRef.current();
+        }, PROCESSOR_TIMING.RESULT_REVEAL);
+        break;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, shouldAnimate]); // Only re-run when phase changes
 
   const resultData = result ? FLAMES_DATA.find((f) => f.letter === result) : null;
 
@@ -501,19 +501,18 @@ function FlamesProcessorComponent({
                   const isActive = activeFlamesIndex === idx;
                   const isEliminated = eliminatedFlames.has(idx);
                   const isResult = finalResultIndex === idx && (phase === 'result-reveal' || phase === 'complete');
-                  const skipInitialAnimation = flamesAnimatedRef.current;
 
                   return (
                     <motion.div
                       key={item.letter}
                       className="relative"
-                      initial={skipInitialAnimation ? false : { opacity: 0, scale: 0 }}
+                      initial={skipFlamesInitialAnimation ? false : { opacity: 0, scale: 0 }}
                       animate={{
                         opacity: isEliminated ? 0.3 : 1,
                         scale: isResult ? 1.2 : isEliminated ? 0.8 : 1,
                       }}
                       transition={{
-                        delay: skipInitialAnimation ? 0 : idx * 0.08,
+                        delay: skipFlamesInitialAnimation ? 0 : idx * 0.08,
                         duration: 0.3,
                         type: 'spring',
                         stiffness: 200,

@@ -116,7 +116,7 @@ export default function PrivacyPage() {
               🛡️
             </h2>
             <p className="text-on-surface-variant text-lg">Last updated: December 2025</p>
-            <p className="text-on-surface-variant/70 mx-auto mt-2 max-w-xl text-sm italic">
+            <p className="text-on-surface-variant mx-auto mt-2 max-w-xl text-sm italic">
               TL;DR: Your crush&apos;s name stays on your device. We only see &quot;someone got Love&quot; – not who or
               with whom.
             </p>
@@ -180,7 +180,7 @@ export default function PrivacyPage() {
                   ❌ <strong>Advertising profiles</strong> – we don&apos;t do ads, period
                 </li>
               </ul>
-              <p className="text-on-surface-variant/70 mt-4 text-sm italic">
+              <p className="text-on-surface-variant mt-4 text-sm italic">
                 Your secret crush-checking sessions are between you and your browser. Pinky promise. 🤫
               </p>
             </PolicySection>
@@ -204,7 +204,7 @@ export default function PrivacyPage() {
                   <strong>📈 Making Things Better:</strong> Knowing which features people love helps us improve
                 </li>
               </ul>
-              <p className="mt-4 rounded-lg bg-green-500/10 p-3 text-green-600 dark:text-green-400">
+              <p className="mt-4 rounded-lg bg-green-100 p-3 text-green-900 dark:bg-green-500/10 dark:text-green-200">
                 <strong>The Important Part:</strong> Even if someone hacked our database (they won&apos;t, but
                 hypothetically), they&apos;d only find &quot;12,847 people got Love today.&quot; No names, no
                 identities, no drama.
@@ -232,7 +232,7 @@ export default function PrivacyPage() {
                   <strong>📝 Recent Games:</strong> Your last few pairings (stored locally, never leaves your device)
                 </li>
               </ul>
-              <p className="mt-4 text-amber-600 italic dark:text-amber-400">
+              <p className="mt-4 text-amber-800 italic dark:text-amber-200">
                 These aren&apos;t creepy tracking cookies—they&apos;re just your preferences so we remember you like
                 dark mode next time you visit! 🍪
               </p>
@@ -282,7 +282,7 @@ export default function PrivacyPage() {
                   <strong>Google Fonts:</strong> Makes our text look pretty
                 </li>
               </ul>
-              <p className="mt-4 text-teal-600 dark:text-teal-400">
+              <p className="mt-4 text-teal-800 dark:text-teal-200">
                 <strong>What we DON&apos;T use:</strong> No Google Analytics, no Facebook Pixel, no advertising
                 networks, no data brokers. Your data is not for sale. Ever. 🙅‍♂️
               </p>
@@ -307,7 +307,7 @@ export default function PrivacyPage() {
               📜
             </h2>
             <p className="text-on-surface-variant text-lg">The &quot;Rules of the Game&quot; (Shorter than most)</p>
-            <p className="text-on-surface-variant/70 mx-auto mt-2 max-w-xl text-sm italic">
+            <p className="text-on-surface-variant mx-auto mt-2 max-w-xl text-sm italic">
               TL;DR: Have fun, be nice, don&apos;t make life decisions based on FLAMES. Simple!
             </p>
           </motion.div>
@@ -334,7 +334,7 @@ export default function PrivacyPage() {
                   &quot;Enemies.&quot; We&apos;re serious about this one.
                 </li>
               </ul>
-              <p className="text-on-surface-variant/70 mt-4 text-sm italic">
+              <p className="text-on-surface-variant mt-4 text-sm italic">
                 If FLAMES predicts &quot;Marriage&quot; and you actually get married, that&apos;s amazing! But also
                 definitely a coincidence. Invite us to the wedding though? 💒
               </p>
@@ -355,7 +355,7 @@ export default function PrivacyPage() {
                 <li>❌ Don&apos;t spam the service with bots or automated tools</li>
                 <li>❌ Don&apos;t use results to bully or harass anyone (it&apos;s just letters!)</li>
               </ul>
-              <p className="text-on-surface-variant/70 mt-4 text-sm italic">
+              <p className="text-on-surface-variant mt-4 text-sm italic">
                 Basically: Don&apos;t be the person who ruins nice things for everyone else. 🙏
               </p>
             </PolicySection>
@@ -425,7 +425,7 @@ export default function PrivacyPage() {
                   🔐 <strong>No age-gated data:</strong> Since we don&apos;t collect personal info, no COPPA worries
                 </li>
               </ul>
-              <p className="text-on-surface-variant/70 mt-4 text-sm italic">
+              <p className="text-on-surface-variant mt-4 text-sm italic">
                 Play with your parents, play with your kids, play with your grandma. We don&apos;t judge! 👵❤️
               </p>
             </PolicySection>
@@ -454,7 +454,7 @@ export default function PrivacyPage() {
                   <strong>Updates:</strong> We may update these terms occasionally—we&apos;ll keep them equally fun
                 </li>
               </ul>
-              <p className="text-on-surface-variant/70 mt-4 text-sm italic">
+              <p className="text-on-surface-variant mt-4 text-sm italic">
                 By using FLAMES, you agree that it&apos;s all in good fun. Now go check if you and your crush are
                 compatible! (Or enemies. It&apos;s a 1-in-6 chance either way.)
               </p>

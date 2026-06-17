@@ -229,7 +229,7 @@ export default function AboutPage() {
             </h2>
             <p className="text-on-surface-variant mx-auto max-w-2xl text-lg">
               Actual* footage of FLAMES being played throughout history.
-              <span className="text-on-surface-variant/60 mt-1 block text-sm italic">
+              <span className="text-on-surface-variant mt-1 block text-sm italic">
                 *May or may not be AI-generated because we couldn&apos;t find our old notebooks 📚
               </span>
             </p>
@@ -261,7 +261,7 @@ export default function AboutPage() {
               Your destiny awaits. Your crush&apos;s name is probably already on your mind.
               <span className="text-primary font-medium"> Go ahead, we won&apos;t judge.</span>
             </p>
-            <p className="text-on-surface-variant/60 mx-auto mt-3 max-w-xl text-base italic">
+            <p className="text-on-surface-variant mx-auto mt-3 max-w-xl text-base italic">
               (Okay, maybe a little. But only if you get &quot;Enemies.&quot; 😈)
             </p>
           </motion.div>

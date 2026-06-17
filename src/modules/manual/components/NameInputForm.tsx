@@ -8,9 +8,8 @@ import type { NameInputFormProps } from '../types';
 import { validateNameInput } from '../utils';
 
 const containerVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { y: 20 },
   visible: {
-    opacity: 1,
     y: 0,
     transition: {
       duration: 0.5,
@@ -21,8 +20,8 @@ const containerVariants = {
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+  hidden: { y: 10 },
+  visible: { y: 0, transition: { duration: 0.4 } },
 };
 
 export default function NameInputForm({ onNamesSubmit, initialName1 = '', initialName2 = '' }: NameInputFormProps) {

@@ -116,8 +116,8 @@ export function ApiHero() {
 
       {/* Metrics */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ y: 20 }}
+        animate={{ y: 0 }}
         transition={{ delay: 0.8, duration: 0.6 }}
         className="z-10 grid w-full max-w-3xl gap-4 pt-8 sm:grid-cols-3"
       >
@@ -126,24 +126,24 @@ export function ApiHero() {
             key={metric.label}
             className="border-border bg-surface-container-low hover:bg-surface-container hover:border-primary/30 rounded-2xl border p-5 text-center shadow-sm transition-all duration-300"
           >
-            <p className="text-accent-foreground text-xs font-medium tracking-wide uppercase">{metric.label}</p>
+            <p className="text-on-surface text-xs font-medium tracking-wide uppercase">{metric.label}</p>
             <p className="text-foreground mt-1 text-3xl font-bold">{metric.value}</p>
-            <p className="text-accent-foreground mt-1 text-xs">{metric.helper}</p>
+            <p className="text-on-surface mt-1 text-xs">{metric.helper}</p>
           </div>
         ))}
       </motion.div>
 
       {/* Status Badges */}
       <motion.div
-        initial={{ opacity: 0 }}
+        initial={false}
         animate={{ opacity: 1 }}
         transition={{ delay: 1, duration: 0.6 }}
         className="z-10 flex flex-wrap items-center justify-center gap-3 pt-4 text-xs"
       >
-        <span className="rounded-full border border-green-600/40 bg-green-100 px-4 py-1.5 font-medium text-green-800 dark:border-green-500/40 dark:bg-green-500/10 dark:text-green-300">
+        <span className="rounded-full border border-green-700/40 bg-green-100 px-4 py-1.5 font-medium text-green-950 dark:border-green-400/40 dark:bg-green-500/10 dark:text-green-100">
           Uptime {hero.status.uptime}
         </span>
-        <span className="border-border bg-surface-container text-muted-foreground rounded-full border px-4 py-1.5">
+        <span className="border-border bg-surface-container text-on-surface rounded-full border px-4 py-1.5">
           Last deploy {hero.status.lastDeploy}
         </span>
         <span className="border-primary/40 bg-primary/10 text-primary rounded-full border px-4 py-1.5 font-mono">
