@@ -170,7 +170,7 @@ export function dataUrlToBlob(dataUrl: string): Blob {
 
   const mimeMatch = header.match(/:(.*?);/);
   const mime = mimeMatch ? mimeMatch[1] : 'image/png';
-  
+
   try {
     const binary = atob(base64Data);
     const array = new Uint8Array(binary.length);
@@ -180,7 +180,7 @@ export function dataUrlToBlob(dataUrl: string): Blob {
     }
 
     return new Blob([array], { type: mime });
-  } catch (e) {
+  } catch {
     throw new Error('Failed to decode base64 data');
   }
 }

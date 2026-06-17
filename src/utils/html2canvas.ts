@@ -32,32 +32,11 @@ async function loadHtml2Canvas(): Promise<
   }
 
   try {
-    // Prefer the ESM bundle explicitly to avoid the broken default export resolution
-    const esmModule = await import('html2canvas-pro/dist/html2canvas-pro.esm.js');
-    const html2canvasFromEsm =
-      (esmModule as { default?: unknown; html2canvas?: unknown }).default ||
-      (esmModule as { default?: unknown; html2canvas?: unknown }).html2canvas ||
-      (esmModule as unknown);
-
-    if (typeof html2canvasFromEsm === 'function') {
-      const fn = html2canvasFromEsm as (
-        element: HTMLElement,
-        options?: Html2CanvasOptions
-      ) => Promise<HTMLCanvasElement>;
-      cachedHtml2Canvas = fn;
-      return fn;
-    }
-  } catch (error) {
-    console.error('Failed to load html2canvas-pro ESM bundle, falling back to package root:', error);
-  }
-
-  try {
-    // Fallback: attempt to load from package root (may resolve to UMD); treat module.exports as default
-    const fallbackModule = await import('html2canvas-pro');
+    const html2canvasModule = await import('html2canvas-pro');
     const html2canvasFromFallback =
-      (fallbackModule as { default?: unknown; html2canvas?: unknown }).default ||
-      (fallbackModule as { default?: unknown; html2canvas?: unknown }).html2canvas ||
-      (fallbackModule as unknown);
+      (html2canvasModule as { default?: unknown; html2canvas?: unknown }).default ||
+      (html2canvasModule as { default?: unknown; html2canvas?: unknown }).html2canvas ||
+      (html2canvasModule as unknown);
 
     if (typeof html2canvasFromFallback === 'function') {
       const fn = html2canvasFromFallback as (
@@ -68,7 +47,7 @@ async function loadHtml2Canvas(): Promise<
       return fn;
     }
   } catch (error) {
-    console.error('Failed to load html2canvas-pro fallback bundle:', error);
+    console.error('Failed to load html2canvas-pro:', error);
   }
 
   throw new Error('html2canvas-pro did not export a function');
