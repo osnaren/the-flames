@@ -6,7 +6,6 @@ import GlobalErrorBoundary from '@layout/GlobalErrorBoundary';
 import Navbar from '@layout/Navbar';
 import {
   baseMetadata,
-  generateFAQSchema,
   generateGameSchema,
   generateOrganizationSchema,
   generateWebApplicationSchema,
@@ -24,7 +23,7 @@ export const viewport: Viewport = viewportConfig;
 export const metadata: Metadata = {
   ...baseMetadata,
   title: {
-    default: 'FLAMES Game - Free Online Relationship Compatibility Calculator',
+    default: 'FLAMES Game Online - Free Relationship Calculator',
     template: '%s | FLAMES Game',
   },
   appleWebApp: {
@@ -51,7 +50,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const organizationSchema = generateOrganizationSchema();
   const webAppSchema = generateWebApplicationSchema();
   const gameSchema = generateGameSchema();
-  const faqSchema = generateFAQSchema();
 
   return (
     <html lang="en" className={fontVariables} suppressHydrationWarning>
@@ -141,13 +139,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(gameSchema),
-          }}
-        />
-        <script
-          key="json-ld-faq"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(faqSchema),
           }}
         />
       </body>

@@ -1,6 +1,6 @@
 'use client';
 
-import { faqData, generateFAQSchema } from '@/lib/seo';
+import { faqData } from '@/lib/seo';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
@@ -13,46 +13,22 @@ interface FAQItem {
 interface FAQSectionProps {
   faqs?: FAQItem[];
   title?: string;
-  showSchema?: boolean;
   className?: string;
 }
 
 /**
  * SEO-friendly FAQ Section Component
- * Renders FAQ content with proper semantic HTML and JSON-LD structured data
+ * Renders FAQ content with semantic HTML.
  */
-export function FAQSection({
-  faqs = faqData,
-  title = 'Frequently Asked Questions',
-  showSchema = true,
-  className = '',
-}: FAQSectionProps) {
+export function FAQSection({ faqs = faqData, title = 'Frequently Asked Questions', className = '' }: FAQSectionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
-  // Generate schema for SEO
-  const schema = generateFAQSchema(faqs);
-
   return (
-    <section
-      className={`py-12 ${className}`}
-      aria-labelledby="faq-heading"
-      itemScope
-      itemType="https://schema.org/FAQPage"
-    >
-      {/* JSON-LD Structured Data */}
-      {showSchema && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(schema),
-          }}
-        />
-      )}
-
+    <section className={`py-12 ${className}`} aria-labelledby="faq-heading">
       <div className="mx-auto max-w-3xl px-4">
         <h2 id="faq-heading" className="mb-8 text-center text-3xl font-bold text-gray-800 dark:text-white">
           {title}
@@ -63,9 +39,6 @@ export function FAQSection({
             <article
               key={index}
               className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
-              itemScope
-              itemProp="mainEntity"
-              itemType="https://schema.org/Question"
             >
               <button
                 onClick={() => toggleFAQ(index)}
@@ -73,9 +46,7 @@ export function FAQSection({
                 aria-expanded={openIndex === index}
                 aria-controls={`faq-answer-${index}`}
               >
-                <h3 className="pr-4 text-lg font-medium text-gray-800 dark:text-white" itemProp="name">
-                  {faq.question}
-                </h3>
+                <h3 className="pr-4 text-lg font-medium text-gray-800 dark:text-white">{faq.question}</h3>
                 <ChevronDown
                   className={`h-5 w-5 shrink-0 text-gray-500 transition-transform duration-200 ${
                     openIndex === index ? 'rotate-180' : ''
@@ -92,14 +63,9 @@ export function FAQSection({
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    itemScope
-                    itemProp="acceptedAnswer"
-                    itemType="https://schema.org/Answer"
                   >
                     <div className="border-t border-gray-200 px-6 py-4 dark:border-gray-700">
-                      <p className="text-gray-600 dark:text-gray-300" itemProp="text">
-                        {faq.answer}
-                      </p>
+                      <p className="text-gray-600 dark:text-gray-300">{faq.answer}</p>
                     </div>
                   </motion.div>
                 )}

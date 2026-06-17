@@ -1,4 +1,4 @@
-import { generateBreadcrumbSchema, generateHowToSchema, generatePageMetadata, pagesSEO } from '@/lib/seo';
+import { generateBreadcrumbSchema, generatePageMetadata, pagesSEO } from '@/lib/seo';
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 
@@ -22,9 +22,6 @@ const breadcrumbSchema = generateBreadcrumbSchema([
   { name: 'How It Works', url: '/how-it-works' },
 ]);
 
-// HowTo schema for instructional content
-const howToSchema = generateHowToSchema();
-
 export default function Page() {
   return (
     <>
@@ -34,13 +31,6 @@ export default function Page() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(breadcrumbSchema),
-        }}
-      />
-      <script
-        key="json-ld-howto"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(howToSchema),
         }}
       />
       <HowItWorksPage />
