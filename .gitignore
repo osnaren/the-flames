@@ -50,3 +50,7 @@ yarn-error.log*
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+.pydeps
+seo-audit-evidence
+docs/audits/
