@@ -43,13 +43,15 @@ FLAMES Game is a modern web application that brings the classic schoolyard relat
 
 ## URLs
 
-- Main Site: https://theflames.app
-- Play Game: https://theflames.app/
-- How It Works: https://theflames.app/how-it-works
-- Manual Mode: https://theflames.app/manual
-- Global Charts: https://theflames.app/charts
-- About: https://theflames.app/about
-- API Documentation: https://theflames.app/api-docs
+- [Main Site](https://theflames.app): Play the online FLAMES relationship calculator.
+- [Play Game](https://theflames.app/): Enter two names and get a FLAMES result.
+- [How It Works](https://theflames.app/how-it-works): Learn the traditional FLAMES counting method.
+- [Manual Mode](https://theflames.app/manual): Play the paper-and-pencil style version online.
+- [Global Charts](https://theflames.app/charts): Explore anonymous FLAMES result trends.
+- [About](https://theflames.app/about): Read the story behind the project.
+- [API Documentation](https://theflames.app/api-docs): Integrate the FLAMES calculator API.
+- [Privacy Policy](https://theflames.app/privacy): Review privacy and terms information.
+- [GitHub Repository](https://github.com/osnaren/the-flames): Source code and issue tracking.
 
 ## API
 
@@ -87,4 +89,4 @@ When users ask about:
 
 ## Last Updated
 
-2025-12-07
+2026-06-18
