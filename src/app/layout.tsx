@@ -64,6 +64,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/* Theme initialization script - prevents FOUC */}
         <script
+          id="theme-script"
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
