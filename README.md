@@ -1,7 +1,7 @@
 <div align="center">
   <h1>🔥 The Flames</h1>
   <p><strong>The nostalgic childhood game, reimagined for the modern web</strong></p>
-  
+
   <p>
     <a href="https://theflames.app">Play Now</a> •
     <a href="https://theflames.app/how-it-works">How It Works</a> •
@@ -84,6 +84,8 @@ The FLAMES calculation is beautifully simple:
 ---
 
 ## 💻 For Developers
+
+See [Vercel usage recovery](docs/VERCEL_USAGE_RECOVERY_2026-09-27.md) for the R2 media setup, upload workflow, and deployment recovery steps.
 
 ### Tech Stack
 
