@@ -14,6 +14,9 @@ const nextConfig: NextConfig = {
 
   // Optimize images
   images: {
+    // Media assets are served by the R2 custom domain. Avoid routing them
+    // through Vercel's /_next/image endpoint.
+    unoptimized: true,
     // Enable modern image formats
     formats: ['image/avif', 'image/webp'],
     // Define remote patterns for external images
@@ -22,6 +25,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '*.vercel.app',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.osnaren.com',
+        pathname: '/the-flames/v1/**',
       },
     ],
     // Device sizes for responsive images
@@ -98,7 +106,8 @@ const nextConfig: NextConfig = {
               "font-src 'self' https://fonts.gstatic.com data:",
               "img-src 'self' data: blob: https:",
               "worker-src 'self' blob:",
-              "connect-src 'self' https://*.supabase.co https://fonts.googleapis.com https://va.vercel-scripts.com https://vercel.live wss://*.supabase.co https://*.sentry.io https://cdn.jsdelivr.net https://unpkg.com https://lottie.host",
+              "connect-src 'self' https://cdn.osnaren.com https://*.supabase.co https://fonts.googleapis.com https://va.vercel-scripts.com https://vercel.live wss://*.supabase.co https://*.sentry.io https://cdn.jsdelivr.net https://unpkg.com https://lottie.host",
+              "media-src 'self' https://cdn.osnaren.com",
               "frame-src 'self' https://vercel.live",
               "frame-ancestors 'self'",
               "base-uri 'self'",

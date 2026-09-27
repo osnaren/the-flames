@@ -58,6 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL || ''} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link rel="preconnect" href="https://cdn.osnaren.com" crossOrigin="anonymous" />
 
         {/* RSS/Atom feeds (if applicable in future) */}
         {/* <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml" /> */}
