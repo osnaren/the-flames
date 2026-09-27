@@ -287,7 +287,7 @@ const UpiPaymentContent: React.FC<{
       <div className="text-on-surface-variant mt-2 flex flex-col items-center gap-2 text-xs">
         All UPI Apps supported
         <Image
-          src="/upi-apps.png"
+          src="https://cdn.osnaren.com/the-flames/v1/upi-apps.png"
           alt="UPI Apps"
           width={96}
           height={24}

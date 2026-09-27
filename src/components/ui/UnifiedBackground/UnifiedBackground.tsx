@@ -25,7 +25,10 @@ import { useParticleSystem } from './useParticleSystem';
 const StaticBackground = memo(function StaticBackground() {
   return (
     <div className="bg-background fixed inset-0 -z-10 overflow-hidden">
-      <div className="absolute inset-0 bg-[url('/assets/noise.webp')] opacity-5 dark:opacity-[0.03]" />
+      <div
+        className="absolute inset-0 opacity-5 dark:opacity-[0.03]"
+        style={{ backgroundImage: "url('https://cdn.osnaren.com/the-flames/v1/assets/noise-small.webp')" }}
+      />
       <div className="from-primary/5 to-secondary/5 absolute inset-0 bg-linear-to-br" />
     </div>
   );

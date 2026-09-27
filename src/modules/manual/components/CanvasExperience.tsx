@@ -14,12 +14,12 @@ import CanvasTools from './CanvasTools';
 // Enhanced custom cursor system with theme support
 const getCursorConfig = () => ({
   draw: {
-    dark: 'url(/assets/cursor/chalk.png) 15 12, auto',
-    light: 'url(/assets/cursor/pen.png) 6 60, auto',
+    dark: 'url(https://cdn.osnaren.com/the-flames/v1/assets/cursor/chalk.png) 15 12, auto',
+    light: 'url(https://cdn.osnaren.com/the-flames/v1/assets/cursor/pen.png) 6 60, auto',
   },
   eraser: {
-    dark: 'url(/assets/cursor/duster.png) 30 32, auto',
-    light: 'url(/assets/cursor/eraser.png) 20 26, auto',
+    dark: 'url(https://cdn.osnaren.com/the-flames/v1/assets/cursor/duster.png) 30 32, auto',
+    light: 'url(https://cdn.osnaren.com/the-flames/v1/assets/cursor/eraser.png) 20 26, auto',
   },
 });
 
@@ -729,7 +729,7 @@ export default function CanvasExperience({
             <div className="border-outline/30 bg-surface absolute inset-0 overflow-hidden rounded-xl border-2 shadow-2xl sm:rounded-2xl">
               {isDarkMode ? (
                 <Image
-                  src="/assets/blackboard.jpg"
+                  src="https://cdn.osnaren.com/the-flames/v1/assets/blackboard.webp"
                   className="pointer-events-none h-full w-full object-cover select-none"
                   alt="Blackboard background"
                   fill

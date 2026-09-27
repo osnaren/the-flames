@@ -49,7 +49,15 @@ export const sponsorOptions: SponsorOptionConfig[] = [
   {
     id: 'upi',
     label: 'Support via UPI',
-    icon: <Image src="/upi-logo.svg" alt="" width={24} height={24} aria-hidden="true" />,
+    icon: (
+      <Image
+        src="https://cdn.osnaren.com/the-flames/v1/upi-logo.svg"
+        alt=""
+        width={24}
+        height={24}
+        aria-hidden="true"
+      />
+    ),
     bgColor: 'bg-[#e0e4dc] hover:bg-[#e0e4dc]/90',
     textColor: 'text-white',
     action: { type: 'modal', modalId: 'upi' },

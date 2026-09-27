@@ -53,7 +53,7 @@ export function generateOrganizationSchema() {
     '@type': 'Organization',
     name: siteConfig.author.name,
     url: siteConfig.author.url,
-    logo: `${siteConfig.url}/favicon/web-app-manifest-512x512.png`,
+    logo: 'https://cdn.osnaren.com/the-flames/v1/favicon/web-app-manifest-512x512.png',
     sameAs: [
       'https://twitter.com/osnaren',
       'https://github.com/osnaren',
@@ -93,7 +93,7 @@ export function generateWebApplicationSchema() {
     },
     inLanguage: siteConfig.language,
     isAccessibleForFree: true,
-    screenshot: `${siteConfig.url}${siteConfig.ogImage}`,
+    screenshot: siteConfig.ogImage,
     featureList: [
       'Free online FLAMES game',
       'Instant relationship compatibility results',
@@ -175,7 +175,7 @@ export function generateArticleSchema(options: {
       name: siteConfig.publisher,
       logo: {
         '@type': 'ImageObject',
-        url: `${siteConfig.url}/favicon/web-app-manifest-512x512.png`,
+        url: 'https://cdn.osnaren.com/the-flames/v1/favicon/web-app-manifest-512x512.png',
       },
     },
     mainEntityOfPage: {

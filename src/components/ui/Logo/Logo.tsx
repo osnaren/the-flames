@@ -15,7 +15,7 @@ type LogoProps = {
   textClassName?: string;
 };
 
-const LOTTIE_URL = '/assets/logo.json';
+const LOTTIE_URL = 'https://cdn.osnaren.com/the-flames/v1/assets/logo.lottie';
 
 function Logo({
   variant = 'static',

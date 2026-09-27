@@ -13,22 +13,22 @@ import { StoryTimeline } from './components/StoryTimeline';
 const focusCards = [
   {
     title: 'Backbench Chronicles',
-    src: '/assets/about/students-writing.png',
+    src: 'https://cdn.osnaren.com/the-flames/v1/assets/about/students-writing.webp',
   },
   {
     title: 'Chalkboard Confessions',
-    src: '/assets/about/blackboard-flames.png',
+    src: 'https://cdn.osnaren.com/the-flames/v1/assets/about/blackboard-flames.webp',
   },
   {
     title: 'Secret Notebooks',
-    src: '/assets/about/hiding-notebook.png',
+    src: 'https://cdn.osnaren.com/the-flames/v1/assets/about/hiding-notebook.webp',
   },
 ];
 
 const timelineData = [
   {
     title: 'The Origin Story',
-    img: '/assets/about/origin.png',
+    img: 'https://cdn.osnaren.com/the-flames/v1/assets/about/origin.webp',
     content: (
       <div className="space-y-4">
         <p className="text-on-surface-variant text-lg">
@@ -49,7 +49,7 @@ const timelineData = [
   },
   {
     title: 'The Ancient Algorithm',
-    img: '/assets/about/algorithm.png',
+    img: 'https://cdn.osnaren.com/the-flames/v1/assets/about/algorithm.webp',
     content: (
       <div className="space-y-4">
         <p className="text-on-surface-variant text-lg">
@@ -115,7 +115,7 @@ const timelineData = [
   },
   {
     title: 'The Digital Renaissance',
-    img: '/assets/about/digital.png',
+    img: 'https://cdn.osnaren.com/the-flames/v1/assets/about/digital.webp',
     content: (
       <div className="space-y-4">
         <p className="text-on-surface-variant text-lg">

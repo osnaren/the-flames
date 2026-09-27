@@ -260,7 +260,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('/patterns/falling-snow.gif') repeat;
+  background: url('https://cdn.osnaren.com/the-flames/v1/patterns/falling-snow.gif') repeat;
   opacity: 0.1;
   pointer-events: none;
   z-index: -1;

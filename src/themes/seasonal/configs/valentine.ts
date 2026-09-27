@@ -41,7 +41,7 @@ export const valentineTheme: SeasonalThemeConfig = {
       direction: 'swirl',
       animation: 'float',
     },
-    overlayPattern: '/patterns/hearts.png',
+    overlayPattern: 'https://cdn.osnaren.com/the-flames/v1/patterns/hearts.webp',
     overlayOpacity: 0.05,
     glowEffects: true,
     pulsing: true,
@@ -84,13 +84,16 @@ export const valentineTheme: SeasonalThemeConfig = {
     }
   `,
   assets: {
-    logo: '/assets/themes/valentine/logo.svg',
-    background: '/assets/themes/valentine/background.svg',
-    patterns: ['/assets/themes/valentine/hearts-pattern.svg', '/assets/themes/valentine/cupid-pattern.svg'],
+    logo: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/valentine/logo.svg',
+    background: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/valentine/background.svg',
+    patterns: [
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/valentine/hearts-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/valentine/cupid-pattern.svg',
+    ],
     icons: {
-      heart: '/assets/themes/valentine/heart-icon.svg',
-      cupid: '/assets/themes/valentine/cupid-icon.svg',
-      rose: '/assets/themes/valentine/rose-icon.svg',
+      heart: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/valentine/heart-icon.svg',
+      cupid: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/valentine/cupid-icon.svg',
+      rose: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/valentine/rose-icon.svg',
     },
   },
 };

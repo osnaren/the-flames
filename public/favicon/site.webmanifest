@@ -7,19 +7,19 @@
   "id": "/",
   "icons": [
     {
-      "src": "/favicon/web-app-manifest-192x192.png",
+      "src": "https://cdn.osnaren.com/the-flames/v1/favicon/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/favicon/web-app-manifest-512x512.png",
+      "src": "https://cdn.osnaren.com/the-flames/v1/favicon/web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/favicon/favicon-96x96.png",
+      "src": "https://cdn.osnaren.com/the-flames/v1/favicon/favicon-96x96.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
@@ -39,21 +39,21 @@
       "short_name": "Play",
       "description": "Start a new FLAMES game",
       "url": "/",
-      "icons": [{ "src": "/favicon/favicon-96x96.png", "sizes": "96x96" }]
+      "icons": [{ "src": "https://cdn.osnaren.com/the-flames/v1/favicon/favicon-96x96.png", "sizes": "96x96" }]
     },
     {
       "name": "Manual Mode",
       "short_name": "Manual",
       "description": "Play FLAMES manually",
       "url": "/manual",
-      "icons": [{ "src": "/favicon/favicon-96x96.png", "sizes": "96x96" }]
+      "icons": [{ "src": "https://cdn.osnaren.com/the-flames/v1/favicon/favicon-96x96.png", "sizes": "96x96" }]
     },
     {
       "name": "How It Works",
       "short_name": "Tutorial",
       "description": "Learn how FLAMES works",
       "url": "/how-it-works",
-      "icons": [{ "src": "/favicon/favicon-96x96.png", "sizes": "96x96" }]
+      "icons": [{ "src": "https://cdn.osnaren.com/the-flames/v1/favicon/favicon-96x96.png", "sizes": "96x96" }]
     }
   ]
 }

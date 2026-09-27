@@ -41,7 +41,7 @@ export const christmasTheme: SeasonalThemeConfig = {
       direction: 'down',
       animation: 'fall',
     },
-    overlayPattern: '/patterns/snowflakes.svg',
+    overlayPattern: 'https://cdn.osnaren.com/the-flames/v1/patterns/snowflakes.svg',
     overlayOpacity: 0.06,
     glowEffects: true,
     pulsing: true,
@@ -125,27 +125,27 @@ export const christmasTheme: SeasonalThemeConfig = {
       left: 0;
       right: 0;
       bottom: 0;
-      background: url('/patterns/falling-snow.gif') repeat;
+      background: url('https://cdn.osnaren.com/the-flames/v1/patterns/falling-snow.gif') repeat;
       opacity: 0.1;
       pointer-events: none;
       z-index: -1;
     }
   `,
   assets: {
-    logo: '/assets/themes/christmas/logo.svg',
-    background: '/assets/themes/christmas/background.svg',
+    logo: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/christmas/logo.svg',
+    background: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/christmas/background.svg',
     patterns: [
-      '/assets/themes/christmas/snowflakes-pattern.svg',
-      '/assets/themes/christmas/holly-pattern.svg',
-      '/assets/themes/christmas/candy-cane-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/christmas/snowflakes-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/christmas/holly-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/christmas/candy-cane-pattern.svg',
     ],
     icons: {
-      tree: '/assets/themes/christmas/tree-icon.svg',
-      snowflake: '/assets/themes/christmas/snowflake-icon.svg',
-      gift: '/assets/themes/christmas/gift-icon.svg',
-      bell: '/assets/themes/christmas/bell-icon.svg',
-      star: '/assets/themes/christmas/star-icon.svg',
-      candy: '/assets/themes/christmas/candy-cane-icon.svg',
+      tree: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/christmas/tree-icon.svg',
+      snowflake: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/christmas/snowflake-icon.svg',
+      gift: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/christmas/gift-icon.svg',
+      bell: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/christmas/bell-icon.svg',
+      star: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/christmas/star-icon.svg',
+      candy: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/christmas/candy-cane-icon.svg',
     },
   },
 };

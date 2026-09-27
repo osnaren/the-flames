@@ -57,7 +57,7 @@ export const onamTheme: SeasonalThemeConfig = {
       direction: 'down',
       animation: 'float',
     },
-    overlayPattern: '/patterns/onam.png',
+    overlayPattern: 'https://cdn.osnaren.com/the-flames/v1/patterns/onam.webp',
     overlayOpacity: 0.06,
     glowEffects: true,
     pulsing: false, // More serene feel
@@ -153,19 +153,19 @@ export const onamTheme: SeasonalThemeConfig = {
     }
   `,
   assets: {
-    logo: '/assets/themes/onam/logo.svg',
-    background: '/assets/themes/onam/background.svg',
+    logo: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/onam/logo.svg',
+    background: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/onam/background.svg',
     patterns: [
       '/assets/themes/onam/pookolam-pattern.svg',
-      '/assets/themes/onam/flower-pattern.svg',
-      '/assets/themes/onam/kasavu-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/onam/flower-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/onam/kasavu-pattern.svg',
     ],
     icons: {
-      flower: '/assets/themes/onam/flower-icon.svg',
-      banana: '/assets/themes/onam/banana-icon.svg',
-      boat: '/assets/themes/onam/boat-icon.svg',
-      umbrella: '/assets/themes/onam/umbrella-icon.svg',
-      elephant: '/assets/themes/onam/elephant-icon.svg',
+      flower: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/onam/flower-icon.svg',
+      banana: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/onam/banana-icon.svg',
+      boat: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/onam/boat-icon.svg',
+      umbrella: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/onam/umbrella-icon.svg',
+      elephant: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/onam/elephant-icon.svg',
     },
   },
 };

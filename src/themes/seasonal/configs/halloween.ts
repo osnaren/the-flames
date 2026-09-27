@@ -41,7 +41,7 @@ export const halloweenTheme: SeasonalThemeConfig = {
       direction: 'random',
       animation: 'sparkle',
     },
-    overlayPattern: '/patterns/halloween.png',
+    overlayPattern: 'https://cdn.osnaren.com/the-flames/v1/patterns/halloween.webp',
     overlayOpacity: 0.08,
     glowEffects: true,
     pulsing: true,
@@ -108,19 +108,19 @@ export const halloweenTheme: SeasonalThemeConfig = {
     }
   `,
   assets: {
-    logo: '/assets/themes/halloween/logo.svg',
-    background: '/assets/themes/halloween/background.svg',
+    logo: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/halloween/logo.svg',
+    background: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/halloween/background.svg',
     patterns: [
-      '/assets/themes/halloween/spider-web-pattern.svg',
-      '/assets/themes/halloween/bats-pattern.svg',
-      '/assets/themes/halloween/pumpkins-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/halloween/spider-web-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/halloween/bats-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/halloween/pumpkins-pattern.svg',
     ],
     icons: {
-      pumpkin: '/assets/themes/halloween/pumpkin-icon.svg',
-      bat: '/assets/themes/halloween/bat-icon.svg',
-      ghost: '/assets/themes/halloween/ghost-icon.svg',
-      spider: '/assets/themes/halloween/spider-icon.svg',
-      witch: '/assets/themes/halloween/witch-icon.svg',
+      pumpkin: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/halloween/pumpkin-icon.svg',
+      bat: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/halloween/bat-icon.svg',
+      ghost: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/halloween/ghost-icon.svg',
+      spider: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/halloween/spider-icon.svg',
+      witch: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/halloween/witch-icon.svg',
     },
   },
 };

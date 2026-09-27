@@ -49,7 +49,7 @@ export const SOUND_ASSETS = {
   // -------------------------------------------------------------------------
   bgm_default: {
     id: 'bgm_default',
-    src: '/sounds/bgm/mischief-makers.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/bgm/mischief-makers.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.35,
@@ -58,7 +58,7 @@ export const SOUND_ASSETS = {
   },
   bgm_valentine: {
     id: 'bgm_valentine',
-    src: '/sounds/bgm/bgm-valentine.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/bgm/bgm-valentine.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.35,
@@ -67,7 +67,7 @@ export const SOUND_ASSETS = {
   },
   bgm_halloween: {
     id: 'bgm_halloween',
-    src: '/sounds/bgm/bgm-halloween.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/bgm/bgm-halloween.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.35,
@@ -76,7 +76,7 @@ export const SOUND_ASSETS = {
   },
   bgm_christmas: {
     id: 'bgm_christmas',
-    src: '/sounds/bgm/bgm-christmas.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/bgm/bgm-christmas.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.35,
@@ -85,7 +85,7 @@ export const SOUND_ASSETS = {
   },
   bgm_chill: {
     id: 'bgm_chill',
-    src: '/sounds/bgm/bgm-chill.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/bgm/bgm-chill.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.3,
@@ -98,7 +98,7 @@ export const SOUND_ASSETS = {
   // -------------------------------------------------------------------------
   bgm_result_love: {
     id: 'bgm_result_love',
-    src: '/sounds/bgm/bgm-result-love.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/bgm/bgm-result-love.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.4,
@@ -107,7 +107,7 @@ export const SOUND_ASSETS = {
   },
   bgm_result_friendship: {
     id: 'bgm_result_friendship',
-    src: '/sounds/bgm/bgm-result-friendship.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/bgm/bgm-result-friendship.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.4,
@@ -116,7 +116,7 @@ export const SOUND_ASSETS = {
   },
   bgm_result_marriage: {
     id: 'bgm_result_marriage',
-    src: '/sounds/bgm/bgm-result-marriage.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/bgm/bgm-result-marriage.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.4,
@@ -125,7 +125,7 @@ export const SOUND_ASSETS = {
   },
   bgm_result_enemy: {
     id: 'bgm_result_enemy',
-    src: '/sounds/bgm/bgm-result-enemy.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/bgm/bgm-result-enemy.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.4,
@@ -134,7 +134,7 @@ export const SOUND_ASSETS = {
   },
   bgm_result_sibling: {
     id: 'bgm_result_sibling',
-    src: '/sounds/bgm/bgm-result-sibling.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/bgm/bgm-result-sibling.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.4,
@@ -143,7 +143,7 @@ export const SOUND_ASSETS = {
   },
   bgm_result_affection: {
     id: 'bgm_result_affection',
-    src: '/sounds/bgm/bgm-result-affection.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/bgm/bgm-result-affection.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.4,
@@ -156,7 +156,7 @@ export const SOUND_ASSETS = {
   // -------------------------------------------------------------------------
   click: {
     id: 'click',
-    src: '/sounds/click.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/click.mp3',
     category: 'sfx',
     volume: 0.4,
     preload: true,
@@ -165,7 +165,7 @@ export const SOUND_ASSETS = {
   },
   hover: {
     id: 'hover',
-    src: '/sounds/hover.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/hover.mp3',
     category: 'sfx',
     volume: 0.15,
     preload: true,
@@ -174,7 +174,7 @@ export const SOUND_ASSETS = {
   },
   toggle: {
     id: 'toggle',
-    src: '/sounds/toggle.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/toggle.mp3',
     category: 'sfx',
     volume: 0.35,
     preload: true,
@@ -187,7 +187,7 @@ export const SOUND_ASSETS = {
   // -------------------------------------------------------------------------
   success: {
     id: 'success',
-    src: '/sounds/success.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/success.mp3',
     category: 'sfx',
     volume: 0.55,
     preload: true,
@@ -196,7 +196,7 @@ export const SOUND_ASSETS = {
   },
   error: {
     id: 'error',
-    src: '/sounds/error.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/error.mp3',
     category: 'sfx',
     volume: 0.45,
     preload: true,
@@ -215,7 +215,7 @@ export const SOUND_ASSETS = {
   // },
   resultReveal: {
     id: 'resultReveal',
-    src: '/sounds/reveal.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/reveal.mp3',
     category: 'sfx',
     volume: 0.6,
     preload: true,
@@ -224,7 +224,7 @@ export const SOUND_ASSETS = {
   },
   letterStrike: {
     id: 'letterStrike',
-    src: '/sounds/letter-strike.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/letter-strike.mp3',
     category: 'sfx',
     volume: 0.35,
     preload: true,
@@ -233,7 +233,7 @@ export const SOUND_ASSETS = {
   },
   flamesCount: {
     id: 'flamesCount',
-    src: '/sounds/flames-count.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/flames-count.mp3',
     category: 'sfx',
     volume: 0.4,
     preload: true,
@@ -251,7 +251,7 @@ export const SOUND_ASSETS = {
   // },
   formSubmit: {
     id: 'formSubmit',
-    src: '/sounds/form-submit.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/form-submit.mp3',
     category: 'sfx',
     volume: 0.5,
     preload: true,
@@ -260,7 +260,7 @@ export const SOUND_ASSETS = {
   },
   heartbeat: {
     id: 'heartbeat',
-    src: '/sounds/heartbeat.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/heartbeat.mp3',
     category: 'sfx',
     volume: 0.45,
     loop: true,
@@ -270,7 +270,7 @@ export const SOUND_ASSETS = {
   },
   sparkle: {
     id: 'sparkle',
-    src: '/sounds/sparkle.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/sparkle.mp3',
     category: 'sfx',
     volume: 0.4,
     preload: true,
@@ -279,7 +279,7 @@ export const SOUND_ASSETS = {
   },
   whoosh: {
     id: 'whoosh',
-    src: '/sounds/whoosh.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/whoosh.mp3',
     category: 'sfx',
     volume: 0.35,
     preload: true,
@@ -288,7 +288,7 @@ export const SOUND_ASSETS = {
   },
   pop: {
     id: 'pop',
-    src: '/sounds/pop.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/pop.mp3',
     category: 'sfx',
     volume: 0.4,
     preload: true,
@@ -297,7 +297,7 @@ export const SOUND_ASSETS = {
   },
   delete: {
     id: 'delete',
-    src: '/sounds/delete.mp3',
+    src: 'https://cdn.osnaren.com/the-flames/v1/sounds/delete.mp3',
     category: 'sfx',
     volume: 0.5,
     preload: true,

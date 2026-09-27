@@ -56,7 +56,7 @@ export const newYearTheme: SeasonalThemeConfig = {
       direction: 'up',
       animation: 'sparkle',
     },
-    overlayPattern: '/patterns/fireworks.png',
+    overlayPattern: 'https://cdn.osnaren.com/the-flames/v1/patterns/fireworks.webp',
     overlayOpacity: 0.08,
     glowEffects: true,
     pulsing: true,
@@ -135,18 +135,18 @@ export const newYearTheme: SeasonalThemeConfig = {
     }
   `,
   assets: {
-    logo: '/assets/themes/newYear/logo.svg',
-    background: '/assets/themes/newYear/background.svg',
+    logo: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/newYear/logo.svg',
+    background: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/newYear/background.svg',
     patterns: [
-      '/assets/themes/newYear/fireworks-pattern.svg',
-      '/assets/themes/newYear/confetti-pattern.svg',
-      '/assets/themes/newYear/stars-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/newYear/fireworks-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/newYear/confetti-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/newYear/stars-pattern.svg',
     ],
     icons: {
-      firework: '/assets/themes/newYear/firework-icon.svg',
-      champagne: '/assets/themes/newYear/champagne-icon.svg',
-      clock: '/assets/themes/newYear/clock-icon.svg',
-      confetti: '/assets/themes/newYear/confetti-icon.svg',
+      firework: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/newYear/firework-icon.svg',
+      champagne: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/newYear/champagne-icon.svg',
+      clock: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/newYear/clock-icon.svg',
+      confetti: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/newYear/confetti-icon.svg',
     },
   },
 };

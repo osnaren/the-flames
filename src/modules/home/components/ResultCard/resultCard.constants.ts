@@ -57,12 +57,12 @@ function formatNames(name1?: string, name2?: string): string {
 // ============================================================================
 
 export const RESULT_ICONS: Record<NonNullFlamesResult, string> = {
-  F: '/assets/game/friends.png',
-  L: '/assets/game/love.png',
-  A: '/assets/game/affection.png',
-  M: '/assets/game/marriage.png',
-  E: '/assets/game/enemy.png',
-  S: '/assets/game/siblings.png',
+  F: 'https://cdn.osnaren.com/the-flames/v1/assets/game/friends.webp',
+  L: 'https://cdn.osnaren.com/the-flames/v1/assets/game/love.webp',
+  A: 'https://cdn.osnaren.com/the-flames/v1/assets/game/affection.webp',
+  M: 'https://cdn.osnaren.com/the-flames/v1/assets/game/marriage.webp',
+  E: 'https://cdn.osnaren.com/the-flames/v1/assets/game/enemy.webp',
+  S: 'https://cdn.osnaren.com/the-flames/v1/assets/game/siblings.webp',
 };
 
 export const RESULT_LABELS: Record<NonNullFlamesResult, string> = {

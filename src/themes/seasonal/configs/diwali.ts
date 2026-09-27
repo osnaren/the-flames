@@ -57,7 +57,7 @@ export const diwaliTheme: SeasonalThemeConfig = {
       direction: 'up',
       animation: 'sparkle',
     },
-    overlayPattern: '/patterns/diwali.png',
+    overlayPattern: 'https://cdn.osnaren.com/the-flames/v1/patterns/diwali.webp',
     overlayOpacity: 0.07,
     glowEffects: true,
     pulsing: true,
@@ -154,19 +154,19 @@ export const diwaliTheme: SeasonalThemeConfig = {
     }
   `,
   assets: {
-    logo: '/assets/themes/diwali/logo.svg',
-    background: '/assets/themes/diwali/background.svg',
+    logo: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/diwali/logo.svg',
+    background: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/diwali/background.svg',
     patterns: [
-      '/assets/themes/diwali/rangoli-pattern.svg',
-      '/assets/themes/diwali/diya-pattern.svg',
-      '/assets/themes/diwali/paisley-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/diwali/rangoli-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/diwali/diya-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/diwali/paisley-pattern.svg',
     ],
     icons: {
-      diya: '/assets/themes/diwali/diya-icon.svg',
-      rangoli: '/assets/themes/diwali/rangoli-icon.svg',
-      sparkler: '/assets/themes/diwali/sparkler-icon.svg',
-      firework: '/assets/themes/diwali/firework-icon.svg',
-      lantern: '/assets/themes/diwali/lantern-icon.svg',
+      diya: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/diwali/diya-icon.svg',
+      rangoli: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/diwali/rangoli-icon.svg',
+      sparkler: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/diwali/sparkler-icon.svg',
+      firework: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/diwali/firework-icon.svg',
+      lantern: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/diwali/lantern-icon.svg',
     },
   },
 };

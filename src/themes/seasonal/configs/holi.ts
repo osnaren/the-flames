@@ -68,7 +68,7 @@ export const holiTheme: SeasonalThemeConfig = {
       direction: 'random',
       animation: 'sparkle',
     },
-    overlayPattern: '/patterns/color-splash.svg',
+    overlayPattern: 'https://cdn.osnaren.com/the-flames/v1/patterns/color-splash.svg',
     overlayOpacity: 0.1,
     glowEffects: true,
     pulsing: true,
@@ -178,18 +178,18 @@ export const holiTheme: SeasonalThemeConfig = {
     }
   `,
   assets: {
-    logo: '/assets/themes/holi/logo.svg',
-    background: '/assets/themes/holi/background.svg',
+    logo: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/holi/logo.svg',
+    background: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/holi/background.svg',
     patterns: [
-      '/assets/themes/holi/splash-pattern.svg',
-      '/assets/themes/holi/powder-pattern.svg',
-      '/assets/themes/holi/dots-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/holi/splash-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/holi/powder-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/holi/dots-pattern.svg',
     ],
     icons: {
-      splash: '/assets/themes/holi/splash-icon.svg',
-      pichkari: '/assets/themes/holi/pichkari-icon.svg',
-      gulal: '/assets/themes/holi/gulal-icon.svg',
-      balloon: '/assets/themes/holi/balloon-icon.svg',
+      splash: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/holi/splash-icon.svg',
+      pichkari: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/holi/pichkari-icon.svg',
+      gulal: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/holi/gulal-icon.svg',
+      balloon: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/holi/balloon-icon.svg',
     },
   },
 };

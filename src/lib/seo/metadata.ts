@@ -73,12 +73,12 @@ export const baseMetadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
-      { url: '/favicon/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon/favicon.ico' },
+      { url: 'https://cdn.osnaren.com/the-flames/v1/favicon/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
+      { url: 'https://cdn.osnaren.com/the-flames/v1/favicon/favicon.svg', type: 'image/svg+xml' },
+      { url: 'https://cdn.osnaren.com/the-flames/v1/favicon/favicon.ico' },
     ],
-    apple: [{ url: '/favicon/apple-touch-icon.png', sizes: '180x180' }],
-    shortcut: '/favicon/favicon.ico',
+    apple: [{ url: 'https://cdn.osnaren.com/the-flames/v1/favicon/apple-touch-icon.png', sizes: '180x180' }],
+    shortcut: 'https://cdn.osnaren.com/the-flames/v1/favicon/favicon.ico',
   },
   manifest: '/favicon/site.webmanifest',
   alternates: {

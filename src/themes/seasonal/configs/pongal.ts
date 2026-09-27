@@ -57,7 +57,7 @@ export const pongalTheme: SeasonalThemeConfig = {
       direction: 'up',
       animation: 'float',
     },
-    overlayPattern: '/patterns/pongal.jpg',
+    overlayPattern: 'https://cdn.osnaren.com/the-flames/v1/patterns/pongal.webp',
     overlayOpacity: 0.05,
     glowEffects: true,
     pulsing: true,
@@ -163,19 +163,19 @@ export const pongalTheme: SeasonalThemeConfig = {
     }
   `,
   assets: {
-    logo: '/assets/themes/pongal/logo.svg',
-    background: '/assets/themes/pongal/background.svg',
+    logo: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/pongal/logo.svg',
+    background: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/pongal/background.svg',
     patterns: [
-      '/assets/themes/pongal/kolam-pattern.svg',
-      '/assets/themes/pongal/sugarcane-pattern.svg',
-      '/assets/themes/pongal/pot-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/pongal/kolam-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/pongal/sugarcane-pattern.svg',
+      'https://cdn.osnaren.com/the-flames/v1/assets/themes/pongal/pot-pattern.svg',
     ],
     icons: {
-      pot: '/assets/themes/pongal/pot-icon.svg',
-      sugarcane: '/assets/themes/pongal/sugarcane-icon.svg',
-      kolam: '/assets/themes/pongal/kolam-icon.svg',
-      sun: '/assets/themes/pongal/sun-icon.svg',
-      cow: '/assets/themes/pongal/cow-icon.svg',
+      pot: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/pongal/pot-icon.svg',
+      sugarcane: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/pongal/sugarcane-icon.svg',
+      kolam: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/pongal/kolam-icon.svg',
+      sun: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/pongal/sun-icon.svg',
+      cow: 'https://cdn.osnaren.com/the-flames/v1/assets/themes/pongal/cow-icon.svg',
     },
   },
 };

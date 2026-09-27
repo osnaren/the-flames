@@ -338,7 +338,10 @@ function BackgroundEffects({
   return (
     <>
       {/* Noise Texture */}
-      <div className="absolute inset-0 bg-[url('/assets/noise.webp')] opacity-5 dark:opacity-[0.03]" />
+      <div
+        className="absolute inset-0 opacity-5 dark:opacity-[0.03]"
+        style={{ backgroundImage: "url('https://cdn.osnaren.com/the-flames/v1/assets/noise-small.webp')" }}
+      />
 
       {/* Radial Glow Effects - Only on desktop/high power */}
       {showHeavyEffects && (
