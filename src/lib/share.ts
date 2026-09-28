@@ -23,7 +23,7 @@ interface ShareOptions {
  */
 export const generateShareUrl = (name1: string, name2: string, result?: string | null): string => {
   const url = new URL(window.location.href);
-  url.pathname = '/';
+  url.pathname = '/share';
   url.searchParams.set('name1', name1);
   url.searchParams.set('name2', name2);
   if (result) {

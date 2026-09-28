@@ -98,24 +98,25 @@ export const getUserCountry = async (): Promise<string | null> => {
   if (cached) return cached;
 
   try {
-    // 1. Try our local optimized API route (fastest, uses Vercel headers)
-    try {
-      const localResponse = await fetch('/api/geo', {
-        // Use cache for geo requests
-        next: { revalidate: 3600 }, // Cache for 1 hour
-      } as RequestInit);
-      if (localResponse.ok) {
-        const { country } = await localResponse.json();
-        if (country) {
-          setCache(COUNTRY_CACHE_KEY, country, COUNTRY_CACHE_TTL);
-          return country;
+    // The local route only knows the country on Vercel. Skip its function invocation on Netlify.
+    if (process.env.NEXT_PUBLIC_DEPLOY_PLATFORM !== 'netlify') {
+      try {
+        const localResponse = await fetch('/api/geo', {
+          next: { revalidate: 3600 },
+        } as RequestInit);
+        if (localResponse.ok) {
+          const { country } = await localResponse.json();
+          if (country) {
+            setCache(COUNTRY_CACHE_KEY, country, COUNTRY_CACHE_TTL);
+            return country;
+          }
         }
+      } catch (_e) {
+        // Local API unavailable, fall back to Edge Function.
       }
-    } catch (_e) {
-      // Local API unavailable, fall back to Edge Function
     }
 
-    // 2. Fallback to Supabase Edge Function (uses IP geolocation)
+    // Fallback to Supabase Edge Function (uses IP geolocation).
     const response = await withRetry(() =>
       fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-country`, {
         headers: {

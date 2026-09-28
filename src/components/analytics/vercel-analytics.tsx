@@ -10,5 +10,6 @@ import { Analytics } from '@vercel/analytics/react';
  * of user behavior and application performance.
  */
 export default function VercelAnalytics() {
+  if (process.env.NEXT_PUBLIC_DEPLOY_PLATFORM === 'netlify') return null;
   return <Analytics />;
 }
