@@ -6,12 +6,13 @@ import { siteConfig } from './config';
  */
 
 /**
- * WebSite Schema with Search Action (for sitelinks search box)
+ * WebSite identity. The calculator is not a site-search endpoint.
  */
 export function generateWebSiteSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
+    '@id': `${siteConfig.url}/#website`,
     name: siteConfig.name,
     alternateName: ['FLAMES', 'FLAMES Calculator', 'FLAMES Game Online'],
     url: siteConfig.url,
@@ -21,25 +22,6 @@ export function generateWebSiteSchema() {
     creator: {
       '@type': 'Organization',
       name: siteConfig.creator,
-    },
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: `${siteConfig.url}/?name1={name1}&name2={name2}`,
-      },
-      'query-input': [
-        {
-          '@type': 'PropertyValueSpecification',
-          valueRequired: true,
-          valueName: 'name1',
-        },
-        {
-          '@type': 'PropertyValueSpecification',
-          valueRequired: true,
-          valueName: 'name2',
-        },
-      ],
     },
   };
 }
@@ -51,6 +33,7 @@ export function generateOrganizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
+    '@id': `${siteConfig.author.url}/#organization`,
     name: siteConfig.author.name,
     url: siteConfig.author.url,
     logo: 'https://cdn.osnaren.com/the-flames/v1/favicon/web-app-manifest-512x512.png',
@@ -70,6 +53,7 @@ export function generateWebApplicationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
+    '@id': `${siteConfig.url}/#application`,
     name: siteConfig.name,
     alternateName: 'FLAMES Calculator',
     description: siteConfig.description,
@@ -116,13 +100,11 @@ export function generateGameSchema() {
     description: siteConfig.description,
     url: siteConfig.url,
     genre: ['Casual', 'Word Game', 'Relationship Game'],
-    gamePlatform: ['Web Browser'],
     numberOfPlayers: {
       '@type': 'QuantitativeValue',
       minValue: 1,
       maxValue: 2,
     },
-    playMode: 'SinglePlayer',
     inLanguage: siteConfig.language,
     author: {
       '@type': 'Organization',
@@ -163,8 +145,8 @@ export function generateArticleSchema(options: {
     headline: options.title,
     description: options.description,
     url: options.url,
-    datePublished: options.datePublished || '2025-01-01',
-    dateModified: options.dateModified || new Date().toISOString().split('T')[0],
+    ...(options.datePublished && { datePublished: options.datePublished }),
+    ...(options.dateModified && { dateModified: options.dateModified }),
     author: {
       '@type': 'Organization',
       name: siteConfig.author.name,
@@ -213,22 +195,18 @@ export function generateWebPageSchema(options: {
 }
 
 /**
- * SoftwareApplication Schema for API Documentation
+ * Describe API documentation without implying a separate consumer application.
  */
 export function generateAPISchema() {
   return {
     '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: 'FLAMES Game API',
-    description:
-      'Free API for calculating FLAMES relationship compatibility. Integrate the classic game into your applications.',
-    applicationCategory: 'DeveloperApplication',
-    operatingSystem: 'Any',
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'USD',
-    },
+    '@type': 'TechArticle',
+    '@id': `${siteConfig.url}/api-docs#documentation`,
+    url: `${siteConfig.url}/api-docs`,
+    headline: 'FLAMES API Documentation',
+    description: 'Developer documentation for the FLAMES name-game API, including request and response examples.',
+    inLanguage: siteConfig.language,
+    about: { '@type': 'WebAPI', name: 'FLAMES Game API' },
     author: {
       '@type': 'Organization',
       name: siteConfig.author.name,

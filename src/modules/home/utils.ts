@@ -92,8 +92,10 @@ const findMatches = (name1: string, name2: string, trackCommonLetters: boolean =
 export const findCommonLetters = (name1: string, name2: string): string[] => {
   const n1 = sanitizeName(name1);
   const n2 = sanitizeName(name2);
-  const { common } = findMatches(n1, n2, true);
-  return Array.from(common || []);
+  const { matched1 } = findMatches(n1, n2);
+  // Preserve every matched occurrence so the animated cancellation count agrees
+  // with the result calculation when names share repeated letters.
+  return [...n1].filter((_, index) => matched1.has(index));
 };
 
 /**

@@ -205,6 +205,28 @@ export default function AboutPage() {
         </motion.div>
       </section>
 
+      <section className="mx-auto max-w-3xl space-y-4 px-4 py-12" aria-labelledby="project-creator">
+        <h2 id="project-creator" className="font-heading text-on-surface text-2xl font-bold">
+          About this FLAMES app
+        </h2>
+        <p className="text-on-surface-variant leading-7">
+          FLAMES Game is a free browser project by osLabs, bringing the paper-and-pencil name game online with animated
+          calculations, manual play, and shareable result cards. You can explore the implementation in the{' '}
+          <a href="https://github.com/osnaren/the-flames" className="text-primary underline underline-offset-4">
+            public source repository
+          </a>{' '}
+          or follow our{' '}
+          <Link href="/how-it-works" className="text-primary underline underline-offset-4">
+            explanation of the rules
+          </Link>
+          .
+        </p>
+        <p className="text-on-surface-variant leading-7">
+          The schoolyard stories below are playful nostalgia, not a documented history of who invented FLAMES. The game
+          is for entertainment and has no scientific validity as a relationship test.
+        </p>
+      </section>
+
       {/* Sticky Scroll Story Section */}
       <StoryTimeline items={timelineData} />
 
@@ -299,7 +321,7 @@ export default function AboutPage() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="text-on-surface-variant/50 pt-6 text-sm"
           >
-            🔥 Over a million hearts ignited • 💕 Countless crushes confirmed • 📊 Zero scientific validity
+            🔥 Free to play • 💕 Made for fun • 📊 Zero scientific validity
           </motion.p>
         </div>
       </section>

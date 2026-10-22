@@ -25,7 +25,7 @@ function PageTransition({ children, className = '' }: PageTransitionProps) {
   }
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence initial={false} mode="wait">
       <motion.div
         key={pathname}
         initial={{ opacity: 0, y: 8 }}

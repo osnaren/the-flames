@@ -23,7 +23,7 @@ export const viewport: Viewport = viewportConfig;
 export const metadata: Metadata = {
   ...baseMetadata,
   title: {
-    default: 'FLAMES Game Online - Free Relationship Calculator',
+    default: 'FLAMES Calculator — Free Online Name Game',
     template: '%s | FLAMES Game',
   },
   appleWebApp: {

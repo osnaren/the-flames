@@ -12,7 +12,6 @@ import { AnimatedHeader } from './components/AnimatedHeader';
 import { InputForm } from './components/InputForm';
 import { RecentMatchesSection } from './components/RecentMatches';
 import type { MatchEntry } from './components/RecentMatches/types';
-import { SEOContent } from './components/SEOContent';
 import { useFlamesEngine } from './hooks/useFlamesEngine';
 
 // Dynamically loaded components for code splitting
@@ -141,7 +140,7 @@ function HomePage() {
           {stage === 'input' && (
             <motion.div
               key="input-stage"
-              initial={shouldAnimate ? { opacity: 0, y: 30 } : false}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               exit={{
                 opacity: 0,
@@ -248,18 +247,6 @@ function HomePage() {
             transition={{ delay: 1, duration: 0.5 }}
           >
             <RecentMatchesSection displayCount={5} onMatchClick={handleMatchReplay} />
-          </motion.div>
-        )}
-
-        {/* SEO Content - only on input stage */}
-        {stage === 'input' && (
-          <motion.div
-            initial={shouldAnimate ? { opacity: 0 } : { opacity: 1 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 0.6 }}
-            className="sr-only"
-          >
-            <SEOContent />
           </motion.div>
         )}
       </div>

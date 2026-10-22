@@ -46,7 +46,7 @@ function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) 
       role="group"
       aria-label="FLAMES title"
       className="font-handwriting relative mb-8 text-center md:mb-12"
-      initial={shouldAnimate ? { opacity: 0, y: -20 } : { opacity: 1, y: 0 }}
+      initial={false}
       animate={{
         opacity: 1,
         y: 0,
@@ -57,13 +57,11 @@ function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) 
         ease: [0.25, 0.46, 0.45, 0.94],
       }}
     >
-      <h1 className="sr-only">FLAMES - Relationship Calculator</h1>
-
       {/* Main FLAMES Title */}
       <motion.div
         className="relative mb-4 flex items-center justify-center gap-1 md:gap-2"
         variants={letterContainerVariants}
-        initial={shouldAnimate ? 'hidden' : 'visible'}
+        initial="visible"
         animate="visible"
         style={{ perspective: '1000px' }}
       >
@@ -132,10 +130,14 @@ function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) 
         ))}
       </motion.div>
 
+      <h1 className="font-heading text-on-surface mb-3 text-xl font-bold md:text-2xl">
+        FLAMES Calculator — Play the Name Game
+      </h1>
+
       {/* Subtitle */}
       <motion.p
         className="font-heading text-on-surface-variant mx-auto max-w-md text-lg font-medium md:text-xl lg:text-2xl"
-        initial={shouldAnimate ? { opacity: 0, y: 10 } : { opacity: 1 }}
+        initial={false}
         animate={{ opacity: isCompact ? 0.7 : 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.5 }}
       >

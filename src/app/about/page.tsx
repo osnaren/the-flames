@@ -1,4 +1,4 @@
-import { generateArticleSchema, generateBreadcrumbSchema, generatePageMetadata, pagesSEO, siteConfig } from '@/lib/seo';
+import { generateBreadcrumbSchema, generatePageMetadata, generateWebPageSchema, pagesSEO } from '@/lib/seo';
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 
@@ -23,12 +23,14 @@ const breadcrumbSchema = generateBreadcrumbSchema([
 ]);
 
 // Article schema for the about page content
-const articleSchema = generateArticleSchema({
-  title: pagesSEO.about.title,
-  description: pagesSEO.about.description,
-  url: `${siteConfig.url}/about`,
-  datePublished: '2025-12-01',
-});
+const articleSchema = {
+  ...generateWebPageSchema({
+    title: pagesSEO.about.title,
+    description: pagesSEO.about.description,
+    url: '/about',
+  }),
+  '@type': 'AboutPage',
+};
 
 export default function Page() {
   return (

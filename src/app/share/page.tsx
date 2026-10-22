@@ -1,6 +1,7 @@
 import { generatePageMetadata, generateResultMetadata, pagesSEO, siteConfig } from '@/lib/seo';
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 
 // Dynamic import for client component
 const HomePage = dynamic(() => import('@modules/home/HomePage'), {
@@ -18,6 +19,11 @@ interface PageProps {
  * Otherwise, use default home page metadata
  */
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  // Personal result URLs are social previews, not independent search pages.
+  const searchMetadata: Metadata = {
+    robots: { index: false, follow: true },
+    alternates: { canonical: `${siteConfig.url}/` },
+  };
   const params = await searchParams;
   const name1 = typeof params.name1 === 'string' ? params.name1 : undefined;
   const name2 = typeof params.name2 === 'string' ? params.name2 : undefined;
@@ -35,7 +41,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 
     if (isValidResult) {
       // Generate full result metadata with custom OG image
-      return generateResultMetadata(sanitizedName1, sanitizedName2, validResult);
+      return { ...generateResultMetadata(sanitizedName1, sanitizedName2, validResult), ...searchMetadata };
     }
 
     // Names provided but no/invalid result - generate preview metadata
@@ -44,6 +50,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     const ogImageUrl = `${siteConfig.url}/api/og/result?name1=${encodeURIComponent(sanitizedName1)}&name2=${encodeURIComponent(sanitizedName2)}`;
 
     return {
+      ...searchMetadata,
       title,
       description,
       openGraph: {
@@ -71,15 +78,22 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   }
 
   // Default home page metadata
-  return generatePageMetadata({
-    title: pagesSEO.home.title,
-    description: pagesSEO.home.description,
-    keywords: pagesSEO.home.keywords,
-    path: '/share',
-    ogImage: pagesSEO.home.ogImage,
-  });
+  return {
+    ...generatePageMetadata({
+      title: pagesSEO.home.title,
+      description: pagesSEO.home.description,
+      keywords: pagesSEO.home.keywords,
+      path: '/share',
+      ogImage: pagesSEO.home.ogImage,
+    }),
+    ...searchMetadata,
+  };
 }
 
 export default function Page() {
-  return <HomePage />;
+  return (
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <HomePage />
+    </Suspense>
+  );
 }

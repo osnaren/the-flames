@@ -53,9 +53,9 @@ export const socialLinks = {
  */
 export const pagesSEO = {
   home: {
-    title: 'FLAMES Game Online - Free Relationship Calculator',
+    title: 'FLAMES Calculator — Free Online Name Game',
     description:
-      'Play the classic FLAMES game online for free. Enter two names for an instant relationship result: Friends, Love, Affection, Marriage, Enemies, or Siblings.',
+      'Use the free FLAMES calculator with two names. Watch common letters cancel, see your result, or try manual mode. No sign-up; a name game just for fun.',
     keywords: [
       'FLAMES game',
       'flames online',
@@ -71,7 +71,7 @@ export const pagesSEO = {
   about: {
     title: 'About FLAMES Game - The Story Behind the Classic Game',
     description:
-      'Discover the nostalgic story behind the FLAMES game. Learn how this classic schoolyard game evolved from backbench notebooks to a modern digital experience.',
+      'Meet the FLAMES Game project by osLabs: a free online name game with animated calculations, manual play, and shareable results. Explore the source and rules.',
     keywords: ['FLAMES game history', 'FLAMES game origin', 'schoolyard games', 'nostalgic games'],
     ogImage: 'https://cdn.osnaren.com/the-flames/v1/og/about-og.png',
   },
@@ -160,6 +160,6 @@ export const faqData = [
   {
     question: 'Is my data saved when I play FLAMES?',
     answer:
-      'We only store anonymous statistics to show global trends. We do not save the names you enter or any personal information.',
+      'Recent name pairings are saved in your browser history for the game. Shared result links include the names in their URL. Global charts use anonymous result statistics. Read the privacy policy for details.',
   },
 ];
