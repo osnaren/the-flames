@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test.use({ baseURL: 'http://127.0.0.1:3000', reducedMotion: 'reduce' });
+test.use({ baseURL: 'http://127.0.0.1:3000', contextOptions: { reducedMotion: 'reduce' } });
 
 for (const route of ['/', '/manual', '/charts']) {
   test(`${route} hydrates without React errors when reduced motion is enabled`, async ({ page }) => {

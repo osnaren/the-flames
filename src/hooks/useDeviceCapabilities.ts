@@ -17,16 +17,17 @@ interface NavigatorWithMemory extends Navigator {
   deviceMemory?: number;
 }
 
-interface BatteryManager extends EventTarget {
+interface BatteryManager {
   level: number;
   charging: boolean;
   chargingTime: number;
   dischargingTime: number;
-  addEventListener(type: 'levelchange', listener: () => void): void;
+  addEventListener?: (type: 'levelchange', listener: () => void) => void;
+  removeEventListener?: (type: 'levelchange', listener: () => void) => void;
 }
 
 interface NavigatorWithBattery extends Navigator {
-  getBattery(): Promise<BatteryManager>;
+  getBattery?: () => Promise<BatteryManager | null>;
 }
 
 export interface DeviceCapabilities {
@@ -64,6 +65,10 @@ export function useDeviceCapabilities(): DeviceCapabilities {
   }));
 
   useEffect(() => {
+    let disposed = false;
+    let batteryLevel: number | undefined;
+    let removeBatteryListener: (() => void) | undefined;
+    let orientationTimer: ReturnType<typeof setTimeout> | undefined;
     const updateCapabilities = () => {
       const userAgent = navigator.userAgent.toLowerCase();
       const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
@@ -102,7 +107,11 @@ export function useDeviceCapabilities(): DeviceCapabilities {
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       // Low power mode detection (heuristic)
-      const isLowPowerMode = deviceMemory < 2 || networkSpeed === 'slow' || reducedMotion;
+      const isLowPowerMode =
+        deviceMemory < 2 ||
+        networkSpeed === 'slow' ||
+        reducedMotion ||
+        (batteryLevel !== undefined && batteryLevel < 0.2);
 
       setCapabilities({
         isMobile,
@@ -118,6 +127,7 @@ export function useDeviceCapabilities(): DeviceCapabilities {
         screenSize,
         orientation: window.innerHeight > window.innerWidth ? 'portrait' : 'landscape',
         isLowPowerMode,
+        batteryLevel,
       });
     };
 
@@ -125,7 +135,8 @@ export function useDeviceCapabilities(): DeviceCapabilities {
 
     const handleResize = () => updateCapabilities();
     const handleOrientationChange = () => {
-      setTimeout(updateCapabilities, 100); // Delay to ensure dimensions are updated
+      clearTimeout(orientationTimer);
+      orientationTimer = setTimeout(updateCapabilities, 100); // Wait for updated dimensions.
     };
 
     window.addEventListener('resize', handleResize);
@@ -137,22 +148,40 @@ export function useDeviceCapabilities(): DeviceCapabilities {
     mediaQuery.addEventListener('change', handleMotionChange);
 
     // Battery API if available
-    if ('getBattery' in navigator) {
-      (navigator as NavigatorWithBattery).getBattery().then((battery: BatteryManager) => {
-        const updateBattery = () => {
-          setCapabilities((prev) => ({
-            ...prev,
-            batteryLevel: battery.level,
-            isLowPowerMode: prev.isLowPowerMode || battery.level < 0.2,
-          }));
-        };
+    const batteryNavigator = navigator as NavigatorWithBattery;
+    if (typeof batteryNavigator.getBattery === 'function') {
+      // Browser privacy modes and WebViews can reject this optional API or
+      // return a snapshot without the EventTarget methods.
+      Promise.resolve()
+        .then(() => batteryNavigator.getBattery!())
+        .then((battery) => {
+          if (disposed || !battery) return;
+          const updateBattery = () => {
+            if (disposed || !Number.isFinite(battery.level) || battery.level < 0 || battery.level > 1) return;
+            batteryLevel = battery.level;
+            setCapabilities((prev) => ({
+              ...prev,
+              batteryLevel: battery.level,
+              isLowPowerMode:
+                prev.deviceMemory < 2 || prev.networkSpeed === 'slow' || prev.reducedMotion || battery.level < 0.2,
+            }));
+          };
 
-        updateBattery();
-        battery.addEventListener('levelchange', updateBattery);
-      });
+          updateBattery();
+          if (typeof battery.addEventListener === 'function' && typeof battery.removeEventListener === 'function') {
+            battery.addEventListener('levelchange', updateBattery);
+            removeBatteryListener = () => battery.removeEventListener!('levelchange', updateBattery);
+          }
+        })
+        .catch(() => {
+          // Battery detection is optional; keep the other capability estimates.
+        });
     }
 
     return () => {
+      disposed = true;
+      clearTimeout(orientationTimer);
+      removeBatteryListener?.();
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('orientationchange', handleOrientationChange);
       mediaQuery.removeEventListener('change', handleMotionChange);

@@ -336,8 +336,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
         clearAll();
 
         if (error instanceof z.ZodError) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          toast.error((error as any).errors[0].message);
+          toast.error(error.issues[0]?.message || 'Please check the names and try again.');
         } else {
           toast.error('Something went wrong. Please try again.');
         }

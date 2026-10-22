@@ -3,6 +3,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
+import { filterBrowserEvent } from './src/lib/sentry-browser-filter';
 
 Sentry.init({
   dsn: 'https://6955a5782c6e92e948fc950fd15a0730@o4509979151958016.ingest.us.sentry.io/4510494216880128',
@@ -16,6 +17,7 @@ Sentry.init({
   // Disable PII collection for privacy compliance (GDPR)
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
   sendDefaultPii: false,
+  beforeSend: filterBrowserEvent,
 });
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

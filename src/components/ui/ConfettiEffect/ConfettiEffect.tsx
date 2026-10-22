@@ -1,5 +1,6 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { useDeviceType } from '@/hooks/useDeviceType';
+import { fireResultConfetti, resetResultConfetti } from '@/lib/result-confetti';
 import { FlamesResult, getResultData } from '@/utils/resultData';
 import confetti from 'canvas-confetti';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
@@ -38,6 +39,18 @@ function ConfettiEffect({ result, isActive }: ConfettiEffectProps) {
 
   // Store a single confetti instance instead of multiple ones
   const confettiInstanceRef = useRef<confetti.CreateTypes | null>(null);
+  const timersRef = useRef(new Set<ReturnType<typeof setTimeout>>());
+  const clearPendingBursts = useCallback(() => {
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current.clear();
+  }, []);
+  const scheduleBurst = useCallback((run: () => void, delay: number) => {
+    const timer = setTimeout(() => {
+      timersRef.current.delete(timer);
+      run();
+    }, delay);
+    timersRef.current.add(timer);
+  }, []);
 
   // Define cannon positions based on device type
   const cannonPositions = useCallback((): CannonPosition[] => {
@@ -69,41 +82,36 @@ function ConfettiEffect({ result, isActive }: ConfettiEffectProps) {
 
     const myCanvas = canvasRef.current;
 
-    // Set initial canvas size
-    const updateCanvasSize = () => {
-      if (!confettiInstanceRef.current) {
-        myCanvas.width = window.innerWidth;
-        myCanvas.height = window.innerHeight;
-      }
-    };
-    updateCanvasSize();
-
-    // Listen for window resize to update canvas dimensions
-    window.addEventListener('resize', updateCanvasSize);
+    // Size before transferring ownership to the worker. Its resize fallback
+    // cannot measure an OffscreenCanvas when a hidden DOM canvas reports 0x0.
+    myCanvas.width = Math.max(1, window.innerWidth);
+    myCanvas.height = Math.max(1, window.innerHeight);
 
     // Create only one confetti instance
     if (!confettiInstanceRef.current) {
       confettiInstanceRef.current = confetti.create(myCanvas, {
         useWorker: true,
-        resize: true,
+        resize: false,
+        disableForReducedMotion: true,
       });
     }
 
     return () => {
       // Cleanup
-      window.removeEventListener('resize', updateCanvasSize);
+      clearPendingBursts();
       if (confettiInstanceRef.current) {
-        confettiInstanceRef.current.reset();
+        resetResultConfetti(confettiInstanceRef.current);
+        confettiInstanceRef.current = null;
       }
     };
-  }, [shouldAnimate]);
+  }, [shouldAnimate, clearPendingBursts]);
 
   // Fire confetti from a position
   const fireConfetti = useCallback(
     (origin: { x: number; y: number }, angle: number, delay: number = 0) => {
       if (!confettiInstanceRef.current || !result) return;
 
-      setTimeout(() => {
+      scheduleBurst(() => {
         const visualConfig = getResultData(result);
         const particleCount = isLowEndDevice
           ? Math.floor(visualConfig.particleCount * 0.6)
@@ -113,7 +121,7 @@ function ConfettiEffect({ result, isActive }: ConfettiEffectProps) {
         if (!confettiInstance) return;
 
         // Launch standard confetti particles in colors from the theme
-        confettiInstance({
+        void fireResultConfetti(confettiInstance, {
           particleCount: Math.floor(particleCount * 0.7),
           angle: angle,
           spread: visualConfig.confetti.spread,
@@ -126,33 +134,28 @@ function ConfettiEffect({ result, isActive }: ConfettiEffectProps) {
           shapes: ['circle', 'square'],
         });
 
-        // Launch emoji confetti using shapeFromText
-        setTimeout(() => {
-          if (!confettiInstance) return;
+        // Built-in shapes do not send ImageBitmaps through WebKit's worker
+        // bridge, which can throw TypeError during structured cloning.
+        scheduleBurst(() => {
+          if (confettiInstanceRef.current !== confettiInstance) return;
 
-          // Create emoji shapes that can be passed to the worker
-          const emojiShapes = visualConfig.confetti.emojis.map((emoji) =>
-            confetti.shapeFromText({ text: emoji, scalar: visualConfig.confetti.strength * 1.2 })
-          );
-
-          const emojiOptions = {
+          const secondaryOptions: confetti.Options = {
             particleCount: Math.floor(particleCount * 0.3),
             angle: angle,
             spread: visualConfig.confetti.spread * 0.8,
             origin: origin,
             ticks: isLowEndDevice ? 120 : 180,
             gravity: 0.8,
-            scalar: visualConfig.confetti.strength * 1.2, // Scalar is now part of shapeFromText
+            scalar: visualConfig.confetti.strength * 1.2,
             drift: 0.1,
-            shapes: emojiShapes, // Use the generated emoji shapes
-            colors: visualConfig.confetti.colors, // Emojis have their own colors, but specify base colors
+            shapes: ['star', 'circle'],
+            colors: visualConfig.confetti.colors,
           };
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          confettiInstance(emojiOptions as any);
+          void fireResultConfetti(confettiInstance, secondaryOptions);
         }, 150);
       }, delay);
     },
-    [result, isLowEndDevice]
+    [result, isLowEndDevice, scheduleBurst]
   );
 
   // Trigger confetti when result changes or becomes active
@@ -166,7 +169,8 @@ function ConfettiEffect({ result, isActive }: ConfettiEffectProps) {
     positions.forEach((pos, index) => {
       fireConfetti(pos.origin, pos.angle, index * 150);
     });
-  }, [result, isActive, shouldAnimate, fireConfetti, cannonPositions]);
+    return clearPendingBursts;
+  }, [result, isActive, shouldAnimate, fireConfetti, cannonPositions, clearPendingBursts]);
 
   if (!shouldAnimate) return null;
 
