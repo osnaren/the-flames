@@ -66,3 +66,5 @@ Prioritize helpful answers and functional quality over word counts, repeated syn
 Detailed evidence and primary sources: FULL-AUDIT-REPORT.md.
 
 Production release and final acceptance are recorded in DEPLOYMENT-REPORT.md. All ten live acceptance groups passed for revision d9df394. Normal-motion Safari rapid-toggle stress tests remain unresolved; the post-deployment recrawl request failed at Google's reCAPTCHA service. Ranking and field CWV recovery remain unverified.
+
+Follow-up: SENTRY-REMEDIATION.md records revision 6121ff0, the eight inspected error groups, 92 passing local checks and 14 passing production groups. Fresh Search Console inspection still shows the 20 October five-poor-URL field baseline on both devices; the apex sitemap remains Success with seven discovered pages. No field-performance recovery or ranking gain is claimed.
