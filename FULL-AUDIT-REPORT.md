@@ -105,3 +105,5 @@ Current raw evidence is in `seo-audit-evidence/2026-10-22/`, ignored by git. Thi
 Additional capture: `gsc-4xx-validation.jpg` records Google's validation-started state on 22 October.
 
 See ACTION-PLAN.md for publishing and measurement order.
+
+Post-deployment update: see DEPLOYMENT-REPORT.md for the published Netlify revision, ten passing live acceptance groups, the remaining Safari stress-test limitation and Google's recrawl-request service failure. The audit is not a blanket certification of rankings, rich-result display or field performance.

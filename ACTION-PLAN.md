@@ -1,6 +1,6 @@
 # FLAMES SEO action plan — 22 October 2026
 
-## Delivered locally
+## Deployed improvements
 
 - Visible server-rendered homepage guide with original rules, verified example, meanings, useful questions and contextual links.
 - Calculator-focused title/H1/description; truthful project provenance and browser-storage wording.
@@ -64,3 +64,5 @@ Prioritize helpful answers and functional quality over word counts, repeated syn
 - Existing API-doc lint warning is not a ranking diagnosis.
 
 Detailed evidence and primary sources: FULL-AUDIT-REPORT.md.
+
+Production release and final acceptance are recorded in DEPLOYMENT-REPORT.md. All ten live acceptance groups passed for revision d9df394. Normal-motion Safari rapid-toggle stress tests remain unresolved; the post-deployment recrawl request failed at Google's reCAPTCHA service. Ranking and field CWV recovery remain unverified.
