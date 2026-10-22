@@ -19,22 +19,20 @@ function PageTransition({ children, className = '' }: PageTransitionProps) {
   // Get duration from settings
   const duration = TRANSITION_DURATIONS[transitionSpeed];
 
-  // Skip animation for reduced motion preference, disabled animations, or instant speed
-  if (!shouldAnimate || prefersReducedMotion || transitionSpeed === 'instant') {
-    return <div className={`w-full ${className}`}>{children}</div>;
-  }
+  // Preserve the child tree when preferences hydrate or change during play.
+  const animateTransition = shouldAnimate && !prefersReducedMotion && transitionSpeed !== 'instant';
 
   return (
     <AnimatePresence initial={false} mode="wait">
       <motion.div
         key={pathname}
-        initial={{ opacity: 0, y: 8 }}
+        initial={animateTransition ? { opacity: 0, y: 8 } : false}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -8 }}
+        exit={animateTransition ? { opacity: 0, y: -8 } : undefined}
         transition={{
           type: 'tween',
           ease: [0.25, 0.46, 0.45, 0.94], // Custom easing for smoother feel
-          duration,
+          duration: animateTransition ? duration : 0,
         }}
         className={`w-full ${className}`}
       >

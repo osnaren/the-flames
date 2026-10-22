@@ -525,8 +525,8 @@ export default function PrivacyPage() {
               &quot;We treat your privacy like we treat the FLAMES game—transparently, honestly, and with just enough
               silliness to keep things fun.&quot;
             </p>
-            <p className="text-on-surface-variant/60 text-sm">— The FLAMES Team 💜</p>
-            <p className="text-on-surface-variant/40 mt-6 text-xs">
+            <p className="text-on-surface text-sm">— The FLAMES Team 💜</p>
+            <p className="text-on-surface mt-6 text-xs">
               Last updated: January 2025 • Made with ❤️ and a healthy respect for your data
             </p>
           </motion.div>

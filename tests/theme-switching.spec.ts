@@ -21,6 +21,8 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Theme Switching Functionality', () => {
   test.beforeEach(async ({ page }) => {
+    // Theme assertions do not depend on decorative panel animations.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     // Clear localStorage before each test
     await page.goto('/');
     await page.evaluate(() => localStorage.clear());
@@ -253,46 +255,50 @@ test.describe('Theme Switching Functionality', () => {
     await page.emulateMedia({ colorScheme: 'dark' });
 
     // Navigate with a listener to check initial state
-    let initialThemeClass = '';
-
-    page.on('domcontentloaded', async () => {
-      initialThemeClass = (await page.locator('html').getAttribute('class')) || '';
+    let initialThemeClass: Promise<string | null> | undefined;
+    page.once('domcontentloaded', () => {
+      initialThemeClass = page.locator('html').getAttribute('class');
     });
 
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
     // Check that dark class was applied early (inline script)
-    expect(initialThemeClass).toContain('dark');
+    expect(await initialThemeClass).toContain('dark');
   });
 
-  test('should handle multiple rapid theme toggles', async ({ page }) => {
-    await page.emulateMedia({ colorScheme: 'light' });
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+  for (const reducedMotion of ['reduce', 'no-preference'] as const) {
+    test(`should handle multiple rapid theme toggles (${reducedMotion})`, async ({ page, browserName }) => {
+      // WebKit can spend longer waiting for animated controls to become stable.
+      // Keep every interaction and state assertion within a bounded budget.
+      if (browserName === 'webkit') test.setTimeout(60000);
+      await page.emulateMedia({ colorScheme: 'light', reducedMotion });
+      await page.goto('/');
+      await page.waitForLoadState('networkidle');
 
-    // Expand the floating control panel
-    const settingsButton = page.locator('button[aria-label*="settings"]').first();
-    await settingsButton.click();
-    await page.waitForTimeout(300);
+      // Expand the floating control panel
+      const settingsButton = page.locator('button[aria-label*="settings"]').first();
+      await settingsButton.click();
+      await page.waitForTimeout(300);
 
-    const htmlElement = page.locator('html');
+      const htmlElement = page.locator('html');
 
-    // Toggle multiple times rapidly
-    for (let i = 0; i < 5; i++) {
+      // Toggle multiple times rapidly
+      for (let i = 0; i < 5; i++) {
+        const isDark = await htmlElement.evaluate((el) => el.classList.contains('dark'));
+        const toggleLabel = isDark ? 'Switch to light theme' : 'Switch to dark theme';
+        const toggle = page.locator(`button[aria-label*="${toggleLabel}"]`).first();
+        await toggle.click();
+        await page.waitForTimeout(100);
+      }
+
+      // Verify final state is consistent
       const isDark = await htmlElement.evaluate((el) => el.classList.contains('dark'));
-      const toggleLabel = isDark ? 'Switch to light theme' : 'Switch to dark theme';
-      const toggle = page.locator(`button[aria-label*="${toggleLabel}"]`).first();
-      await toggle.click();
-      await page.waitForTimeout(100);
-    }
+      const dataTheme = await htmlElement.getAttribute('data-theme');
+      const storedTheme = await page.evaluate(() => localStorage.getItem('theme'));
 
-    // Verify final state is consistent
-    const isDark = await htmlElement.evaluate((el) => el.classList.contains('dark'));
-    const dataTheme = await htmlElement.getAttribute('data-theme');
-    const storedTheme = await page.evaluate(() => localStorage.getItem('theme'));
-
-    expect(dataTheme).toBe(isDark ? 'dark' : 'light');
-    expect(storedTheme).toBe(isDark ? 'dark' : 'light');
-  });
+      expect(dataTheme).toBe(isDark ? 'dark' : 'light');
+      expect(storedTheme).toBe(isDark ? 'dark' : 'light');
+    });
+  }
 });

@@ -90,6 +90,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Skip to main content link for accessibility */}
         <a
           href="#main-content"
+          tabIndex={0}
           className="fixed top-0 left-0 z-9999 -translate-y-full bg-pink-600 px-4 py-2 text-white transition-transform focus:translate-y-0"
         >
           Skip to main content

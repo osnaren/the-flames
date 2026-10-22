@@ -319,7 +319,7 @@ export default function AboutPage() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-on-surface-variant/50 pt-6 text-sm"
+            className="text-on-surface pt-6 text-sm"
           >
             🔥 Free to play • 💕 Made for fun • 📊 Zero scientific validity
           </motion.p>

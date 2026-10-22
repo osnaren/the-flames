@@ -1,4 +1,3 @@
-import { useReducedMotion } from 'framer-motion';
 import { useMemo } from 'react';
 import { useMediaQuery } from './useMediaQuery';
 import { usePreferences } from './usePreferences';
@@ -9,8 +8,9 @@ import { usePreferences } from './usePreferences';
  */
 export function useAnimationPreferences() {
   const [{ animationsEnabled }] = usePreferences();
-  const isReducedMotion = useReducedMotion();
-  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)') || isReducedMotion;
+  // Keep the server snapshot for hydration, then observe the browser setting.
+  // An immediate client-only reading can change the rendered HTML too early.
+  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
   // Should animations be enabled based on both user settings and system preferences
   const shouldAnimate = useMemo(() => {

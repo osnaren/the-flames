@@ -60,7 +60,7 @@ Prioritize helpful answers and functional quality over word counts, repeated syn
 
 - Exact ranking causes and copying remain unestablished. One search showed competitor second/app eighth; originality chronology requires separate evidence.
 - Verify image rights before adding licensing metadata. Movie is irrelevant; ProfilePage does not fit current pages.
-- PageSpeed rate-limited; fresh traces and live rich-result validation outstanding.
+- PageSpeed rate-limited; fresh traces remain outstanding. Live Google Rich Results Test passed on 22 October with one valid Software App item and one non-critical optional aggregateRating warning.
 - Existing API-doc lint warning is not a ranking diagnosis.
 
 Detailed evidence and primary sources: FULL-AUDIT-REPORT.md.

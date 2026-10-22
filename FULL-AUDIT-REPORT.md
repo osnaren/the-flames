@@ -48,14 +48,14 @@ This bounded comparison does not establish which site originated specific design
 
 ## Applying the supplied Google guidance
 
-| Topic                  | Application                                                                                                                                                                               |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| JavaScript/SSR JSON-LD | Existing server-rendered JSON-LD is retained. Moving it into client JavaScript or adding Tag Manager provides no necessary benefit.                                                       |
-| ProfilePage            | Current pages are calculator/project pages rather than qualifying creator profiles. AboutPage fits the current About content.                                                             |
-| Image license metadata | Consider after verifying rights for each image and truthful license/acquisition pages. Repository license alone does not prove all CDN image rights. Deferred; no invented rights claims. |
-| Movie                  | No movie lists exist in this app. Not applicable.                                                                                                                                         |
-| Software app           | WebApplication describes the calculator, but a real review/rating is required for Google's Software App rich result. None fabricated. Schema validity, eligibility and ranking differ.    |
-| FAQ                    | Useful visible questions included. Current Google changelog says FAQ rich results stopped 7 May 2026; no FAQ-rich-result claim or markup added.                                           |
+| Topic                  | Application                                                                                                                                                                                                                                                 |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| JavaScript/SSR JSON-LD | Existing server-rendered JSON-LD is retained. Moving it into client JavaScript or adding Tag Manager provides no necessary benefit.                                                                                                                         |
+| ProfilePage            | Current pages are calculator/project pages rather than qualifying creator profiles. AboutPage fits the current About content.                                                                                                                               |
+| Image license metadata | Consider after verifying rights for each image and truthful license/acquisition pages. Repository license alone does not prove all CDN image rights. Deferred; no invented rights claims.                                                                   |
+| Movie                  | No movie lists exist in this app. Not applicable.                                                                                                                                                                                                           |
+| Software app           | Google's live Rich Results Test on 22 October detected one valid Software App item, with one non-critical warning: missing optional aggregateRating. Leave ratings absent until genuine reviews exist. A valid test does not guarantee display or rankings. |
+| FAQ                    | Useful visible questions included. Current Google changelog says FAQ rich results stopped 7 May 2026; no FAQ-rich-result claim or markup added.                                                                                                             |
 
 Primary sources reviewed:
 
@@ -81,7 +81,8 @@ Bundled SEO references predate this audit and still describe older FAQ eligibili
 - Final local/live HTTP crawls saved separately. JSON-LD helper validation passed on local home/About/API HTML; not equivalent to Google Rich Results Test.
 - PageSpeed API rate-limited; no fresh Lighthouse score or numeric field LCP/INP/CLS claimed. GSC issue bands are live field evidence.
 - Verification corrected an incorrect draft worked example and title/canonical test assumptions. A stale Turbopack cache was moved to the ignored evidence folder; removing the root loading screen required an explicit share-page Suspense boundary. Final build/tests passed afterward.
-- No production deployment/post-deploy acceptance, Rich Results Test, backlink-authority assessment, full image-rights audit, or refreshed field outcome completed.
+- Production release 5449794 published on the existing Netlify site on 22 October at 19:05 IST. Google Rich Results Test crawled it successfully at 19:21 IST and reported one valid Software App item with an optional aggregateRating warning. A follow-up addresses reduced-motion hydration, form preservation, contrast and Safari skip-link focus found during acceptance. Final acceptance evidence is recorded separately in the evidence directory.
+- Backlink-authority assessment, full image-rights audit and refreshed field outcomes remain outstanding.
 
 ## Evidence map
 

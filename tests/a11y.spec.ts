@@ -160,7 +160,7 @@ test.describe('Screen Reader Tests', () => {
     expect(mainCount).toBe(1);
 
     // Should have navigation landmark
-    const nav = page.locator('nav, [role="navigation"]');
+    const nav = page.locator('nav:visible, [role="navigation"]:visible');
     await expect(nav.first()).toBeVisible();
 
     // Should have banner (header) landmark - use first() as there should be at least one

@@ -1,3 +1,4 @@
+import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { motion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 
@@ -30,14 +31,15 @@ export default function Toggle({
   tabIndex,
 }: ToggleProps) {
   const Icon = isActive ? ActiveIcon : InactiveIcon;
+  const { shouldAnimate } = useAnimationPreferences();
 
   return (
     <motion.button
-      className={`flex w-full items-center justify-between rounded-lg p-2.5 ${backgroundColor} border-outline/10 border backdrop-blur-xs transition-all duration-200 ${isActive ? 'shadow-glow-sm' : ''} focus:ring-primary dark:focus:ring-primary dark:focus:ring-offset-surface hover:brightness-105 focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-95 dark:hover:brightness-110`}
+      className={`flex w-full items-center justify-between rounded-lg p-2.5 ${backgroundColor} border-outline/10 border backdrop-blur-xs transition-colors duration-200 ${isActive ? 'shadow-glow-sm' : ''} focus:ring-primary dark:focus:ring-primary dark:focus:ring-offset-surface hover:brightness-105 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:hover:brightness-110`}
       onClick={onToggle}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      whileFocus={{ scale: 1.02 }}
+      whileHover={shouldAnimate ? { scale: 1.02 } : undefined}
+      whileTap={shouldAnimate ? { scale: 0.98 } : undefined}
+      whileFocus={shouldAnimate ? { scale: 1.02 } : undefined}
       role="switch"
       aria-checked={isActive}
       aria-label={ariaLabel || `Toggle ${label}`}
