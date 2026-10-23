@@ -12,8 +12,7 @@ export const ProductHuntBadge = () => {
         href="https://www.producthunt.com/products/the-flames"
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="The FLAMES on Product Hunt"
-        className="inline-flex h-[50px] w-[200px] items-center justify-center gap-3 rounded-xl border border-orange-200 bg-white text-orange-700 transition-colors hover:bg-orange-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-700"
+        className="inline-flex h-[50px] w-[200px] items-center justify-center gap-3 rounded-xl border border-orange-200 bg-white text-orange-950 transition-colors hover:bg-orange-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-700"
       >
         <span className="text-left leading-tight">
           <span className="block text-xs">Find us on</span>
