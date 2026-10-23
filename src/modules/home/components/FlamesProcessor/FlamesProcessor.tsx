@@ -473,7 +473,7 @@ function FlamesProcessorComponent({
           </div>
 
           {/* Remaining count badge */}
-          <AnimatePresence>
+          <div className="min-h-9">
             {showFlames && (
               <motion.div
                 className="flex justify-center"
@@ -486,10 +486,10 @@ function FlamesProcessorComponent({
                 </div>
               </motion.div>
             )}
-          </AnimatePresence>
+          </div>
 
           {/* FLAMES letters */}
-          {showFlames && (
+          <div style={{ visibility: showFlames ? 'visible' : 'hidden' }} aria-hidden={!showFlames}>
             <motion.div
               className="pt-4"
               initial={{ opacity: 0, y: 20 }}
@@ -591,44 +591,48 @@ function FlamesProcessorComponent({
               </div>
 
               {/* Result label */}
-              {phase === 'result-reveal' && resultData && (
-                <motion.div
-                  className="mt-6 text-center"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <div
-                    className={`inline-block rounded-full bg-linear-to-r ${resultData.color} px-6 py-2 text-lg font-bold text-white shadow-lg md:text-xl`}
+              <div className="min-h-20">
+                {phase === 'result-reveal' && resultData && (
+                  <motion.div
+                    className="mt-6 text-center"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
                   >
-                    {resultData.emoji} {resultData.full}!
-                  </div>
-                </motion.div>
-              )}
+                    <div
+                      className={`inline-block rounded-full bg-linear-to-r ${resultData.color} px-6 py-2 text-lg font-bold text-white shadow-lg md:text-xl`}
+                    >
+                      {resultData.emoji} {resultData.full}!
+                    </div>
+                  </motion.div>
+                )}
+              </div>
             </motion.div>
-          )}
+          </div>
 
           {/* Skip button */}
-          <AnimatePresence>
-            {showSkip && phase !== 'complete' && phase !== 'result-reveal' && (
-              <motion.div
-                className="flex justify-center pt-2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <button
-                  onClick={() => {
-                    uiInteraction('click');
-                    handleSkip();
-                  }}
-                  className="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+          <div className="min-h-10">
+            <AnimatePresence>
+              {showSkip && phase !== 'complete' && phase !== 'result-reveal' && (
+                <motion.div
+                  className="flex justify-center pt-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                 >
-                  Skip animation →
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  <button
+                    onClick={() => {
+                      uiInteraction('click');
+                      handleSkip();
+                    }}
+                    className="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                  >
+                    Skip animation →
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </motion.div>

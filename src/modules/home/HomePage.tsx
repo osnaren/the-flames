@@ -5,7 +5,7 @@ import { useSoundSystem } from '@/hooks/useSoundSystem';
 import { useBackgroundStore } from '@/store/useBackgroundStore';
 import { AnimatePresence, motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
-import { memo, useCallback, useEffect, useRef } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
 // Critical components - loaded immediately
 import { AnimatedHeader } from './components/AnimatedHeader';
@@ -56,6 +56,8 @@ function HomePage() {
   // References for scrolling
   const containerRef = useRef<HTMLDivElement>(null);
   const resultSectionRef = useRef<HTMLDivElement>(null);
+  const workspaceRef = useRef<HTMLDivElement>(null);
+  const [workspaceHeight, setWorkspaceHeight] = useState<number>();
 
   // FLAMES game engine state and actions
   const [
@@ -97,6 +99,8 @@ function HomePage() {
   // Handle form submission
   const onSubmitForm = useCallback(
     (e: React.FormEvent) => {
+      // Keep the guide and title still throughout delayed game transitions.
+      if (workspaceRef.current) setWorkspaceHeight(workspaceRef.current.getBoundingClientRect().height);
       handleSubmit(e);
     },
     [handleSubmit]
@@ -135,120 +139,122 @@ function HomePage() {
         <AnimatedHeader shouldAnimate={shouldAnimate} stage={stage} />
 
         {/* Main content area with stage-based transitions */}
-        <AnimatePresence mode="wait">
-          {/* Input Stage */}
+        <div ref={workspaceRef} style={{ minHeight: workspaceHeight }}>
+          <AnimatePresence mode="wait">
+            {/* Input Stage */}
+            {stage === 'input' && (
+              <motion.div
+                key="input-stage"
+                initial={false}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{
+                  opacity: 0,
+                  y: -30,
+                  scale: 0.95,
+                  filter: 'blur(4px)',
+                }}
+                transition={{
+                  duration: 0.5,
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                }}
+              >
+                <InputForm
+                  name1={name1}
+                  name2={name2}
+                  setName1={setName1}
+                  setName2={setName2}
+                  onSubmit={onSubmitForm}
+                  shouldAnimate={shouldAnimate}
+                  stage={stage}
+                  isCollapsing={isProcessing}
+                  isProcessing={isProcessing}
+                />
+              </motion.div>
+            )}
+
+            {/* Processing Stage - New unified processor */}
+            {stage === 'processing' && (
+              <motion.div
+                key="processing-stage"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                transition={{ duration: 0.4, ease: 'easeOut' }}
+              >
+                <FlamesProcessor
+                  key={`${runId}`}
+                  name1={name1}
+                  name2={name2}
+                  commonLetters={commonLetters}
+                  remainingCount={remainingLetters.length}
+                  result={result}
+                  onComplete={handleProcessorComplete}
+                  shouldAnimate={shouldAnimate}
+                  runId={runId}
+                />
+              </motion.div>
+            )}
+
+            {/* Result Stage */}
+            {stage === 'result' && result && (
+              <motion.div
+                key="result-stage"
+                ref={resultSectionRef}
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                transition={{
+                  duration: 0.3,
+                  ease: 'easeOut',
+                }}
+              >
+                <ResultCard
+                  result={result}
+                  stage={stage}
+                  name1={name1}
+                  name2={name2}
+                  onRetry={resetGame}
+                  onNavigateToManual={() => window.open('/manual', '_blank')}
+                  onNavigateToStats={() => window.open('/charts', '_blank')}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Footer tips - only on input stage */}
           {stage === 'input' && (
             <motion.div
-              key="input-stage"
-              initial={false}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{
-                opacity: 0,
-                y: -30,
-                scale: 0.95,
-                filter: 'blur(4px)',
-              }}
-              transition={{
-                duration: 0.5,
-                ease: [0.25, 0.46, 0.45, 0.94],
-              }}
-            >
-              <InputForm
-                name1={name1}
-                name2={name2}
-                setName1={setName1}
-                setName2={setName2}
-                onSubmit={onSubmitForm}
-                shouldAnimate={shouldAnimate}
-                stage={stage}
-                isCollapsing={isProcessing}
-                isProcessing={isProcessing}
-              />
-            </motion.div>
-          )}
-
-          {/* Processing Stage - New unified processor */}
-          {stage === 'processing' && (
-            <motion.div
-              key="processing-stage"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95, y: -20 }}
-              transition={{ duration: 0.4, ease: 'easeOut' }}
-            >
-              <FlamesProcessor
-                key={`${runId}`}
-                name1={name1}
-                name2={name2}
-                commonLetters={commonLetters}
-                remainingCount={remainingLetters.length}
-                result={result}
-                onComplete={handleProcessorComplete}
-                shouldAnimate={shouldAnimate}
-                runId={runId}
-              />
-            </motion.div>
-          )}
-
-          {/* Result Stage */}
-          {stage === 'result' && result && (
-            <motion.div
-              key="result-stage"
-              ref={resultSectionRef}
-              initial={{ opacity: 1 }}
+              className="mt-12 space-y-3 text-center"
+              initial={shouldAnimate ? { opacity: 0 } : { opacity: 1 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{
-                duration: 0.3,
-                ease: 'easeOut',
-              }}
+              transition={{ delay: 0.8, duration: 0.6 }}
+              role="note"
+              aria-label="FLAMES meaning legend"
             >
-              <ResultCard
-                result={result}
-                stage={stage}
-                name1={name1}
-                name2={name2}
-                onRetry={resetGame}
-                onNavigateToManual={() => window.open('/manual', '_blank')}
-                onNavigateToStats={() => window.open('/charts', '_blank')}
-              />
+              <p className="font-space text-on-surface-variant/80 text-sm font-medium">
+                <span className="text-blue-500">F</span>riends •<span className="text-pink-500"> L</span>ove •
+                <span className="text-amber-500"> A</span>ffection •<span className="text-emerald-500"> M</span>arriage
+                •<span className="text-red-500"> E</span>nemies •<span className="text-purple-500"> S</span>iblings
+              </p>
+
+              <p className="font-handwriting text-on-surface-variant/60 text-xs">
+                ✨ The classic relationship game, reimagined with modern magic ✨
+              </p>
             </motion.div>
           )}
-        </AnimatePresence>
 
-        {/* Footer tips - only on input stage */}
-        {stage === 'input' && (
-          <motion.div
-            className="mt-12 space-y-3 text-center"
-            initial={shouldAnimate ? { opacity: 0 } : { opacity: 1 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
-            role="note"
-            aria-label="FLAMES meaning legend"
-          >
-            <p className="font-space text-on-surface-variant/80 text-sm font-medium">
-              <span className="text-blue-500">F</span>riends •<span className="text-pink-500"> L</span>ove •
-              <span className="text-amber-500"> A</span>ffection •<span className="text-emerald-500"> M</span>arriage •
-              <span className="text-red-500"> E</span>nemies •<span className="text-purple-500"> S</span>iblings
-            </p>
-
-            <p className="font-handwriting text-on-surface-variant/60 text-xs">
-              ✨ The classic relationship game, reimagined with modern magic ✨
-            </p>
-          </motion.div>
-        )}
-
-        {/* Recent Matches Section - only on input stage */}
-        {stage === 'input' && (
-          <motion.div
-            className="mt-8"
-            initial={shouldAnimate ? { opacity: 0, y: 20 } : { opacity: 1 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1, duration: 0.5 }}
-          >
-            <RecentMatchesSection displayCount={5} onMatchClick={handleMatchReplay} />
-          </motion.div>
-        )}
+          {/* Recent Matches Section - only on input stage */}
+          {stage === 'input' && (
+            <motion.div
+              className="mt-8"
+              initial={shouldAnimate ? { opacity: 0, y: 20 } : { opacity: 1 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1, duration: 0.5 }}
+            >
+              <RecentMatchesSection displayCount={5} onMatchClick={handleMatchReplay} />
+            </motion.div>
+          )}
+        </div>
       </div>
     </section>
   );

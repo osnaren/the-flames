@@ -110,11 +110,12 @@ function ResultHeroTransition({ result, isActive, onTransitionComplete }: Result
           className="absolute rounded-full"
           style={{
             background: `radial-gradient(circle, ${colors.primary}80 0%, transparent 70%)`,
+            width: '120vw',
+            height: '120vh',
           }}
-          initial={{ width: 0, height: 0, opacity: 0 }}
+          initial={{ scale: 0, opacity: 0 }}
           animate={{
-            width: phase === 'burst' ? '120vw' : '60vw',
-            height: phase === 'burst' ? '120vh' : '60vh',
+            scale: phase === 'burst' ? 1 : 0.5,
             opacity: phase === 'burst' ? 0.4 : 0,
           }}
           transition={{
@@ -129,11 +130,10 @@ function ResultHeroTransition({ result, isActive, onTransitionComplete }: Result
           <>
             <motion.div
               className="absolute rounded-full"
-              style={{ borderWidth: 4, borderStyle: 'solid', borderColor: colors.primary }}
-              initial={{ width: 150, height: 150, opacity: 0.8 }}
+              style={{ width: 400, height: 400, borderWidth: 4, borderStyle: 'solid', borderColor: colors.primary }}
+              initial={{ scale: 0.375, opacity: 0.8 }}
               animate={{
-                width: [150, 400],
-                height: [150, 400],
+                scale: [0.375, 1],
                 opacity: [0.8, 0],
               }}
               transition={{
@@ -143,11 +143,10 @@ function ResultHeroTransition({ result, isActive, onTransitionComplete }: Result
             />
             <motion.div
               className="absolute rounded-full"
-              style={{ borderWidth: 2, borderStyle: 'solid', borderColor: colors.secondary }}
-              initial={{ width: 150, height: 150, opacity: 0.6 }}
+              style={{ width: 350, height: 350, borderWidth: 2, borderStyle: 'solid', borderColor: colors.secondary }}
+              initial={{ scale: 150 / 350, opacity: 0.6 }}
               animate={{
-                width: [150, 350],
-                height: [150, 350],
+                scale: [150 / 350, 1],
                 opacity: [0.6, 0],
               }}
               transition={{

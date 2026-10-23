@@ -111,3 +111,45 @@ for (const historyCount of [0, 5]) {
     expect(totalShift).toBeLessThanOrEqual(0.1);
   });
 }
+
+test('the animated game keeps the page stable through its final result', async ({ page, browserName }) => {
+  test.skip(browserName !== 'chromium', 'LayoutShift entries are supported by Chromium.');
+  test.setTimeout(90000);
+  await page.addInitScript(() => {
+    const shifts: { value: number; time: number }[] = [];
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        const shift = entry as PerformanceEntry & { hadRecentInput: boolean; value: number };
+        if (!shift.hadRecentInput) shifts.push({ value: shift.value, time: shift.startTime });
+      }
+    }).observe({ type: 'layout-shift', buffered: true });
+    Object.assign(window, { gameShifts: shifts });
+  });
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/');
+  await page.locator('#name1').fill('Rahul');
+  await page.locator('#name2').fill('Priya');
+  await page.getByRole('button', { name: /Reveal Your FLAMES/ }).click();
+  await expect(page.getByRole('button', { name: 'Reset', exact: true })).toBeVisible({ timeout: 60000 });
+  await page.waitForTimeout(4000);
+  const cls = await page.evaluate(() => {
+    const shifts = (window as Window & { gameShifts?: { value: number; time: number }[] }).gameShifts || [];
+    let max = 0,
+      total = 0,
+      start = 0,
+      previous = 0;
+    for (const shift of shifts) {
+      if (shift.time - previous > 1000 || shift.time - start > 5000) {
+        total = 0;
+        start = shift.time;
+      }
+      total += shift.value;
+      max = Math.max(max, total);
+      previous = shift.time;
+    }
+    return max;
+  });
+  expect(cls).toBeLessThanOrEqual(0.1);
+  await page.getByRole('button', { name: 'Reset', exact: true }).click();
+  await expect(page.locator('#name1')).toBeVisible();
+});
