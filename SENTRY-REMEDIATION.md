@@ -6,6 +6,10 @@ Runtime revision `6121ff06646eb0b5721fdbcce6cc4fed588c8455` is published on the 
 
 ## Eight inspected issue groups
 
+**23 October follow-up:** the performance release retains these scoped fixes. All 14 live production acceptance groups passed again on `71694bf`, including the battery variants, invalid-name handling, unsupported-action guard and normal-motion Safari result/confetti/reset. The later footer-only revisions passed fresh route/API and Lighthouse checks. Final published runtime is `99e5cd86f277c5222340e4950bc834930dbc394f`; its signed-in Chrome release-filtered feed showed no matching issues immediately after verification. This is a short observation, not proof of a sustained clean window or of complete event ingestion. No issue groups were bulk-resolved.
+
+The previous Safari stress timeout was investigated through CPU/background isolation; the affected normal/reduced-motion Safari checks passed after the theme/background work. Performance findings and additional regression results are in CWV-IMPROVEMENTS.md. All six Google CWV validations now show Started; historical 4xx validation remains Started. The apex sitemap remains Success/seven pages. Google's recrawl request still fails at its reCAPTCHA service, so submission and field/ranking recovery are unconfirmed. The older pending-item list below describes the 22 October state and is superseded by this follow-up and ACTION-PLAN.md.
+
 The supplied Sentry feed contained eight unresolved groups over 30 days. The displayed counts below are the inspected feed counts, not affected-user estimates. Their last-seen dates preceded this evening's releases.
 
 | Sentry group                                                  | Feed events | Evidence and remediation                                                                                                                                                                                                                                                                                                           |

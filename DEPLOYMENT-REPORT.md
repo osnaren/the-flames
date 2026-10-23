@@ -1,6 +1,27 @@
-# SEO production release — 22 October 2026
+# SEO and performance production releases
 
-The SEO improvements are deployed to the existing production site, https://theflames.app, using branch `codex/netlify-temporary`. The ten production acceptance groups passed. This is bounded verification, not a claim that every browser stress case or every SEO recommendation is complete.
+## Current release — 23 October 2026
+
+Runtime **`99e5cd86f277c5222340e4950bc834930dbc394f`** is published at [theflames.app](https://theflames.app) from **`codex/netlify-temporary`**. Netlify confirmed production deploy **`6adb8cc8da6da62ccdfae346`**, state **ready**, published **22:06:20 IST on 23 October**. [Deploy details](https://app.netlify.com/projects/theflames/deploys/6adb8cc8da6da62ccdfae346) · [Immutable deployment](https://6adb8cc8da6da62ccdfae346--theflames.netlify.app).
+
+The release includes the previous SEO/Sentry fixes, deferred optional media/settings/statistics, lighter mobile and idle backgrounds, shared theme state, removal of unused GPU/audio work and duplicate font requests, server-rendered supporting content, protected early input, stable charts/game transitions, and accessible footer headings/link without a third-party badge embed. Hosting, DNS, backend schema and provider environment values were preserved.
+
+Verification is scoped to the changes and revisions actually tested:
+
+- Build, TypeScript and lint passed. The initial runtime gate passed **98 checks / six capability skips**. The game-layout follow-up passed **12 performance checks**, plus **20 Safari hydration/Sentry checks / two capability skips**.
+- All **14 live acceptance groups passed** on `71694bf`, covering the calculator, saved history/reset, normal-motion mobile Safari/confetti, manual game, charts, APIs, schemas, sharing, crawl routes and battery fallbacks. Subsequent source edits only changed the footer.
+- On final revision `99e5cd8`, all seven canonical pages and the calculator API passed the footer/content smoke check. Fresh mobile Lighthouse audits of home and manual each scored **100 accessibility, 100 Best Practices and 100 SEO**. These are bounded automated checks, not comprehensive certification.
+- Sequential production audits on the preceding footer revision `a63254a` gave homepage three-run mobile medians: **performance 56 → 83**, **LCP 3.53 → 3.23 s**, **TBT 818 → 340 ms**, initial transfer **3.39 → 0.62 MB**. Desktop performance was **96**. The final home run scored **86**; it is a single run rather than a new median.
+- Full animated live journeys on `71694bf` measured CLS **0.002534 mobile / 0.000709 desktop**, down from **0.904 / 0.651** before the layout follow-up. Synthetic INP was **64 / 40 ms**. Lab and field results are distinct.
+- The signed-in Chrome Sentry feed filtered to the final revision showed **no matching issues** at observation time. This very short window does not establish non-recurrence or confirm complete event ingestion.
+
+Google's refreshed reports show **Started** for all six active CWV validations, mobile/desktop INP/CLS/LCP. The apex sitemap remains **Success**, with seven discovered pages. Historical other-4xx validation remains **Started**. The homepage remains indexed, but the new recrawl request failed at Google's reCAPTCHA service; submission is unconfirmed. Field CWV, ranking recovery and CTR gains are still unproven. Mobile homepage simulated median LCP remains above 2.5 seconds.
+
+Detailed findings, measurements and official sources: [CWV-IMPROVEMENTS.md](CWV-IMPROVEMENTS.md). Current remaining evidence requirements: [ACTION-PLAN.md](ACTION-PLAN.md). Raw local artifacts: `seo-audit-evidence/2026-10-23/`, especially `sentry-production-acceptance.json`, `footer-acceptance.json`, `live-game-vitals.json`, `live-performance-summary.json`, `final-lighthouse-summary.json`, and the Google validation/Sentry screenshots. Generated evidence is git-ignored.
+
+## Historical release — 22 October 2026
+
+The initial SEO improvements were deployed to the existing production site using branch `codex/netlify-temporary`. The ten production acceptance groups passed. The following records the original release and its then-open limitations; the dated follow-up above supersedes their current status.
 
 ## Published release
 

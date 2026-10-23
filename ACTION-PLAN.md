@@ -1,70 +1,48 @@
-# FLAMES SEO action plan — 22 October 2026
+# FLAMES SEO action plan — 23 October 2026
 
-## Deployed improvements
+## Delivered
 
-- Visible server-rendered homepage guide with original rules, verified example, meanings, useful questions and contextual links.
-- Calculator-focused title/H1/description; truthful project provenance and browser-storage wording.
-- Initial content no longer hidden for entrance animations; reserved game loading geometry; root loading screen removed so static guide can be read without JavaScript.
-- Correct schema descriptions, no misleading SearchAction or invented freshness dates, noindex social previews with sharing retained.
-- Repeated-letter animation agrees with calculator results; unsupported promotional totals removed.
-- Production build, typecheck, lint and fourteen desktop/mobile checks passed. One pre-existing lint warning remains.
+The SEO, Sentry and measured performance changes are pushed on `codex/netlify-temporary` and deployed through the existing Netlify production site. Runtime revisions and bounded acceptance evidence are recorded in DEPLOYMENT-REPORT.md and CWV-IMPROVEMENTS.md.
 
-## Google-side work
+- Visible, server-rendered calculator guide; accurate rules, worked example, meanings, useful questions and contextual links.
+- Calculator-focused title/H1/description, apex canonicals, seven-page sitemap, proper 404/redirect behavior and noindex social previews with working OG images.
+- Truthful structured data and provenance; no invented ratings, freshness, SearchAction, irrelevant Movie/ProfilePage markup or unverified image licensing.
+- Repeated-letter animations agree with the algorithm. No-JavaScript content and early typing/hydration checks pass.
+- Measured initial payload and main-thread work reduced by removing duplicate font imports, deferring media/settings/statistics, sharing the theme controller, removing unused AudioContext/WebGL creation, and simplifying backgrounds.
+- Charts reserve their loading geometry. Full animated game transitions reserve space and animate transforms instead of dimensions. Saved-history loading is covered by layout tests.
+- Previous Sentry failure paths retain focused fixes and regression coverage. Generic application exceptions remain reportable; historical issue groups were not bulk-resolved.
+- Footer headings are corrected and the third-party Product Hunt image embed is replaced by a direct link.
 
-1. Canonical apex sitemap submitted: **Success**, read 22 October, seven discovered pages.
-2. Historical apex/www Product Hunt URL errors currently HTTP 200: **validation started** on 22 October. Outcome pending.
-3. Homepage indexing/canonical and manual/security reports inspected. Four crawled-not-indexed examples are fonts/icons/manifest; do not request indexing for them.
+## Google processing
 
-## Publish the reviewed patch
+Use signed-in **Chrome** for provider actions. A recrawl request or validation start is distinct from Google completing it.
 
-**GO for this bounded patch. Production deployment was approved on 22 October 2026 for codex/netlify-temporary.** This is not a claim that all SEO/performance work is finished. The deployment and live acceptance results will be recorded separately.
+- Homepage remains indexed. The apex sitemap previously reported **Success**, read 22 October, with seven discovered pages. Public XML and canonical routes pass current live checks.
+- Historical apex/www Product Hunt 4xx validation started on 22 October; Google completion remains unconfirmed.
+- The 23 October post-release recrawl request reached live testing, then Google's reCAPTCHA service failed to connect. Submission is **not confirmed**; no challenge was bypassed or solved. Existing indexing is unaffected by that failed request.
+- Search Console field data last updated **21 October** still shows five poor URLs on each device. Mobile group: LCP 4.4 s, INP 688 ms, CLS 1.15. Desktop INP 519 ms and CLS 0.74. These predate the performance release.
+- All six active CWV validations now show **Started**: mobile INP/CLS/LCP and desktop INP/CLS/LCP. Google says validation will complete within 28 days. A started validation does not mean field CWV passed. Targets remain p75 LCP <=2.5 s, INP <=200 ms, CLS <=0.1.
 
-- Verify the active production target/branch first. Current checkout is codex/netlify-temporary; repository deployment documentation describes the Netlify apex. Do not silently switch hosting/DNS.
-- Deploy using existing production environment variables, not the mock values used locally.
-- Live acceptance: new title, visible H1/guide, canonical apex, HTTP/www redirects, seven valid sitemap URLs, named share-preview OG image and noindex, primary routes and a working calculator/manual navigation.
-- Run Google Rich Results Test on representative live pages, distinguishing actual eligibility from schema syntax. Inspect/request homepage recrawl after changed content is live; never request indexing of share URLs.
-- If a published change fails acceptance, fix forward by reverting the release commit and letting the same branch deploy again. A failed build does not replace the published site. No DNS/database changes are part of this source patch.
+## Search intent and acquisition
 
-## Highest-priority follow-up: field performance
+| Destination   | Relevant searches                                                 | Direction                                                              |
+| ------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| /             | flames calculator, calculator by name, flames game, flames online | Keep the useful visible guide and monitor query-specific CTR/position. |
+| /how-it-works | how to calculate flames, how to play flames, flames rules         | Maintain the accurate walkthrough and contextual calculator link.      |
+| /manual       | manual flames, paper-and-pencil flames                            | Preserve the differentiated hands-on game.                             |
+| /about        | creator and project provenance                                    | Maintain truthful project/creator references.                          |
+| /api-docs     | flames API, developer integration                                 | Keep examples accurate and the public API working.                     |
 
-GSC currently reports five poor URLs on both mobile and desktop. Local changes remove plausible contributors; field recovery is unverified.
+Chrome's Search Console Links report lists **15 external links**: 14 to the homepage, one to charts. Listed domains include Reddit, ChatGate, Gridinsoft, GitHub and LinkedIn. One listed anchor advertises domain-rating services; this does not establish a manual action, justify a disavow, or prove a ranking cause. No paid links, third-party outreach or complaints were submitted.
 
-1. Profile normal-motion mobile homepage and worst URL group: actual LCP element, layout-shift sources and event/main-thread work.
-2. Investigate measured cost of full-screen particles, blurred animated orbs, background/theme hydration and non-critical bundles. Avoid attributing the GSC failures to a specific component without traces.
-3. Consider static decoration and an explicit disabled RAF state on mobile/low-power devices if profiling supports it. **Proposed, not implemented.**
-4. Stabilize recent-history loading/empty/populated heights if they contribute to CLS. **Proposed, not implemented.**
-5. Keep critical text visible and the homepage static/CDN-served; measure interactions before claiming INP gains.
-6. Start CWV validation after representative live lab improvement. Recheck rolling field data; target p75 LCP <=2.5s, INP <=200ms, CLS <=0.1. No guaranteed timetable or rank gain.
+The copying/originality claim and exact ranking causes remain unestablished. Prior search evidence showed competitor second/app eighth; a specific personal result is not a universal rank. Earn relevant references through the useful walkthrough, manual game and API; do not create duplicate keyword/name-pair landing pages or buy authority metrics.
 
-## Search intent and content priorities
+## Follow-up that requires new evidence
 
-| Destination   | Relevant searches                                                 | Direction                                                                                                |
-| ------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| /             | flames calculator, calculator by name, flames game, flames online | Ship visible explanation; monitor query-specific CTR/position. Avoid duplicate calculator landing pages. |
-| /how-it-works | how to calculate flames, how to play flames, flames rules         | Accurate complete walkthrough, contextual link back, profile interactive example.                        |
-| /manual       | manual flames, paper-and-pencil flames                            | Preserve differentiated hands-on play; add context only when useful.                                     |
-| /about        | who made this app, project provenance                             | Truthful creator/project links; fictional nostalgia clearly identified.                                  |
-| /api-docs     | flames API, developer integration                                 | Accurate examples and documentation schema; no fabricated rating.                                        |
+1. Compare the next complete 28 post-release days with the preceding 28, using identical query/country/device filters and accounting for seasonality. Baseline exact calculator query, 23 September–20 October: **389 clicks / 34,783 impressions / 1.1% CTR / position 6.9**. India, 14–20 October: **60 / 9,653 / 0.6% / 7.3**.
+2. Recheck Google's CWV validation, rolling field data, 4xx validation and sitemap processing. Lab improvements cannot certify those outcomes or guarantee a top ranking.
+3. Observe Sentry over a meaningful post-release traffic window. An immediately empty release-filtered feed is only a point-in-time observation.
 
-Prioritize helpful answers and functional quality over word counts, repeated synonyms, meta-keyword tags, unrelated schema or generated name-pair pages.
+The previous normal-motion Safari rapid-toggle timeout was investigated and the affected checks passed after background/theme performance changes. The initial 98-check release gate, additional 12 performance checks and 20 Safari checks are detailed in CWV-IMPROVEMENTS.md. Earlier interrupted broad suites are not represented as completely green.
 
-## Measure after publishing
-
-- Record deployment date/revision. Compare the next complete 28 days with the preceding 28 using the same Web/query/country/device filters; account for seasonality and query mix.
-- Baseline exact calculator query: 389 clicks / 34,783 impressions / displayed 1.1% CTR / position 6.9, 23 September–20 October. India, 14–20 October: 60 / 9,653 / 0.6% / 7.3.
-- Track flames game, how to play flames and calculator by name separately. Property-wide average is not every query's rank.
-- Recheck 4xx validation, sitemap read, canonical and field CWV. Discovery, indexing, rich-result eligibility and rankings are distinct.
-- Inspect legitimate relevant referring links/mentions before planning outreach. Earn references through useful manual walkthrough/API/original demonstrations. No paid/spam links or third-party submissions made.
-
-## Deferred evidence gaps
-
-- Exact ranking causes and copying remain unestablished. One search showed competitor second/app eighth; originality chronology requires separate evidence.
-- Verify image rights before adding licensing metadata. Movie is irrelevant; ProfilePage does not fit current pages.
-- PageSpeed rate-limited; fresh traces remain outstanding. Live Google Rich Results Test passed on 22 October with one valid Software App item and one non-critical optional aggregateRating warning.
-- Existing API-doc lint warning is not a ranking diagnosis.
-
-Detailed evidence and primary sources: FULL-AUDIT-REPORT.md.
-
-Production release and final acceptance are recorded in DEPLOYMENT-REPORT.md. All ten live acceptance groups passed for revision d9df394. Normal-motion Safari rapid-toggle stress tests remain unresolved; the post-deployment recrawl request failed at Google's reCAPTCHA service. Ranking and field CWV recovery remain unverified.
-
-Follow-up: SENTRY-REMEDIATION.md records revision 6121ff0, the eight inspected error groups, 92 passing local checks and 14 passing production groups. Fresh Search Console inspection still shows the 20 October five-poor-URL field baseline on both devices; the apex sitemap remains Success with seven discovered pages. No field-performance recovery or ranking gain is claimed.
+Detailed original audit: FULL-AUDIT-REPORT.md. Production evidence: DEPLOYMENT-REPORT.md. Error analysis: SENTRY-REMEDIATION.md.
