@@ -204,10 +204,10 @@ function Footer() {
 
           {/* Navigation Section */}
           <motion.div variants={itemVariants} className="lg:col-span-1">
-            <h3 className="text-on-surface mb-4 flex items-center gap-2 font-semibold" id="footer-nav-heading">
+            <h2 className="text-on-surface mb-4 flex items-center gap-2 font-semibold" id="footer-nav-heading">
               <Sparkles className="text-primary h-4 w-4" aria-hidden="true" />
               Navigation
-            </h3>
+            </h2>
             <nav className="space-y-3" aria-labelledby="footer-nav-heading">
               {FOOTER_CONFIG.navigation.primary.map((link) => (
                 <div key={link.to}>
@@ -228,10 +228,10 @@ function Footer() {
 
           {/* Resources Section */}
           <motion.div variants={itemVariants} className="lg:col-span-1">
-            <h3 className="text-on-surface mb-4 flex items-center gap-2 font-semibold" id="footer-resources-heading">
+            <h2 className="text-on-surface mb-4 flex items-center gap-2 font-semibold" id="footer-resources-heading">
               <ExternalLink className="text-primary h-4 w-4" aria-hidden="true" />
               Resources
-            </h3>
+            </h2>
             <nav className="space-y-3" aria-labelledby="footer-resources-heading">
               {FOOTER_CONFIG.external.map((link) => (
                 <div key={link.href}>
@@ -246,10 +246,10 @@ function Footer() {
           {/* Stats Section */}
           {FOOTER_CONFIG.showStats && (
             <motion.div variants={itemVariants} className="lg:col-span-1">
-              <h3 className="text-on-surface mb-4 flex items-center gap-2 font-semibold" id="footer-stats-heading">
+              <h2 className="text-on-surface mb-4 flex items-center gap-2 font-semibold" id="footer-stats-heading">
                 <TrendingUp className="text-primary h-4 w-4" aria-hidden="true" />
                 Our Impact
-              </h3>
+              </h2>
               <div className="grid grid-cols-2 gap-3" role="list" aria-labelledby="footer-stats-heading">
                 {FOOTER_CONFIG.stats.map((stat) => (
                   <motion.div
