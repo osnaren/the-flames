@@ -16,10 +16,11 @@ export function ErrorCodes() {
       <CardContent>
         <Tabs defaultValue="400" className="w-full space-y-6">
           {/* Required for Safari keyboard access to the horizontally scrollable tab list. */}
-          { }
           <div
             className="scrollbar-hide overflow-x-auto pb-2"
             role="region"
+            // Safari keyboard users need to focus this horizontally scrollable region.
+            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
             tabIndex={0}
             aria-label="Error code options"
           >

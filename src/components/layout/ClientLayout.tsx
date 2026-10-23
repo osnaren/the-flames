@@ -1,5 +1,6 @@
 'use client';
 
+import { SeasonalThemeProvider } from '@/themes/seasonal/useSeasonalTheme';
 import { PreferencesInitializer, SoundController } from '@components/providers';
 import PageTransition from '@layout/PageTransition';
 import dynamic from 'next/dynamic';
@@ -36,7 +37,7 @@ interface ClientLayoutProps {
  */
 export default function ClientLayout({ children }: ClientLayoutProps) {
   return (
-    <>
+    <SeasonalThemeProvider>
       <PreferencesInitializer />
       <SoundController />
       {/* <WebVitalsReporter /> */}
@@ -45,6 +46,6 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
         <PageTransition>{children}</PageTransition>
         <SponsorFAB />
       </div>
-    </>
+    </SeasonalThemeProvider>
   );
 }

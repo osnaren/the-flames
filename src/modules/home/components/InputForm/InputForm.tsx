@@ -1,4 +1,5 @@
 import { useGameIntegration } from '@/hooks/useGameIntegration';
+import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { validateFlamesInput, validateName } from '@/utils/validation';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
@@ -35,6 +36,7 @@ function InputFormComponent({
   const [errors, setErrors] = useState<FormErrors>({});
   const [focusedField, setFocusedField] = useState<'name1' | 'name2' | null>(null);
   const { formSubmit, sound } = useGameIntegration();
+  const hydrated = usePreferencesStore((state) => state.hydrated);
 
   // Individual field validation
   const validateField = useCallback((fieldName: 'name1' | 'name2', value: string) => {
@@ -212,7 +214,7 @@ function InputFormComponent({
                   }`}
                   placeholder="Your name..."
                   required
-                  disabled={isProcessing}
+                  disabled={!hydrated || isProcessing}
                   autoComplete="off"
                   suppressHydrationWarning
                 />
@@ -279,7 +281,7 @@ function InputFormComponent({
                   }`}
                   placeholder="Their name..."
                   required
-                  disabled={isProcessing}
+                  disabled={!hydrated || isProcessing}
                   autoComplete="off"
                   suppressHydrationWarning
                 />
@@ -322,7 +324,7 @@ function InputFormComponent({
           {/* Submit Button */}
           <motion.button
             type="submit"
-            disabled={!isFormValid || isProcessing}
+            disabled={!hydrated || !isFormValid || isProcessing}
             className="group relative w-full overflow-hidden rounded-xl bg-linear-to-r from-pink-500 via-rose-500 to-red-500 px-6 py-4 font-bold text-white shadow-lg transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale"
             whileHover={
               shouldAnimate && isFormValid && !isProcessing

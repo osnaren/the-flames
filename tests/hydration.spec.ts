@@ -24,6 +24,15 @@ for (const route of ['/', '/manual', '/charts']) {
   });
 }
 
+test('a shared manual game hydrates and opens the saved names', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto('/manual?name1=Rahul&name2=Priya');
+  await expect(page.getByRole('heading', { name: 'First Name: RAHUL', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Second Name: PRIYA', exact: true })).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
 test('changing motion preferences preserves an in-progress calculator entry', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');

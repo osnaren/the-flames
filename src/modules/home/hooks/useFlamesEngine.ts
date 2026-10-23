@@ -1,7 +1,6 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { usePairingHistory } from '@/hooks/usePairingHistory';
 import { useTimers } from '@/hooks/useTimers';
-import { getUserCountry, insertMatch } from '@lib/supabase';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -56,7 +55,6 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
   const [commonLetters, setCommonLetters] = useState<string[]>([]);
   const [remainingLetters, setRemainingLetters] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [userCountry, setUserCountry] = useState<string | null>(null);
 
   // Stage progress tracking
   const [stageProgress, setStageProgress] = useState({
@@ -80,19 +78,6 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
 
   // Pairing history and badges
   const { addPairing, getNewlyUnlockedBadges } = usePairingHistory();
-
-  // Fetch user country on mount
-  useEffect(() => {
-    const fetchCountry = async () => {
-      try {
-        const country = await getUserCountry();
-        setUserCountry(country);
-      } catch {
-        // Silent failure - country detection is non-critical
-      }
-    };
-    fetchCountry();
-  }, []);
 
   // Initialize from URL params
   useEffect(() => {
@@ -304,9 +289,15 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
 
         // Record match in background (non-blocking)
         if (gameData.result) {
-          insertMatch(gameData.result, userCountry || undefined).catch(() => {
-            // Silent failure - match recording is non-critical
-          });
+          const recordedResult = gameData.result;
+          void import('@lib/supabase')
+            .then(async ({ getUserCountry, insertMatch }) => {
+              const country = await getUserCountry();
+              await insertMatch(recordedResult, country || undefined);
+            })
+            .catch(() => {
+              // Recording is optional; the local calculator stays available.
+            });
         }
 
         // Transition to processing stage with form collapse effect
@@ -351,7 +342,6 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       calculateGameData,
       addTimeout,
       shouldAnimate,
-      userCountry,
       progressToNextStage,
     ]
   );

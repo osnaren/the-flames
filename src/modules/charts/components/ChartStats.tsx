@@ -3,7 +3,7 @@ import { Activity, Calendar, TrendingUp } from 'lucide-react';
 import { GlobalStats, ResultInfo } from '../types';
 
 interface ChartStatsProps {
-  data: GlobalStats;
+  data: GlobalStats | null;
   hottestTrend: {
     result: string;
     trend: number;
@@ -33,7 +33,7 @@ export default function ChartStats({ data, hottestTrend, resultInfo }: ChartStat
   return (
     <motion.div
       variants={container}
-      initial="hidden"
+      initial={false}
       animate="show"
       className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3"
     >
@@ -45,7 +45,7 @@ export default function ChartStats({ data, hottestTrend, resultInfo }: ChartStat
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs font-medium tracking-wider text-white/80 uppercase">Total Matches</p>
-            <h3 className="mt-1 text-2xl font-bold text-white">{data.totalMatches.toLocaleString()}</h3>
+            <h3 className="mt-1 text-2xl font-bold text-white">{data?.totalMatches.toLocaleString() ?? '—'}</h3>
           </div>
           <div className="rounded-lg bg-white/20 p-2 text-white">
             <Activity className="h-5 w-5" />
@@ -62,7 +62,7 @@ export default function ChartStats({ data, hottestTrend, resultInfo }: ChartStat
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs font-medium tracking-wider text-white/80 uppercase">Today</p>
-            <h3 className="mt-1 text-2xl font-bold text-white">{data.todayMatches.toLocaleString()}</h3>
+            <h3 className="mt-1 text-2xl font-bold text-white">{data?.todayMatches.toLocaleString() ?? '—'}</h3>
           </div>
           <div className="rounded-lg bg-white/20 p-2 text-white">
             <Calendar className="h-5 w-5" />

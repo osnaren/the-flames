@@ -1,9 +1,11 @@
 'use client';
 
-import CanvasExperience from './components/CanvasExperience';
-import ClickExperience from './components/ClickExperience';
+import dynamic from 'next/dynamic';
 import NameInputForm from './components/NameInputForm';
 import { useManualMode } from './hooks/useManualMode';
+
+const CanvasExperience = dynamic(() => import('./components/CanvasExperience'), { ssr: false });
+const ClickExperience = dynamic(() => import('./components/ClickExperience'), { ssr: false });
 
 export default function ManualMode() {
   const {

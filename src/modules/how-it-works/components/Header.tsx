@@ -29,7 +29,7 @@ export default function Header() {
       {/* Enhanced Back Button */}
       <motion.div
         className="mb-6 flex items-center"
-        initial={{ opacity: 0, x: -30 }}
+        initial={false}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.1, duration: 0.6, ease: 'easeOut' }}
       >
@@ -49,7 +49,7 @@ export default function Header() {
       {/* Enhanced Title Section */}
       <motion.div
         className="relative mb-20 overflow-hidden text-center"
-        initial={{ opacity: 0, y: -40 }}
+        initial={false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
       >
@@ -89,7 +89,7 @@ export default function Header() {
         {/* Main Flame Icon with Enhanced Animation */}
         <motion.div
           className="relative mb-6 flex justify-center"
-          initial={{ scale: 0, rotate: -180 }}
+          initial={false}
           animate={{ scale: 1, rotate: 0 }}
           transition={{
             type: 'spring',
@@ -159,7 +159,7 @@ export default function Header() {
         {/* Enhanced Title with Staggered Animation */}
         <motion.h1
           className="font-heading text-on-background mb-6 text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl"
-          initial={{ opacity: 0, y: 30 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6, ease: 'easeOut' }}
         >
@@ -195,7 +195,7 @@ export default function Header() {
 
         {/* Enhanced Subtitle - More fun and mysterious */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8, ease: 'easeOut' }}
         >

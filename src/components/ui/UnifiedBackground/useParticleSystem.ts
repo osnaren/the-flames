@@ -82,6 +82,7 @@ const RESULT_SHAPES: Record<string, ParticleShape[]> = {
 // --- Hook Types ---
 
 interface UseParticleSystemProps {
+  enabled: boolean;
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   themeParticleConfig: {
     enabled: boolean;
@@ -108,6 +109,7 @@ interface UseParticleSystemReturn {
 // --- Main Hook ---
 
 export function useParticleSystem({
+  enabled,
   canvasRef,
   themeParticleConfig,
   variant,
@@ -123,6 +125,7 @@ export function useParticleSystem({
   const particlesRef = useRef<Particle[]>([]);
   const isVisibleRef = useRef(true);
   const lastFrameTimeRef = useRef<number>(0);
+  const pixelRatioRef = useRef(1);
 
   // Frame rate control
   const targetFPS = isLowPowerMode ? 15 : isMobile ? 24 : 30;
@@ -270,14 +273,14 @@ export function useParticleSystem({
 
   // --- Initialize Particles ---
   const initParticles = useCallback(() => {
-    if (!config.enabled || !shouldAnimate) {
+    if (!enabled || !config.enabled || !shouldAnimate) {
       particlesRef.current = [];
       return;
     }
 
     const canvas = canvasRef.current;
-    const width = canvas ? canvas.width / (window.devicePixelRatio || 1) : window.innerWidth;
-    const height = canvas ? canvas.height / (window.devicePixelRatio || 1) : window.innerHeight;
+    const width = canvas ? canvas.width / pixelRatioRef.current : window.innerWidth;
+    const height = canvas ? canvas.height / pixelRatioRef.current : window.innerHeight;
 
     const newParticles: Particle[] = [];
     for (let i = 0; i < config.count; i++) {
@@ -286,26 +289,16 @@ export function useParticleSystem({
       newParticles.push(p);
     }
     particlesRef.current = newParticles;
-  }, [config, shouldAnimate, createParticle, canvasRef]);
+  }, [enabled, config, shouldAnimate, createParticle, canvasRef]);
 
   // Re-init particles when config changes
   useEffect(() => {
     initParticles();
   }, [initParticles]);
 
-  // --- Visibility Handler ---
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      isVisibleRef.current = !document.hidden;
-      if (!document.hidden) lastFrameTimeRef.current = 0;
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
-
   // --- Animation Loop ---
   useEffect(() => {
-    if (!shouldAnimate || !config.enabled) return;
+    if (!enabled || !shouldAnimate || !config.enabled) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -314,7 +307,6 @@ export function useParticleSystem({
 
     const animate = (timestamp: number) => {
       if (!isVisibleRef.current) {
-        animationIdRef.current = requestAnimationFrame(animate);
         return;
       }
 
@@ -324,7 +316,7 @@ export function useParticleSystem({
       }
       lastFrameTimeRef.current = timestamp;
 
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = pixelRatioRef.current;
       const width = canvas.width / dpr;
       const height = canvas.height / dpr;
 
@@ -375,18 +367,6 @@ export function useParticleSystem({
         ctx.fillStyle = p.color;
         ctx.strokeStyle = p.color;
 
-        // Glow effect - Reduced on mobile for performance, disabled on low power
-        if (isLowPowerMode) {
-          ctx.shadowBlur = 0;
-        } else if (isMobile) {
-          // Subtle glow on mobile - enough for polish without performance hit
-          ctx.shadowBlur = isDarkTheme ? 4 : 6;
-          ctx.shadowColor = p.color;
-        } else {
-          ctx.shadowBlur = isDarkTheme ? 15 : 20;
-          ctx.shadowColor = p.color;
-        }
-
         // Draw the shape
         drawParticleShape(ctx, p.shape, p.size, p.emoji);
 
@@ -394,29 +374,43 @@ export function useParticleSystem({
       });
 
       ctx.restore();
-      animationIdRef.current = requestAnimationFrame(animate);
+      // Ambient particles keep their appearance without a perpetual idle loop.
+      if (variant !== 'default') animationIdRef.current = requestAnimationFrame(animate);
     };
 
     // Resize Handler
     const handleResize = () => {
-      // Use appropriate DPR for crisp rendering
-      // Mobile: cap at 1.5 for balance between quality and performance
-      // Desktop: cap at 2 for high quality
-      const maxDpr = isMobile ? 1.5 : isLowPowerMode ? 1 : 2;
-      const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+      // Keep CSS and backing-store coordinates consistent at a bounded DPR.
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      pixelRatioRef.current = dpr;
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
+      initParticles();
+      lastFrameTimeRef.current = 0;
+      cancelAnimationFrame(animationIdRef.current);
+      animationIdRef.current = requestAnimationFrame(animate);
+    };
+
+    const handleVisibilityChange = () => {
+      isVisibleRef.current = !document.hidden;
+      cancelAnimationFrame(animationIdRef.current);
+      if (isVisibleRef.current) {
+        lastFrameTimeRef.current = 0;
+        animationIdRef.current = requestAnimationFrame(animate);
+      }
     };
 
     handleResize();
     window.addEventListener('resize', handleResize);
-    animationIdRef.current = requestAnimationFrame(animate);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    isVisibleRef.current = !document.hidden;
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(animationIdRef.current);
     };
-  }, [shouldAnimate, config, frameInterval, isDarkTheme, canvasRef, isMobile, isLowPowerMode]);
+  }, [enabled, shouldAnimate, config, frameInterval, isDarkTheme, canvasRef, variant, initParticles]);
 
   return { config, canvasColors };
 }

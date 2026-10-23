@@ -6,7 +6,7 @@
  * - Duplicate mounting protection
  * - Proper cleanup on unmount
  * - Fade in/out transitions for BGM
- * - Audio context for better performance
+ * - Playback starts after user interaction
  * - Preloading with progress tracking
  * - Error recovery and fallbacks
  * - Volume normalization
@@ -26,8 +26,8 @@ class AudioManager {
   private isInitialized = false;
   private fadeInterval: NodeJS.Timeout | null = null;
   private mountCount = 0;
-  private audioContext: AudioContext | null = null;
   private isUserInteracted = false;
+  private pendingBGM: { id: SoundId; volume: number; fadeIn: boolean } | null = null;
   private wasPlayingBeforeHidden = false;
   private isDucking = false;
   private onTrackEndedCallback: (() => void) | null = null;
@@ -40,10 +40,14 @@ class AudioManager {
 
   private handleInteraction = () => {
     this.isUserInteracted = true;
-    this.initAudioContext();
     document.removeEventListener('click', this.handleInteraction);
     document.removeEventListener('touchstart', this.handleInteraction);
     document.removeEventListener('keydown', this.handleInteraction);
+    const pending = this.pendingBGM;
+    this.pendingBGM = null;
+    if (pending && usePreferencesStore.getState().isBGMEnabled) {
+      void this.playBGM(pending.id, pending.volume, pending.fadeIn);
+    }
   };
 
   private handleVisibilityChange = () => {
@@ -99,17 +103,6 @@ class AudioManager {
     this.onTrackEndedCallback = callback;
     if (this.bgmElement) {
       this.bgmElement.onended = callback;
-    }
-  }
-
-  private initAudioContext(): void {
-    if (this.audioContext || typeof window === 'undefined') return;
-    try {
-      this.audioContext = new (
-        window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
-      )();
-    } catch {
-      // AudioContext not supported
     }
   }
 
@@ -209,6 +202,14 @@ class AudioManager {
   async playBGM(id: SoundId, globalVolume: number = 1, fadeIn: boolean = true): Promise<void> {
     const asset = SOUND_ASSETS[id];
     if (!asset || asset.category !== 'bgm') return;
+
+    // Selecting a theme must not download music while the calculator is loading.
+    // Keep the latest selection and start it inside the first user gesture.
+    if (!this.isUserInteracted) {
+      this.pendingBGM = { id, volume: globalVolume, fadeIn };
+      this.currentBgmId = id;
+      return;
+    }
 
     // Increment operation ID to invalidate any pending play operations
     const opId = ++this.playOperationId;
@@ -315,6 +316,7 @@ class AudioManager {
   }
 
   pauseBGM(): void {
+    this.pendingBGM = null;
     // Invalidate any pending play operations
     this.playOperationId++;
 
@@ -327,6 +329,13 @@ class AudioManager {
     // Invalidate any pending play operations (though resume is usually safe)
     this.playOperationId++;
 
+    // A saved disabled preference can pause the selection before any Audio
+    // element exists. Create it when the user explicitly enables music.
+    if (!this.bgmElement && this.currentBgmId) {
+      await this.playBGM(this.currentBgmId as SoundId, usePreferencesStore.getState().volume);
+      return;
+    }
+
     if (this.bgmElement && this.bgmElement.paused) {
       try {
         await this.bgmElement.play();
@@ -337,6 +346,7 @@ class AudioManager {
   }
 
   stopBGM(): void {
+    this.pendingBGM = null;
     // Invalidate any pending play operations
     this.playOperationId++;
 
@@ -490,12 +500,6 @@ class AudioManager {
     // Reset state
     this.currentBgmId = null;
     this.isInitialized = false;
-
-    // Close audio context
-    if (this.audioContext && this.audioContext.state !== 'closed') {
-      this.audioContext.close().catch(() => {});
-      this.audioContext = null;
-    }
 
     // Reset singleton
     AudioManager.instance = null;

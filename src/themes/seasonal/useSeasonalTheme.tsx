@@ -1,5 +1,7 @@
+'use client';
+
 import { usePreferencesStore } from '@/store/usePreferencesStore';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import {
   christmasTheme,
@@ -40,7 +42,7 @@ const SEASONAL_THEMES: SeasonalTheme[] = [
   'newYear', // Dec 26 - Jan 5
 ];
 
-export function useSeasonalTheme() {
+function useSeasonalThemeController() {
   const { seasonalTheme: preferenceTheme, setSeasonalTheme, isDarkTheme } = usePreferencesStore();
 
   const [state, setState] = useState<SeasonalThemeState>({
@@ -95,15 +97,15 @@ export function useSeasonalTheme() {
           root.style.setProperty(`--theme-${key}-${index}`, gradient);
         });
       } else {
-        root.style.setProperty(`--theme-${key}`, value);
+        if (root.style.getPropertyValue(`--theme-${key}`) !== value) root.style.setProperty(`--theme-${key}`, value);
       }
     });
 
     // Apply theme class to body
-    document.body.className = document.body.className
-      .replace(/\b\w+-theme\b/g, '') // Remove existing theme classes
-      .trim();
-    document.body.classList.add(`${theme.id}-theme`);
+    if (!document.body.classList.contains(`${theme.id}-theme`)) {
+      document.body.className = document.body.className.replace(/\b\w+-theme\b/g, '').trim();
+      document.body.classList.add(`${theme.id}-theme`);
+    }
 
     // Inject custom CSS if provided
     if (theme.customCSS) {
@@ -113,7 +115,9 @@ export function useSeasonalTheme() {
         styleElement.id = 'seasonal-theme-styles';
         document.head.appendChild(styleElement);
       }
-      styleElement.textContent = theme.customCSS;
+      if (styleElement.textContent !== theme.customCSS) styleElement.textContent = theme.customCSS;
+    } else {
+      document.getElementById('seasonal-theme-styles')?.remove();
     }
 
     // Set theme meta tag for browser chrome
@@ -128,31 +132,9 @@ export function useSeasonalTheme() {
 
   // Transition to new theme
   const transitionToTheme = useCallback(
-    async (newTheme: SeasonalTheme) => {
-      setState((prev) => ({ ...prev, isTransitioning: true }));
-
-      try {
-        // Add transition class
-        document.body.classList.add('theme-transitioning');
-
-        // Apply new theme after short delay
-        setTimeout(() => {
-          applyTheme(THEME_CONFIGS[newTheme], isDarkTheme);
-          setState((prev) => ({
-            ...prev,
-            currentTheme: newTheme,
-            isTransitioning: false,
-          }));
-
-          // Remove transition class
-          setTimeout(() => {
-            document.body.classList.remove('theme-transitioning');
-          }, 300);
-        }, 150);
-      } catch {
-        // Theme transition failed - gracefully recover
-        setState((prev) => ({ ...prev, isTransitioning: false }));
-      }
+    (newTheme: SeasonalTheme) => {
+      applyTheme(THEME_CONFIGS[newTheme], isDarkTheme);
+      setState((prev) => ({ ...prev, currentTheme: newTheme, isTransitioning: false }));
     },
     [applyTheme, isDarkTheme]
   );
@@ -160,52 +142,24 @@ export function useSeasonalTheme() {
   // Set manual theme override
   const setManualTheme = useCallback(
     (theme: SeasonalTheme | null) => {
-      setState((prev) => ({ ...prev, manualOverride: theme }));
       setSeasonalTheme(theme || 'auto');
-
-      if (theme) {
-        transitionToTheme(theme);
-      } else {
-        // Reset to detected theme
-        const detectedTheme = detectCurrentTheme();
-        transitionToTheme(detectedTheme);
-      }
     },
-    [transitionToTheme, detectCurrentTheme, setSeasonalTheme]
+    [setSeasonalTheme]
   );
 
   // Initialize theme on mount and update when preferences change
   useEffect(() => {
     const detectedTheme = detectCurrentTheme();
 
-    // Defer state update to avoid synchronous setState in effect warning
-    setTimeout(() => {
-      setState((prev) => {
-        if (prev.detectedTheme !== detectedTheme) {
-          return { ...prev, detectedTheme };
-        }
-        return prev;
-      });
-    }, 0);
-
-    let targetTheme: SeasonalTheme;
-
-    if (preferenceTheme === 'auto') {
-      targetTheme = detectedTheme;
-      setTimeout(() => setState((prev) => ({ ...prev, manualOverride: null })), 0);
-    } else {
-      targetTheme = preferenceTheme;
-      setTimeout(() => setState((prev) => ({ ...prev, manualOverride: preferenceTheme })), 0);
-    }
-
-    // Apply theme if different from current
-    if (targetTheme !== state.currentTheme) {
-      setTimeout(() => transitionToTheme(targetTheme), 0);
-    } else {
-      // Ensure theme is applied even if same (for initial load)
-      applyTheme(THEME_CONFIGS[targetTheme], isDarkTheme);
-    }
-  }, [preferenceTheme, detectCurrentTheme, transitionToTheme, applyTheme, state.currentTheme, isDarkTheme]);
+    const targetTheme = preferenceTheme === 'auto' ? detectedTheme : preferenceTheme;
+    setState((prev) => ({
+      ...prev,
+      currentTheme: targetTheme,
+      detectedTheme,
+      manualOverride: preferenceTheme === 'auto' ? null : preferenceTheme,
+    }));
+    applyTheme(THEME_CONFIGS[targetTheme], isDarkTheme);
+  }, [preferenceTheme, detectCurrentTheme, applyTheme, isDarkTheme]);
 
   // Check for theme changes periodically (every hour)
   useEffect(() => {
@@ -224,13 +178,6 @@ export function useSeasonalTheme() {
 
     return () => clearInterval(interval);
   }, [preferenceTheme, state.detectedTheme, detectCurrentTheme, transitionToTheme]);
-
-  // Reapply theme when dark mode changes (to apply darkModeColors)
-  useEffect(() => {
-    if (state.currentTheme) {
-      applyTheme(THEME_CONFIGS[state.currentTheme], isDarkTheme);
-    }
-  }, [isDarkTheme, state.currentTheme, applyTheme]);
 
   // Utility functions
   const getThemeConfig = useCallback((themeId: SeasonalTheme) => {
@@ -293,23 +240,6 @@ export function useSeasonalTheme() {
     }
   }, []);
 
-  // Preload next likely theme
-  useEffect(() => {
-    const now = new Date();
-    const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-
-    // Determine what theme might be next
-    const nextTheme = SEASONAL_THEMES.find((themeId) => {
-      const theme = THEME_CONFIGS[themeId];
-      const { start } = theme.dateRange;
-      return nextMonth.getMonth() + 1 === start.month;
-    });
-
-    if (nextTheme && nextTheme !== state.currentTheme) {
-      preloadThemeAssets(nextTheme);
-    }
-  }, [state.currentTheme, preloadThemeAssets]);
-
   return {
     // Current state
     currentTheme: state.currentTheme,
@@ -331,4 +261,18 @@ export function useSeasonalTheme() {
     // Theme configs
     themes: THEME_CONFIGS,
   };
+}
+
+const SeasonalThemeContext = createContext<ReturnType<typeof useSeasonalThemeController> | null>(null);
+
+/** One controller owns document styles; consumers share its state and timers. */
+export function SeasonalThemeProvider({ children }: { children: ReactNode }) {
+  const theme = useSeasonalThemeController();
+  return <SeasonalThemeContext.Provider value={theme}>{children}</SeasonalThemeContext.Provider>;
+}
+
+export function useSeasonalTheme() {
+  const theme = useContext(SeasonalThemeContext);
+  if (!theme) throw new Error('SeasonalThemeProvider is required');
+  return theme;
 }

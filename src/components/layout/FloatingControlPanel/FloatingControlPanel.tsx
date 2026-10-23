@@ -1,5 +1,3 @@
-import SeasonalThemeSelector from '@/components/settings/SeasonalThemeSelector';
-import { MusicPlayer } from '@/components/ui/MusicPlayer';
 import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { usePreferencesStore } from '@/store/usePreferencesStore';
@@ -23,7 +21,11 @@ import {
   Volume2,
   VolumeX,
 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
+
+const SeasonalThemeSelector = dynamic(() => import('@/components/settings/SeasonalThemeSelector'));
+const MusicPlayer = dynamic(() => import('@/components/ui/MusicPlayer').then((mod) => mod.MusicPlayer));
 
 export default function FloatingControlPanel() {
   const [isExpanded, setIsExpanded] = useState(false);

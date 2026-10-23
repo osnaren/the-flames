@@ -187,11 +187,7 @@ function Navbar() {
           <motion.div className="flex items-center justify-between" variants={contentVariants}>
             {/* Enhanced Logo with hover effect */}
             <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
-              <Logo
-                variant="animated"
-                animationType={isScrolled ? 'onHover' : 'continuous'}
-                className="transition-all duration-300"
-              />
+              <Logo variant="animated" animationType="onHover" className="transition-all duration-300" />
             </motion.div>
 
             {/* Enhanced Desktop Navigation Links */}

@@ -14,20 +14,25 @@ import {
 } from '../utils';
 
 export function useManualMode() {
-  // Get initial names from URL params
-  const urlParams = getUrlParams();
-
   const [state, setState] = useState<ManualModeState>({
-    name1: urlParams.name1 || '',
-    name2: urlParams.name2 || '',
+    name1: '',
+    name2: '',
     experienceMode: 'click',
-    canvasState: urlParams.name1 && urlParams.name2 ? 'experience' : 'input',
+    canvasState: 'input',
     isDrawing: false,
     isErasing: false,
     crossedLetters: new Set<string>(),
     flamesCrossedLetters: new Set<string>(),
     result: null,
   });
+
+  // Read personalized deep links after the server form has hydrated.
+  useEffect(() => {
+    const params = getUrlParams();
+    if (params.name1 && params.name2) {
+      setState((prev) => ({ ...prev, name1: params.name1!, name2: params.name2!, canvasState: 'experience' }));
+    }
+  }, []);
 
   // Add loading states for operations
   const [isSharing, setIsSharing] = useState(false);

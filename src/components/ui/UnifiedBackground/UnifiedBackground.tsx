@@ -12,6 +12,8 @@
 'use client';
 
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
+import { useDeviceCapabilities } from '@/hooks/useDeviceCapabilities';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useBackgroundStore } from '@/store/useBackgroundStore';
 import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { useSeasonalTheme } from '@/themes/seasonal/useSeasonalTheme';
@@ -20,24 +22,13 @@ import { memo, useRef } from 'react';
 import BackgroundEffects from './BackgroundEffects';
 import { useParticleSystem } from './useParticleSystem';
 
-// --- Static Background (Reduced Motion) ---
-
-const StaticBackground = memo(function StaticBackground() {
-  return (
-    <div className="bg-background fixed inset-0 -z-10 overflow-hidden">
-      <div
-        className="absolute inset-0 opacity-5 dark:opacity-[0.03]"
-        style={{ backgroundImage: "url('https://cdn.osnaren.com/the-flames/v1/assets/noise-small.webp')" }}
-      />
-      <div className="from-primary/5 to-secondary/5 absolute inset-0 bg-linear-to-br" />
-    </div>
-  );
-});
-
 // --- Main Component ---
 
 function UnifiedBackground() {
   const { shouldAnimate, prefersReducedMotion } = useAnimationPreferences();
+  const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
+  const { isLowPowerMode } = useDeviceCapabilities();
+  const animateBackground = shouldAnimate && !compactDevice && !isLowPowerMode;
   const { currentThemeConfig, currentTheme } = useSeasonalTheme();
   const { variant, result, intensity } = useBackgroundStore();
   const { isDarkTheme } = usePreferencesStore();
@@ -55,11 +46,20 @@ function UnifiedBackground() {
     result: result ?? null,
     intensity,
     currentTheme,
+    enabled: animateBackground,
   });
 
   // Static background for reduced motion
-  if (!shouldAnimate || prefersReducedMotion) {
-    return <StaticBackground />;
+  if (!animateBackground || prefersReducedMotion) {
+    return (
+      <div
+        aria-hidden="true"
+        data-background="static"
+        className="bg-background pointer-events-none fixed inset-0 z-0 overflow-hidden"
+      >
+        <div className="from-primary/5 to-secondary/5 absolute inset-0 bg-linear-to-br" />
+      </div>
+    );
   }
 
   // Get gradient colors for orbs
@@ -68,7 +68,11 @@ function UnifiedBackground() {
   const accentColor = currentThemeConfig.colors.accent;
 
   return (
-    <div className="bg-background fixed inset-0 z-0 overflow-hidden transition-colors duration-700">
+    <div
+      aria-hidden="true"
+      data-background="particles"
+      className="bg-background pointer-events-none fixed inset-0 z-0 overflow-hidden"
+    >
       {/* Background Effects Layer */}
       <BackgroundEffects
         variant={variant}

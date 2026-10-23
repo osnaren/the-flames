@@ -14,6 +14,21 @@ test('the homepage guide and contextual links are readable without JavaScript', 
   await expect(article.getByRole('link', { name: 'privacy policy' })).toHaveAttribute('href', '/privacy');
 });
 
+test('supporting pages show their primary content before JavaScript', async ({ page }) => {
+  await page.goto('/manual');
+  await expect(page.getByRole('heading', { level: 1, name: 'FLAMES Manual Mode', exact: true })).toBeVisible();
+  await expect(page.locator('#name1')).toBeVisible();
+  await page.goto('/how-it-works');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.getByText(/old-fashioned letter-crossing chaos/)).toBeVisible();
+  await page.goto('/about');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.getByText(/Remember the days when your biggest worry/)).toBeVisible();
+  await page.goto('/charts');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.getByText('Total Matches', { exact: true })).toBeVisible();
+});
+
 test('the hydrated calculator and visible guide fit the viewport', async ({ browser }, testInfo) => {
   const context = await browser.newContext({
     viewport: testInfo.project.use.viewport,

@@ -141,7 +141,7 @@ export default function ChartsContent({
                 <h2 className="font-heading text-2xl font-bold text-white sm:text-3xl">Global Charts</h2>
               </div>
               <motion.p
-                className="mt-2 text-sm font-medium text-white/90 sm:text-base"
+                className="mt-2 min-h-10 text-sm font-medium text-white/90 sm:min-h-6 sm:text-base"
                 animate={{ opacity: [0.8, 1, 0.8] }}
                 transition={{ duration: 3, repeat: Infinity }}
               >
@@ -160,12 +160,12 @@ export default function ChartsContent({
           </div>
 
           {/* Stats Overview */}
-          {data && <ChartStats data={data} hottestTrend={hottestTrend} resultInfo={resultInfo} />}
+          <ChartStats data={data} hottestTrend={hottestTrend} resultInfo={resultInfo} />
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="relative z-1 max-h-[70vh] overflow-y-auto bg-gray-50/50 p-4 sm:p-6 dark:bg-gray-900/50">
+      <div className="relative z-1 h-[70vh] overflow-y-auto bg-gray-50/50 p-4 sm:p-6 dark:bg-gray-900/50">
         {isLoading ? (
           <LoadingState />
         ) : error ? (

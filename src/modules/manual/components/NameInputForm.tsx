@@ -1,5 +1,6 @@
 import Button from '@/components/ui/Button';
 import { useGameIntegration } from '@/hooks/useGameIntegration';
+import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { motion } from 'framer-motion';
 import { ArrowRight, Heart, Info, Pen, Pointer } from 'lucide-react';
 import { useState } from 'react';
@@ -29,6 +30,7 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
   const [name2, setName2] = useState(initialName2);
   const [isLoading, setIsLoading] = useState(false);
   const { uiInteraction, formSubmit, sound } = useGameIntegration();
+  const hydrated = usePreferencesStore((state) => state.hydrated);
 
   const performSubmit = async (experienceMode: 'click' | 'canvas') => {
     if (isLoading) return;
@@ -81,7 +83,7 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
       className="bg-background flex min-h-svh items-center justify-center overflow-y-auto p-4"
       aria-label="Name input form"
     >
-      <motion.div variants={containerVariants} initial="hidden" animate="visible" className="w-full max-w-md">
+      <motion.div variants={containerVariants} initial={false} animate="visible" className="w-full max-w-md">
         <div className="bg-surface/80 border-outline/20 rounded-3xl border p-6 shadow-2xl backdrop-blur-xl sm:p-8">
           <motion.div variants={itemVariants} className="mb-8 text-center">
             <motion.div
@@ -110,6 +112,7 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
                   placeholder="Enter first name..."
                   className="bg-surface-container border-outline/30 text-on-surface placeholder-on-surface-variant focus:ring-primary/50 focus:border-primary hover:border-primary/50 w-full rounded-xl border px-4 py-3 transition-all duration-200 focus:ring-2 focus:outline-none"
                   maxLength={20}
+                  disabled={!hydrated}
                 />
               </div>
 
@@ -126,6 +129,7 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
                   placeholder="Enter second name..."
                   className="bg-surface-container border-outline/30 text-on-surface placeholder-on-surface-variant focus:ring-primary/50 focus:border-primary hover:border-primary/50 w-full rounded-xl border px-4 py-3 transition-all duration-200 focus:ring-2 focus:outline-none"
                   maxLength={20}
+                  disabled={!hydrated}
                 />
               </div>
             </div>

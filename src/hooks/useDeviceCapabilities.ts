@@ -36,7 +36,6 @@ export interface DeviceCapabilities {
   isDesktop: boolean;
   hasTouch: boolean;
   supportsHaptics: boolean;
-  supportsWebGL: boolean;
   reducedMotion: boolean;
   networkSpeed: 'slow' | 'fast' | 'unknown';
   deviceMemory: number;
@@ -54,7 +53,6 @@ export function useDeviceCapabilities(): DeviceCapabilities {
     isDesktop: true,
     hasTouch: false,
     supportsHaptics: false,
-    supportsWebGL: false,
     reducedMotion: false,
     networkSpeed: 'unknown',
     deviceMemory: 4,
@@ -99,10 +97,6 @@ export function useDeviceCapabilities(): DeviceCapabilities {
       // Memory detection
       const deviceMemory = (navigator as NavigatorWithMemory).deviceMemory || 4;
 
-      // WebGL support
-      const canvas = document.createElement('canvas');
-      const supportsWebGL = !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
-
       // Reduced motion preference
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -119,7 +113,6 @@ export function useDeviceCapabilities(): DeviceCapabilities {
         isDesktop,
         hasTouch: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
         supportsHaptics: 'vibrate' in navigator,
-        supportsWebGL,
         reducedMotion,
         networkSpeed,
         deviceMemory,

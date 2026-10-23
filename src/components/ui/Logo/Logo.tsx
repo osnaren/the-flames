@@ -1,11 +1,11 @@
 'use client';
 
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
-import { DotLottie, DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, Variants } from 'framer-motion';
 import { Flame } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useState } from 'react';
 
 type LogoProps = {
   variant?: 'static' | 'animated';
@@ -15,7 +15,7 @@ type LogoProps = {
   textClassName?: string;
 };
 
-const LOTTIE_URL = 'https://cdn.osnaren.com/the-flames/v1/assets/logo.lottie';
+const AnimatedLogo = dynamic(() => import('./AnimatedLogo'), { ssr: false });
 
 function Logo({
   variant = 'static',
@@ -27,43 +27,8 @@ function Logo({
   const { shouldAnimate } = useAnimationPreferences();
   const isAnimated = variant === 'animated';
   const playOnHover = animationType === 'onHover';
-  const [dotLottieInstance, setDotLottieInstance] = useState<DotLottie | null>(null);
   const [isHovering, setIsHovering] = useState(false);
-
-  // Optimize the callback to prevent unnecessary re-renders
-  const dotLottieRefCallback = useCallback((dotLottie: DotLottie | null) => {
-    setDotLottieInstance(dotLottie);
-  }, []);
-
-  // For hover animation control
-  useEffect(() => {
-    if (shouldAnimate && playOnHover && dotLottieInstance) {
-      if (isHovering) {
-        dotLottieInstance.play();
-      } else {
-        dotLottieInstance.stop();
-      }
-    }
-  }, [isHovering, playOnHover, dotLottieInstance, shouldAnimate]);
-
-  // For continuous animation, ensure it's always playing
-  useEffect(() => {
-    if (shouldAnimate && !playOnHover && dotLottieInstance) {
-      dotLottieInstance.play();
-    }
-  }, [dotLottieInstance, playOnHover, shouldAnimate]);
-
-  const lottieElement = (
-    <DotLottieReact
-      src={LOTTIE_URL}
-      autoplay={shouldAnimate && !playOnHover}
-      loop={true}
-      style={{ width: 30, height: 30 }}
-      className="text-primary-container text-glow-sm h-8 transition-transform group-hover:scale-110"
-      aria-hidden="true"
-      dotLottieRefCallback={dotLottieRefCallback}
-    />
-  );
+  const [animationRequested, setAnimationRequested] = useState(false);
 
   const staticElement = (
     <Flame
@@ -84,13 +49,21 @@ function Logo({
     <motion.div
       className={`flex items-center ${className || ''}`}
       whileHover={{ scale: shouldAnimate ? 1.05 : 1 }}
-      onHoverStart={() => setIsHovering(true)}
+      onHoverStart={() => {
+        setIsHovering(true);
+        if (shouldAnimate && isAnimated) setAnimationRequested(true);
+      }}
       onHoverEnd={() => setIsHovering(false)}
     >
       <Link href="/" className="group flex items-center gap-2" aria-label={showText ? 'FLAMES Home' : 'Home'}>
-        <div className={`relative flex items-center justify-center ${isHovering ? 'animate-pulse' : ''}`}>
-          {isAnimated ? lottieElement : staticElement}
-          {isAnimated && shouldAnimate && (
+        <div className="relative flex h-8 w-8 shrink-0 items-center justify-center">
+          {staticElement}
+          {isAnimated && shouldAnimate && animationRequested && (
+            <div className="bg-surface absolute inset-0">
+              <AnimatedLogo playing={!playOnHover || isHovering} />
+            </div>
+          )}
+          {isAnimated && shouldAnimate && isHovering && (
             <motion.div
               className="bg-primary-container/20 absolute h-8 w-8 rounded-full"
               animate={{

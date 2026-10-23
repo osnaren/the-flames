@@ -4,19 +4,10 @@ import Button from '@/components/ui/Button';
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Flame } from 'lucide-react';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { memo } from 'react';
 
-// Lazy load the heavy GlobalCharts component
-const GlobalCharts = dynamic(() => import('./components/GlobalCharts'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex h-96 items-center justify-center">
-      <div className="bg-primary/20 h-8 w-8 animate-pulse rounded-full" />
-    </div>
-  ),
-});
+import GlobalCharts from './components/GlobalCharts';
 
 function ChartsPage() {
   const router = useRouter();
@@ -28,11 +19,7 @@ function ChartsPage() {
 
   return (
     <div className="min-h-screen">
-      <motion.div
-        initial={shouldAnimate ? { opacity: 0 } : { opacity: 1 }}
-        animate={{ opacity: 1 }}
-        className="p-4 md:p-6"
-      >
+      <motion.div initial={false} animate={{ opacity: 1 }} className="p-4 md:p-6">
         <div className="mb-4 flex items-center">
           <Button variant="secondary" size="sm" onClick={goBack} icon={ArrowLeft}>
             Back

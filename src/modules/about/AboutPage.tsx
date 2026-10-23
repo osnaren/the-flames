@@ -1,7 +1,6 @@
 'use client';
 
 import { SparklesText } from '@/components/magicui/sparkles-text';
-import { TextAnimate } from '@/components/magicui/text-animate';
 import { Button } from '@/components/shadcn/button';
 import { RetroGrid } from '@/components/shadcn/retro-grid';
 import { FocusCards } from '@/components/ui/focus-cards';
@@ -155,7 +154,7 @@ export default function AboutPage() {
         <RetroGrid className="opacity-50" />
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="z-10"
@@ -176,16 +175,12 @@ export default function AboutPage() {
         </motion.div>
 
         <div className="z-10 mx-auto mt-8 max-w-2xl space-y-4">
-          <TextAnimate
-            animation="blurInUp"
-            by="word"
-            className="font-handwriting text-on-surface-variant/90 text-lg leading-relaxed md:text-xl"
-          >
+          <p className="font-handwriting text-on-surface-variant/90 text-lg leading-relaxed md:text-xl">
             Remember the days when your biggest worry was whether your crush would notice you? When a simple game could
             determine your entire romantic future? When &quot;passing notes&quot; was the original DM?
-          </TextAnimate>
+          </p>
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2, duration: 0.6 }}
             className="text-on-surface-variant/70 text-base italic"

@@ -1,23 +1,12 @@
 'use client';
 
-import LoadingScreen from '@/components/ui/LoadingScreen';
-import dynamic from 'next/dynamic';
 import { memo } from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
-
-// Lazy load ManualMode as it's a heavy component with canvas
-const ManualMode = dynamic(() => import('./ManualMode'), {
-  ssr: false,
-  loading: () => <LoadingScreen message="Loading Manual Mode..." fullScreen={false} className="min-h-screen" />,
-});
+import ManualMode from './ManualMode';
 
 function ManualModePage() {
   return (
     <div className="min-h-screen">
-      <header className="sr-only">
-        <h1>Manual FLAMES Mode</h1>
-        <p>Play the classic FLAMES game by crossing out shared letters and counting the remaining letters yourself.</p>
-      </header>
       <ErrorBoundary>
         <ManualMode />
       </ErrorBoundary>
