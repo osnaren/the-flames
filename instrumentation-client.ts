@@ -7,6 +7,13 @@ import { filterBrowserEvent } from './src/lib/sentry-browser-filter';
 
 Sentry.init({
   dsn: 'https://6955a5782c6e92e948fc950fd15a0730@o4509979151958016.ingest.us.sentry.io/4510494216880128',
+  // Production builds also run in local QA. Disable all telemetry there,
+  // including traces/logs, rather than filtering only captured exceptions.
+  enabled:
+    process.env.NODE_ENV === 'production' &&
+    typeof window !== 'undefined' &&
+    !/(^|\.)localhost$|^127(?:\.\d{1,3}){3}$|^(?:\[?::1\]?|0\.0\.0\.0)$/i.test(window.location.hostname),
+  environment: process.env.NODE_ENV,
 
   // Sample 10% of traces in production to reduce costs
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1,
