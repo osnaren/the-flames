@@ -1,9 +1,11 @@
+import { useDeferredAction } from '@/hooks/useDeferredAction';
 import { useGameIntegration } from '@/hooks/useGameIntegration';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { validateFlamesInput, validateName } from '@/utils/validation';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
-import { memo, useCallback, useMemo, useState, useTransition } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import type { GameStage } from '../../types';
 
 interface InputFormProps {
@@ -37,8 +39,11 @@ function InputFormComponent({
   const [focusedField, setFocusedField] = useState<'name1' | 'name2' | null>(null);
   const { formSubmit, sound } = useGameIntegration();
   const hydrated = usePreferencesStore((state) => state.hydrated);
-  const [isSubmitting, startSubmitTransition] = useTransition();
+  const [isSubmitting, startSubmitTransition] = useDeferredAction();
   const isBusy = isProcessing || isSubmitting;
+  const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
+  const animateDecorations = shouldAnimate && !compactDevice;
+  const SubmitButton = compactDevice ? 'button' : motion.button;
 
   // Individual field validation
   const validateField = useCallback((fieldName: 'name1' | 'name2', value: string) => {
@@ -124,8 +129,10 @@ function InputFormComponent({
       setErrors(validationErrors);
 
       if (name1Result.isValid && name2Result.isValid && combinedResult.isValid) {
-        formSubmit();
-        startSubmitTransition(() => onSubmit(e));
+        startSubmitTransition(() => {
+          void formSubmit();
+          onSubmit(e);
+        });
       }
     },
     [onSubmit, isBusy, name1, name2, formSubmit, startSubmitTransition]
@@ -149,21 +156,22 @@ function InputFormComponent({
     >
       {/* Glass Card */}
       <motion.div
-        className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/80 p-6 shadow-2xl backdrop-blur-xl md:p-8 dark:border-white/10 dark:bg-black/40"
+        className={`relative overflow-hidden rounded-3xl border border-white/20 p-6 md:p-8 dark:border-white/10 ${compactDevice ? 'bg-white shadow-lg dark:bg-[#211b1a]' : 'bg-white/80 shadow-2xl backdrop-blur-xl dark:bg-black/40'}`}
         whileHover={
-          shouldAnimate && !isBusy
+          animateDecorations && !isBusy
             ? {
                 boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255,255,255,0.1)',
               }
             : {}
         }
-        style={{
-          transformStyle: 'preserve-3d',
-        }}
       >
         {/* Decorative gradient blob */}
-        <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-linear-to-br from-pink-500/20 to-purple-500/20 blur-3xl" />
-        <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-linear-to-br from-blue-500/20 to-cyan-500/20 blur-3xl" />
+        {!compactDevice && (
+          <>
+            <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-linear-to-br from-pink-500/20 to-purple-500/20 blur-3xl" />
+            <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-linear-to-br from-blue-500/20 to-cyan-500/20 blur-3xl" />
+          </>
+        )}
 
         <form onSubmit={handleSubmit} className="relative space-y-6">
           {/* Header */}
@@ -171,7 +179,7 @@ function InputFormComponent({
             <motion.div
               className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-pink-500 to-rose-500 shadow-lg"
               animate={
-                shouldAnimate
+                animateDecorations
                   ? {
                       scale: [1, 1.05, 1],
                       rotate: [0, 5, -5, 0],
@@ -220,7 +228,7 @@ function InputFormComponent({
                   suppressHydrationWarning
                 />
                 {/* Focus glow effect */}
-                {focusedField === 'name1' && shouldAnimate && (
+                {focusedField === 'name1' && animateDecorations && (
                   <motion.div
                     className="absolute inset-0 -z-10 rounded-xl bg-linear-to-r from-pink-500/20 to-purple-500/20 blur-md"
                     initial={{ opacity: 0 }}
@@ -247,7 +255,7 @@ function InputFormComponent({
               <div className="h-px flex-1 bg-linear-to-r from-transparent via-gray-300 to-transparent dark:via-gray-600" />
               <motion.span
                 className="mx-4 text-2xl"
-                animate={shouldAnimate && name1 && name2 ? { scale: [1, 1.2, 1] } : {}}
+                animate={animateDecorations && name1 && name2 ? { scale: [1, 1.2, 1] } : {}}
                 transition={{ duration: 1, repeat: Infinity }}
               >
                 💕
@@ -286,7 +294,7 @@ function InputFormComponent({
                   autoComplete="off"
                   suppressHydrationWarning
                 />
-                {focusedField === 'name2' && shouldAnimate && (
+                {focusedField === 'name2' && animateDecorations && (
                   <motion.div
                     className="absolute inset-0 -z-10 rounded-xl bg-linear-to-r from-blue-500/20 to-cyan-500/20 blur-md"
                     initial={{ opacity: 0 }}
@@ -323,25 +331,23 @@ function InputFormComponent({
           </div>
 
           {/* Submit Button */}
-          <motion.button
+          <SubmitButton
             type="submit"
             disabled={!hydrated || !isFormValid || isBusy}
-            className="group relative w-full overflow-hidden rounded-xl bg-linear-to-r from-pink-500 via-rose-500 to-red-500 px-6 py-4 font-bold text-white shadow-lg transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale"
-            whileHover={
-              shouldAnimate && isFormValid && !isBusy
-                ? {
-                    scale: 1.02,
-                    boxShadow: '0 20px 40px -10px rgba(236, 72, 153, 0.5)',
-                  }
-                : {}
-            }
-            whileTap={shouldAnimate && isFormValid && !isBusy ? { scale: 0.98 } : {}}
+            className="group relative w-full overflow-hidden rounded-xl bg-linear-to-r from-pink-500 via-rose-500 to-red-500 px-6 py-4 font-bold text-white shadow-lg transition-[box-shadow,opacity,transform] duration-300 disabled:cursor-not-allowed disabled:opacity-50"
+            {...(!compactDevice && {
+              whileHover:
+                animateDecorations && isFormValid && !isBusy
+                  ? { scale: 1.02, boxShadow: '0 20px 40px -10px rgba(236, 72, 153, 0.5)' }
+                  : {},
+              whileTap: animateDecorations && isFormValid && !isBusy ? { scale: 0.98 } : {},
+            })}
           >
             {/* Shine effect */}
             <motion.div
               className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/30 to-transparent"
               animate={
-                shouldAnimate && isFormValid && !isBusy
+                animateDecorations && isFormValid && !isBusy
                   ? {
                       translateX: ['-100%', '100%'],
                     }
@@ -358,11 +364,7 @@ function InputFormComponent({
             <span className="relative flex items-center justify-center gap-2">
               {isBusy ? (
                 <>
-                  <motion.div
-                    className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
-                  />
+                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white motion-reduce:animate-none" />
                   <span>Finding destiny...</span>
                 </>
               ) : (
@@ -373,7 +375,7 @@ function InputFormComponent({
                 </>
               )}
             </span>
-          </motion.button>
+          </SubmitButton>
         </form>
       </motion.div>
     </motion.div>

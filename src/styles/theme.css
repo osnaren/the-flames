@@ -14,14 +14,12 @@
     background var(--duration, 0.3s) cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-/* Touch controls update colors immediately. Keep compositor-friendly motion
-   without recalculating the entire inherited palette on every animation frame. */
-@media (pointer: coarse) {
-  *,
-  *::before,
-  *::after {
-    transition-property: opacity, transform !important;
-  }
+/* Color changes are immediate on every device. Interpolating an inherited root
+   color restyles the whole page on each frame; keep opacity and transform motion. */
+*,
+*::before,
+*::after {
+  transition-property: opacity, transform !important;
 }
 
 /* Let the browser skip offscreen editorial content while retaining its last

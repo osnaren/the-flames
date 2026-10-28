@@ -85,9 +85,10 @@ const ThemeCard = memo(function ThemeCard({ theme, isActive, isDetected, onClick
 
 interface SeasonalThemeSelectorProps {
   isExpanded: boolean;
+  compact?: boolean;
 }
 
-function SeasonalThemeSelector({ isExpanded }: SeasonalThemeSelectorProps) {
+function SeasonalThemeSelector({ isExpanded, compact = false }: SeasonalThemeSelectorProps) {
   const { currentTheme, detectedTheme, manualOverride, setManualTheme, themes } = useSeasonalTheme();
   const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
   const { shouldAnimate } = useAnimationPreferences();
@@ -188,7 +189,7 @@ function SeasonalThemeSelector({ isExpanded }: SeasonalThemeSelectorProps) {
     [handleScrollPrev, handleScrollNext]
   );
 
-  if (compactDevice) {
+  if (compact || compactDevice) {
     return (
       <div role="group" aria-label="Seasonal theme selector">
         <select

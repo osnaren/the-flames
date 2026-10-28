@@ -1,11 +1,10 @@
 import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { cn } from '@/utils';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import Toggle from '@ui/Toggle';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
 import {
   ChevronUp,
   Moon,
@@ -56,9 +55,6 @@ export default function FloatingControlPanel() {
   const [controlsReady, setControlsReady] = useState(false);
   const [, startControlsTransition] = useTransition();
   const prefersReducedMotion = useReducedMotion();
-  const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
-  const PanelElement = compactDevice ? 'div' : motion.div;
-  const ButtonElement = compactDevice ? 'button' : motion.button;
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const soundFrameRef = useRef<number | null>(null);
@@ -240,41 +236,13 @@ export default function FloatingControlPanel() {
     },
   ];
 
-  // Staggered children animations
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        when: 'beforeChildren',
-        staggerChildren: prefersReducedMotion ? 0 : 0.08,
-      },
-    },
-    exit: {
-      opacity: 0,
-      transition: {
-        when: 'afterChildren',
-        staggerChildren: prefersReducedMotion ? 0 : 0.05,
-        staggerDirection: -1,
-      },
-    },
-  };
-
-  const childVariants = {
-    hidden: { opacity: 0, x: 20 },
-    visible: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: 10 },
-  };
-
   return (
     <div className={cn('fixed top-20 right-5 z-50 md:right-6')}>
-      <PanelElement
+      <div
         ref={panelRef}
         className={cn(
           'border-outline/20 overflow-hidden border',
-          compactDevice
-            ? 'bg-surface-container'
-            : 'from-surface-container-low/90 to-surface-container-high/80 bg-linear-to-br backdrop-blur-lg',
+          'bg-surface-container',
           isExpanded && 'shadow-lg',
           isExpanded && 'shadow-[0_0_15px_2px_rgba(0,0,0,0.1)] dark:shadow-[0_0_15px_2px_rgba(255,182,144,0.15)]',
           isExpanded
@@ -285,7 +253,7 @@ export default function FloatingControlPanel() {
         role="region"
         aria-busy={isExpanded && !controlsReady}
       >
-        <ButtonElement
+        <button
           ref={toggleButtonRef}
           onClick={() => {
             hapticFeedback.tap();
@@ -312,10 +280,6 @@ export default function FloatingControlPanel() {
               });
             });
           }}
-          {...(!compactDevice && {
-            whileHover: { scale: shouldAnimate ? 1.1 : 1 },
-            whileTap: { scale: shouldAnimate ? 0.9 : 1 },
-          })}
           className={cn(
             'absolute z-20 flex touch-manipulation items-center justify-center rounded-full transition-colors',
             isExpanded
@@ -326,40 +290,25 @@ export default function FloatingControlPanel() {
           aria-label={isExpanded ? 'Close settings' : 'Open settings'}
           suppressHydrationWarning
         >
-          {isExpanded ? (
-            <ChevronUp size={18} />
-          ) : (
-            <Settings size={20} className={shouldAnimate && !compactDevice ? 'animate-spin-slow' : ''} />
-          )}
-        </ButtonElement>
+          {isExpanded ? <ChevronUp size={18} /> : <Settings size={20} />}
+        </button>
 
-        <AnimatePresence mode="wait">
+        <>
           {isExpanded && (
-            <PanelElement
-              className="px-4 pt-14 pb-3"
-              {...(!compactDevice && {
-                variants: containerVariants,
-                initial: 'hidden',
-                animate: 'visible',
-                exit: 'exit',
-              })}
-            >
-              <PanelElement
-                {...(!compactDevice && { variants: childVariants })}
-                className="mb-4 flex items-center justify-center"
-              >
+            <div className="px-4 pt-14 pb-3">
+              <div className="mb-4 flex items-center justify-center">
                 <h3 className="from-primary via-primary-container to-error bg-linear-to-r bg-clip-text text-center text-xs font-medium tracking-wider text-transparent uppercase">
                   Settings
                 </h3>
-              </PanelElement>
+              </div>
 
               {controlsReady ? (
                 <div className="space-y-3">
-                  <PanelElement {...(!compactDevice && { variants: childVariants })}>
+                  <div>
                     <ThemeControl />
-                  </PanelElement>
+                  </div>
                   {controls.map((control, _index) => (
-                    <PanelElement key={control.label} {...(!compactDevice && { variants: childVariants })}>
+                    <div key={control.label}>
                       <Toggle
                         isActive={control.active}
                         onToggle={control.toggle}
@@ -372,11 +321,11 @@ export default function FloatingControlPanel() {
                         ariaLabel={control.ariaLabel}
                         tabIndex={0}
                       />
-                    </PanelElement>
+                    </div>
                   ))}
 
                   {/* Audio Controls Row (SFX, Music, Haptics) */}
-                  <PanelElement {...(!compactDevice && { variants: childVariants })}>
+                  <div>
                     <div className="from-secondary-container/30 to-secondary/10 flex items-center justify-between rounded-lg bg-linear-to-r px-3 py-2">
                       <span className="text-on-surface-variant text-xs font-medium">Audio</span>
                       <div className="flex items-center gap-1">
@@ -407,13 +356,10 @@ export default function FloatingControlPanel() {
                         })}
                       </div>
                     </div>
-                  </PanelElement>
+                  </div>
 
                   {/* Seasonal Theme Selector */}
-                  <PanelElement
-                    className="border-outline/20 mt-3 border-t pt-3"
-                    {...(!compactDevice && { variants: childVariants })}
-                  >
+                  <div className="border-outline/20 mt-3 border-t pt-3">
                     <div className="mb-2 flex items-center gap-1.5">
                       <Palette className="text-secondary h-3.5 w-3.5" />
                       <span className="text-on-surface-variant text-[10px] font-medium tracking-wide uppercase">
@@ -421,15 +367,12 @@ export default function FloatingControlPanel() {
                       </span>
                     </div>
                     <div className="min-h-16">
-                      <SeasonalThemeSelector isExpanded={isExpanded} />
+                      <SeasonalThemeSelector isExpanded={isExpanded} compact />
                     </div>
-                  </PanelElement>
+                  </div>
 
                   {/* Music Player */}
-                  <PanelElement
-                    className="border-outline/20 mt-3 border-t pt-3"
-                    {...(!compactDevice && { variants: childVariants })}
-                  >
+                  <div className="border-outline/20 mt-3 border-t pt-3">
                     <div className="mb-2 flex items-center gap-1.5">
                       <Music2 className="text-secondary h-3.5 w-3.5" />
                       <span className="text-on-surface-variant text-[10px] font-medium tracking-wide uppercase">
@@ -437,14 +380,11 @@ export default function FloatingControlPanel() {
                       </span>
                     </div>
                     <div className="min-h-36">
-                      <MusicPlayer isExpanded={isExpanded} tabIndex={0} />
+                      <MusicPlayer isExpanded={isExpanded} tabIndex={0} compact />
                     </div>
-                  </PanelElement>
+                  </div>
 
-                  <PanelElement
-                    className="border-outline/20 text-on-surface-variant mt-4 border-t pt-4 text-center text-xs"
-                    {...(!compactDevice && { variants: childVariants })}
-                  >
+                  <div className="border-outline/20 text-on-surface-variant mt-4 border-t pt-4 text-center text-xs">
                     <button
                       className="hover:bg-surface-container-lowest hover:text-on-surface hover:text-glow-sm focus:ring-primary/50 flex w-full items-center justify-center gap-1.5 rounded-md px-3 py-2 transition-colors focus:ring-2 focus:outline-none"
                       aria-label="Jump to top of page"
@@ -454,33 +394,17 @@ export default function FloatingControlPanel() {
                       <MousePointerClick size={14} />
                       <span>Jump to top</span>
                     </button>
-                  </PanelElement>
+                  </div>
                 </div>
               ) : (
                 <p role="status" className="text-on-surface-variant py-8 text-center text-sm">
                   Loading settings…
                 </p>
               )}
-            </PanelElement>
+            </div>
           )}
-        </AnimatePresence>
-
-        {!isExpanded && shouldAnimate && !compactDevice && (
-          <motion.div
-            className="absolute inset-0 flex h-12 w-12 items-center justify-center"
-            animate={{
-              rotate: [0, 5, 0, -5, 0],
-              scale: [1, 1.05, 1, 1.05, 1],
-            }}
-            transition={{
-              duration: 2,
-              ease: 'easeInOut',
-              repeat: Infinity,
-              repeatDelay: 4,
-            }}
-          />
-        )}
-      </PanelElement>
+        </>
+      </div>
     </div>
   );
 }

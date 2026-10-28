@@ -27,6 +27,8 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 interface MusicPlayerProps {
+  /** Use native controls inside the performance-sensitive settings panel. */
+  compact?: boolean;
   /** Whether the player is in an expanded panel */
   isExpanded?: boolean;
   /** Additional CSS classes */
@@ -35,7 +37,7 @@ interface MusicPlayerProps {
   tabIndex?: number;
 }
 
-function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0 }: MusicPlayerProps) {
+function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0, compact = false }: MusicPlayerProps) {
   const { shouldAnimate } = useAnimationPreferences();
   const { isBGMEnabled, musicTheme, volume, toggleBGM, setMusicTheme, setVolume } = usePreferencesStore(
     useShallow((state) => ({
@@ -207,7 +209,7 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0 }: Mu
     },
   };
 
-  if (compactDevice) {
+  if (compact || compactDevice) {
     const controlClass =
       'text-on-surface-variant hover:bg-surface-container-highest/50 focus:ring-primary/50 flex h-9 w-9 items-center justify-center rounded-full focus:ring-2 focus:outline-none disabled:opacity-30';
     return (

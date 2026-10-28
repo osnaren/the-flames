@@ -1,3 +1,4 @@
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import { forwardRef, memo, useEffect, useMemo, useState } from 'react';
@@ -41,6 +42,8 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
   ref
 ) {
   const { shouldAnimate } = useAnimationPreferences();
+  const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
+  const animateDecorations = shouldAnimate && !compactDevice;
 
   // Choose animation stages based on whether hero transition is used
   const stages = heroTransitionComplete ? [...ANIMATION_STAGES_WITH_HERO] : [...ANIMATION_STAGES];
@@ -127,7 +130,12 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
           aria-label={`FLAMES Result: ${label}`}
         >
           {/* Result Glow Effect */}
-          <ResultGlow result={result} isVisible={heroTransitionComplete ? stageCompleted.card : stageCompleted.entry} />
+          {!compactDevice && (
+            <ResultGlow
+              result={result}
+              isVisible={heroTransitionComplete ? stageCompleted.card : stageCompleted.entry}
+            />
+          )}
 
           {/* Confetti Effect for positive results */}
           {isResultPositive && (heroTransitionComplete ? stageCompleted.card : stageCompleted.entry) && (
@@ -136,7 +144,10 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
 
           {/* Main Card */}
           <div
-            className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-black/30"
+            className={cn(
+              'relative overflow-hidden rounded-3xl border border-white/20 shadow-2xl dark:border-white/10',
+              compactDevice ? 'bg-surface-container' : 'bg-white/10 backdrop-blur-xl dark:bg-black/30'
+            )}
             data-capture-target="card-bg"
           >
             {/* Animated gradient background */}
@@ -160,17 +171,19 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
             <div className="absolute -right-24 -bottom-24 h-48 w-48 rounded-full bg-linear-to-tl from-white/15 to-transparent blur-3xl" />
 
             {/* Subtle shimmer effect */}
-            <motion.div
-              className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent"
-              initial={{ x: '-100%' }}
-              animate={{ x: '100%' }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatDelay: 3,
-                ease: 'easeInOut',
-              }}
-            />
+            {animateDecorations && (
+              <motion.div
+                className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent"
+                initial={{ x: '-100%' }}
+                animate={{ x: '100%' }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatDelay: 3,
+                  ease: 'easeInOut',
+                }}
+              />
+            )}
 
             {/* Content */}
             <div className="relative p-6 text-center sm:p-8">
@@ -220,7 +233,9 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
                   <motion.div
                     className={cn('absolute -inset-1 rounded-full border-2 opacity-30', `border-current`)}
                     initial={{ scale: 1, opacity: 0.3 }}
-                    animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0, 0.3] }}
+                    animate={
+                      animateDecorations ? { scale: [1, 1.15, 1], opacity: [0.3, 0, 0.3] } : { scale: 1, opacity: 0.3 }
+                    }
                     transition={{
                       duration: 2,
                       repeat: Infinity,
@@ -264,7 +279,7 @@ const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCa
                   </span>
                   <motion.span
                     className="text-2xl"
-                    animate={shouldAnimate ? { scale: [1, 1.2, 1] } : {}}
+                    animate={animateDecorations ? { scale: [1, 1.2, 1] } : {}}
                     transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 1.5 }}
                     aria-hidden="true"
                   >

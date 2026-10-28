@@ -1,6 +1,8 @@
+import { useDeferredAction } from '@/hooks/useDeferredAction';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { motion } from 'framer-motion';
 import { BarChart3, ImageDown, Link2, RotateCcw, Share2 } from 'lucide-react';
-import { memo, useCallback, useState, useTransition } from 'react';
+import { memo, useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { useGameIntegration } from '@/hooks/useGameIntegration';
@@ -25,6 +27,7 @@ interface DockButtonProps {
   variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'info';
   delay?: number;
   isBusy?: boolean;
+  compact?: boolean;
 }
 
 const variantStyles = {
@@ -35,28 +38,35 @@ const variantStyles = {
   info: 'from-indigo-500 to-blue-600 hover:from-indigo-400 hover:to-blue-500',
 };
 
-function DockButton({ icon: Icon, label, onClick, variant = 'secondary', delay = 0, isBusy = false }: DockButtonProps) {
+function DockButton({
+  icon: Icon,
+  label,
+  onClick,
+  variant = 'secondary',
+  delay = 0,
+  isBusy = false,
+  compact = false,
+}: DockButtonProps) {
   const { shouldAnimate } = useAnimationPreferences();
   const [isPressed, setIsPressed] = useState(false);
+  const ButtonElement = compact ? 'button' : motion.button;
 
   return (
-    <motion.button
+    <ButtonElement
+      type="button"
       onClick={onClick}
       disabled={isBusy}
       aria-busy={isBusy || undefined}
-      onPointerDown={() => setIsPressed(true)}
-      onPointerUp={() => setIsPressed(false)}
-      onPointerLeave={() => setIsPressed(false)}
-      initial={shouldAnimate ? { opacity: 0, y: 20, scale: 0.8 } : false}
-      animate={{ opacity: 1, y: 0, scale: isPressed ? 0.95 : 1 }}
-      transition={{
-        delay: shouldAnimate ? delay : 0,
-        type: 'spring',
-        stiffness: 400,
-        damping: 25,
-      }}
-      whileHover={shouldAnimate ? { scale: 1.1, y: -4 } : {}}
-      whileTap={{ scale: 0.9 }}
+      {...(!compact && {
+        onPointerDown: () => setIsPressed(true),
+        onPointerUp: () => setIsPressed(false),
+        onPointerLeave: () => setIsPressed(false),
+        initial: shouldAnimate ? { opacity: 0, y: 20, scale: 0.8 } : false,
+        animate: { opacity: 1, y: 0, scale: isPressed ? 0.95 : 1 },
+        transition: { delay: shouldAnimate ? delay : 0, type: 'spring', stiffness: 400, damping: 25 },
+        whileHover: shouldAnimate ? { scale: 1.1, y: -4 } : {},
+        whileTap: { scale: 0.9 },
+      })}
       className={cn(
         'group relative flex cursor-pointer flex-col items-center gap-1.5 rounded-2xl px-3 py-2.5',
         'bg-linear-to-br shadow-lg',
@@ -68,7 +78,12 @@ function DockButton({ icon: Icon, label, onClick, variant = 'secondary', delay =
       aria-label={label}
     >
       {/* Icon container */}
-      <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
+      <span
+        className={cn(
+          'flex h-8 w-8 items-center justify-center rounded-xl bg-white/20',
+          !compact && 'backdrop-blur-sm'
+        )}
+      >
         <Icon
           className={cn('h-4 w-4 text-white transition-transform group-hover:scale-110', isBusy && 'animate-spin')}
         />
@@ -78,15 +93,17 @@ function DockButton({ icon: Icon, label, onClick, variant = 'secondary', delay =
       <span className="text-[10px] font-medium text-white/90 sm:text-xs">{label}</span>
 
       {/* Glow effect on hover */}
-      <motion.div
-        className={cn(
-          'absolute inset-0 -z-10 rounded-2xl bg-linear-to-br opacity-0 blur-xl transition-opacity',
-          variantStyles[variant]
-        )}
-        initial={{ opacity: 0 }}
-        whileHover={{ opacity: 0.5 }}
-      />
-    </motion.button>
+      {!compact && (
+        <motion.div
+          className={cn(
+            'absolute inset-0 -z-10 rounded-2xl bg-linear-to-br opacity-0 blur-xl transition-opacity',
+            variantStyles[variant]
+          )}
+          initial={{ opacity: 0 }}
+          whileHover={{ opacity: 0.5 }}
+        />
+      )}
+    </ButtonElement>
   );
 }
 
@@ -105,8 +122,9 @@ function ResultActionsDock({
   className,
 }: ResultActionsDockProps) {
   const { shouldAnimate } = useAnimationPreferences();
+  const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
   const { uiInteraction, gameReset } = useGameIntegration();
-  const [isResetting, startResetTransition] = useTransition();
+  const [isResetting, startResetTransition] = useDeferredAction();
 
   const handleCopyLink = useCallback(() => {
     uiInteraction('click');
@@ -118,10 +136,12 @@ function ResultActionsDock({
   }, [onCopyLink, uiInteraction]);
 
   const handleRetry = useCallback(() => {
-    gameReset();
     // Acknowledge the action while React prepares the input stage without
     // blocking the next frame with the entire result-tree replacement.
-    startResetTransition(onRetry);
+    startResetTransition(() => {
+      void gameReset();
+      onRetry();
+    });
   }, [gameReset, onRetry, startResetTransition]);
 
   const handleShare = useCallback(() => {
@@ -154,7 +174,8 @@ function ResultActionsDock({
       }}
       className={cn(
         'mt-4 flex flex-wrap items-center justify-center gap-2 sm:gap-3',
-        'rounded-3xl border border-white/10 bg-black/20 px-3 py-3 backdrop-blur-xl',
+        'rounded-3xl border border-white/10 px-3 py-3',
+        compactDevice ? 'bg-surface-container-high' : 'bg-black/20 backdrop-blur-xl',
         'shadow-2xl shadow-black/20',
         'dark:border-white/5 dark:bg-black/40',
         className
@@ -168,13 +189,35 @@ function ResultActionsDock({
         variant="secondary"
         delay={0}
         isBusy={isResetting}
+        compact={compactDevice}
       />
 
-      <DockButton icon={Share2} label="Share" onClick={handleShare} variant="primary" delay={0.05} />
+      <DockButton
+        icon={Share2}
+        label="Share"
+        onClick={handleShare}
+        variant="primary"
+        delay={0.05}
+        compact={compactDevice}
+      />
 
-      <DockButton icon={ImageDown} label="Save Image" onClick={handleShareAsImage} variant="success" delay={0.1} />
+      <DockButton
+        icon={ImageDown}
+        label="Save Image"
+        onClick={handleShareAsImage}
+        variant="success"
+        delay={0.1}
+        compact={compactDevice}
+      />
 
-      <DockButton icon={Link2} label="Copy" onClick={handleCopyLink} variant="info" delay={0.15} />
+      <DockButton
+        icon={Link2}
+        label="Copy"
+        onClick={handleCopyLink}
+        variant="info"
+        delay={0.15}
+        compact={compactDevice}
+      />
 
       {/* Optional Actions */}
       {/* {onNavigateToManual && (
@@ -182,7 +225,14 @@ function ResultActionsDock({
       )} */}
 
       {onNavigateToStats && (
-        <DockButton icon={BarChart3} label="Charts" onClick={handleStats} variant="info" delay={0.25} />
+        <DockButton
+          icon={BarChart3}
+          label="Charts"
+          onClick={handleStats}
+          variant="info"
+          delay={0.25}
+          compact={compactDevice}
+        />
       )}
     </motion.div>
   );
