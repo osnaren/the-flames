@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/s
 import { BGM_TRACKS, getTracksForTheme, SoundId, THEME_GROUPS } from '@/config/sound';
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useSoundSystem } from '@/hooks/useSoundSystem';
 import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { cn } from '@/utils';
@@ -48,6 +49,7 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0 }: Mu
   );
   const { playBGM, getBGMState, pauseBGM, resumeBGM } = useSoundSystem();
   const { hapticFeedback } = useHapticFeedback();
+  const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
@@ -204,6 +206,100 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0 }: Mu
       },
     },
   };
+
+  if (compactDevice) {
+    const controlClass =
+      'text-on-surface-variant hover:bg-surface-container-highest/50 focus:ring-primary/50 flex h-9 w-9 items-center justify-center rounded-full focus:ring-2 focus:outline-none disabled:opacity-30';
+    return (
+      <div
+        role="group"
+        aria-label="Music player"
+        className={cn('border-outline/20 bg-surface-container-low/80 space-y-2 rounded-xl border p-2', className)}
+      >
+        <select
+          aria-label="Music theme"
+          value={currentThemeGroup.id}
+          onChange={(event) => {
+            void handleThemeSelect(event.target.value);
+          }}
+          className="bg-surface-container-high/50 text-on-surface h-8 w-full rounded-md px-2 text-xs [color-scheme:light] dark:[color-scheme:dark]"
+          tabIndex={isExpanded ? tabIndex : -1}
+        >
+          {THEME_GROUPS.map((group) => (
+            <option key={group.id} value={group.id}>
+              {group.icon} {group.label}
+            </option>
+          ))}
+        </select>
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => {
+              void cycleTrack('prev');
+            }}
+            disabled={themeTracks.length <= 1}
+            className={controlClass}
+            aria-label="Previous track"
+            tabIndex={isExpanded ? tabIndex : -1}
+          >
+            <SkipBack className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              void handlePlayPause();
+            }}
+            className={cn(controlClass, 'bg-primary/20 text-primary')}
+            aria-label={isPlaying ? 'Pause music' : 'Play music'}
+            tabIndex={isExpanded ? tabIndex : -1}
+          >
+            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              void cycleTrack('next');
+            }}
+            disabled={themeTracks.length <= 1}
+            className={controlClass}
+            aria-label="Next track"
+            tabIndex={isExpanded ? tabIndex : -1}
+          >
+            <SkipForward className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              hapticFeedback.tap();
+              toggleBGM();
+            }}
+            className={controlClass}
+            aria-label={isBGMEnabled ? 'Mute music' : 'Unmute music'}
+            tabIndex={isExpanded ? tabIndex : -1}
+          >
+            {isBGMEnabled && volume > 0 ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            value={volume}
+            onChange={handleVolumeChange}
+            aria-label="Volume control"
+            className="accent-primary h-6 min-w-0 flex-1"
+            tabIndex={isExpanded ? tabIndex : -1}
+          />
+          <span className="text-on-surface-variant w-7 text-right text-[10px]">{Math.round(volume * 100)}%</span>
+        </div>
+        <p className="text-on-surface-variant h-4 truncate text-[10px]">
+          {isPlaying ? 'Now playing' : 'Track'}: {currentTrack.label}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div

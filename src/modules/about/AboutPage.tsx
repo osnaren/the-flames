@@ -226,7 +226,7 @@ export default function AboutPage() {
       <StoryTimeline items={timelineData} />
 
       {/* Image Gallery Section */}
-      <section className="bg-surface-container/30 px-4 py-32" aria-labelledby="gallery-heading">
+      <section className="deferred-content bg-surface-container/30 px-4 py-32" aria-labelledby="gallery-heading">
         <div className="container mx-auto space-y-16">
           <div className="space-y-4 text-center">
             <motion.div
@@ -256,7 +256,7 @@ export default function AboutPage() {
       </section>
 
       {/* Call to Action */}
-      <section className="relative overflow-hidden px-4 py-32" aria-labelledby="cta-heading">
+      <section className="deferred-content relative overflow-hidden px-4 py-32" aria-labelledby="cta-heading">
         <div
           className="from-background via-primary-container/10 to-background absolute inset-0 -z-10 bg-linear-to-b"
           aria-hidden="true"

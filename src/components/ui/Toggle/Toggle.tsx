@@ -1,4 +1,5 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { motion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 
@@ -32,14 +33,19 @@ export default function Toggle({
 }: ToggleProps) {
   const Icon = isActive ? ActiveIcon : InactiveIcon;
   const { shouldAnimate } = useAnimationPreferences();
+  const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
+  const ButtonElement = compactDevice ? 'button' : motion.button;
 
   return (
-    <motion.button
+    <ButtonElement
       className={`flex w-full items-center justify-between rounded-lg p-2.5 ${backgroundColor} border-outline/10 border backdrop-blur-xs transition-colors duration-200 ${isActive ? 'shadow-glow-sm' : ''} focus:ring-primary dark:focus:ring-primary dark:focus:ring-offset-surface hover:brightness-105 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:hover:brightness-110`}
       onClick={onToggle}
-      whileHover={shouldAnimate ? { scale: 1.02 } : undefined}
-      whileTap={shouldAnimate ? { scale: 0.98 } : undefined}
-      whileFocus={shouldAnimate ? { scale: 1.02 } : undefined}
+      {...(!compactDevice &&
+        shouldAnimate && {
+          whileHover: { scale: 1.02 },
+          whileTap: { scale: 0.98 },
+          whileFocus: { scale: 1.02 },
+        })}
       role="switch"
       aria-checked={isActive}
       aria-label={ariaLabel || `Toggle ${label}`}
@@ -51,6 +57,6 @@ export default function Toggle({
         className={`${isActive ? activeColor : inactiveColor} transition-colors duration-200`}
         aria-hidden="true"
       />
-    </motion.button>
+    </ButtonElement>
   );
 }

@@ -1,26 +1,26 @@
 'use client';
 
 import Button from '@/components/ui/Button';
-import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { motion, useInView } from 'framer-motion';
 import { ArrowRight, FlameKindling, Heart, Sparkles, Wand2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRef } from 'react';
 import { RiSparklingLine } from 'react-icons/ri';
+import { useGuideMotion } from '../useGuideMotion';
 
 /**
  * Enhanced Call to Action component encouraging users to try the FLAMES game
  * with engaging animations and visual appeal
  */
 export default function CallToAction() {
-  const { shouldAnimate } = useAnimationPreferences();
+  const { shouldAnimate } = useGuideMotion();
   const containerRef = useRef(null);
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
 
   return (
     <motion.section
       ref={containerRef}
-      className="relative py-16"
+      className="deferred-content relative py-16"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}

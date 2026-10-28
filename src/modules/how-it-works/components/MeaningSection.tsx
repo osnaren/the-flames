@@ -1,11 +1,11 @@
 'use client';
 
 import Card from '@/components/ui/Card';
-import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { motion, useInView } from 'framer-motion';
 import { Flame, Handshake, Heart, Shield, Sparkles, Zap } from 'lucide-react';
 import { useRef } from 'react';
 import { GiBigDiamondRing, GiBrokenHeart } from 'react-icons/gi';
+import { useGuideMotion } from '../useGuideMotion';
 
 interface MeaningCard {
   letter: string;
@@ -86,14 +86,14 @@ const meaningCards: MeaningCard[] = [
  * with interactive cards and rich animations
  */
 export default function MeaningSection() {
-  const { shouldAnimate } = useAnimationPreferences();
+  const { shouldAnimate } = useGuideMotion();
   const containerRef = useRef(null);
   const isInView = useInView(containerRef, { once: true, amount: 0.2 });
 
   return (
     <motion.section
       ref={containerRef}
-      className="relative py-16"
+      className="deferred-content relative py-16"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, amount: 0.1 }}

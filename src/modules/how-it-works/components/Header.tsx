@@ -1,11 +1,11 @@
 'use client';
 
 import Button from '@/components/ui/Button';
-import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowLeft, Flame, Zap } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { GiSparkyBomb } from 'react-icons/gi';
+import { useGuideMotion } from '../useGuideMotion';
 
 /**
  * Enhanced Header component for How It Works page
@@ -13,7 +13,7 @@ import { GiSparkyBomb } from 'react-icons/gi';
  */
 export default function Header() {
   const router = useRouter();
-  const { shouldAnimate } = useAnimationPreferences();
+  const { shouldAnimate } = useGuideMotion();
   const { scrollY } = useScroll();
 
   // Parallax effect for floating elements

@@ -24,6 +24,21 @@
   }
 }
 
+/* Let the browser skip offscreen editorial content while retaining its last
+   rendered height. Keep interactive game and canvas layouts outside containment. */
+@media (max-width: 767px), (pointer: coarse) {
+  .deferred-content,
+  footer {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto 700px;
+  }
+
+  #charts-content-panel > * {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto 400px;
+  }
+}
+
 @theme {
   /* Spacing & Timing */
   --radius: 0.5rem;

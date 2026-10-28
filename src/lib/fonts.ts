@@ -42,7 +42,8 @@ export const patrickHand = Patrick_Hand({
   display: 'swap',
   variable: '--font-patrick-hand',
   weight: ['400'],
-  preload: false,
+  // Used in the above-the-fold wordmark and About introduction.
+  preload: true,
 });
 
 // Combined font variables for use in className

@@ -2,11 +2,11 @@
 
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { AnimatePresence, motion, useInView } from 'framer-motion';
 import { Flame, Play, RefreshCcw, Target, Zap } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useGuideMotion } from '../useGuideMotion';
 
 interface Step3Props {
   remainingCount: number;
@@ -27,7 +27,7 @@ const FLAMES_MEANINGS: Record<string, { title: string; color: string }> = {
  * with sophisticated counting and striking animations
  */
 export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
-  const { shouldAnimate } = useAnimationPreferences();
+  const { shouldAnimate } = useGuideMotion();
   const { sound, uiInteraction, resultReveal } = useGameIntegration();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentPosition, setCurrentPosition] = useState(-1);

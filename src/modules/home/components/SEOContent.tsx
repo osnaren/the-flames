@@ -5,7 +5,7 @@ export function SEOContent() {
   const linkClass = 'text-primary underline underline-offset-4';
 
   return (
-    <article className="mx-auto max-w-2xl space-y-8 border-t border-pink-200/50 px-4 pt-10 pb-12 text-left dark:border-pink-900/40">
+    <article className="deferred-content mx-auto max-w-2xl space-y-8 border-t border-pink-200/50 px-4 pt-10 pb-12 text-left dark:border-pink-900/40">
       <section className="space-y-4" aria-labelledby="flames-calculator-guide">
         <h2 id="flames-calculator-guide" className="font-heading text-on-surface text-2xl font-bold">
           What is the FLAMES calculator?

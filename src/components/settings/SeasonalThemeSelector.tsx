@@ -3,6 +3,7 @@
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/shadcn/carousel';
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { useGameIntegration } from '@/hooks/useGameIntegration';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { SeasonalTheme, SeasonalThemeConfig } from '@/themes/seasonal/types';
 import { useSeasonalTheme } from '@/themes/seasonal/useSeasonalTheme';
 import { cn } from '@/utils';
@@ -87,7 +88,8 @@ interface SeasonalThemeSelectorProps {
 }
 
 function SeasonalThemeSelector({ isExpanded }: SeasonalThemeSelectorProps) {
-  const { currentTheme, detectedTheme, setManualTheme, themes } = useSeasonalTheme();
+  const { currentTheme, detectedTheme, manualOverride, setManualTheme, themes } = useSeasonalTheme();
+  const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
   const { shouldAnimate } = useAnimationPreferences();
   const { uiInteraction } = useGameIntegration();
   const [api, setApi] = useState<CarouselApi>();
@@ -185,6 +187,34 @@ function SeasonalThemeSelector({ isExpanded }: SeasonalThemeSelectorProps) {
     },
     [handleScrollPrev, handleScrollNext]
   );
+
+  if (compactDevice) {
+    return (
+      <div role="group" aria-label="Seasonal theme selector">
+        <select
+          aria-label="Seasonal theme"
+          value={manualOverride ?? 'auto'}
+          onChange={(event) => {
+            if (event.target.value === 'auto') {
+              uiInteraction('select');
+              setManualTheme(null);
+            } else {
+              handleThemeSelect(event.target.value as SeasonalTheme);
+            }
+          }}
+          className="bg-surface-container-high/50 border-outline/20 text-on-surface h-10 w-full rounded-lg border px-2 text-xs [color-scheme:light] dark:[color-scheme:dark]"
+          tabIndex={isExpanded ? 0 : -1}
+        >
+          <option value="auto">Automatic ({themes[detectedTheme].name})</option>
+          {orderedThemes.map((theme) => (
+            <option key={theme.id} value={theme.id}>
+              {theme.emoji} {theme.name}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
 
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions

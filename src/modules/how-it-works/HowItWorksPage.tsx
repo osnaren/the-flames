@@ -33,6 +33,7 @@ function HowItWorksPage() {
           >
             {/* Step 1: Names */}
             <motion.div
+              className="deferred-content"
               initial={shouldAnimate ? { opacity: 0, y: 30 } : { opacity: 1, y: 0 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
@@ -43,6 +44,7 @@ function HowItWorksPage() {
 
             {/* Step 2: Common Letters */}
             <motion.div
+              className="deferred-content"
               initial={shouldAnimate ? { opacity: 0, y: 30 } : { opacity: 1, y: 0 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
@@ -53,6 +55,7 @@ function HowItWorksPage() {
 
             {/* Step 3: FLAMES Simulation */}
             <motion.div
+              className="deferred-content"
               initial={shouldAnimate ? { opacity: 0, y: 30 } : { opacity: 1, y: 0 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}

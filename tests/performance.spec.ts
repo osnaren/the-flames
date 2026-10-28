@@ -69,6 +69,43 @@ test('settings do not preload sound effects for unplayed game stages', async ({ 
   expect(gameSounds).toEqual([]);
 });
 
+test('touch settings preserve season, music and volume choices', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Native controls are used on touch screens.');
+  await page.goto('/');
+  await expect(page.locator('#name1')).toBeEnabled();
+  await page.getByRole('button', { name: 'Open settings', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Seasonal theme', exact: true }).selectOption('default');
+  await expect(page.locator('body')).toHaveClass(/default-theme/);
+  await page.getByRole('combobox', { name: 'Music theme', exact: true }).selectOption('chill');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('musicTheme'))).toBe('chill');
+  const volume = page.getByRole('slider', { name: 'Volume control', exact: true });
+  await volume.focus();
+  await page.keyboard.press('Home');
+  for (let i = 0; i < 3; i++) await page.keyboard.press('ArrowRight');
+  await expect(volume).toHaveValue('0.15');
+  await expect.poll(() => page.evaluate(() => Number(localStorage.getItem('volume')))).toBe(0.15);
+  await page.getByRole('button', { name: 'Mute music', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Unmute music', exact: true })).toBeVisible();
+  await page.reload();
+  await page.getByRole('button', { name: 'Open settings', exact: true }).click();
+  await expect(page.getByRole('combobox', { name: 'Seasonal theme', exact: true })).toHaveValue('default');
+  await expect(page.getByRole('combobox', { name: 'Music theme', exact: true })).toHaveValue('chill');
+  await expect(page.getByRole('slider', { name: 'Volume control', exact: true })).toHaveValue('0.15');
+});
+
+test('the tutorial simulation completes and resets on touch screens', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Covers the compact tutorial motion policy.');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/how-it-works');
+  const start = page.getByRole('button', { name: 'Start', exact: true });
+  await start.scrollIntoViewIfNeeded();
+  await start.tap();
+  await expect(page.getByText('The result is:', { exact: true })).toBeVisible({ timeout: 30000 });
+  await page.getByRole('button', { name: 'Reset', exact: true }).tap();
+  await expect(start).toBeEnabled();
+  await expect(page.getByText('The result is:', { exact: true })).toHaveCount(0);
+});
+
 test.beforeEach(async ({ page }) => {
   await page.route('**/*.sentry.io/**', (route) => route.abort());
   await page.route('https://example.supabase.co/functions/v1/get-country', (route) =>

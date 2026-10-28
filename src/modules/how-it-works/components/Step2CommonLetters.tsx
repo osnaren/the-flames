@@ -1,11 +1,11 @@
 'use client';
 
 import Card from '@/components/ui/Card';
-import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { motion, useInView } from 'framer-motion';
 import { Sparkles, Target, Zap } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { GiRollingBomb } from 'react-icons/gi';
+import { useGuideMotion } from '../useGuideMotion';
 
 interface Step2Props {
   name1: string;
@@ -18,7 +18,7 @@ interface Step2Props {
  * with sophisticated animations and visual feedback
  */
 export default function Step2CommonLetters({ name1, name2, commonLetters }: Step2Props) {
-  const { shouldAnimate } = useAnimationPreferences();
+  const { shouldAnimate } = useGuideMotion();
   const [hoveredLetter, setHoveredLetter] = useState<string | null>(null);
   const containerRef = useRef(null);
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });

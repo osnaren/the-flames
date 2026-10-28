@@ -1,10 +1,10 @@
 'use client';
 
 import Card from '@/components/ui/Card';
-import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Heart, Sparkles, Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useGuideMotion } from '../useGuideMotion';
 
 interface Step1Props {
   name1: string;
@@ -178,7 +178,7 @@ const NameConnector = ({ shouldAnimate }: { shouldAnimate: boolean }) => {
  * Enhanced Step 1 component showing the input names with sophisticated connection animation
  */
 export default function Step1Names({ name1, name2 }: Step1Props) {
-  const { shouldAnimate } = useAnimationPreferences();
+  const { shouldAnimate } = useGuideMotion();
   const [isHovered, setIsHovered] = useState(false);
 
   return (
