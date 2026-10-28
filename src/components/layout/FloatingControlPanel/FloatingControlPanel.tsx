@@ -59,6 +59,7 @@ export default function FloatingControlPanel() {
   const ButtonElement = compactDevice ? 'button' : motion.button;
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const soundFrameRef = useRef<number | null>(null);
 
   const { shouldAnimate } = useAnimationPreferences();
   const { isSoundEnabled, isBGMEnabled, isHapticEnabled, toggleSound, toggleBGM, toggleHaptic, toggleAnimations } =
@@ -73,8 +74,15 @@ export default function FloatingControlPanel() {
         toggleAnimations: state.toggleAnimations,
       }))
     );
-  const { uiInteraction } = useGameIntegration();
+  const { uiInteraction, sound } = useGameIntegration();
   const { hapticFeedback } = useHapticFeedback();
+
+  useEffect(
+    () => () => {
+      if (soundFrameRef.current !== null) cancelAnimationFrame(soundFrameRef.current);
+    },
+    []
+  );
 
   // Local wrapper for toggling animations to ensure parent state is updated too
   const handleToggleAnimations = useCallback(() => {
@@ -259,7 +267,10 @@ export default function FloatingControlPanel() {
       <PanelElement
         ref={panelRef}
         className={cn(
-          'border-outline/20 from-surface-container-low/90 to-surface-container-high/80 overflow-hidden border bg-linear-to-br backdrop-blur-lg',
+          'border-outline/20 overflow-hidden border',
+          compactDevice
+            ? 'bg-surface-container'
+            : 'from-surface-container-low/90 to-surface-container-high/80 bg-linear-to-br backdrop-blur-lg',
           isExpanded && 'shadow-lg',
           isExpanded && 'shadow-[0_0_15px_2px_rgba(0,0,0,0.1)] dark:shadow-[0_0_15px_2px_rgba(255,182,144,0.15)]',
           isExpanded
@@ -273,8 +284,15 @@ export default function FloatingControlPanel() {
           ref={toggleButtonRef}
           onClick={() => {
             hapticFeedback.tap();
-            uiInteraction('toggle');
             setIsExpanded(!isExpanded);
+            // Show the panel before optional media initialization can block paint.
+            if (soundFrameRef.current !== null) cancelAnimationFrame(soundFrameRef.current);
+            soundFrameRef.current = requestAnimationFrame(() => {
+              soundFrameRef.current = requestAnimationFrame(() => {
+                soundFrameRef.current = null;
+                void Promise.allSettled([sound.playSound('toggle')]);
+              });
+            });
           }}
           {...(!compactDevice && {
             whileHover: { scale: shouldAnimate ? 1.1 : 1 },

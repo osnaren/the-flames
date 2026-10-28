@@ -27,6 +27,11 @@
 /* Let the browser skip offscreen editorial content while retaining its last
    rendered height. Keep interactive game and canvas layouts outside containment. */
 @media (max-width: 767px), (pointer: coarse) {
+  /* Native body text avoids a late font swap during mobile hydration. */
+  body {
+    font-family: Arial, sans-serif;
+  }
+
   .deferred-content,
   footer {
     content-visibility: auto;

@@ -28,6 +28,21 @@ test.describe('Theme Switching Functionality', () => {
     await page.evaluate(() => localStorage.clear());
   });
 
+  test('native and fallback palette colors stay accurate through theme changes', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.goto('/');
+    await expect(page.locator('#name1')).toBeEnabled();
+    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 248, 246)');
+    await expect(page.locator('h1')).toHaveCSS('color', 'rgb(28, 27, 27)');
+    await page.getByRole('button', { name: 'Open settings', exact: true }).click();
+    await page.getByRole('switch', { name: 'Switch to dark theme', exact: true }).click();
+    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(28, 17, 11)');
+    await expect(page.locator('h1')).toHaveCSS('color', 'rgb(230, 226, 224)');
+    await page.getByRole('switch', { name: 'Switch to light theme', exact: true }).click();
+    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(255, 248, 246)');
+    await expect(page.locator('h1')).toHaveCSS('color', 'rgb(28, 27, 27)');
+  });
+
   test('should respect system preference on first visit (dark mode)', async ({ page }) => {
     // Set system preference to dark mode
     await page.emulateMedia({ colorScheme: 'dark' });

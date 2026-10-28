@@ -38,7 +38,7 @@ export default function Toggle({
 
   return (
     <ButtonElement
-      className={`flex w-full items-center justify-between rounded-lg p-2.5 ${backgroundColor} border-outline/10 border backdrop-blur-xs transition-colors duration-200 ${isActive ? 'shadow-glow-sm' : ''} focus:ring-primary dark:focus:ring-primary dark:focus:ring-offset-surface hover:brightness-105 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:hover:brightness-110`}
+      className={`flex w-full items-center justify-between rounded-lg p-2.5 ${backgroundColor} border-outline/10 border ${compactDevice ? '' : 'backdrop-blur-xs'} transition-colors duration-200 ${isActive ? 'shadow-glow-sm' : ''} focus:ring-primary dark:focus:ring-primary dark:focus:ring-offset-surface hover:brightness-105 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:hover:brightness-110`}
       onClick={onToggle}
       {...(!compactDevice &&
         shouldAnimate && {

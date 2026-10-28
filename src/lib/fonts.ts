@@ -3,10 +3,11 @@ import { DM_Serif_Text, Josefin_Sans, Noto_Sans, Patrick_Hand, Space_Grotesk } f
 // Primary body font
 export const notoSans = Noto_Sans({
   subsets: ['latin'],
-  display: 'swap',
+  display: 'optional',
   variable: '--font-noto-sans',
   weight: ['400', '500', '600', '700'],
-  preload: true,
+  // Keep body text readable without delaying the render-blocking stylesheet.
+  preload: false,
 });
 
 // Display/heading font
