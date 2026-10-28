@@ -28,6 +28,7 @@ interface DockButtonProps {
   delay?: number;
   isBusy?: boolean;
   compact?: boolean;
+  pendingLabel?: string;
 }
 
 const variantStyles = {
@@ -46,6 +47,7 @@ function DockButton({
   delay = 0,
   isBusy = false,
   compact = false,
+  pendingLabel,
 }: DockButtonProps) {
   const { shouldAnimate } = useAnimationPreferences();
   const [isPressed, setIsPressed] = useState(false);
@@ -90,7 +92,14 @@ function DockButton({
       </span>
 
       {/* Label */}
-      <span className="text-[10px] font-medium text-white/90 sm:text-xs">{label}</span>
+      <span className="grid text-[10px] font-medium text-white/90 sm:text-xs">
+        {pendingLabel && (
+          <span aria-hidden="true" className="invisible col-start-1 row-start-1">
+            {pendingLabel}
+          </span>
+        )}
+        <span className="col-start-1 row-start-1">{isBusy ? pendingLabel || label : label}</span>
+      </span>
 
       {/* Glow effect on hover */}
       {!compact && (
@@ -189,6 +198,7 @@ function ResultActionsDock({
         variant="secondary"
         delay={0}
         isBusy={isResetting}
+        pendingLabel="Resetting…"
         compact={compactDevice}
       />
 

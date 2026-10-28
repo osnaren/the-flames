@@ -7,6 +7,7 @@
 import { RECENT_MATCHES_CONFIG } from '@/config/recentMatches';
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { useGameIntegration } from '@/hooks/useGameIntegration';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronUp, History, Trash2 } from 'lucide-react';
 import { memo, useCallback, useEffect, useState } from 'react';
@@ -156,7 +157,9 @@ function RecentMatchesSection({
   showHeader = true,
   className = '',
 }: RecentMatchesSectionProps) {
-  const { shouldAnimate } = useAnimationPreferences();
+  const { shouldAnimate: animationsEnabled } = useAnimationPreferences();
+  const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
+  const shouldAnimate = animationsEnabled && !compactDevice;
   const { sound } = useGameIntegration();
   const { displayMatches, totalCount, isLoading, hasMatches, removeMatch, clearAllMatches, getDisplayMatches } =
     useRecentMatches();
@@ -239,11 +242,13 @@ function RecentMatchesSection({
       variants={shouldAnimate ? sectionVariants : undefined}
       initial={shouldAnimate ? 'hidden' : false}
       animate="visible"
-      className={`w-full ${className}`}
+      className={`deferred-content w-full ${className}`}
       aria-label="Recent matches history"
     >
       {/* Section container with glass effect */}
-      <div className="bg-surface-container-lowest/50 dark:bg-surface-container-lowest/30 border-outline/5 rounded-2xl border p-4 shadow-sm backdrop-blur-sm">
+      <div
+        className={`border-outline/5 rounded-2xl border p-4 shadow-sm ${compactDevice ? 'bg-surface-container-lowest' : 'bg-surface-container-lowest/50 dark:bg-surface-container-lowest/30 backdrop-blur-sm'}`}
+      >
         {/* Header */}
         {showHeader && (
           <SectionHeader
