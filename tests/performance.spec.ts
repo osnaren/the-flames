@@ -21,8 +21,13 @@ test('mounting game controls does not repeatedly reload global preferences', asy
   expect(reads).toBeLessThanOrEqual(2);
 });
 
-test('opening settings stays stable on a slower mobile CPU', async ({ page, browserName }) => {
+test('opening settings stays stable while extra controls load slowly', async ({ page, browserName }) => {
   test.skip(browserName !== 'chromium', 'Uses Chromium layout-shift entries and CPU throttling.');
+  let delayExtraControls = false;
+  await page.route('**/_next/static/chunks/*.js', async (route) => {
+    if (delayExtraControls) await new Promise((resolve) => setTimeout(resolve, 2500));
+    await route.continue().catch(() => {});
+  });
   await page.addInitScript(() => {
     const shifts: number[] = [];
     new PerformanceObserver((list) => {
@@ -38,13 +43,30 @@ test('opening settings stays stable on a slower mobile CPU', async ({ page, brow
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
   await expect(page.locator('#name1')).toBeEnabled();
+  delayExtraControls = true;
   await page.getByRole('button', { name: 'Open settings', exact: true }).click();
   await expect(page.getByRole('switch', { name: /Switch to (dark|light) theme/ })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Seasonal theme selector' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^(Play|Pause) music$/ })).toBeVisible();
   await page.waitForTimeout(2000);
   const cls = await page.evaluate(() =>
     (window as Window & { settingsShifts?: number[] }).settingsShifts?.reduce((sum, value) => sum + value, 0)
   );
   expect(cls).toBeLessThanOrEqual(0.1);
+});
+
+test('settings do not preload sound effects for unplayed game stages', async ({ page }) => {
+  const gameSounds: string[] = [];
+  page.on('request', (request) => {
+    if (/letter-strike|flames-count|result-reveal|badge-unlock/.test(request.url())) gameSounds.push(request.url());
+  });
+  await page.goto('/');
+  await expect(page.locator('#name1')).toBeEnabled();
+  await page.getByRole('button', { name: 'Open settings', exact: true }).click();
+  await expect(page.getByRole('group', { name: 'Seasonal theme selector' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^(Play|Pause) music$/ })).toBeVisible();
+  await page.waitForTimeout(1000);
+  expect(gameSounds).toEqual([]);
 });
 
 test.beforeEach(async ({ page }) => {

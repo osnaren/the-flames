@@ -24,7 +24,6 @@ class AudioManager {
   private audioCache: Map<string, HTMLAudioElement> = new Map();
   private bgmElement: HTMLAudioElement | null = null;
   private currentBgmId: string | null = null;
-  private isInitialized = false;
   private fadeInterval: NodeJS.Timeout | null = null;
   private mountCount = 0;
   private isUserInteracted = false;
@@ -105,17 +104,6 @@ class AudioManager {
     if (this.bgmElement) {
       this.bgmElement.onended = callback;
     }
-  }
-
-  async preloadSounds(): Promise<void> {
-    if (this.isInitialized || typeof window === 'undefined') return;
-    this.isInitialized = true;
-
-    const preloadPromises = Object.values(SOUND_ASSETS)
-      .filter((asset) => 'preload' in asset && asset.preload)
-      .map((asset) => this.loadSound(asset.id, asset.src));
-
-    await Promise.allSettled(preloadPromises);
   }
 
   private async loadSound(id: string, src: string): Promise<HTMLAudioElement | null> {
@@ -500,7 +488,6 @@ class AudioManager {
 
     // Reset state
     this.currentBgmId = null;
-    this.isInitialized = false;
 
     // Reset singleton
     AudioManager.instance = null;
@@ -542,28 +529,8 @@ export function useSoundSystem() {
     };
   }, [getManager]);
 
-  // Preload optional audio only after user intent. This keeps the initial page payload focused on visible content.
-  useEffect(() => {
-    if (typeof window === 'undefined' || (!isSoundEnabled && !isBGMEnabled)) return;
-
-    const manager = getManager();
-    const preloadOnInteraction = () => {
-      manager.preloadSounds();
-      document.removeEventListener('click', preloadOnInteraction);
-      document.removeEventListener('touchstart', preloadOnInteraction);
-      document.removeEventListener('keydown', preloadOnInteraction);
-    };
-
-    document.addEventListener('click', preloadOnInteraction, { once: true });
-    document.addEventListener('touchstart', preloadOnInteraction, { once: true });
-    document.addEventListener('keydown', preloadOnInteraction, { once: true });
-
-    return () => {
-      document.removeEventListener('click', preloadOnInteraction);
-      document.removeEventListener('touchstart', preloadOnInteraction);
-      document.removeEventListener('keydown', preloadOnInteraction);
-    };
-  }, [isSoundEnabled, isBGMEnabled, getManager]);
+  // SFX load on demand in playSFX. Fetching every game sound on the first
+  // settings click competes with the controls' JavaScript on slow connections.
 
   // Handle volume changes
   useEffect(() => {

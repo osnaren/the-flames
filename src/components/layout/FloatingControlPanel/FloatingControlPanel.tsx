@@ -24,8 +24,12 @@ import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-const SeasonalThemeSelector = dynamic(() => import('@/components/settings/SeasonalThemeSelector'));
-const MusicPlayer = dynamic(() => import('@/components/ui/MusicPlayer').then((mod) => mod.MusicPlayer));
+const SeasonalThemeSelector = dynamic(() => import('@/components/settings/SeasonalThemeSelector'), {
+  loading: () => <div className="h-16" aria-hidden="true" />,
+});
+const MusicPlayer = dynamic(() => import('@/components/ui/MusicPlayer').then((mod) => mod.MusicPlayer), {
+  loading: () => <div className="bg-surface-container-low/50 h-36 rounded-xl" aria-hidden="true" />,
+});
 
 function ThemeControl() {
   const isDarkTheme = usePreferencesStore((state) => state.isDarkTheme);
@@ -365,7 +369,9 @@ export default function FloatingControlPanel() {
                       Seasonal Theme
                     </span>
                   </div>
-                  <SeasonalThemeSelector isExpanded={isExpanded} />
+                  <div className="min-h-16">
+                    <SeasonalThemeSelector isExpanded={isExpanded} />
+                  </div>
                 </motion.div>
 
                 {/* Music Player */}
@@ -376,7 +382,9 @@ export default function FloatingControlPanel() {
                       Background Music
                     </span>
                   </div>
-                  <MusicPlayer isExpanded={isExpanded} tabIndex={0} />
+                  <div className="min-h-36">
+                    <MusicPlayer isExpanded={isExpanded} tabIndex={0} />
+                  </div>
                 </motion.div>
 
                 <motion.div
