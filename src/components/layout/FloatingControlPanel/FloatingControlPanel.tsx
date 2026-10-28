@@ -22,7 +22,7 @@ import {
   VolumeX,
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 const SeasonalThemeSelector = dynamic(() => import('@/components/settings/SeasonalThemeSelector'), {
@@ -53,6 +53,8 @@ function ThemeControl() {
 
 export default function FloatingControlPanel() {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [controlsReady, setControlsReady] = useState(false);
+  const [, startControlsTransition] = useTransition();
   const prefersReducedMotion = useReducedMotion();
   const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
   const PanelElement = compactDevice ? 'div' : motion.div;
@@ -60,6 +62,7 @@ export default function FloatingControlPanel() {
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const soundFrameRef = useRef<number | null>(null);
+  const controlsFrameRef = useRef<number | null>(null);
 
   const { shouldAnimate } = useAnimationPreferences();
   const { isSoundEnabled, isBGMEnabled, isHapticEnabled, toggleSound, toggleBGM, toggleHaptic, toggleAnimations } =
@@ -80,6 +83,7 @@ export default function FloatingControlPanel() {
   useEffect(
     () => () => {
       if (soundFrameRef.current !== null) cancelAnimationFrame(soundFrameRef.current);
+      if (controlsFrameRef.current !== null) cancelAnimationFrame(controlsFrameRef.current);
     },
     []
   );
@@ -274,17 +278,31 @@ export default function FloatingControlPanel() {
           isExpanded && 'shadow-lg',
           isExpanded && 'shadow-[0_0_15px_2px_rgba(0,0,0,0.1)] dark:shadow-[0_0_15px_2px_rgba(255,182,144,0.15)]',
           isExpanded
-            ? 'max-h-[calc(100dvh-6rem)] w-[min(300px,calc(100vw-2.5rem))] overflow-y-auto overscroll-contain rounded-2xl'
+            ? 'h-[min(650px,calc(100dvh-6rem))] max-h-[calc(100dvh-6rem)] w-[min(300px,calc(100vw-2.5rem))] overflow-y-auto overscroll-contain rounded-2xl'
             : 'h-12 w-12 rounded-full'
         )}
         aria-label="Settings panel"
         role="region"
+        aria-busy={isExpanded && !controlsReady}
       >
         <ButtonElement
           ref={toggleButtonRef}
           onClick={() => {
             hapticFeedback.tap();
-            setIsExpanded(!isExpanded);
+            const nextExpanded = !isExpanded;
+            setIsExpanded(nextExpanded);
+            if (controlsFrameRef.current !== null) cancelAnimationFrame(controlsFrameRef.current);
+            if (nextExpanded) {
+              setControlsReady(false);
+              // Keep the panel and its close control responsive while the
+              // preference controls mount in a separate, interruptible render.
+              controlsFrameRef.current = requestAnimationFrame(() => {
+                controlsFrameRef.current = requestAnimationFrame(() => {
+                  controlsFrameRef.current = null;
+                  startControlsTransition(() => setControlsReady(true));
+                });
+              });
+            }
             // Show the panel before optional media initialization can block paint.
             if (soundFrameRef.current !== null) cancelAnimationFrame(soundFrameRef.current);
             soundFrameRef.current = requestAnimationFrame(() => {
@@ -335,108 +353,114 @@ export default function FloatingControlPanel() {
                 </h3>
               </PanelElement>
 
-              <div className="space-y-3">
-                <PanelElement {...(!compactDevice && { variants: childVariants })}>
-                  <ThemeControl />
-                </PanelElement>
-                {controls.map((control, _index) => (
-                  <PanelElement key={control.label} {...(!compactDevice && { variants: childVariants })}>
-                    <Toggle
-                      isActive={control.active}
-                      onToggle={control.toggle}
-                      activeIcon={control.activeIcon}
-                      inactiveIcon={control.inactiveIcon}
-                      label={control.label}
-                      activeColor={control.activeColor}
-                      inactiveColor={control.inactiveColor}
-                      backgroundColor={control.color}
-                      ariaLabel={control.ariaLabel}
-                      tabIndex={0}
-                    />
+              {controlsReady ? (
+                <div className="space-y-3">
+                  <PanelElement {...(!compactDevice && { variants: childVariants })}>
+                    <ThemeControl />
                   </PanelElement>
-                ))}
+                  {controls.map((control, _index) => (
+                    <PanelElement key={control.label} {...(!compactDevice && { variants: childVariants })}>
+                      <Toggle
+                        isActive={control.active}
+                        onToggle={control.toggle}
+                        activeIcon={control.activeIcon}
+                        inactiveIcon={control.inactiveIcon}
+                        label={control.label}
+                        activeColor={control.activeColor}
+                        inactiveColor={control.inactiveColor}
+                        backgroundColor={control.color}
+                        ariaLabel={control.ariaLabel}
+                        tabIndex={0}
+                      />
+                    </PanelElement>
+                  ))}
 
-                {/* Audio Controls Row (SFX, Music, Haptics) */}
-                <PanelElement {...(!compactDevice && { variants: childVariants })}>
-                  <div className="from-secondary-container/30 to-secondary/10 flex items-center justify-between rounded-lg bg-linear-to-r px-3 py-2">
-                    <span className="text-on-surface-variant text-xs font-medium">Audio</span>
-                    <div className="flex items-center gap-1">
-                      {audioControls.map((control) => {
-                        const Icon = control.active ? control.icon : control.inactiveIcon;
-                        return (
-                          <button
-                            key={control.id}
-                            onClick={() => {
-                              hapticFeedback.tap();
-                              uiInteraction('toggle');
-                              control.toggle();
-                            }}
-                            className={cn(
-                              'flex h-9 w-9 touch-manipulation items-center justify-center rounded-md transition-all',
-                              'focus:ring-primary/50 focus:ring-2 focus:outline-none',
-                              control.active
-                                ? 'bg-secondary/20 text-secondary text-glow-sm hover:bg-secondary/30 active:bg-secondary/40'
-                                : 'text-on-surface-variant hover:bg-surface-container-highest/50 active:bg-surface-container-highest/70 hover:text-on-surface opacity-50'
-                            )}
-                            aria-label={control.ariaLabel}
-                            title={control.label}
-                            tabIndex={0}
-                          >
-                            <Icon className="h-4 w-4" />
-                          </button>
-                        );
-                      })}
+                  {/* Audio Controls Row (SFX, Music, Haptics) */}
+                  <PanelElement {...(!compactDevice && { variants: childVariants })}>
+                    <div className="from-secondary-container/30 to-secondary/10 flex items-center justify-between rounded-lg bg-linear-to-r px-3 py-2">
+                      <span className="text-on-surface-variant text-xs font-medium">Audio</span>
+                      <div className="flex items-center gap-1">
+                        {audioControls.map((control) => {
+                          const Icon = control.active ? control.icon : control.inactiveIcon;
+                          return (
+                            <button
+                              key={control.id}
+                              onClick={() => {
+                                hapticFeedback.tap();
+                                uiInteraction('toggle');
+                                control.toggle();
+                              }}
+                              className={cn(
+                                'flex h-9 w-9 touch-manipulation items-center justify-center rounded-md transition-all',
+                                'focus:ring-primary/50 focus:ring-2 focus:outline-none',
+                                control.active
+                                  ? 'bg-secondary/20 text-secondary text-glow-sm hover:bg-secondary/30 active:bg-secondary/40'
+                                  : 'text-on-surface-variant hover:bg-surface-container-highest/50 active:bg-surface-container-highest/70 hover:text-on-surface opacity-50'
+                              )}
+                              aria-label={control.ariaLabel}
+                              title={control.label}
+                              tabIndex={0}
+                            >
+                              <Icon className="h-4 w-4" />
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                </PanelElement>
+                  </PanelElement>
 
-                {/* Seasonal Theme Selector */}
-                <PanelElement
-                  className="border-outline/20 mt-3 border-t pt-3"
-                  {...(!compactDevice && { variants: childVariants })}
-                >
-                  <div className="mb-2 flex items-center gap-1.5">
-                    <Palette className="text-secondary h-3.5 w-3.5" />
-                    <span className="text-on-surface-variant text-[10px] font-medium tracking-wide uppercase">
-                      Seasonal Theme
-                    </span>
-                  </div>
-                  <div className="min-h-16">
-                    <SeasonalThemeSelector isExpanded={isExpanded} />
-                  </div>
-                </PanelElement>
-
-                {/* Music Player */}
-                <PanelElement
-                  className="border-outline/20 mt-3 border-t pt-3"
-                  {...(!compactDevice && { variants: childVariants })}
-                >
-                  <div className="mb-2 flex items-center gap-1.5">
-                    <Music2 className="text-secondary h-3.5 w-3.5" />
-                    <span className="text-on-surface-variant text-[10px] font-medium tracking-wide uppercase">
-                      Background Music
-                    </span>
-                  </div>
-                  <div className="min-h-36">
-                    <MusicPlayer isExpanded={isExpanded} tabIndex={0} />
-                  </div>
-                </PanelElement>
-
-                <PanelElement
-                  className="border-outline/20 text-on-surface-variant mt-4 border-t pt-4 text-center text-xs"
-                  {...(!compactDevice && { variants: childVariants })}
-                >
-                  <button
-                    className="hover:bg-surface-container-lowest hover:text-on-surface hover:text-glow-sm focus:ring-primary/50 flex w-full items-center justify-center gap-1.5 rounded-md px-3 py-2 transition-colors focus:ring-2 focus:outline-none"
-                    aria-label="Jump to top of page"
-                    onClick={handleScrollToTop}
-                    tabIndex={0}
+                  {/* Seasonal Theme Selector */}
+                  <PanelElement
+                    className="border-outline/20 mt-3 border-t pt-3"
+                    {...(!compactDevice && { variants: childVariants })}
                   >
-                    <MousePointerClick size={14} />
-                    <span>Jump to top</span>
-                  </button>
-                </PanelElement>
-              </div>
+                    <div className="mb-2 flex items-center gap-1.5">
+                      <Palette className="text-secondary h-3.5 w-3.5" />
+                      <span className="text-on-surface-variant text-[10px] font-medium tracking-wide uppercase">
+                        Seasonal Theme
+                      </span>
+                    </div>
+                    <div className="min-h-16">
+                      <SeasonalThemeSelector isExpanded={isExpanded} />
+                    </div>
+                  </PanelElement>
+
+                  {/* Music Player */}
+                  <PanelElement
+                    className="border-outline/20 mt-3 border-t pt-3"
+                    {...(!compactDevice && { variants: childVariants })}
+                  >
+                    <div className="mb-2 flex items-center gap-1.5">
+                      <Music2 className="text-secondary h-3.5 w-3.5" />
+                      <span className="text-on-surface-variant text-[10px] font-medium tracking-wide uppercase">
+                        Background Music
+                      </span>
+                    </div>
+                    <div className="min-h-36">
+                      <MusicPlayer isExpanded={isExpanded} tabIndex={0} />
+                    </div>
+                  </PanelElement>
+
+                  <PanelElement
+                    className="border-outline/20 text-on-surface-variant mt-4 border-t pt-4 text-center text-xs"
+                    {...(!compactDevice && { variants: childVariants })}
+                  >
+                    <button
+                      className="hover:bg-surface-container-lowest hover:text-on-surface hover:text-glow-sm focus:ring-primary/50 flex w-full items-center justify-center gap-1.5 rounded-md px-3 py-2 transition-colors focus:ring-2 focus:outline-none"
+                      aria-label="Jump to top of page"
+                      onClick={handleScrollToTop}
+                      tabIndex={0}
+                    >
+                      <MousePointerClick size={14} />
+                      <span>Jump to top</span>
+                    </button>
+                  </PanelElement>
+                </div>
+              ) : (
+                <p role="status" className="text-on-surface-variant py-8 text-center text-sm">
+                  Loading settings…
+                </p>
+              )}
             </PanelElement>
           )}
         </AnimatePresence>
