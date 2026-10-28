@@ -31,7 +31,7 @@ function UnifiedBackground() {
   const animateBackground = shouldAnimate && !compactDevice && !isLowPowerMode;
   const { currentThemeConfig, currentTheme } = useSeasonalTheme();
   const { variant, result, intensity } = useBackgroundStore();
-  const { isDarkTheme } = usePreferencesStore();
+  const isDarkTheme = usePreferencesStore((state) => state.isDarkTheme);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 

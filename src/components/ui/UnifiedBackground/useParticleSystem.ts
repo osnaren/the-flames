@@ -119,7 +119,7 @@ export function useParticleSystem({
 }: UseParticleSystemProps): UseParticleSystemReturn {
   const { shouldAnimate } = useAnimationPreferences();
   const { isMobile, isLowPowerMode } = useDeviceCapabilities();
-  const { isDarkTheme } = usePreferencesStore();
+  const isDarkTheme = usePreferencesStore((state) => state.isDarkTheme);
 
   const animationIdRef = useRef<number>(0);
   const particlesRef = useRef<Particle[]>([]);
@@ -136,6 +136,7 @@ export function useParticleSystem({
 
   // Update canvas colors when theme changes
   useEffect(() => {
+    if (!enabled || !shouldAnimate) return;
     const timer = setTimeout(() => {
       if (variant === 'default') {
         const colors = getThemeColors(isDarkTheme);
@@ -159,7 +160,7 @@ export function useParticleSystem({
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [isDarkTheme, variant, themeParticleConfig, currentTheme]);
+  }, [enabled, shouldAnimate, isDarkTheme, variant, themeParticleConfig, currentTheme]);
 
   // --- Configuration ---
   const config = useMemo((): ParticleSystemConfig => {

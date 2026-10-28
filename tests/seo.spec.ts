@@ -4,6 +4,16 @@ import { calculateFlamesResult, findCommonLetters } from '../src/modules/home/ut
 
 test.use({ javaScriptEnabled: false, baseURL: 'http://127.0.0.1:3000' });
 
+test('the calculator form renders in the first HTML without JavaScript', async ({ page }) => {
+  await page.goto('/');
+  await expect(
+    page.getByRole('heading', { name: 'FLAMES Calculator — Play the Name Game', exact: true })
+  ).toBeVisible();
+  await expect(page.locator('#name1')).toBeVisible();
+  await expect(page.locator('#name2')).toBeVisible();
+  await expect(page.locator('#name1')).toBeDisabled();
+});
+
 test('the homepage guide and contextual links are readable without JavaScript', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle('FLAMES Calculator — Free Online Name Game');

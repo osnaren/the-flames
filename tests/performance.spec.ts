@@ -2,6 +2,51 @@ import { expect, test } from '@playwright/test';
 
 test.use({ baseURL: 'http://127.0.0.1:3000' });
 
+test('mounting game controls does not repeatedly reload global preferences', async ({ page }) => {
+  await page.addInitScript(() => {
+    let reads = 0;
+    const original = Storage.prototype.getItem;
+    Storage.prototype.getItem = function (key) {
+      if (key === 'theme') reads++;
+      return original.call(this, key);
+    };
+    Object.defineProperty(window, 'themeStorageReads', { get: () => reads });
+  });
+  await page.goto('/');
+  await expect(page.locator('#name1')).toBeEnabled();
+  await page.getByRole('button', { name: 'Open settings', exact: true }).click();
+  await expect(page.getByRole('switch', { name: /Switch to (dark|light) theme/ })).toBeVisible();
+  // One read for the pre-paint theme script and one for root hydration.
+  const reads = await page.evaluate(() => (window as Window & { themeStorageReads?: number }).themeStorageReads);
+  expect(reads).toBeLessThanOrEqual(2);
+});
+
+test('opening settings stays stable on a slower mobile CPU', async ({ page, browserName }) => {
+  test.skip(browserName !== 'chromium', 'Uses Chromium layout-shift entries and CPU throttling.');
+  await page.addInitScript(() => {
+    const shifts: number[] = [];
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        const shift = entry as PerformanceEntry & { hadRecentInput: boolean; value: number };
+        if (!shift.hadRecentInput) shifts.push(shift.value);
+      }
+    }).observe({ type: 'layout-shift', buffered: true });
+    Object.assign(window, { settingsShifts: shifts });
+  });
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/');
+  await expect(page.locator('#name1')).toBeEnabled();
+  await page.getByRole('button', { name: 'Open settings', exact: true }).click();
+  await expect(page.getByRole('switch', { name: /Switch to (dark|light) theme/ })).toBeVisible();
+  await page.waitForTimeout(2000);
+  const cls = await page.evaluate(() =>
+    (window as Window & { settingsShifts?: number[] }).settingsShifts?.reduce((sum, value) => sum + value, 0)
+  );
+  expect(cls).toBeLessThanOrEqual(0.1);
+});
+
 test.beforeEach(async ({ page }) => {
   await page.route('**/*.sentry.io/**', (route) => route.abort());
   await page.route('https://example.supabase.co/functions/v1/get-country', (route) =>
@@ -130,6 +175,7 @@ test('the animated game keeps the page stable through its final result', async (
   await page.locator('#name1').fill('Rahul');
   await page.locator('#name2').fill('Priya');
   await page.getByRole('button', { name: /Reveal Your FLAMES/ }).click();
+  await expect(page).toHaveURL(/name1=Rahul&name2=Priya/);
   await expect(page.getByRole('button', { name: 'Reset', exact: true })).toBeVisible({ timeout: 60000 });
   await page.waitForTimeout(4000);
   const cls = await page.evaluate(() => {
@@ -152,4 +198,5 @@ test('the animated game keeps the page stable through its final result', async (
   expect(cls).toBeLessThanOrEqual(0.1);
   await page.getByRole('button', { name: 'Reset', exact: true }).click();
   await expect(page.locator('#name1')).toBeVisible();
+  await expect(page).not.toHaveURL(/name1=/);
 });

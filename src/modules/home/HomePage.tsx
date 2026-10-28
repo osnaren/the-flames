@@ -5,7 +5,8 @@ import { useSoundSystem } from '@/hooks/useSoundSystem';
 import { useBackgroundStore } from '@/store/useBackgroundStore';
 import { AnimatePresence, motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { memo, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 
 // Critical components - loaded immediately
 import { AnimatedHeader } from './components/AnimatedHeader';
@@ -44,13 +45,26 @@ function ResultPlaceholder() {
   );
 }
 
+// Only this invisible subscriber needs client URL state. Keeping it inside its
+// own boundary lets the calculator's title and form remain server-rendered.
+function NameQuerySync({ setName1, setName2 }: { setName1: (name: string) => void; setName2: (name: string) => void }) {
+  const params = useSearchParams();
+  useEffect(() => {
+    const first = params.get('name1');
+    const second = params.get('name2');
+    if (first) setName1(first);
+    if (second) setName2(second);
+  }, [params, setName1, setName2]);
+  return null;
+}
+
 /**
  * HomePage - Main FLAMES game page
  * Features streamlined stage management and beautiful animations
  */
 function HomePage() {
   const { shouldAnimate } = useAnimationPreferences();
-  const { setBackgroundState } = useBackgroundStore();
+  const setBackgroundState = useBackgroundStore((state) => state.setBackgroundState);
   const { resumeThemeBGM, isGameActive } = useSoundSystem();
 
   // References for scrolling
@@ -134,6 +148,9 @@ function HomePage() {
       ref={containerRef}
       aria-label="FLAMES Game"
     >
+      <Suspense fallback={null}>
+        <NameQuerySync setName1={setName1} setName2={setName2} />
+      </Suspense>
       <div className="relative z-10 w-full max-w-2xl">
         {/* Animated Header */}
         <AnimatedHeader shouldAnimate={shouldAnimate} stage={stage} />
@@ -151,7 +168,6 @@ function HomePage() {
                   opacity: 0,
                   y: -30,
                   scale: 0.95,
-                  filter: 'blur(4px)',
                 }}
                 transition={{
                   duration: 0.5,

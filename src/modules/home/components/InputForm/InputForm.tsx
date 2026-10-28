@@ -3,7 +3,7 @@ import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { validateFlamesInput, validateName } from '@/utils/validation';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState, useTransition } from 'react';
 import type { GameStage } from '../../types';
 
 interface InputFormProps {
@@ -37,6 +37,8 @@ function InputFormComponent({
   const [focusedField, setFocusedField] = useState<'name1' | 'name2' | null>(null);
   const { formSubmit, sound } = useGameIntegration();
   const hydrated = usePreferencesStore((state) => state.hydrated);
+  const [isSubmitting, startSubmitTransition] = useTransition();
+  const isBusy = isProcessing || isSubmitting;
 
   // Individual field validation
   const validateField = useCallback((fieldName: 'name1' | 'name2', value: string) => {
@@ -107,7 +109,7 @@ function InputFormComponent({
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      if (isProcessing) return;
+      if (isBusy) return;
 
       const name1Result = validateName(name1);
       const name2Result = validateName(name2);
@@ -123,10 +125,10 @@ function InputFormComponent({
 
       if (name1Result.isValid && name2Result.isValid && combinedResult.isValid) {
         formSubmit();
-        onSubmit(e);
+        startSubmitTransition(() => onSubmit(e));
       }
     },
-    [onSubmit, isProcessing, name1, name2, formSubmit]
+    [onSubmit, isBusy, name1, name2, formSubmit, startSubmitTransition]
   );
 
   return (
@@ -138,7 +140,6 @@ function InputFormComponent({
         opacity: 0,
         scale: 0.9,
         y: -20,
-        filter: 'blur(8px)',
         transition: { duration: 0.4, ease: 'easeInOut' },
       }}
       transition={{
@@ -150,7 +151,7 @@ function InputFormComponent({
       <motion.div
         className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/80 p-6 shadow-2xl backdrop-blur-xl md:p-8 dark:border-white/10 dark:bg-black/40"
         whileHover={
-          shouldAnimate && !isProcessing
+          shouldAnimate && !isBusy
             ? {
                 boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255,255,255,0.1)',
               }
@@ -214,7 +215,7 @@ function InputFormComponent({
                   }`}
                   placeholder="Your name..."
                   required
-                  disabled={!hydrated || isProcessing}
+                  disabled={!hydrated || isBusy}
                   autoComplete="off"
                   suppressHydrationWarning
                 />
@@ -281,7 +282,7 @@ function InputFormComponent({
                   }`}
                   placeholder="Their name..."
                   required
-                  disabled={!hydrated || isProcessing}
+                  disabled={!hydrated || isBusy}
                   autoComplete="off"
                   suppressHydrationWarning
                 />
@@ -324,23 +325,23 @@ function InputFormComponent({
           {/* Submit Button */}
           <motion.button
             type="submit"
-            disabled={!hydrated || !isFormValid || isProcessing}
+            disabled={!hydrated || !isFormValid || isBusy}
             className="group relative w-full overflow-hidden rounded-xl bg-linear-to-r from-pink-500 via-rose-500 to-red-500 px-6 py-4 font-bold text-white shadow-lg transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale"
             whileHover={
-              shouldAnimate && isFormValid && !isProcessing
+              shouldAnimate && isFormValid && !isBusy
                 ? {
                     scale: 1.02,
                     boxShadow: '0 20px 40px -10px rgba(236, 72, 153, 0.5)',
                   }
                 : {}
             }
-            whileTap={shouldAnimate && isFormValid && !isProcessing ? { scale: 0.98 } : {}}
+            whileTap={shouldAnimate && isFormValid && !isBusy ? { scale: 0.98 } : {}}
           >
             {/* Shine effect */}
             <motion.div
               className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/30 to-transparent"
               animate={
-                shouldAnimate && isFormValid && !isProcessing
+                shouldAnimate && isFormValid && !isBusy
                   ? {
                       translateX: ['-100%', '100%'],
                     }
@@ -355,7 +356,7 @@ function InputFormComponent({
             />
 
             <span className="relative flex items-center justify-center gap-2">
-              {isProcessing ? (
+              {isBusy ? (
                 <>
                   <motion.div
                     className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white"

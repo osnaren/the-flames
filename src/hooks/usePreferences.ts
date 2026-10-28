@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { TransitionSpeed, usePreferencesStore } from '../store/usePreferencesStore';
 
 interface Preferences {
@@ -32,20 +31,10 @@ export function usePreferences(): [Preferences, PreferenceActions] {
     toggleAnimations,
     toggleSound,
     setTransitionSpeed,
-    init,
   } = usePreferencesStore();
 
-  // Load preferences from localStorage on mount
-  useEffect(() => {
-    init();
-
-    // Cleanup on unmount
-    // Get cleanup function at cleanup time to avoid stale reference
-    return () => {
-      const { cleanup } = usePreferencesStore.getState();
-      cleanup();
-    };
-  }, [init]);
+  // PreferencesInitializer owns hydration and the system-theme listener.
+  // Consumers must not reload global state or tear down that listener.
 
   return [
     { isDarkTheme, animationsEnabled, isSoundEnabled, transitionSpeed, hydrated },

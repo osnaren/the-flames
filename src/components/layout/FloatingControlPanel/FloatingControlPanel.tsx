@@ -3,7 +3,6 @@ import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { cn } from '@/utils';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
-import { usePreferences } from '@hooks/usePreferences';
 import Toggle from '@ui/Toggle';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
@@ -23,20 +22,49 @@ import {
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 const SeasonalThemeSelector = dynamic(() => import('@/components/settings/SeasonalThemeSelector'));
 const MusicPlayer = dynamic(() => import('@/components/ui/MusicPlayer').then((mod) => mod.MusicPlayer));
 
+function ThemeControl() {
+  const isDarkTheme = usePreferencesStore((state) => state.isDarkTheme);
+  const toggleTheme = usePreferencesStore((state) => state.toggleTheme);
+  return (
+    <Toggle
+      isActive={!isDarkTheme}
+      onToggle={toggleTheme}
+      activeIcon={Sun}
+      inactiveIcon={Moon}
+      label="Theme"
+      activeColor="text-primary text-glow-sm"
+      inactiveColor="text-on-surface-variant"
+      backgroundColor="bg-linear-to-r from-tertiary-container/30 to-tertiary/10"
+      ariaLabel={isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'}
+      tabIndex={0}
+    />
+  );
+}
+
 export default function FloatingControlPanel() {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [exitingPanel, setExitingPanel] = useState(false);
   const prefersReducedMotion = useReducedMotion();
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  const [{ isDarkTheme }, { toggleTheme, toggleAnimations }] = usePreferences();
   const { shouldAnimate } = useAnimationPreferences();
-  const { isSoundEnabled, isBGMEnabled, isHapticEnabled, toggleSound, toggleBGM, toggleHaptic } = usePreferencesStore();
+  const { isSoundEnabled, isBGMEnabled, isHapticEnabled, toggleSound, toggleBGM, toggleHaptic, toggleAnimations } =
+    usePreferencesStore(
+      useShallow((state) => ({
+        isSoundEnabled: state.isSoundEnabled,
+        isBGMEnabled: state.isBGMEnabled,
+        isHapticEnabled: state.isHapticEnabled,
+        toggleSound: state.toggleSound,
+        toggleBGM: state.toggleBGM,
+        toggleHaptic: state.toggleHaptic,
+        toggleAnimations: state.toggleAnimations,
+      }))
+    );
   const { uiInteraction } = useGameIntegration();
   const { hapticFeedback } = useHapticFeedback();
 
@@ -49,9 +77,6 @@ export default function FloatingControlPanel() {
   const handleScrollToTop = useCallback(() => {
     const firstFocusableElement = document.querySelector('main button, main a, main input, main [tabindex="0"]');
 
-    // Animate panel closing with better UX
-    setExitingPanel(true);
-
     // Scroll to top
     window.scrollTo({
       top: 0,
@@ -61,7 +86,6 @@ export default function FloatingControlPanel() {
     // Close panel after scroll starts
     setTimeout(() => {
       setIsExpanded(false);
-      setExitingPanel(false);
     }, 300);
 
     // Set focus after scroll completes
@@ -153,17 +177,6 @@ export default function FloatingControlPanel() {
   // Controls configuration
   const controls = [
     {
-      label: 'Theme',
-      activeIcon: Sun,
-      inactiveIcon: Moon,
-      active: !isDarkTheme,
-      toggle: toggleTheme,
-      color: 'bg-linear-to-r from-tertiary-container/30 to-tertiary/10',
-      activeColor: 'text-primary text-glow-sm',
-      inactiveColor: 'text-on-surface-variant',
-      ariaLabel: isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme',
-    },
-    {
       label: 'Animations',
       activeIcon: Power,
       inactiveIcon: PowerOff,
@@ -207,20 +220,6 @@ export default function FloatingControlPanel() {
     },
   ];
 
-  // Animation variants
-  const panelVariants = {
-    collapsed: {
-      width: '48px',
-      height: '48px',
-      borderRadius: '24px',
-    },
-    expanded: {
-      width: '300px',
-      height: 'auto',
-      borderRadius: '16px',
-    },
-  };
-
   // Staggered children animations
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -254,19 +253,11 @@ export default function FloatingControlPanel() {
         className={cn(
           'border-outline/20 from-surface-container-low/90 to-surface-container-high/80 overflow-hidden border bg-linear-to-br backdrop-blur-lg',
           isExpanded && 'shadow-lg',
-          isExpanded && isDarkTheme && 'shadow-[0_0_15px_2px_rgba(255,182,144,0.15)]',
-          isExpanded && !isDarkTheme && 'shadow-[0_0_15px_2px_rgba(0,0,0,0.1)]',
-          exitingPanel && 'transition-all duration-300'
+          isExpanded && 'shadow-[0_0_15px_2px_rgba(0,0,0,0.1)] dark:shadow-[0_0_15px_2px_rgba(255,182,144,0.15)]',
+          isExpanded
+            ? 'max-h-[calc(100dvh-6rem)] w-[min(300px,calc(100vw-2.5rem))] overflow-y-auto overscroll-contain rounded-2xl'
+            : 'h-12 w-12 rounded-full'
         )}
-        variants={panelVariants}
-        initial="collapsed"
-        animate={isExpanded ? 'expanded' : 'collapsed'}
-        transition={{
-          type: prefersReducedMotion ? 'tween' : 'spring',
-          stiffness: 500,
-          damping: 30,
-          duration: prefersReducedMotion ? 0.2 : undefined,
-        }}
         aria-label="Settings panel"
         role="region"
       >
@@ -280,7 +271,7 @@ export default function FloatingControlPanel() {
           whileHover={{ scale: shouldAnimate ? 1.1 : 1 }}
           whileTap={{ scale: shouldAnimate ? 0.9 : 1 }}
           className={cn(
-            'absolute z-20 flex touch-manipulation items-center justify-center rounded-full transition-all',
+            'absolute z-20 flex touch-manipulation items-center justify-center rounded-full transition-colors',
             isExpanded
               ? 'from-surface-container-high to-surface-container top-3 right-3 h-10 w-10 bg-linear-to-br shadow-sm'
               : 'inset-0 h-full w-full bg-transparent',
@@ -312,6 +303,9 @@ export default function FloatingControlPanel() {
               </motion.div>
 
               <div className="space-y-3">
+                <motion.div variants={childVariants}>
+                  <ThemeControl />
+                </motion.div>
                 {controls.map((control, _index) => (
                   <motion.div key={control.label} variants={childVariants}>
                     <Toggle

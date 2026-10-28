@@ -43,7 +43,9 @@ const SEASONAL_THEMES: SeasonalTheme[] = [
 ];
 
 function useSeasonalThemeController() {
-  const { seasonalTheme: preferenceTheme, setSeasonalTheme, isDarkTheme } = usePreferencesStore();
+  const preferenceTheme = usePreferencesStore((state) => state.seasonalTheme);
+  const setSeasonalTheme = usePreferencesStore((state) => state.setSeasonalTheme);
+  const isDarkTheme = usePreferencesStore((state) => state.isDarkTheme);
 
   const [state, setState] = useState<SeasonalThemeState>({
     currentTheme: 'default',
@@ -133,10 +135,10 @@ function useSeasonalThemeController() {
   // Transition to new theme
   const transitionToTheme = useCallback(
     (newTheme: SeasonalTheme) => {
-      applyTheme(THEME_CONFIGS[newTheme], isDarkTheme);
+      applyTheme(THEME_CONFIGS[newTheme], usePreferencesStore.getState().isDarkTheme);
       setState((prev) => ({ ...prev, currentTheme: newTheme, isTransitioning: false }));
     },
-    [applyTheme, isDarkTheme]
+    [applyTheme]
   );
 
   // Set manual theme override
@@ -152,12 +154,14 @@ function useSeasonalThemeController() {
     const detectedTheme = detectCurrentTheme();
 
     const targetTheme = preferenceTheme === 'auto' ? detectedTheme : preferenceTheme;
-    setState((prev) => ({
-      ...prev,
-      currentTheme: targetTheme,
-      detectedTheme,
-      manualOverride: preferenceTheme === 'auto' ? null : preferenceTheme,
-    }));
+    const manualOverride = preferenceTheme === 'auto' ? null : preferenceTheme;
+    setState((prev) =>
+      prev.currentTheme === targetTheme &&
+      prev.detectedTheme === detectedTheme &&
+      prev.manualOverride === manualOverride
+        ? prev
+        : { ...prev, currentTheme: targetTheme, detectedTheme, manualOverride }
+    );
     applyTheme(THEME_CONFIGS[targetTheme], isDarkTheme);
   }, [preferenceTheme, detectCurrentTheme, applyTheme, isDarkTheme]);
 
@@ -240,27 +244,39 @@ function useSeasonalThemeController() {
     }
   }, []);
 
-  return {
-    // Current state
-    currentTheme: state.currentTheme,
-    currentThemeConfig,
-    isTransitioning: state.isTransitioning,
-    detectedTheme: state.detectedTheme,
-    manualOverride: state.manualOverride,
+  return useMemo(
+    () => ({
+      // Current state
+      currentTheme: state.currentTheme,
+      currentThemeConfig,
+      isTransitioning: state.isTransitioning,
+      detectedTheme: state.detectedTheme,
+      manualOverride: state.manualOverride,
 
-    // Actions
-    setManualTheme,
-    transitionToTheme,
+      // Actions
+      setManualTheme,
+      transitionToTheme,
 
-    // Utilities
-    getThemeConfig,
-    getAvailableThemes,
-    isThemeActive,
-    preloadThemeAssets,
+      // Utilities
+      getThemeConfig,
+      getAvailableThemes,
+      isThemeActive,
+      preloadThemeAssets,
 
-    // Theme configs
-    themes: THEME_CONFIGS,
-  };
+      // Theme configs
+      themes: THEME_CONFIGS,
+    }),
+    [
+      state,
+      currentThemeConfig,
+      setManualTheme,
+      transitionToTheme,
+      getThemeConfig,
+      getAvailableThemes,
+      isThemeActive,
+      preloadThemeAssets,
+    ]
+  );
 }
 
 const SeasonalThemeContext = createContext<ReturnType<typeof useSeasonalThemeController> | null>(null);

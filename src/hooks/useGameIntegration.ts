@@ -23,7 +23,7 @@ export function useGameIntegration() {
   const { hapticFeedback, triggerHapticSequence } = useHapticFeedback();
   const { getNewlyUnlockedBadges } = usePairingHistory();
   const { currentThemeConfig } = useSeasonalTheme();
-  const { isBGMEnabled } = usePreferencesStore();
+  const isBGMEnabled = usePreferencesStore((state) => state.isBGMEnabled);
 
   // Prevent duplicate badge celebrations
   const celebratedBadgesRef = useRef<Set<string>>(new Set());

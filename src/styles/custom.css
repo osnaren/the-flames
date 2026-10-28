@@ -106,8 +106,25 @@
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  /* Avoid theme-dependent styles on every text and SVG node. */
+  :where(
+    .border,
+    .border-2,
+    .border-4,
+    .border-8,
+    .border-t,
+    .border-r,
+    .border-b,
+    .border-l,
+    .border-x,
+    .border-y,
+    .border-s,
+    .border-e
+  ) {
+    @apply border-border;
+  }
+  :focus-visible {
+    @apply outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;

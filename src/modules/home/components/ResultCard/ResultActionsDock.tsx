@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { BarChart3, ImageDown, Link2, RotateCcw, Share2 } from 'lucide-react';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useState, useTransition } from 'react';
 import toast from 'react-hot-toast';
 
 import { useGameIntegration } from '@/hooks/useGameIntegration';
@@ -24,6 +24,7 @@ interface DockButtonProps {
   onClick: () => void;
   variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'info';
   delay?: number;
+  isBusy?: boolean;
 }
 
 const variantStyles = {
@@ -34,13 +35,15 @@ const variantStyles = {
   info: 'from-indigo-500 to-blue-600 hover:from-indigo-400 hover:to-blue-500',
 };
 
-function DockButton({ icon: Icon, label, onClick, variant = 'secondary', delay = 0 }: DockButtonProps) {
+function DockButton({ icon: Icon, label, onClick, variant = 'secondary', delay = 0, isBusy = false }: DockButtonProps) {
   const { shouldAnimate } = useAnimationPreferences();
   const [isPressed, setIsPressed] = useState(false);
 
   return (
     <motion.button
       onClick={onClick}
+      disabled={isBusy}
+      aria-busy={isBusy || undefined}
       onPointerDown={() => setIsPressed(true)}
       onPointerUp={() => setIsPressed(false)}
       onPointerLeave={() => setIsPressed(false)}
@@ -58,6 +61,7 @@ function DockButton({ icon: Icon, label, onClick, variant = 'secondary', delay =
         'group relative flex cursor-pointer flex-col items-center gap-1.5 rounded-2xl px-3 py-2.5',
         'bg-linear-to-br shadow-lg',
         'transition-all duration-200',
+        'disabled:cursor-wait disabled:opacity-60',
         'focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-transparent focus:outline-none',
         variantStyles[variant]
       )}
@@ -65,7 +69,9 @@ function DockButton({ icon: Icon, label, onClick, variant = 'secondary', delay =
     >
       {/* Icon container */}
       <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
-        <Icon className="h-4 w-4 text-white transition-transform group-hover:scale-110" />
+        <Icon
+          className={cn('h-4 w-4 text-white transition-transform group-hover:scale-110', isBusy && 'animate-spin')}
+        />
       </span>
 
       {/* Label */}
@@ -100,6 +106,7 @@ function ResultActionsDock({
 }: ResultActionsDockProps) {
   const { shouldAnimate } = useAnimationPreferences();
   const { uiInteraction, gameReset } = useGameIntegration();
+  const [isResetting, startResetTransition] = useTransition();
 
   const handleCopyLink = useCallback(() => {
     uiInteraction('click');
@@ -112,8 +119,10 @@ function ResultActionsDock({
 
   const handleRetry = useCallback(() => {
     gameReset();
-    onRetry();
-  }, [gameReset, onRetry]);
+    // Acknowledge the action while React prepares the input stage without
+    // blocking the next frame with the entire result-tree replacement.
+    startResetTransition(onRetry);
+  }, [gameReset, onRetry, startResetTransition]);
 
   const handleShare = useCallback(() => {
     uiInteraction('click');
@@ -152,7 +161,14 @@ function ResultActionsDock({
       )}
     >
       {/* Primary Actions */}
-      <DockButton icon={RotateCcw} label="Reset" onClick={handleRetry} variant="secondary" delay={0} />
+      <DockButton
+        icon={RotateCcw}
+        label="Reset"
+        onClick={handleRetry}
+        variant="secondary"
+        delay={0}
+        isBusy={isResetting}
+      />
 
       <DockButton icon={Share2} label="Share" onClick={handleShare} variant="primary" delay={0.05} />
 

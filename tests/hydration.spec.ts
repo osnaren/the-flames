@@ -24,6 +24,15 @@ for (const route of ['/', '/manual', '/charts']) {
   });
 }
 
+test('a shared calculator loads its names and allows editing after hydration', async ({ page }) => {
+  await page.goto('/?name1=Rahul&name2=Priya');
+  await expect(page.locator('#name1')).toHaveValue('Rahul');
+  await expect(page.locator('#name2')).toHaveValue('Priya');
+  await page.locator('#name1').fill('Alexandra');
+  await page.getByRole('button', { name: 'Open settings', exact: true }).click();
+  await expect(page.locator('#name1')).toHaveValue('Alexandra');
+});
+
 test('a shared manual game hydrates and opens the saved names', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));

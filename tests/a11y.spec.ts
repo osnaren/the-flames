@@ -77,15 +77,17 @@ test.describe('Keyboard Navigation Tests', () => {
 
     // Tab to first input
     const name1Input = page.locator('#name1');
+    await expect(name1Input).toBeEnabled();
     await name1Input.focus();
     await expect(name1Input).toBeFocused();
 
     // Tab to second input
     await page.keyboard.press('Tab');
-    // Should focus on the heart emoji (decorative) or name2 input
+    // The decorative divider must not interrupt the form's tab order.
     const name2Input = page.locator('#name2');
-    await name2Input.focus();
     await expect(name2Input).toBeFocused();
+    await page.keyboard.press('Shift+Tab');
+    await expect(name1Input).toBeFocused();
   });
 
   test('Mobile menu should trap focus when open', async ({ page }) => {

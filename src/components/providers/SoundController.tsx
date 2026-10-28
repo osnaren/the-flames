@@ -15,7 +15,8 @@ import { useEffect, useRef } from 'react';
  */
 export default function SoundController() {
   const { playBGM, setOnTrackEnded, getBGMState } = useSoundSystem();
-  const { musicTheme, isBGMEnabled } = usePreferencesStore();
+  const musicTheme = usePreferencesStore((state) => state.musicTheme);
+  const isBGMEnabled = usePreferencesStore((state) => state.isBGMEnabled);
   const isInitialized = useRef(false);
 
   // Handle playlist auto-advance

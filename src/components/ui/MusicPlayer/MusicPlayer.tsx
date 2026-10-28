@@ -23,6 +23,7 @@ import { cn } from '@/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Disc3, Music2, Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 interface MusicPlayerProps {
   /** Whether the player is in an expanded panel */
@@ -35,7 +36,16 @@ interface MusicPlayerProps {
 
 function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0 }: MusicPlayerProps) {
   const { shouldAnimate } = useAnimationPreferences();
-  const { isBGMEnabled, musicTheme, volume, toggleBGM, setMusicTheme, setVolume } = usePreferencesStore();
+  const { isBGMEnabled, musicTheme, volume, toggleBGM, setMusicTheme, setVolume } = usePreferencesStore(
+    useShallow((state) => ({
+      isBGMEnabled: state.isBGMEnabled,
+      musicTheme: state.musicTheme,
+      volume: state.volume,
+      toggleBGM: state.toggleBGM,
+      setMusicTheme: state.setMusicTheme,
+      setVolume: state.setVolume,
+    }))
+  );
   const { playBGM, getBGMState, pauseBGM, resumeBGM } = useSoundSystem();
   const { hapticFeedback } = useHapticFeedback();
 

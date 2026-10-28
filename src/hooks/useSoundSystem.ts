@@ -16,6 +16,7 @@
 import { BGM_TRACKS, cycleTrackInTheme, getTracksForTheme, SOUND_ASSETS, SoundId, THEME_GROUPS } from '@/config/sound';
 import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 // Singleton audio manager to prevent duplicate instances
 class AudioManager {
@@ -507,7 +508,15 @@ class AudioManager {
 }
 
 export function useSoundSystem() {
-  const { isSoundEnabled, isBGMEnabled, volume, seasonalTheme, musicTheme } = usePreferencesStore();
+  const { isSoundEnabled, isBGMEnabled, volume, seasonalTheme, musicTheme } = usePreferencesStore(
+    useShallow((state) => ({
+      isSoundEnabled: state.isSoundEnabled,
+      isBGMEnabled: state.isBGMEnabled,
+      volume: state.volume,
+      seasonalTheme: state.seasonalTheme,
+      musicTheme: state.musicTheme,
+    }))
+  );
 
   const managerRef = useRef<AudioManager | null>(null);
   const prevBgmEnabledRef = useRef(isBGMEnabled);

@@ -1,5 +1,6 @@
 'use client';
 
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import Logo from '@components/ui/Logo';
 import { FOOTER_CONFIG } from '@config/navigation';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
@@ -12,6 +13,8 @@ import type { FooterLinkProps } from './types';
 
 function Footer() {
   const { shouldAnimate, prefersReducedMotion } = useAnimationPreferences();
+  const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
+  const animateDecoration = shouldAnimate && !compactDevice;
   const { scrollYProgress } = useScroll();
 
   // Enhanced scroll-based effects - use wider range to work on shorter pages
@@ -118,14 +121,14 @@ function Footer() {
   return (
     <motion.footer
       style={{
-        opacity: prefersReducedMotion ? 1 : footerOpacity,
-        y: prefersReducedMotion ? 0 : footerY,
+        opacity: prefersReducedMotion || compactDevice ? 1 : footerOpacity,
+        y: prefersReducedMotion || compactDevice ? 0 : footerY,
       }}
       className="border-outline/10 from-surface-container-lowest/80 via-surface/50 relative mt-auto overflow-hidden border-t bg-linear-to-t to-transparent"
       role="contentinfo"
     >
       {/* Enhanced background elements */}
-      {shouldAnimate && (
+      {animateDecoration && (
         <>
           {/* Subtle gradient overlay */}
           <div className="from-primary/5 to-secondary/5 absolute inset-0 bg-linear-to-br via-transparent" />
@@ -290,7 +293,7 @@ function Footer() {
               <span>Made with</span>
               <motion.div
                 animate={
-                  shouldAnimate
+                  animateDecoration
                     ? {
                         scale: [1, 1.2, 1],
                         rotate: [0, 10, -10, 0],
@@ -326,7 +329,7 @@ function Footer() {
       </div>
 
       {/* Decorative bottom accent */}
-      {shouldAnimate && (
+      {animateDecoration && (
         <motion.div
           className="from-primary via-secondary to-tertiary absolute right-0 bottom-0 left-0 h-1 bg-linear-to-r opacity-60 will-change-transform"
           initial={{ scaleX: 0 }}

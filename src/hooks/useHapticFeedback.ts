@@ -48,7 +48,7 @@ interface HapticCapabilities {
 }
 
 export function useHapticFeedback() {
-  const { isHapticEnabled } = usePreferencesStore();
+  const isHapticEnabled = usePreferencesStore((state) => state.isHapticEnabled);
   const [capabilities, setCapabilities] = useState<HapticCapabilities>({
     hasVibration: false,
     hasVibrationAPI: false,

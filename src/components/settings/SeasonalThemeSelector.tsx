@@ -66,8 +66,9 @@ const ThemeCard = memo(function ThemeCard({ theme, isActive, isDetected, onClick
       {isActive && (
         <motion.div
           className="bg-primary absolute -bottom-0.5 left-1/2 h-0.5 w-4 -translate-x-1/2 rounded-full"
-          layoutId="theme-indicator"
-          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: shouldAnimate ? 0.15 : 0 }}
         />
       )}
 

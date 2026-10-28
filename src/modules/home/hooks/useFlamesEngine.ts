@@ -1,7 +1,6 @@
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { usePairingHistory } from '@/hooks/usePairingHistory';
 import { useTimers } from '@/hooks/useTimers';
-import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
@@ -44,8 +43,6 @@ interface FlamesEngineActions {
  * Handles all game logic, timing, and state transitions
  */
 export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
-  const searchParams = useSearchParams();
-
   // Core game state
   const [name1, setName1] = useState<string>('');
   const [name2, setName2] = useState<string>('');
@@ -79,43 +76,18 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
   // Pairing history and badges
   const { addPairing, getNewlyUnlockedBadges } = usePairingHistory();
 
-  // Initialize from URL params
-  useEffect(() => {
-    // Guard against SSR or missing searchParams
-    if (typeof window === 'undefined' || !searchParams) return;
-
-    const urlName1 = searchParams.get('name1');
-    const urlName2 = searchParams.get('name2');
-
-    if (urlName1) {
-      if (urlName1 !== name1) {
-        setName1(urlName1);
-      }
-    }
-    if (urlName2) {
-      if (urlName2 !== name2) {
-        setName2(urlName2);
-      }
-    }
-    // Only run on mount and when searchParams changes, not when names change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
-
   // Update URL params when names change
-  const updateUrlParams = useCallback(
-    (newName1: string, newName2: string) => {
-      const params = new URLSearchParams(searchParams?.toString() || '');
-      if (newName1.trim()) params.set('name1', newName1.trim());
-      else params.delete('name1');
-      if (newName2.trim()) params.set('name2', newName2.trim());
-      else params.delete('name2');
+  const updateUrlParams = useCallback((newName1: string, newName2: string) => {
+    const params = new URLSearchParams(window.location.search);
+    if (newName1.trim()) params.set('name1', newName1.trim());
+    else params.delete('name1');
+    if (newName2.trim()) params.set('name2', newName2.trim());
+    else params.delete('name2');
 
-      // Use history API directly to avoid Next.js navigation/re-render issues
-      const newUrl = `${window.location.pathname}?${params.toString()}`;
-      window.history.replaceState(null, '', newUrl);
-    },
-    [searchParams]
-  );
+    // Use history API directly to avoid Next.js navigation/re-render issues
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState(null, '', newUrl);
+  }, []);
 
   // Memoized name setters
   const handleSetName1 = useCallback((input: string) => {
@@ -271,12 +243,20 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
         setIsProcessing(true);
         clearAll();
 
-        // Update URL params
-        updateUrlParams(validName1, validName2);
-
         // Calculate all game data immediately
         const gameData = calculateGameData(validName1, validName2);
         calculatedDataRef.current = gameData;
+        const pathname = window.location.pathname;
+        // Native history updates also schedule Next.js router work. The names
+        // already live in game state; synchronize the share URL after a frame
+        // has painted, and ignore a game that was reset or navigated away from.
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (calculatedDataRef.current === gameData && window.location.pathname === pathname) {
+              updateUrlParams(validName1, validName2);
+            }
+          });
+        });
         // Make remaining letters available to the processor immediately so counting has the correct value
         setRemainingLetters(gameData.remainingLetters);
         // Provide common letters up-front so the processor doesn't restart mid-animation
@@ -287,17 +267,24 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
         // Bump runId so processors remount even if names repeat
         setRunId((id) => id + 1);
 
-        // Record match in background (non-blocking)
+        // Loading the optional statistics SDK can take a long task. Give the
+        // calculator's first frame priority before starting that work.
         if (gameData.result) {
           const recordedResult = gameData.result;
-          void import('@lib/supabase')
-            .then(async ({ getUserCountry, insertMatch }) => {
-              const country = await getUserCountry();
-              await insertMatch(recordedResult, country || undefined);
-            })
-            .catch(() => {
-              // Recording is optional; the local calculator stays available.
-            });
+          const recordMatch = () =>
+            void import('@lib/supabase')
+              .then(async ({ getUserCountry, insertMatch }) => {
+                const country = await getUserCountry();
+                await insertMatch(recordedResult, country || undefined);
+              })
+              .catch(() => {
+                // Recording is optional; the local calculator stays available.
+              });
+          if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(recordMatch, { timeout: 1500 });
+          } else {
+            requestAnimationFrame(() => setTimeout(recordMatch, 0));
+          }
         }
 
         // Transition to processing stage with form collapse effect
@@ -373,6 +360,13 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
     const newUrl = window.location.pathname;
     window.history.replaceState(null, '', newUrl);
   }, [clearAll]);
+
+  useEffect(
+    () => () => {
+      calculatedDataRef.current = null;
+    },
+    []
+  );
 
   /**
    * Force reset processing state - useful for when form validation fails

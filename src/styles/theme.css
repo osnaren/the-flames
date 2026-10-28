@@ -14,6 +14,16 @@
     background var(--duration, 0.3s) cubic-bezier(0.23, 1, 0.32, 1);
 }
 
+/* Touch controls update colors immediately. Keep compositor-friendly motion
+   without recalculating the entire inherited palette on every animation frame. */
+@media (pointer: coarse) {
+  *,
+  *::before,
+  *::after {
+    transition-property: opacity, transform !important;
+  }
+}
+
 @theme {
   /* Spacing & Timing */
   --radius: 0.5rem;

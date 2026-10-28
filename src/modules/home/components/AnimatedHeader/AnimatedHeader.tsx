@@ -1,4 +1,5 @@
 import { useGameIntegration } from '@/hooks/useGameIntegration';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { memo, useState } from 'react';
 import { FLAMES_LETTERS } from '../../constants';
@@ -38,6 +39,8 @@ const letterVariants: Variants = {
 function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const { sound } = useGameIntegration();
+  const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
+  const animateDecoration = shouldAnimate && !compactDevice;
 
   const isCompact = stage === 'processing' || stage === 'result';
 
@@ -145,7 +148,7 @@ function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) 
         <motion.span
           className="ml-2 inline-block"
           animate={
-            shouldAnimate && !isCompact
+            animateDecoration && !isCompact
               ? {
                   rotate: [0, 15, -15, 0],
                   scale: [1, 1.2, 1.2, 1],
@@ -164,7 +167,7 @@ function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) 
       </motion.p>
 
       {/* Floating decorative elements */}
-      {shouldAnimate && !isCompact && (
+      {animateDecoration && !isCompact && (
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           {[...Array(5)].map((_, i) => (
             <motion.div
