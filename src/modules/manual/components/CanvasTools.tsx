@@ -25,42 +25,42 @@ export default function CanvasTools({
   const isMobile = deviceType === 'mobile';
   const { sound, uiInteraction } = useGameIntegration();
 
-  const handleBack = useCallback(async () => {
-    await sound.playSound('whoosh', { volume: 0.5 });
+  const handleBack = useCallback(() => {
     onBack();
+    void Promise.allSettled([sound.playSound('whoosh', { volume: 0.5 })]);
   }, [sound, onBack]);
 
-  const handleErase = useCallback(async () => {
-    await uiInteraction('toggle');
+  const handleErase = useCallback(() => {
     onErase();
+    void Promise.allSettled([uiInteraction('toggle')]);
   }, [uiInteraction, onErase]);
 
-  const handleClear = useCallback(async () => {
-    await sound.playSound('delete', { volume: 0.6 });
+  const handleClear = useCallback(() => {
     onClear();
+    void Promise.allSettled([sound.playSound('delete', { volume: 0.6 })]);
   }, [sound, onClear]);
 
-  const handleShare = useCallback(async () => {
-    await uiInteraction('click');
+  const handleShare = useCallback(() => {
     onShare();
+    void Promise.allSettled([uiInteraction('click')]);
   }, [uiInteraction, onShare]);
 
-  const handleSave = useCallback(async () => {
-    await uiInteraction('click');
+  const handleSave = useCallback(() => {
     onSave();
+    void Promise.allSettled([uiInteraction('click')]);
   }, [uiInteraction, onSave]);
 
-  const handleUndo = useCallback(async () => {
+  const handleUndo = useCallback(() => {
     if (onUndo && canUndo) {
-      await sound.playSound('pop', { volume: 0.4 });
       onUndo();
+      void Promise.allSettled([sound.playSound('pop', { volume: 0.4 })]);
     }
   }, [sound, onUndo, canUndo]);
 
-  const handleRedo = useCallback(async () => {
+  const handleRedo = useCallback(() => {
     if (onRedo && canRedo) {
-      await sound.playSound('pop', { volume: 0.4 });
       onRedo();
+      void Promise.allSettled([sound.playSound('pop', { volume: 0.4 })]);
     }
   }, [sound, onRedo, canRedo]);
 

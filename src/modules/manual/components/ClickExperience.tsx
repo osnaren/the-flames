@@ -99,12 +99,10 @@ export default function ClickExperience({
     toast.success('Reset completed!');
   }, [uiInteraction, resumeThemeBGM]);
 
-  const handleBack = useCallback(async () => {
-    // Resume theme BGM if result BGM was playing
-    await resumeThemeBGM();
-
-    await sound.playSound('whoosh', { volume: 0.5 });
+  const handleBack = useCallback(() => {
     onBack();
+    // Return immediately even when optional music or sound files are slow.
+    void Promise.allSettled([resumeThemeBGM(), sound.playSound('whoosh', { volume: 0.5 })]);
   }, [sound, onBack, resumeThemeBGM]);
 
   // Get user's current result from FLAMES letters

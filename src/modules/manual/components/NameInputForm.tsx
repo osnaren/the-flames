@@ -55,10 +55,9 @@ export default function NameInputForm({ onNamesSubmit, initialName1 = '', initia
       return;
     }
 
-    // Play form submit sound
-    await formSubmit();
-
     setIsLoading(true);
+    // Optional audio must not hold the form while a sound downloads.
+    void Promise.allSettled([formSubmit()]);
     setTimeout(() => {
       onNamesSubmit(name1.trim(), name2.trim(), experienceMode);
       setIsLoading(false);

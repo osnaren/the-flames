@@ -106,6 +106,45 @@ test('the tutorial simulation completes and resets on touch screens', async ({ p
   await expect(page.getByText('The result is:', { exact: true })).toHaveCount(0);
 });
 
+test('manual navigation does not wait for slow sound files', async ({ page }) => {
+  let releaseAudio!: () => void;
+  const audioBlocked = new Promise<void>((resolve) => {
+    releaseAudio = resolve;
+  });
+  await page.route('**/sounds/**', async (route) => {
+    await audioBlocked;
+    await route.abort().catch(() => {});
+  });
+  try {
+    await page.goto('/manual');
+    await page.locator('#name1').fill('Rahul');
+    await page.locator('#name2').fill('Priya');
+    await page.getByRole('button', { name: /Interactive/ }).click();
+    await expect(page.getByRole('button', { name: 'Back to Input', exact: true })).toBeVisible({ timeout: 3000 });
+    await page.getByRole('button', { name: 'Back to Input', exact: true }).click();
+    await expect(page.locator('#name1')).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('#name1')).toHaveValue('Rahul');
+    await page.getByRole('button', { name: 'Creative Draw like pen on paper', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Go back to input', exact: true })).toBeVisible({ timeout: 3000 });
+    await page.getByRole('button', { name: 'Switch to erasing mode', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Switch to drawing mode', exact: true })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+      { timeout: 3000 }
+    );
+    await page.getByRole('button', { name: 'Switch to drawing mode', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Switch to erasing mode', exact: true })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+      { timeout: 3000 }
+    );
+    await page.getByRole('button', { name: 'Go back to input', exact: true }).click();
+    await expect(page.locator('#name1')).toBeVisible({ timeout: 3000 });
+  } finally {
+    releaseAudio();
+  }
+});
+
 test.beforeEach(async ({ page }) => {
   await page.route('**/*.sentry.io/**', (route) => route.abort());
   await page.route('https://example.supabase.co/functions/v1/get-country', (route) =>
