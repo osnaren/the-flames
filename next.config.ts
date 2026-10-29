@@ -70,6 +70,10 @@ const nextConfig: NextConfig = {
       {
         source: '/:path*',
         headers: [
+          {
+            key: 'X-App-Revision',
+            value: process.env.COMMIT_REF || process.env.VERCEL_GIT_COMMIT_SHA || 'local',
+          },
           // Security headers
           {
             key: 'X-DNS-Prefetch-Control',
