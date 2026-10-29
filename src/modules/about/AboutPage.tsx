@@ -2,7 +2,6 @@
 
 import { SparklesText } from '@/components/magicui/sparkles-text';
 import { Button } from '@/components/shadcn/button';
-import { RetroGrid } from '@/components/shadcn/retro-grid';
 import { FocusCards } from '@/components/ui/focus-cards';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
@@ -151,7 +150,11 @@ export default function AboutPage() {
         className="relative flex min-h-[90vh] flex-col items-center justify-center space-y-8 overflow-hidden px-4 text-center"
         aria-labelledby="about-hero-title"
       >
-        <RetroGrid className="opacity-50" />
+        {/* Keep theme repaints inside the hero instead of a 600vw animated 3D layer. */}
+        <div
+          aria-hidden="true"
+          className="text-on-surface/10 pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] mask-[linear-gradient(to_top,transparent,#000)] bg-size-[60px_60px]"
+        />
 
         <motion.div
           initial={false}
