@@ -72,6 +72,7 @@ export default function FloatingControlPanel() {
   const [controlsReady, setControlsReady] = useState(false);
   const [, startControlsTransition] = useTransition();
   const prefersReducedMotion = useReducedMotion();
+  const hydrated = usePreferencesStore((state) => state.hydrated);
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const soundFrameRef = useRef<number | null>(null);
@@ -272,6 +273,7 @@ export default function FloatingControlPanel() {
       >
         <button
           ref={toggleButtonRef}
+          disabled={!hydrated}
           onClick={() => {
             hapticFeedback.tap();
             const nextExpanded = !isExpanded;

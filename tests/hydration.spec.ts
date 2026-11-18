@@ -1,5 +1,27 @@
 import { expect, test } from '@playwright/test';
 
+test('the first settings tap works after a delayed hydration', async ({ page }) => {
+  const scripts = /\/_next\/static\/.*\.js(?:\?|$)/;
+  let unblock!: () => void;
+  const hydration = new Promise<void>((resolve) => {
+    unblock = resolve;
+  });
+  await page.route(scripts, async (route) => {
+    await hydration;
+    await route.continue();
+  });
+
+  const settings = page.getByRole('button', { name: 'Open settings', exact: true });
+  try {
+    await page.goto('/', { waitUntil: 'commit' });
+    await expect(settings).toBeDisabled();
+  } finally {
+    unblock();
+  }
+  await settings.click();
+  await expect(page.getByRole('switch', { name: /Switch to (dark|light) theme/ })).toBeVisible();
+});
+
 test.use({ baseURL: 'http://127.0.0.1:3000', contextOptions: { reducedMotion: 'reduce' } });
 
 for (const route of ['/', '/manual', '/charts']) {

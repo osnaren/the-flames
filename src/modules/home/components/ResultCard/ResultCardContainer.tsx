@@ -140,7 +140,7 @@ function ResultCardContainer({
       } else {
         await copyShareUrl(name1, name2);
       }
-      // Toast is already shown in ResultActionsDock
+      toast.success('Link copied to clipboard!', { icon: '🔗', duration: 2000 });
     } catch {
       uiInteraction('error');
       toast.error('Failed to copy link');

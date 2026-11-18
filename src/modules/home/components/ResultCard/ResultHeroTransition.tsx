@@ -31,6 +31,8 @@ function ResultHeroTransition({ result, onTransitionComplete }: ResultHeroTransi
   const gradient = RESULT_GRADIENTS[result];
   const colors = RESULT_COLORS[result];
   const label = RESULT_LABELS[result];
+  const burstDuration = compactDevice ? 350 : HERO_TRANSITION_TIMING.BURST_DURATION;
+  const shrinkDuration = compactDevice ? 0.22 : HERO_TRANSITION_TIMING.SHRINK_DURATION;
 
   // Pre-calculate particle positions to avoid Math.random during render
   const particleOffsets = useMemo(
@@ -44,9 +46,9 @@ function ResultHeroTransition({ result, onTransitionComplete }: ResultHeroTransi
   );
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsShrinking(true), HERO_TRANSITION_TIMING.BURST_DURATION);
+    const timer = setTimeout(() => setIsShrinking(true), burstDuration);
     return () => clearTimeout(timer);
-  }, []);
+  }, [burstDuration]);
 
   const glowIntensity = isShrinking ? 0.6 : 1;
 
@@ -57,7 +59,7 @@ function ResultHeroTransition({ result, onTransitionComplete }: ResultHeroTransi
       data-result-hero
       initial={{ opacity: 0 }}
       animate={{ opacity: isShrinking ? 0 : 1 }}
-      transition={{ duration: isShrinking ? HERO_TRANSITION_TIMING.SHRINK_DURATION : 0.16 }}
+      transition={{ duration: isShrinking ? shrinkDuration : 0.16 }}
     >
       {/* Backdrop with radial glow */}
       <motion.div
@@ -103,20 +105,22 @@ function ResultHeroTransition({ result, onTransitionComplete }: ResultHeroTransi
               ease: 'easeOut',
             }}
           />
-          <motion.div
-            className="absolute rounded-full"
-            style={{ width: 350, height: 350, borderWidth: 2, borderStyle: 'solid', borderColor: colors.secondary }}
-            initial={{ scale: 150 / 350, opacity: 0.6 }}
-            animate={{
-              scale: [150 / 350, 1],
-              opacity: [0.6, 0],
-            }}
-            transition={{
-              duration: 0.6,
-              ease: 'easeOut',
-              delay: 0.1,
-            }}
-          />
+          {!compactDevice && (
+            <motion.div
+              className="absolute rounded-full"
+              style={{ width: 350, height: 350, borderWidth: 2, borderStyle: 'solid', borderColor: colors.secondary }}
+              initial={{ scale: 150 / 350, opacity: 0.6 }}
+              animate={{
+                scale: [150 / 350, 1],
+                opacity: [0.6, 0],
+              }}
+              transition={{
+                duration: 0.6,
+                ease: 'easeOut',
+                delay: 0.1,
+              }}
+            />
+          )}
         </>
       )}
 
@@ -130,7 +134,7 @@ function ResultHeroTransition({ result, onTransitionComplete }: ResultHeroTransi
         }}
         transition={
           isShrinking
-            ? { duration: HERO_TRANSITION_TIMING.SHRINK_DURATION, ease: 'easeInOut' }
+            ? { duration: shrinkDuration, ease: 'easeInOut' }
             : { type: 'spring', stiffness: 240, damping: 17 }
         }
         onAnimationComplete={() => {

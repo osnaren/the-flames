@@ -41,7 +41,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
       <PreferencesInitializer />
       <SoundController />
       {/* <WebVitalsReporter /> */}
-      <div className="from-customBg-1 to-customBg-2 relative flex min-h-screen flex-col bg-linear-to-br transition-colors duration-500">
+      <div className="app-layout from-customBg-1 to-customBg-2 relative flex min-h-screen flex-col bg-linear-to-br transition-colors duration-500">
         <UnifiedBackground />
         <PageTransition>{children}</PageTransition>
         <SponsorFAB />

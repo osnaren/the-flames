@@ -345,6 +345,9 @@ test('the mobile game finishes a long count with the winning icon still loading'
     const title = card.getByRole('heading', { name: 'Siblings' });
     await expect(title).toBeInViewport({ timeout: 2500 });
     await expect(card.getByText('👫', { exact: true })).toBeInViewport();
+    const support = page.getByRole('button', { name: 'Support Us', exact: true });
+    await expect(support).toBeVisible();
+    await expect(page.locator('.support-button').filter({ has: support })).toHaveCSS('position', 'relative');
     expect(await page.evaluate(() => (window as Window & { countAudio?: unknown }).countAudio)).toEqual({
       loads: 1,
       players: 1,

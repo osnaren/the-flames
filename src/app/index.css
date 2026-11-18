@@ -14,6 +14,13 @@
 /* Import seasonal theme styles */
 @import '../styles/seasonal-themes.css';
 
+/* Give the result actions the full viewport width while keeping support accessible below the page. */
+@media (max-width: 767px), (pointer: coarse) {
+  .app-layout:has([data-result-actions]) > .support-button {
+    @apply relative inset-auto mx-6 mb-6 self-end;
+  }
+}
+
 /* Layout Adjustments */
 @layer base {
   html {

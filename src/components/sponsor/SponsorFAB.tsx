@@ -92,12 +92,12 @@ const SponsorFAB: React.FC = () => {
 
   return (
     <>
-      <div ref={fabRef} className="fixed right-6 bottom-16 z-50 flex flex-col items-center gap-3">
+      <div ref={fabRef} className="support-button fixed right-6 bottom-16 z-50 flex flex-col items-center">
         <AnimatePresence>
           {isOpen && (
             <motion.div
               id={menuId}
-              className="flex flex-col items-center gap-3"
+              className="absolute bottom-full mb-3 flex flex-col items-center gap-3"
               initial="closed"
               animate="open"
               exit="closed"

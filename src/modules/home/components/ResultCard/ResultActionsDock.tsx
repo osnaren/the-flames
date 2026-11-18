@@ -3,7 +3,6 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { motion } from 'framer-motion';
 import { BarChart3, ImageDown, Link2, RotateCcw, Share2 } from 'lucide-react';
 import { memo, useCallback, useState } from 'react';
-import toast from 'react-hot-toast';
 
 import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { cn } from '@/utils';
@@ -138,10 +137,6 @@ function ResultActionsDock({
   const handleCopyLink = useCallback(() => {
     uiInteraction('click');
     onCopyLink();
-    toast.success('Link copied to clipboard!', {
-      icon: '🔗',
-      duration: 2000,
-    });
   }, [onCopyLink, uiInteraction]);
 
   const handleRetry = useCallback(() => {
@@ -172,6 +167,7 @@ function ResultActionsDock({
 
   return (
     <motion.div
+      data-result-actions
       initial={shouldAnimate ? { opacity: 0, y: 30, scale: 0.9 } : false}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 20, scale: 0.9 }}
