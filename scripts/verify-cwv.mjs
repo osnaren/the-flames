@@ -75,6 +75,7 @@ for (const route of routes) {
   const page = await ctx.newPage();
   page.setDefaultTimeout(15000);
   const errors = [];
+  let revealToCardMs;
   page.on('pageerror', (e) => errors.push(e.message));
   const cdp = await ctx.newCDPSession(page);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: Number(process.env.CWV_CPU || 4) });
@@ -96,11 +97,20 @@ for (const route of routes) {
       fonts: [...globalThis.document.fonts].filter((f) => f.status === 'loaded').map((f) => f.family),
     }));
     if (scenario === 'game') {
+      // Synthetic matches are for browser verification and stay out of the public charts.
+      await page.route('**/rest/v1/flames_matches*', (route) =>
+        route.request().method() === 'POST' ? route.fulfill({ status: 201, json: [] }) : route.continue()
+      );
       await activate(page.locator('#name1'));
       await page.locator('#name1').pressSequentially(process.env.CWV_NAME1 || 'Alexanderthegreat', { delay: 35 });
       await activate(page.locator('#name2'));
       await page.locator('#name2').pressSequentially(process.env.CWV_NAME2 || 'ElizabethVictoria', { delay: 35 });
       await activate(page.getByRole('button', { name: /Reveal Your FLAMES/ }));
+      await expect(page.getByText('🎉 Your result is ready!', { exact: true })).toBeVisible({ timeout: 25000 });
+      const revealStarted = Date.now();
+      const resultHeading = page.getByRole('region', { name: /^FLAMES Result:/ }).getByRole('heading');
+      await expect(resultHeading).toBeInViewport({ timeout: 5000 });
+      revealToCardMs = Date.now() - revealStarted;
       await expect(page.getByRole('button', { name: 'Reset', exact: true })).toBeVisible({ timeout: 90000 });
       await page.waitForTimeout(4000);
       await activate(page.getByRole('button', { name: 'Reset', exact: true }));
@@ -141,6 +151,7 @@ for (const route of routes) {
       input: touch ? 'touch' : 'mouse',
       cpu: Number(process.env.CWV_CPU || 4),
       initial,
+      revealToCardMs,
       errors,
       ...result,
     });
@@ -149,6 +160,7 @@ for (const route of routes) {
         route,
         initial,
         metrics: result.metrics,
+        revealToCardMs,
         errors,
         shifts: result.shifts.length,
         worstEvent: Math.max(0, ...result.events.map((e) => e.duration)),

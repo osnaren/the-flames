@@ -84,6 +84,40 @@ test('all shared preview variants opt out of indexing and preserve social previe
   }
 });
 
+test('long shared names round-trip and the preview shows the calculated result', async ({ page, request }) => {
+  const name1 = `${'A'.repeat(26)}C`;
+  const name2 = `${'A'.repeat(26)}B`;
+  const path = `/share?${new URLSearchParams({ name1, name2, result: 'L' })}`;
+  await page.goto(path);
+  const share = new URL((await page.locator('meta[property="og:url"]').getAttribute('content'))!);
+  const image = new URL((await page.locator('meta[property="og:image"]').getAttribute('content'))!);
+  expect(share.pathname).toBe('/share');
+  expect(image.pathname).toBe('/api/og/result');
+  for (const url of [share, image]) {
+    expect(url.searchParams.get('name1')).toBe(name1);
+    expect(url.searchParams.get('name2')).toBe(name2);
+    expect(url.searchParams.get('result')).toBe('E');
+  }
+
+  const imageResponse = await request.get(image.pathname + image.search);
+  expect(imageResponse.ok()).toBe(true);
+  expect(imageResponse.headers()['x-robots-tag']).toBe('noindex');
+  expect(imageResponse.headers()['content-type']).toBe('image/png');
+});
+
+test('robots permits social image crawlers to load previews without opening the calculation API', async ({
+  request,
+}) => {
+  const result = await request.get('/robots.txt');
+  expect(result.ok()).toBe(true);
+  const groups = (await result.text()).split(/\r?\n\r?\n/);
+  for (const bot of ['*', 'Googlebot', 'Bingbot']) {
+    const entries = groups.find((group) => group.split(/\r?\n/).includes(`User-Agent: ${bot}`));
+    expect(entries).toContain('Allow: /api/og/');
+    expect(entries).toContain('Disallow: /api/');
+  }
+});
+
 test('sitemap contains canonical public pages without synthetic update dates', async ({ request }) => {
   const response = await request.get('/sitemap.xml');
   expect(response.status()).toBe(200);

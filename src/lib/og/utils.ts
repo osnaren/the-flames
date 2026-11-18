@@ -58,12 +58,7 @@ export function sanitizeName(name: string | null | undefined): string | null {
     return null;
   }
 
-  // Truncate if too long (keeping last character for ellipsis if truncated)
-  if (sanitized.length > OG_VALIDATION.maxNameLength) {
-    sanitized = sanitized.slice(0, OG_VALIDATION.maxNameLength - 1).trim() + '…';
-  }
-
-  return sanitized;
+  return truncateText(sanitized, OG_VALIDATION.maxNameLength);
 }
 
 /**
@@ -125,8 +120,14 @@ export function toTitleCase(str: string): string {
  * @returns Truncated text
  */
 export function truncateText(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength - 1) + '…';
+  const characters = [...text];
+  if (characters.length <= maxLength) return text;
+  return (
+    characters
+      .slice(0, maxLength - 1)
+      .join('')
+      .trimEnd() + '…'
+  );
 }
 
 /**

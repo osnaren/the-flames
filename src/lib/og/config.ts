@@ -207,7 +207,7 @@ export const OG_VALIDATION = {
   /** Minimum characters for names */
   minNameLength: 1,
   /** Characters to strip from names (security and display) */
-  stripChars: /[<>'"&\\/\n\r\t\0]/g,
+  stripChars: /[<>"&\\/\n\r\t\0]/g,
   /** Valid FLAMES results */
   validResults: ['F', 'L', 'A', 'M', 'E', 'S'] as const,
   /** Maximum URL length for OG image requests */

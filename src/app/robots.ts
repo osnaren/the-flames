@@ -11,19 +11,19 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
+        allow: ['/', '/api/og/'],
         disallow: ['/api/'],
       },
       {
         // Google specific rules for better crawling
         userAgent: 'Googlebot',
-        allow: '/',
+        allow: ['/', '/api/og/'],
         disallow: ['/api/'],
       },
       {
         // Bing specific rules
         userAgent: 'Bingbot',
-        allow: '/',
+        allow: ['/', '/api/og/'],
         disallow: ['/api/'],
       },
       {

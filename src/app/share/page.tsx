@@ -1,4 +1,12 @@
-import { generatePageMetadata, generateResultMetadata, pagesSEO, siteConfig } from '@/lib/seo';
+import { OG_VALIDATION, truncateText, validateResult } from '@/lib/og';
+import {
+  generatePageMetadata,
+  generateResultMetadata,
+  generateResultOGImageUrl,
+  pagesSEO,
+  siteConfig,
+} from '@/lib/seo';
+import { calculateFlamesResult, nameSchema } from '@/modules/home/utils';
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
@@ -25,29 +33,26 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     alternates: { canonical: `${siteConfig.url}/` },
   };
   const params = await searchParams;
-  const name1 = typeof params.name1 === 'string' ? params.name1 : undefined;
-  const name2 = typeof params.name2 === 'string' ? params.name2 : undefined;
+  const first = nameSchema.safeParse(typeof params.name1 === 'string' ? params.name1.trim() : undefined);
+  const second = nameSchema.safeParse(typeof params.name2 === 'string' ? params.name2.trim() : undefined);
   const result = typeof params.result === 'string' ? params.result : undefined;
 
-  // If we have both names, generate result-specific metadata
-  if (name1 && name2) {
-    // Sanitize names (basic validation)
-    const sanitizedName1 = name1.trim().slice(0, 25);
-    const sanitizedName2 = name2.trim().slice(0, 25);
+  if (first.success && second.success) {
+    const name1 = first.data;
+    const name2 = second.data;
 
-    // Validate result if provided
-    const validResult = result?.toUpperCase();
-    const isValidResult = validResult && ['F', 'L', 'A', 'M', 'E', 'S'].includes(validResult);
-
-    if (isValidResult) {
-      // Generate full result metadata with custom OG image
-      return { ...generateResultMetadata(sanitizedName1, sanitizedName2, validResult), ...searchMetadata };
+    // A result parameter opts into a spoiler. Calculate it from the complete names.
+    const calculatedResult = validateResult(result) && calculateFlamesResult(name1, name2);
+    if (calculatedResult) {
+      return { ...generateResultMetadata(name1, name2, calculatedResult), ...searchMetadata };
     }
 
-    // Names provided but no/invalid result - generate preview metadata
-    const title = `${sanitizedName1} & ${sanitizedName2} | FLAMES Compatibility`;
-    const description = `Check the FLAMES compatibility between ${sanitizedName1} and ${sanitizedName2}! Discover if it's Friends, Love, Affection, Marriage, Enemies, or Siblings.`;
-    const ogImageUrl = `${siteConfig.url}/api/og/result?name1=${encodeURIComponent(sanitizedName1)}&name2=${encodeURIComponent(sanitizedName2)}`;
+    const displayName1 = truncateText(name1, OG_VALIDATION.maxNameLength);
+    const displayName2 = truncateText(name2, OG_VALIDATION.maxNameLength);
+    const title = `${displayName1} & ${displayName2} | FLAMES Compatibility`;
+    const description = `Check the FLAMES compatibility between ${displayName1} and ${displayName2}! Discover if it's Friends, Love, Affection, Marriage, Enemies, or Siblings.`;
+    const ogImageUrl = generateResultOGImageUrl(name1, name2);
+    const shareParams = new URLSearchParams({ name1, name2 });
 
     return {
       ...searchMetadata,
@@ -57,13 +62,13 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
         title,
         description,
         type: 'website',
-        url: `${siteConfig.url}/share?name1=${encodeURIComponent(sanitizedName1)}&name2=${encodeURIComponent(sanitizedName2)}`,
+        url: `${siteConfig.url}/share?${shareParams}`,
         images: [
           {
             url: ogImageUrl,
             width: 1200,
             height: 630,
-            alt: `${sanitizedName1} & ${sanitizedName2} FLAMES Compatibility`,
+            alt: `${displayName1} & ${displayName2} FLAMES Compatibility`,
             type: 'image/png',
           },
         ],

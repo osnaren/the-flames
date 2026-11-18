@@ -1,3 +1,4 @@
+import { OG_VALIDATION, truncateText } from '@/lib/og';
 import type { Metadata } from 'next';
 import { siteConfig } from './config';
 
@@ -170,12 +171,15 @@ export function generatePageMetadata(options: {
  * Includes custom OG image URL with names and result for social preview
  */
 export function generateResultMetadata(name1: string, name2: string, result: string): Metadata {
-  const resultInfo = FLAMES_MEANINGS[result.toUpperCase()] || { label: result, emoji: '✨' };
-  const title = `${name1} & ${name2}: ${resultInfo.emoji} ${resultInfo.label} | FLAMES Result`;
-  const description = `${name1} and ${name2} got "${resultInfo.label}" in the FLAMES game! ${resultInfo.emoji} Play now to discover your relationship compatibility.`;
+  const letter = result.toUpperCase();
+  const resultInfo = FLAMES_MEANINGS[letter] || { label: result, emoji: '✨' };
+  const displayName1 = truncateText(name1, OG_VALIDATION.maxNameLength);
+  const displayName2 = truncateText(name2, OG_VALIDATION.maxNameLength);
+  const title = `${displayName1} & ${displayName2}: ${resultInfo.emoji} ${resultInfo.label} | FLAMES Result`;
+  const description = `${displayName1} and ${displayName2} got "${resultInfo.label}" in the FLAMES game! ${resultInfo.emoji} Play now to discover your relationship compatibility.`;
 
-  // Generate dynamic OG image URL
-  const ogImageUrl = `${siteConfig.url}/api/og/result?name1=${encodeURIComponent(name1)}&name2=${encodeURIComponent(name2)}&result=${result.toUpperCase()}`;
+  const ogImageUrl = generateResultOGImageUrl(name1, name2, letter);
+  const shareParams = new URLSearchParams({ name1, name2, result: letter });
 
   return {
     title,
@@ -185,12 +189,13 @@ export function generateResultMetadata(name1: string, name2: string, result: str
       description,
       type: 'website',
       siteName: siteConfig.name,
+      url: `${siteConfig.url}/share?${shareParams}`,
       images: [
         {
           url: ogImageUrl,
           width: 1200,
           height: 630,
-          alt: `${name1} & ${name2} FLAMES Result: ${resultInfo.label}`,
+          alt: `${displayName1} & ${displayName2} FLAMES Result: ${resultInfo.label}`,
           type: 'image/png',
         },
       ],

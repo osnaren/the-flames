@@ -151,6 +151,10 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: '/api/og/result',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
+      },
+      {
         // Cache OG images
         source: '/(opengraph-image|twitter-image)(.png)?',
         headers: [
