@@ -6,7 +6,7 @@ import { useBackgroundStore } from '@/store/useBackgroundStore';
 import { AnimatePresence, motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
-import { memo, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, memo, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 
 // Critical components - loaded immediately
 import { AnimatedHeader } from './components/AnimatedHeader';
@@ -14,6 +14,7 @@ import { InputForm } from './components/InputForm';
 import { RecentMatchesSection } from './components/RecentMatches';
 import type { MatchEntry } from './components/RecentMatches/types';
 import { useFlamesEngine } from './hooks/useFlamesEngine';
+import type { NonNullFlamesResult } from './types';
 
 // Dynamically loaded components for code splitting
 const FlamesProcessor = dynamic(
@@ -21,10 +22,14 @@ const FlamesProcessor = dynamic(
   { ssr: false, loading: () => <ProcessingPlaceholder /> }
 );
 
-const ResultCard = dynamic(() => import('./components/ResultCard').then((mod) => mod.ResultCard), {
-  ssr: false,
-  loading: () => <ResultPlaceholder />,
-});
+const loadResult = () => import('./components/ResultCard');
+const ResultCard = lazy(() => loadResult().then(({ ResultCard }) => ({ default: ResultCard })));
+
+function prepareResult(result: NonNullFlamesResult) {
+  void loadResult()
+    .then(({ preloadResultIcon }) => preloadResultIcon(result))
+    .catch(() => {});
+}
 
 // Lightweight loading placeholders
 function ProcessingPlaceholder() {
@@ -72,10 +77,11 @@ function HomePage() {
   const resultSectionRef = useRef<HTMLDivElement>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const [workspaceHeight, setWorkspaceHeight] = useState<number>();
+  const [skipHero, setSkipHero] = useState(false);
 
   // FLAMES game engine state and actions
   const [
-    { name1, name2, result, stage, runId, commonLetters, remainingLetters, isProcessing },
+    { name1, name2, result, stage, runId, remainingLetters, isProcessing },
     { setName1, setName2, handleSubmit, resetGame, onFlamesAnimationComplete },
   ] = useFlamesEngine();
 
@@ -95,20 +101,13 @@ function HomePage() {
     setBackgroundState({ variant, result });
   }, [stage, result, setBackgroundState]);
 
-  // Scroll to results when they appear (after hero transition completes)
-  useEffect(() => {
-    if (stage === 'result' && resultSectionRef.current) {
-      // Hero transition takes ~1600ms, then card animates in ~800ms
-      const scrollDelay = shouldAnimate ? 2400 : 200;
-      const timer = setTimeout(() => {
-        resultSectionRef.current?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
-      }, scrollDelay);
-      return () => clearTimeout(timer);
-    }
-  }, [stage, shouldAnimate]);
+  const scrollToResult = useCallback(() => {
+    const compact = window.matchMedia('(max-width: 767px), (pointer: coarse)').matches;
+    resultSectionRef.current?.scrollIntoView({
+      behavior: shouldAnimate ? 'smooth' : 'instant',
+      block: compact ? 'start' : 'center',
+    });
+  }, [shouldAnimate]);
 
   // Handle form submission
   const onSubmitForm = useCallback(
@@ -121,9 +120,13 @@ function HomePage() {
   );
 
   // Handle processor completion - moves to result stage
-  const handleProcessorComplete = useCallback(() => {
-    onFlamesAnimationComplete();
-  }, [onFlamesAnimationComplete]);
+  const handleProcessorComplete = useCallback(
+    (skipAnimation = false) => {
+      setSkipHero(skipAnimation);
+      onFlamesAnimationComplete();
+    },
+    [onFlamesAnimationComplete]
+  );
 
   // Handle replay from recent matches
   const handleMatchReplay = useCallback(
@@ -164,13 +167,17 @@ function HomePage() {
                 key="input-stage"
                 initial={false}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{
-                  opacity: 0,
-                  y: -30,
-                  scale: 0.95,
-                }}
+                exit={
+                  shouldAnimate
+                    ? {
+                        opacity: 0,
+                        y: -30,
+                        scale: 0.95,
+                      }
+                    : undefined
+                }
                 transition={{
-                  duration: 0.5,
+                  duration: 0.35,
                   ease: [0.25, 0.46, 0.45, 0.94],
                 }}
               >
@@ -185,30 +192,52 @@ function HomePage() {
                   isCollapsing={isProcessing}
                   isProcessing={isProcessing}
                 />
+
+                <motion.div
+                  className="mt-12 space-y-3 text-center"
+                  initial={shouldAnimate ? { opacity: 0 } : { opacity: 1 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.8, duration: 0.6 }}
+                  role="note"
+                  aria-label="FLAMES meaning legend"
+                >
+                  <p className="font-space text-on-surface-variant/80 text-sm font-medium">
+                    <span className="text-blue-500">F</span>riends •<span className="text-pink-500"> L</span>ove •
+                    <span className="text-amber-500"> A</span>ffection •<span className="text-emerald-500"> M</span>
+                    arriage •<span className="text-red-500"> E</span>nemies •<span className="text-purple-500"> S</span>
+                    iblings
+                  </p>
+
+                  <p className="font-handwriting text-on-surface-variant/60 text-xs">
+                    ✨ The classic relationship game, reimagined with modern magic ✨
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  className="mt-8"
+                  initial={shouldAnimate ? { opacity: 0, y: 20 } : { opacity: 1 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1, duration: 0.5 }}
+                >
+                  <RecentMatchesSection displayCount={5} onMatchClick={handleMatchReplay} />
+                </motion.div>
               </motion.div>
             )}
 
             {/* Processing Stage - New unified processor */}
             {stage === 'processing' && (
-              <motion.div
-                key="processing-stage"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                transition={{ duration: 0.4, ease: 'easeOut' }}
-              >
+              <div key="processing-stage">
                 <FlamesProcessor
                   key={`${runId}`}
                   name1={name1}
                   name2={name2}
-                  commonLetters={commonLetters}
                   remainingCount={remainingLetters.length}
                   result={result}
+                  onPrepareResult={prepareResult}
                   onComplete={handleProcessorComplete}
                   shouldAnimate={shouldAnimate}
-                  runId={runId}
                 />
-              </motion.div>
+              </div>
             )}
 
             {/* Result Stage */}
@@ -216,60 +245,31 @@ function HomePage() {
               <motion.div
                 key="result-stage"
                 ref={resultSectionRef}
+                className="scroll-mt-20"
                 initial={{ opacity: 1 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                exit={shouldAnimate ? { opacity: 0, y: -20, scale: 0.95 } : undefined}
                 transition={{
                   duration: 0.3,
                   ease: 'easeOut',
                 }}
               >
-                <ResultCard
-                  result={result}
-                  stage={stage}
-                  name1={name1}
-                  name2={name2}
-                  onRetry={resetGame}
-                  onNavigateToManual={() => window.open('/manual', '_blank')}
-                  onNavigateToStats={() => window.open('/charts', '_blank')}
-                />
+                <Suspense fallback={<ResultPlaceholder />}>
+                  <ResultCard
+                    result={result}
+                    stage={stage}
+                    name1={name1}
+                    name2={name2}
+                    skipHero={skipHero}
+                    onResultVisible={scrollToResult}
+                    onRetry={resetGame}
+                    onNavigateToManual={() => window.open('/manual', '_blank')}
+                    onNavigateToStats={() => window.open('/charts', '_blank')}
+                  />
+                </Suspense>
               </motion.div>
             )}
           </AnimatePresence>
-
-          {/* Footer tips - only on input stage */}
-          {stage === 'input' && (
-            <motion.div
-              className="mt-12 space-y-3 text-center"
-              initial={shouldAnimate ? { opacity: 0 } : { opacity: 1 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8, duration: 0.6 }}
-              role="note"
-              aria-label="FLAMES meaning legend"
-            >
-              <p className="font-space text-on-surface-variant/80 text-sm font-medium">
-                <span className="text-blue-500">F</span>riends •<span className="text-pink-500"> L</span>ove •
-                <span className="text-amber-500"> A</span>ffection •<span className="text-emerald-500"> M</span>arriage
-                •<span className="text-red-500"> E</span>nemies •<span className="text-purple-500"> S</span>iblings
-              </p>
-
-              <p className="font-handwriting text-on-surface-variant/60 text-xs">
-                ✨ The classic relationship game, reimagined with modern magic ✨
-              </p>
-            </motion.div>
-          )}
-
-          {/* Recent Matches Section - only on input stage */}
-          {stage === 'input' && (
-            <motion.div
-              className="mt-8"
-              initial={shouldAnimate ? { opacity: 0, y: 20 } : { opacity: 1 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1, duration: 0.5 }}
-            >
-              <RecentMatchesSection displayCount={5} onMatchClick={handleMatchReplay} />
-            </motion.div>
-          )}
         </div>
       </div>
     </section>

@@ -147,6 +147,9 @@ test('manual navigation does not wait for slow sound files', async ({ page }) =>
 
 test.beforeEach(async ({ page }) => {
   await page.route('**/*.sentry.io/**', (route) => route.abort());
+  await page.route('**/*.supabase.co/rest/v1/**', (route) =>
+    route.request().method() === 'POST' ? route.fulfill({ status: 201, json: [] }) : route.continue()
+  );
   await page.route('https://example.supabase.co/functions/v1/get-country', (route) =>
     route.fulfill({ json: { country: 'IN' } })
   );
@@ -297,4 +300,57 @@ test('the animated game keeps the page stable through its final result', async (
   await page.getByRole('button', { name: 'Reset', exact: true }).click();
   await expect(page.locator('#name1')).toBeVisible();
   await expect(page).not.toHaveURL(/name1=/);
+});
+
+test('the mobile game finishes a long count with the winning icon still loading', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Covers the result handoff in a narrow viewport.');
+  let releaseIcon!: () => void;
+  const iconBlocked = new Promise<void>((resolve) => {
+    releaseIcon = resolve;
+  });
+  const iconUrl = '**/assets/game/siblings.webp';
+  await page.route(iconUrl, async (route) => {
+    await iconBlocked;
+    await route.abort().catch(() => {});
+  });
+
+  try {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.goto('/');
+    await page.locator('#name1').fill('A'.repeat(50));
+    await page.locator('#name2').fill('B'.repeat(50));
+    const iconRequested = page.waitForRequest(iconUrl);
+    await page.getByRole('button', { name: /Reveal Your FLAMES/ }).tap();
+    await iconRequested;
+    await expect(page.getByText('100 remaining letters', { exact: true })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('🎉 Your result is ready!', { exact: true })).toBeVisible({ timeout: 12000 });
+
+    const card = page.getByRole('region', { name: 'FLAMES Result: Siblings' });
+    const title = card.getByRole('heading', { name: 'Siblings' });
+    await expect(title).toBeInViewport({ timeout: 2500 });
+    await expect(card.getByText('👫', { exact: true })).toBeInViewport();
+    await expect
+      .poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('flames-pairing-history') ?? '[]').length))
+      .toBe(1);
+  } finally {
+    releaseIcon();
+  }
+});
+
+test('skipping the count shows the result without opening the hero', async ({ page }) => {
+  test.setTimeout(45000);
+  await page.addInitScript(() => Object.defineProperty(navigator, 'share', { value: undefined }));
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/');
+  await page.locator('#name1').fill('Rahul');
+  await page.locator('#name2').fill('Priya');
+  await page.getByRole('button', { name: /Reveal Your FLAMES/ }).click();
+  await page.getByRole('button', { name: /Skip animation/ }).click();
+  await expect(page.getByRole('region', { name: 'FLAMES Result: Marriage' })).toBeVisible({ timeout: 3000 });
+  await expect(page.locator('[data-result-hero]')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Share', exact: true }).click();
+  await page.getByRole('button', { name: 'Close share menu' }).click();
+  await expect(page.getByRole('button', { name: 'Close share menu' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Reset', exact: true }).click();
+  await expect(page.locator('#name1')).toBeEmpty();
 });

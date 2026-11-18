@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Copy, Download, Share2, X } from 'lucide-react';
 import { useCallback, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
 
 import { downloadResultCard, generateShareUrl, shareOnTelegram, shareOnTwitter } from '@/lib/share';
@@ -178,7 +179,9 @@ export default function SharePopover({
     exit: { opacity: 0, y: -10 },
   };
 
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -194,10 +197,10 @@ export default function SharePopover({
           {/* Popover */}
           <motion.div
             ref={popoverRef}
-            className="fixed top-1/2 left-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border border-white/20 bg-white/95 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-gray-900/95"
-            initial={{ opacity: 0, scale: 0.95, y: '-40%' }}
-            animate={{ opacity: 1, scale: 1, y: '-50%' }}
-            exit={{ opacity: 0, scale: 0.95, y: '-40%' }}
+            className="fixed top-1/2 left-1/2 z-50 max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 overflow-y-auto overscroll-contain rounded-2xl border border-white/20 bg-white/95 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-gray-900/95"
+            initial={{ opacity: 0, scale: 0.95, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 12 }}
             transition={{
               type: shouldReduceMotion ? 'tween' : 'spring',
               duration: shouldReduceMotion ? 0.2 : undefined,
@@ -303,6 +306,7 @@ export default function SharePopover({
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

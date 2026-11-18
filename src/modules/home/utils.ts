@@ -112,14 +112,23 @@ export const calculateFlamesResult = (name1: string, name2: string): FlamesResul
 
   // Calculate the result using the FLAMES algorithm
   // Total letters minus pairs of matched letters
-  const remainingCount = n1.length + n2.length - matched1.size * 2;
-  const flames: FlamesResult[] = [...FLAMES_ORDER];
+  const remainingCount = [...n1].length + [...n2].length - matched1.size * 2;
+  return getFlamesRounds(remainingCount).result;
+};
+
+export function getFlamesRounds(remainingCount: number) {
+  let letters = [...FLAMES_ORDER];
+  const rounds = [];
   let currentIndex = 0;
 
-  while (flames.length > 1) {
-    currentIndex = (currentIndex + remainingCount - 1) % flames.length;
-    flames.splice(currentIndex, 1);
+  while (letters.length > 1) {
+    const start = currentIndex;
+    currentIndex = (start + remainingCount - 1) % letters.length;
+    const next = [...letters];
+    const [eliminated] = next.splice(currentIndex, 1);
+    rounds.push({ letters, start, eliminated });
+    letters = next;
   }
 
-  return flames[0] ? flames[0] : null;
-};
+  return { rounds, result: letters[0] };
+}

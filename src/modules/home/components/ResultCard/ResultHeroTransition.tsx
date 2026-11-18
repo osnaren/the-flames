@@ -1,17 +1,17 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
-import Image from 'next/image';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { motion } from 'framer-motion';
 import { memo, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import { cn } from '@/utils';
-import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import type { NonNullFlamesResult } from '../../types';
-import { RESULT_COLORS, RESULT_GRADIENTS, RESULT_ICONS, RESULT_LABELS } from './resultCard.constants';
+import { ResultIcon } from './ResultIcon';
+import { HERO_TRANSITION_TIMING, RESULT_COLORS, RESULT_GRADIENTS, RESULT_LABELS } from './resultCard.constants';
 
 interface ResultHeroTransitionProps {
   result: NonNullFlamesResult;
-  isActive: boolean;
   onTransitionComplete: () => void;
 }
 
@@ -24,13 +24,12 @@ interface ResultHeroTransitionProps {
  * 2. Pulsing glow effect for dramatic reveal
  * 3. Icon shrinks while calling onTransitionComplete
  */
-function ResultHeroTransition({ result, isActive, onTransitionComplete }: ResultHeroTransitionProps) {
-  const { shouldAnimate, prefersReducedMotion } = useAnimationPreferences();
-  const [phase, setPhase] = useState<'hidden' | 'burst' | 'shrinking'>('hidden');
+function ResultHeroTransition({ result, onTransitionComplete }: ResultHeroTransitionProps) {
+  const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
+  const [isShrinking, setIsShrinking] = useState(false);
 
   const gradient = RESULT_GRADIENTS[result];
   const colors = RESULT_COLORS[result];
-  const iconSrc = RESULT_ICONS[result];
   const label = RESULT_LABELS[result];
 
   // Pre-calculate particle positions to avoid Math.random during render
@@ -44,256 +43,225 @@ function ResultHeroTransition({ result, isActive, onTransitionComplete }: Result
     []
   );
 
-  // Handle the animation sequence
   useEffect(() => {
-    if (!isActive) {
-      setPhase('hidden');
-      return;
-    }
+    const timer = setTimeout(() => setIsShrinking(true), HERO_TRANSITION_TIMING.BURST_DURATION);
+    return () => clearTimeout(timer);
+  }, []);
 
-    // Skip animation if user prefers reduced motion
-    if (!shouldAnimate || prefersReducedMotion) {
-      onTransitionComplete();
-      return;
-    }
+  const glowIntensity = isShrinking ? 0.6 : 1;
 
-    // Small delay to let FlamesProcessor exit animation complete
-    const startDelay = setTimeout(() => {
-      setPhase('burst');
-    }, 200);
-
-    // After burst animation, start shrinking
-    const shrinkTimer = setTimeout(() => {
-      setPhase('shrinking');
-    }, 1000); // 200ms delay + 800ms burst = 1000ms
-
-    // Complete transition after shrink
-    const completeTimer = setTimeout(() => {
-      onTransitionComplete();
-    }, 1600); // Total: 200ms delay + 800ms burst + 600ms shrink = 1600ms
-
-    return () => {
-      clearTimeout(startDelay);
-      clearTimeout(shrinkTimer);
-      clearTimeout(completeTimer);
-    };
-  }, [isActive, shouldAnimate, prefersReducedMotion, onTransitionComplete]);
-
-  // Don't render if not active
-  if (!isActive || phase === 'hidden') {
-    return null;
-  }
-
-  // Determine icon scale based on phase
-  const iconScale = phase === 'burst' ? 1.8 : 1;
-  const glowIntensity = phase === 'burst' ? 1 : 0.6;
-
-  return (
-    <AnimatePresence>
+  return createPortal(
+    <motion.div
+      className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
+      aria-hidden="true"
+      data-result-hero
+      initial={{ opacity: 0 }}
+      animate={{ opacity: isShrinking ? 0 : 1 }}
+      transition={{ duration: isShrinking ? HERO_TRANSITION_TIMING.SHRINK_DURATION : 0.16 }}
+    >
+      {/* Backdrop with radial glow */}
       <motion.div
-        className="fixed inset-0 z-50 flex items-center justify-center"
+        className={cn('absolute inset-0 bg-black/20', !compactDevice && 'backdrop-blur-sm')}
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
+        animate={{ opacity: isShrinking ? 0 : 1 }}
+        transition={{ duration: 0.4 }}
+      />
+
+      {/* Central glow burst */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          background: `radial-gradient(circle, ${colors.primary}80 0%, transparent 70%)`,
+          width: 'min(100vw, 48rem)',
+          height: 'min(100vh, 48rem)',
+        }}
+        initial={{ scale: 0.55, opacity: 0 }}
+        animate={{
+          scale: isShrinking ? 0.85 : 1,
+          opacity: isShrinking ? 0 : 0.4,
+        }}
+        transition={{
+          type: 'spring',
+          stiffness: 100,
+          damping: 20,
+        }}
+      />
+
+      {/* Pulsing ring effects */}
+      {!isShrinking && (
+        <>
+          <motion.div
+            className="absolute rounded-full"
+            style={{ width: 400, height: 400, borderWidth: 4, borderStyle: 'solid', borderColor: colors.primary }}
+            initial={{ scale: 0.375, opacity: 0.8 }}
+            animate={{
+              scale: [0.375, 1],
+              opacity: [0.8, 0],
+            }}
+            transition={{
+              duration: 0.8,
+              ease: 'easeOut',
+            }}
+          />
+          <motion.div
+            className="absolute rounded-full"
+            style={{ width: 350, height: 350, borderWidth: 2, borderStyle: 'solid', borderColor: colors.secondary }}
+            initial={{ scale: 150 / 350, opacity: 0.6 }}
+            animate={{
+              scale: [150 / 350, 1],
+              opacity: [0.6, 0],
+            }}
+            transition={{
+              duration: 0.6,
+              ease: 'easeOut',
+              delay: 0.1,
+            }}
+          />
+        </>
+      )}
+
+      {/* Main icon container */}
+      <motion.div
+        className="relative z-10"
+        initial={{ scale: 0, rotate: -180 }}
+        animate={{
+          scale: isShrinking ? 1 : 1.8,
+          rotate: 0,
+        }}
+        transition={
+          isShrinking
+            ? { duration: HERO_TRANSITION_TIMING.SHRINK_DURATION, ease: 'easeInOut' }
+            : { type: 'spring', stiffness: 240, damping: 17 }
+        }
+        onAnimationComplete={() => {
+          if (isShrinking) onTransitionComplete();
+        }}
       >
-        {/* Backdrop with radial glow */}
-        <motion.div
-          className="absolute inset-0 bg-black/20 backdrop-blur-sm"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: phase === 'burst' ? 1 : 0 }}
-          transition={{ duration: 0.4 }}
-        />
-
-        {/* Central glow burst */}
-        <motion.div
-          className="absolute rounded-full"
-          style={{
-            background: `radial-gradient(circle, ${colors.primary}80 0%, transparent 70%)`,
-            width: '120vw',
-            height: '120vh',
-          }}
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{
-            scale: phase === 'burst' ? 1 : 0.5,
-            opacity: phase === 'burst' ? 0.4 : 0,
-          }}
-          transition={{
-            type: 'spring',
-            stiffness: 100,
-            damping: 20,
-          }}
-        />
-
-        {/* Pulsing ring effects */}
-        {phase === 'burst' && (
-          <>
-            <motion.div
-              className="absolute rounded-full"
-              style={{ width: 400, height: 400, borderWidth: 4, borderStyle: 'solid', borderColor: colors.primary }}
-              initial={{ scale: 0.375, opacity: 0.8 }}
-              animate={{
-                scale: [0.375, 1],
-                opacity: [0.8, 0],
-              }}
-              transition={{
-                duration: 0.8,
-                ease: 'easeOut',
-              }}
-            />
-            <motion.div
-              className="absolute rounded-full"
-              style={{ width: 350, height: 350, borderWidth: 2, borderStyle: 'solid', borderColor: colors.secondary }}
-              initial={{ scale: 150 / 350, opacity: 0.6 }}
-              animate={{
-                scale: [150 / 350, 1],
-                opacity: [0.6, 0],
-              }}
-              transition={{
-                duration: 0.6,
-                ease: 'easeOut',
-                delay: 0.1,
-              }}
-            />
-          </>
-        )}
-
-        {/* Main icon container */}
-        <motion.div
-          className="relative z-10"
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{
-            scale: iconScale,
-            rotate: 0,
-          }}
-          transition={{
-            type: 'spring',
-            stiffness: phase === 'burst' ? 200 : 300,
-            damping: phase === 'burst' ? 15 : 25,
-          }}
+        {/* Outer glow container */}
+        <div
+          className={cn(
+            'relative h-40 w-40 rounded-full p-1 sm:h-48 sm:w-48',
+            'bg-linear-to-br shadow-2xl',
+            gradient.from,
+            gradient.to
+          )}
         >
-          {/* Outer glow container */}
-          <div
+          {/* Intense outer glow */}
+          <motion.div
             className={cn(
-              'relative h-40 w-40 rounded-full p-1 sm:h-48 sm:w-48',
-              'bg-linear-to-br shadow-2xl',
-              gradient.from,
-              gradient.to
+              'absolute -inset-8 rounded-full',
+              !compactDevice && 'bg-linear-to-br blur-2xl',
+              !compactDevice && gradient.from,
+              !compactDevice && gradient.to
             )}
-          >
-            {/* Intense outer glow */}
-            <motion.div
-              className={cn('absolute -inset-8 rounded-full bg-linear-to-br blur-2xl', gradient.from, gradient.to)}
-              animate={{
-                opacity: [0.4 * glowIntensity, 0.8 * glowIntensity, 0.4 * glowIntensity],
-                scale: [1, 1.15, 1],
-              }}
-              transition={{
-                duration: 1.5,
-                repeat: phase === 'burst' ? Infinity : 0,
-                ease: 'easeInOut',
-              }}
-            />
+            style={
+              compactDevice
+                ? { background: `radial-gradient(circle, ${colors.primary}a0, transparent 72%)` }
+                : undefined
+            }
+            animate={{
+              opacity: [0.4 * glowIntensity, 0.8 * glowIntensity, 0.4 * glowIntensity],
+              scale: [1, 1.15, 1],
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: 0,
+              ease: 'easeInOut',
+            }}
+          />
 
-            {/* Secondary glow layer */}
+          {!compactDevice && (
             <motion.div
               className={cn(
                 'absolute -inset-4 rounded-full bg-linear-to-br opacity-60 blur-xl',
                 gradient.from,
                 gradient.to
               )}
-              animate={{
-                opacity: [0.3 * glowIntensity, 0.6 * glowIntensity, 0.3 * glowIntensity],
-              }}
-              transition={{
-                duration: 1,
-                repeat: phase === 'burst' ? Infinity : 0,
-                ease: 'easeInOut',
-              }}
+              animate={{ opacity: [0.3 * glowIntensity, 0.6 * glowIntensity, 0.3 * glowIntensity] }}
+              transition={{ duration: 1, ease: 'easeInOut' }}
             />
+          )}
 
-            {/* Pulsing border ring */}
+          {/* Pulsing border ring */}
+          <motion.div
+            className="absolute -inset-2 rounded-full border-4 border-white/50"
+            animate={{
+              scale: [1, 1.1, 1],
+              opacity: [0.5, 0.8, 0.5],
+            }}
+            transition={{
+              duration: 0.8,
+              repeat: 0,
+              ease: 'easeInOut',
+            }}
+          />
+
+          {/* Icon container */}
+          <div
+            className={cn(
+              'relative flex h-full w-full items-center justify-center rounded-full bg-white/30',
+              !compactDevice && 'backdrop-blur-sm'
+            )}
+          >
+            <ResultIcon result={result} className="h-24 w-24 object-contain drop-shadow-2xl sm:h-28 sm:w-28" />
+          </div>
+        </div>
+
+        {/* Result label below icon during burst */}
+        {!isShrinking && (
+          <motion.div
+            className="absolute -bottom-16 left-1/2 -translate-x-1/2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.12, duration: 0.24 }}
+          >
+            <span
+              className={cn(
+                'text-3xl font-bold tracking-wide whitespace-nowrap sm:text-4xl',
+                'bg-clip-text text-transparent drop-shadow-lg',
+                gradient.text
+              )}
+            >
+              {label.toUpperCase()}!
+            </span>
+          </motion.div>
+        )}
+      </motion.div>
+
+      {/* Sparkle particles during burst */}
+      {!isShrinking && (
+        <div className="absolute inset-0 overflow-hidden">
+          {particleOffsets.map((particle, i) => (
             <motion.div
-              className="absolute -inset-2 rounded-full border-4 border-white/50"
+              key={i}
+              className={cn('absolute h-2 w-2 rounded-full', 'bg-white')}
+              style={{
+                left: '50%',
+                top: '50%',
+              }}
+              initial={{
+                x: 0,
+                y: 0,
+                opacity: 1,
+                scale: 1,
+              }}
               animate={{
-                scale: [1, 1.1, 1],
-                opacity: [0.5, 0.8, 0.5],
+                x: particle.x,
+                y: particle.y,
+                opacity: 0,
+                scale: 0,
               }}
               transition={{
                 duration: 0.8,
-                repeat: phase === 'burst' ? Infinity : 0,
-                ease: 'easeInOut',
+                ease: 'easeOut',
+                delay: particle.delay,
               }}
             />
-
-            {/* Icon container */}
-            <div className="relative flex h-full w-full items-center justify-center rounded-full bg-white/30 backdrop-blur-sm">
-              <Image
-                src={iconSrc}
-                alt={label}
-                width={120}
-                height={120}
-                className="h-24 w-24 object-contain drop-shadow-2xl sm:h-28 sm:w-28"
-                priority
-              />
-            </div>
-          </div>
-
-          {/* Result label below icon during burst */}
-          {phase === 'burst' && (
-            <motion.div
-              className="absolute -bottom-16 left-1/2 -translate-x-1/2"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.4 }}
-            >
-              <span
-                className={cn(
-                  'text-3xl font-bold tracking-wide whitespace-nowrap sm:text-4xl',
-                  'bg-clip-text text-transparent drop-shadow-lg',
-                  gradient.text
-                )}
-              >
-                {label.toUpperCase()}!
-              </span>
-            </motion.div>
-          )}
-        </motion.div>
-
-        {/* Sparkle particles during burst */}
-        {phase === 'burst' && (
-          <div className="absolute inset-0 overflow-hidden">
-            {particleOffsets.map((particle, i) => (
-              <motion.div
-                key={i}
-                className={cn('absolute h-2 w-2 rounded-full', 'bg-white')}
-                style={{
-                  left: '50%',
-                  top: '50%',
-                }}
-                initial={{
-                  x: 0,
-                  y: 0,
-                  opacity: 1,
-                  scale: 1,
-                }}
-                animate={{
-                  x: particle.x,
-                  y: particle.y,
-                  opacity: 0,
-                  scale: 0,
-                }}
-                transition={{
-                  duration: 0.8,
-                  ease: 'easeOut',
-                  delay: particle.delay,
-                }}
-              />
-            ))}
-          </div>
-        )}
-      </motion.div>
-    </AnimatePresence>
+          ))}
+        </div>
+      )}
+    </motion.div>,
+    document.body
   );
 }
 

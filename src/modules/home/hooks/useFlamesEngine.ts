@@ -1,10 +1,7 @@
-import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { usePairingHistory } from '@/hooks/usePairingHistory';
-import { useTimers } from '@/hooks/useTimers';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
-import { STAGE_TIMINGS } from '../constants';
 import type { FlamesResult, GameStage } from '../types';
 import { calculateFlamesResult, findCommonLetters, nameSchema } from '../utils';
 
@@ -17,14 +14,6 @@ interface FlamesEngineState {
   commonLetters: string[];
   remainingLetters: string[];
   isProcessing: boolean;
-  stageProgress: {
-    commonLettersRevealed: boolean;
-    flamesAnimationStarted: boolean;
-    flamesAnimationComplete: boolean;
-    resultRevealed: boolean;
-  };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  newlyUnlockedBadges: any[];
 }
 
 interface FlamesEngineActions {
@@ -32,10 +21,7 @@ interface FlamesEngineActions {
   setName2: (name: string) => void;
   handleSubmit: (e: React.FormEvent) => void;
   resetGame: () => void;
-  resetProcessingState: () => void;
-  onCommonLettersComplete: () => void;
   onFlamesAnimationComplete: () => void;
-  onResultReveal: () => void;
 }
 
 /**
@@ -53,14 +39,6 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
   const [remainingLetters, setRemainingLetters] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
-  // Stage progress tracking
-  const [stageProgress, setStageProgress] = useState({
-    commonLettersRevealed: false,
-    flamesAnimationStarted: false,
-    flamesAnimationComplete: false,
-    resultRevealed: false,
-  });
-
   // Refs for managing state and preventing race conditions
   const processingRef = useRef<boolean>(false);
   const calculatedDataRef = useRef<{
@@ -69,12 +47,7 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
     remainingLetters: string[];
   } | null>(null);
 
-  // Get animation preferences and timer utilities
-  const { shouldAnimate } = useAnimationPreferences();
-  const { addTimeout, clearAll } = useTimers();
-
-  // Pairing history and badges
-  const { addPairing, getNewlyUnlockedBadges } = usePairingHistory();
+  const { addPairing } = usePairingHistory();
 
   // Update URL params when names change
   const updateUrlParams = useCallback((newName1: string, newName2: string) => {
@@ -154,73 +127,21 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
     };
   }, []);
 
-  /**
-   * Centralized stage progression with proper timing
-   */
-  const progressToNextStage = useCallback(() => {
-    if (!calculatedDataRef.current) return;
-
-    const { result: gameResult } = calculatedDataRef.current;
-
-    // Stage 1: Reveal common letters
-    if (!stageProgress.commonLettersRevealed) {
-      setStageProgress((prev) => ({ ...prev, commonLettersRevealed: true }));
-
-      // The common letters will stay visible, but we'll start the FLAMES animation after a delay
-      addTimeout(
-        () => {
-          setStageProgress((prev) => ({ ...prev, flamesAnimationStarted: true }));
-        },
-        shouldAnimate ? STAGE_TIMINGS.COMMON_LETTERS_STRIKE : 100
-      );
-
-      return;
-    }
-
-    // Stage 2: Complete FLAMES animation
-    if (stageProgress.flamesAnimationStarted && !stageProgress.flamesAnimationComplete) {
-      setStageProgress((prev) => ({ ...prev, flamesAnimationComplete: true }));
-      setResult(gameResult);
-
-      // Add to pairing history and check for badges
-      if (gameResult) {
-        addPairing(name1, name2, gameResult);
-      }
-
-      // Give some time to see the final FLAMES letter before moving to result stage
-      addTimeout(
-        () => {
-          setStageProgress((prev) => ({ ...prev, resultRevealed: true }));
-          setStage('result');
-          setIsProcessing(false);
-        },
-        shouldAnimate ? STAGE_TIMINGS.RESULT_REVEAL_DELAY : 100
-      );
-
-      return;
-    }
-  }, [stageProgress, shouldAnimate, addTimeout, name1, name2, addPairing]);
-
-  /**
-   * Stage completion callbacks
-   */
-  const onCommonLettersComplete = useCallback(() => {
-    progressToNextStage();
-  }, [progressToNextStage]);
-
   const onFlamesAnimationComplete = useCallback(() => {
-    progressToNextStage();
-  }, [progressToNextStage]);
+    const game = calculatedDataRef.current;
+    if (!game || !processingRef.current) return;
 
-  const onResultReveal = useCallback(() => {
-    // Final stage complete
-  }, []);
+    processingRef.current = false;
+    setStage('result');
+    setIsProcessing(false);
+    if (game.result) addPairing(name1, name2, game.result);
+  }, [addPairing, name1, name2]);
 
   /**
    * Main form submission handler
    */
   const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
+    (e: React.FormEvent) => {
       e.preventDefault();
 
       // Prevent multiple submissions
@@ -241,11 +162,12 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
         // Set processing state immediately after validation passes
         processingRef.current = true;
         setIsProcessing(true);
-        clearAll();
 
         // Calculate all game data immediately
         const gameData = calculateGameData(validName1, validName2);
         calculatedDataRef.current = gameData;
+        setName1(validName1);
+        setName2(validName2);
         const pathname = window.location.pathname;
         // Native history updates also schedule Next.js router work. The names
         // already live in game state; synchronize the share URL after a frame
@@ -289,29 +211,10 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
 
         // Transition to processing stage with form collapse effect
         setStage('processing');
-
-        // Reset stage progress
-        setStageProgress({
-          commonLettersRevealed: false,
-          flamesAnimationStarted: false,
-          flamesAnimationComplete: false,
-          resultRevealed: false,
-        });
-
-        // Start the staged animation sequence
-        addTimeout(
-          () => {
-            progressToNextStage();
-          },
-          shouldAnimate ? STAGE_TIMINGS.FORM_COLLAPSE : 100
-        );
       } catch (error) {
         // Reset processing state on any error
         processingRef.current = false;
         setIsProcessing(false);
-
-        // Clear any pending timeouts
-        clearAll();
 
         if (error instanceof z.ZodError) {
           toast.error(error.issues[0]?.message || 'Please check the names and try again.');
@@ -320,24 +223,13 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
         }
       }
     },
-    [
-      isProcessing,
-      name1,
-      name2,
-      clearAll,
-      updateUrlParams,
-      calculateGameData,
-      addTimeout,
-      shouldAnimate,
-      progressToNextStage,
-    ]
+    [isProcessing, name1, name2, updateUrlParams, calculateGameData]
   );
 
   /**
    * Reset the entire game state
    */
   const resetGame = useCallback(() => {
-    clearAll();
     processingRef.current = false;
     calculatedDataRef.current = null;
 
@@ -349,17 +241,11 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
     setCommonLetters([]);
     setRemainingLetters([]);
     setIsProcessing(false);
-    setStageProgress({
-      commonLettersRevealed: false,
-      flamesAnimationStarted: false,
-      flamesAnimationComplete: false,
-      resultRevealed: false,
-    });
 
     // Clear URL params
     const newUrl = window.location.pathname;
     window.history.replaceState(null, '', newUrl);
-  }, [clearAll]);
+  }, []);
 
   useEffect(
     () => () => {
@@ -367,31 +253,6 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
     },
     []
   );
-
-  /**
-   * Force reset processing state - useful for when form validation fails
-   */
-  const resetProcessingState = useCallback(() => {
-    processingRef.current = false;
-    setIsProcessing(false);
-    clearAll();
-  }, [clearAll]);
-
-  // Safety timeout to prevent getting stuck
-  useEffect(() => {
-    if (isProcessing && stage === 'processing') {
-      const safetyTimeout = addTimeout(() => {
-        if (calculatedDataRef.current) {
-          setResult(calculatedDataRef.current.result);
-          setStage('result');
-          setIsProcessing(false);
-          setStageProgress((prev) => ({ ...prev, resultRevealed: true }));
-        }
-      }, 20000); // 20 second safety net
-
-      return () => clearTimeout(safetyTimeout);
-    }
-  }, [isProcessing, stage, addTimeout]);
 
   // Memoize state and actions to prevent unnecessary re-renders
   const state = useMemo(
@@ -404,21 +265,8 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       commonLetters,
       remainingLetters,
       isProcessing,
-      stageProgress,
-      newlyUnlockedBadges: getNewlyUnlockedBadges(),
     }),
-    [
-      name1,
-      name2,
-      result,
-      stage,
-      runId,
-      commonLetters,
-      remainingLetters,
-      isProcessing,
-      stageProgress,
-      getNewlyUnlockedBadges,
-    ]
+    [name1, name2, result, stage, runId, commonLetters, remainingLetters, isProcessing]
   );
 
   const actions = useMemo(
@@ -427,21 +275,9 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
       setName2: handleSetName2,
       handleSubmit,
       resetGame,
-      resetProcessingState,
-      onCommonLettersComplete,
       onFlamesAnimationComplete,
-      onResultReveal,
     }),
-    [
-      handleSetName1,
-      handleSetName2,
-      handleSubmit,
-      resetGame,
-      resetProcessingState,
-      onCommonLettersComplete,
-      onFlamesAnimationComplete,
-      onResultReveal,
-    ]
+    [handleSetName1, handleSetName2, handleSubmit, resetGame, onFlamesAnimationComplete]
   );
 
   return [state, actions];

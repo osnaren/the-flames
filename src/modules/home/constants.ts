@@ -2,16 +2,6 @@
  * Home Module Constants
  */
 
-// Stage timing configuration (in milliseconds)
-export const STAGE_TIMINGS = {
-  FORM_COLLAPSE: 800,
-  COMMON_LETTERS_REVEAL: 1200,
-  COMMON_LETTERS_STRIKE: 2000,
-  FLAMES_ANIMATION_START: 500,
-  FLAMES_ANIMATION_DURATION: 4000,
-  RESULT_REVEAL_DELAY: 800,
-} as const;
-
 // FLAMES letters data for UI
 export const FLAMES_LETTERS = [
   { char: 'F', emoji: '🤝', full: 'Friends', color: 'from-blue-500 to-cyan-500' },
@@ -52,10 +42,11 @@ export const FLAMES_DATA = [
 
 // Animation timing for FlamesProcessor
 export const PROCESSOR_TIMING = {
-  NAMES_REVEAL: 600,
-  STRIKE_DELAY: 400,
-  STRIKE_DURATION: 800,
-  COUNT_START: 300,
-  COUNT_PER_LETTER: 200,
-  RESULT_REVEAL: 500,
+  NAMES_REVEAL: 940,
+  STRIKE_DURATION: 460,
+  COUNT_START: 390,
+  COUNT_PER_LETTER: 165,
+  FAST_COUNT: 135,
+  ROUND_PAUSE: 220,
+  RESULT_REVEAL: 420,
 } as const;

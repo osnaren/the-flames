@@ -1,13 +1,12 @@
 import { copyShareUrl } from '@lib/share';
-import { AnimatePresence, motion } from 'framer-motion';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 import SharePopover from '@/components/ui/SharePopover';
 import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { canShareFiles, downloadBlob } from '@/utils/canvasColor';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
-import type { FlamesResult, GameStage, NonNullFlamesResult } from '../../types';
+import type { FlamesResult, GameStage } from '../../types';
 
 import ResultActionsDock from './ResultActionsDock';
 import ResultCardDisplay from './ResultCardDisplay';
@@ -19,6 +18,8 @@ interface ResultCardContainerProps {
   stage: GameStage;
   name1?: string;
   name2?: string;
+  skipHero?: boolean;
+  onResultVisible?: () => void;
   onRetry: () => void;
   onNavigateToManual?: () => void;
   onNavigateToStats?: () => void;
@@ -34,49 +35,32 @@ function ResultCardContainer({
   stage,
   name1,
   name2,
+  skipHero = false,
+  onResultVisible,
   onRetry,
   onNavigateToManual,
   onNavigateToStats,
 }: ResultCardContainerProps) {
-  const { shouldAnimate, prefersReducedMotion } = useAnimationPreferences();
+  const { shouldAnimate } = useAnimationPreferences();
   const { uiInteraction } = useGameIntegration();
   const resultCardRef = useRef<HTMLDivElement>(null);
   const [isSharePopoverOpen, setIsSharePopoverOpen] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
 
-  // Hero transition state
-  const [showHeroTransition, setShowHeroTransition] = useState(false);
-  const [heroTransitionComplete, setHeroTransitionComplete] = useState(false);
-
+  const [heroTransitionComplete, setHeroTransitionComplete] = useState(!shouldAnimate || skipHero);
   const isVisible = stage === 'result' && result !== null;
-
-  // Handle stage transition - trigger hero animation when result becomes visible
-  const prevStageRef = useRef<GameStage | null>(null);
+  const showHero = isVisible && shouldAnimate && !skipHero && !heroTransitionComplete;
+  const notifyResultVisible = useEffectEvent(() => onResultVisible?.());
 
   useEffect(() => {
-    // Stage just changed to result - start hero transition
-    if (stage === 'result' && prevStageRef.current !== 'result' && result !== null) {
-      if (shouldAnimate && !prefersReducedMotion) {
-        setShowHeroTransition(true);
-        setHeroTransitionComplete(false);
-      } else {
-        // Skip hero transition if animations disabled
-        setHeroTransitionComplete(true);
-      }
-    }
-
-    // Reset hero state when leaving result stage
-    if (stage !== 'result' && prevStageRef.current === 'result') {
-      setShowHeroTransition(false);
-      setHeroTransitionComplete(false);
-    }
-
-    prevStageRef.current = stage;
-  }, [stage, result, shouldAnimate, prefersReducedMotion]);
+    if (!isVisible || showHero) return;
+    setHeroTransitionComplete(true);
+    const frame = requestAnimationFrame(notifyResultVisible);
+    return () => cancelAnimationFrame(frame);
+  }, [isVisible, showHero]);
 
   // Handle hero transition completion
   const handleHeroTransitionComplete = useCallback(() => {
-    setShowHeroTransition(false);
     setHeroTransitionComplete(true);
   }, []);
 
@@ -171,62 +155,45 @@ function ResultCardContainer({
     resultText: result || '',
   };
 
+  if (!isVisible || !result) return null;
+
+  if (showHero) {
+    return <ResultHeroTransition result={result} onTransitionComplete={handleHeroTransitionComplete} />;
+  }
+
   return (
-    <>
-      {/* Hero Transition - Large icon reveal */}
-      {result !== null && (
-        <ResultHeroTransition
-          result={result as NonNullFlamesResult}
-          isActive={showHeroTransition}
-          onTransitionComplete={handleHeroTransitionComplete}
-        />
-      )}
+    <div className="flex flex-col items-center">
+      {/* Result Card Display */}
+      <ResultCardDisplay
+        ref={resultCardRef}
+        result={result}
+        stage={stage}
+        name1={name1}
+        name2={name2}
+        className={isCapturing ? 'pointer-events-none' : ''}
+      />
 
-      <AnimatePresence mode="wait">
-        {isVisible && heroTransitionComplete && (
-          <motion.div
-            key="result-container"
-            initial={shouldAnimate ? { opacity: 0 } : false}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="flex flex-col items-center"
-          >
-            {/* Result Card Display */}
-            <ResultCardDisplay
-              ref={resultCardRef}
-              result={result}
-              stage={stage}
-              name1={name1}
-              name2={name2}
-              className={isCapturing ? 'pointer-events-none' : ''}
-              heroTransitionComplete={heroTransitionComplete}
-            />
+      {/* Actions Dock */}
+      <ResultActionsDock
+        isVisible={isVisible}
+        onRetry={onRetry}
+        onShare={handleShare}
+        onShareAsImage={handleShareAsImage}
+        onCopyLink={handleCopyLink}
+        onNavigateToManual={onNavigateToManual}
+        onNavigateToStats={onNavigateToStats}
+      />
 
-            {/* Actions Dock */}
-            <ResultActionsDock
-              isVisible={isVisible}
-              onRetry={onRetry}
-              onShare={handleShare}
-              onShareAsImage={handleShareAsImage}
-              onCopyLink={handleCopyLink}
-              onNavigateToManual={onNavigateToManual}
-              onNavigateToStats={onNavigateToStats}
-            />
-
-            {/* Share Popover */}
-            <SharePopover
-              isOpen={isSharePopoverOpen}
-              onClose={() => setIsSharePopoverOpen(false)}
-              resultCardRef={resultCardRef}
-              shareData={shareData}
-              onShareAsImage={handleShareAsImage}
-              isCapturingImage={isCapturing}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+      {/* Share Popover */}
+      <SharePopover
+        isOpen={isSharePopoverOpen}
+        onClose={() => setIsSharePopoverOpen(false)}
+        resultCardRef={resultCardRef}
+        shareData={shareData}
+        onShareAsImage={handleShareAsImage}
+        isCapturingImage={isCapturing}
+      />
+    </div>
   );
 }
 

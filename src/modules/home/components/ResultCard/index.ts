@@ -5,6 +5,7 @@ export { default as ResultCard, default as ResultCardContainer } from './ResultC
 export { default as ResultActionsDock } from './ResultActionsDock';
 export { default as ResultCardDisplay } from './ResultCardDisplay';
 export { default as ResultHeroTransition } from './ResultHeroTransition';
+export { preloadResultIcon } from './ResultIcon';
 
 // Utilities and constants
 export * from './resultCard.constants';

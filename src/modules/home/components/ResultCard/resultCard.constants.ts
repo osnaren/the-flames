@@ -381,17 +381,7 @@ export function getRandomResultContent(
 // ANIMATION CONFIGURATION
 // ============================================================================
 
-export const ANIMATION_STAGES = ['entry', 'icon', 'names', 'title', 'description', 'quote'] as const;
-export const ANIMATION_DELAYS = [100, 250, 400, 550, 700, 850];
-
-// Animation stages when hero transition is used (card content fades in after hero icon shrinks)
-export const ANIMATION_STAGES_WITH_HERO = ['entry', 'card', 'icon', 'names', 'title', 'description', 'quote'] as const;
-export const ANIMATION_DELAYS_WITH_HERO = [0, 100, 200, 350, 500, 650, 800];
-
-// Hero transition timing constants
 export const HERO_TRANSITION_TIMING = {
-  START_DELAY: 200, // Delay before hero icon appears (let processor exit)
-  BURST_DURATION: 800, // How long the large icon is shown
-  SHRINK_DURATION: 600, // How long the shrink animation takes
-  TOTAL_DURATION: 1600, // Total hero transition time
+  BURST_DURATION: 460,
+  SHRINK_DURATION: 0.26,
 } as const;
