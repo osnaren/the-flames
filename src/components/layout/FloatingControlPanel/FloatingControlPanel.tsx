@@ -34,17 +34,34 @@ const MusicPlayer = dynamic(() => import('@/components/ui/MusicPlayer').then((mo
 function ThemeControl() {
   const isDarkTheme = usePreferencesStore((state) => state.isDarkTheme);
   const toggleTheme = usePreferencesStore((state) => state.toggleTheme);
+  const [requestedTheme, setRequestedTheme] = useState<boolean | null>(null);
+  const visibleDarkTheme = requestedTheme ?? isDarkTheme;
+
+  function handleToggle() {
+    if (requestedTheme !== null) return;
+    const nextTheme = !isDarkTheme;
+    setRequestedTheme(nextTheme);
+    // Show the new switch state before invalidating styles on the whole page.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (usePreferencesStore.getState().isDarkTheme !== nextTheme) toggleTheme();
+        requestAnimationFrame(() => setRequestedTheme(null));
+      });
+    });
+  }
+
   return (
     <Toggle
-      isActive={!isDarkTheme}
-      onToggle={toggleTheme}
+      isActive={!visibleDarkTheme}
+      onToggle={handleToggle}
+      isBusy={requestedTheme !== null}
       activeIcon={Sun}
       inactiveIcon={Moon}
       label="Theme"
       activeColor="text-primary text-glow-sm"
       inactiveColor="text-on-surface-variant"
       backgroundColor="bg-linear-to-r from-tertiary-container/30 to-tertiary/10"
-      ariaLabel={isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'}
+      ariaLabel={visibleDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'}
       tabIndex={0}
     />
   );

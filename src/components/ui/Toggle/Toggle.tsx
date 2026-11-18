@@ -4,6 +4,7 @@ import type { LucideIcon } from 'lucide-react';
 
 interface ToggleProps {
   isActive: boolean;
+  isBusy?: boolean;
   onToggle: () => void;
   activeIcon: LucideIcon;
   inactiveIcon: LucideIcon;
@@ -20,6 +21,7 @@ interface ToggleProps {
  */
 export default function Toggle({
   isActive,
+  isBusy = false,
   onToggle,
   activeIcon: ActiveIcon,
   inactiveIcon: InactiveIcon,
@@ -37,10 +39,11 @@ export default function Toggle({
   return (
     <button
       type="button"
-      className={`flex w-full items-center justify-between rounded-lg p-2.5 ${backgroundColor} border-outline/10 border transition-[color,background-color,border-color,box-shadow,transform] duration-200 ${shouldAnimate && !coarsePointer ? 'motion-safe:hover:scale-[1.02] motion-safe:focus-visible:scale-[1.02] motion-safe:active:scale-[0.98]' : ''} ${isActive ? 'shadow-glow-sm' : ''} focus:ring-primary dark:focus:ring-primary dark:focus:ring-offset-surface hover:brightness-105 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:hover:brightness-110`}
+      className={`flex w-full items-center justify-between rounded-lg p-2.5 ${backgroundColor} border-outline/10 border transition-transform duration-200 ${shouldAnimate && !coarsePointer ? 'motion-safe:hover:scale-[1.02] motion-safe:focus-visible:scale-[1.02] motion-safe:active:scale-[0.98]' : ''} ${!coarsePointer ? 'hover:brightness-105 dark:hover:brightness-110' : ''} ${isActive ? 'shadow-glow-sm' : ''} focus:ring-primary dark:focus:ring-primary dark:focus:ring-offset-surface focus:ring-2 focus:ring-offset-2 focus:outline-none`}
       onClick={onToggle}
       role="switch"
       aria-checked={isActive}
+      aria-disabled={isBusy || undefined}
       aria-label={ariaLabel || `Toggle ${label}`}
       tabIndex={tabIndex}
     >

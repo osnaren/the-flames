@@ -304,7 +304,7 @@ test.describe('Theme Switching Functionality', () => {
         const toggleLabel = isDark ? 'Switch to light theme' : 'Switch to dark theme';
         const toggle = page.locator(`button[aria-label*="${toggleLabel}"]`).first();
         await toggle.click();
-        await page.waitForTimeout(100);
+        await expect(htmlElement).toHaveAttribute('data-theme', isDark ? 'light' : 'dark');
       }
 
       // Verify final state is consistent
