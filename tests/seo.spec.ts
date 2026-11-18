@@ -31,6 +31,7 @@ test('supporting pages show their primary content before JavaScript', async ({ p
   await page.goto('/how-it-works');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(page.getByText(/old-fashioned letter-crossing chaos/)).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Start', exact: true })).toBeDisabled();
   await page.goto('/about');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(page.getByText(/Remember the days when your biggest worry/)).toBeVisible();

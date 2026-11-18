@@ -304,6 +304,22 @@ test('the animated game keeps the page stable through its final result', async (
 
 test('the mobile game finishes a long count with the winning icon still loading', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'Covers the result handoff in a narrow viewport.');
+  await page.addInitScript(() => {
+    const loading = new Set<HTMLMediaElement>();
+    const playing = new Set<HTMLMediaElement>();
+    const { load, play } = HTMLMediaElement.prototype;
+    HTMLMediaElement.prototype.load = function () {
+      if (!this.src.endsWith('/flames-count.mp3')) return load.call(this);
+      loading.add(this);
+      setTimeout(() => this.dispatchEvent(new Event('canplaythrough')), 700);
+    };
+    HTMLMediaElement.prototype.play = function () {
+      if (!this.src.endsWith('/flames-count.mp3')) return play.call(this);
+      playing.add(this);
+      return Promise.resolve();
+    };
+    Object.defineProperty(window, 'countAudio', { get: () => ({ loads: loading.size, players: playing.size }) });
+  });
   let releaseIcon!: () => void;
   const iconBlocked = new Promise<void>((resolve) => {
     releaseIcon = resolve;
@@ -329,6 +345,10 @@ test('the mobile game finishes a long count with the winning icon still loading'
     const title = card.getByRole('heading', { name: 'Siblings' });
     await expect(title).toBeInViewport({ timeout: 2500 });
     await expect(card.getByText('👫', { exact: true })).toBeInViewport();
+    expect(await page.evaluate(() => (window as Window & { countAudio?: unknown }).countAudio)).toEqual({
+      loads: 1,
+      players: 1,
+    });
     await expect
       .poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('flames-pairing-history') ?? '[]').length))
       .toBe(1);

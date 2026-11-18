@@ -3,6 +3,7 @@
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { useGameIntegration } from '@/hooks/useGameIntegration';
+import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { AnimatePresence, motion, useInView } from 'framer-motion';
 import { Flame, Play, RefreshCcw, Target, Zap } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -29,6 +30,7 @@ const FLAMES_MEANINGS: Record<string, { title: string; color: string }> = {
 export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
   const { shouldAnimate } = useGuideMotion();
   const { sound, uiInteraction, resultReveal } = useGameIntegration();
+  const hydrated = usePreferencesStore((state) => state.hydrated);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentPosition, setCurrentPosition] = useState(-1);
   const [eliminatedLetters, setEliminatedLetters] = useState<number[]>([]);
@@ -58,6 +60,7 @@ export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
 
     let count = 0;
     let activeIndex = currentPosition;
+    let eliminationTimer: ReturnType<typeof setTimeout> | undefined;
 
     // Count animation
     const countInterval = setInterval(() => {
@@ -81,7 +84,7 @@ export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
 
       if (count >= remainingCount) {
         clearInterval(countInterval);
-        setTimeout(() => {
+        eliminationTimer = setTimeout(() => {
           // Play letter strike sound when eliminating
           sound.playSound('letterStrike', { volume: 0.6 });
           setEliminatedLetters((prev) => [...prev, nextIndex]);
@@ -104,7 +107,10 @@ export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
       }
     }, 200);
 
-    return () => clearInterval(countInterval);
+    return () => {
+      clearInterval(countInterval);
+      clearTimeout(eliminationTimer);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, eliminatedLetters]);
 
@@ -297,7 +303,7 @@ export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
                 onClick={handleStart}
-                disabled={isPlaying || result !== null}
+                disabled={!hydrated || isPlaying || result !== null}
                 icon={Play}
                 className="min-w-[120px]"
               >
@@ -305,7 +311,13 @@ export default function Step3FlamesSimulation({ remainingCount }: Step3Props) {
               </Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button variant="secondary" onClick={handleReset} icon={RefreshCcw} className="min-w-[120px]">
+              <Button
+                variant="secondary"
+                onClick={handleReset}
+                disabled={!hydrated}
+                icon={RefreshCcw}
+                className="min-w-[120px]"
+              >
                 Reset
               </Button>
             </motion.div>

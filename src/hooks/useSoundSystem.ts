@@ -22,6 +22,7 @@ import { useShallow } from 'zustand/react/shallow';
 class AudioManager {
   private static instance: AudioManager | null = null;
   private audioCache: Map<string, HTMLAudioElement> = new Map();
+  private loadingSounds = new Set<SoundId>();
   private bgmElement: HTMLAudioElement | null = null;
   private currentBgmId: string | null = null;
   private fadeInterval: NodeJS.Timeout | null = null;
@@ -152,28 +153,41 @@ class AudioManager {
     let audio = this.audioCache.get(id);
 
     if (!audio) {
-      const loaded = await this.loadSound(id, asset.src);
-      if (!loaded) return;
-      audio = loaded;
+      // Drop repeated cues while the first copy is still loading. Queuing
+      // every beat would play them all at once as soon as the file arrived.
+      if (this.loadingSounds.has(id)) return;
+      this.loadingSounds.add(id);
+      try {
+        const loaded = await this.loadSound(id, asset.src);
+        if (!loaded || AudioManager.instance !== this || !usePreferencesStore.getState().isSoundEnabled) return;
+        audio = loaded;
+      } finally {
+        this.loadingSounds.delete(id);
+      }
     }
 
     try {
-      // Clone audio for overlapping sounds
-      const playbackAudio = audio.cloneNode() as HTMLAudioElement;
+      const loop = options?.loop ?? ('loop' in asset ? asset.loop : false) ?? false;
+      // Count and strike cues can arrive faster than a single clip finishes.
+      // Retrigger the loaded clip so the beat stays aligned with the tile.
+      const retrigger = !loop && (id === 'flamesCount' || id === 'letterStrike');
+      const playbackAudio = retrigger ? audio : (audio.cloneNode() as HTMLAudioElement);
 
       // Configure
       const baseVolume = asset.volume || 1;
       const optionVolume = options?.volume ?? 1;
       playbackAudio.volume = Math.min(1, Math.max(0, baseVolume * optionVolume * globalVolume));
       playbackAudio.playbackRate = options?.playbackRate || 1;
-      playbackAudio.loop = options?.loop ?? ('loop' in asset ? asset.loop : false) ?? false;
+      playbackAudio.loop = loop;
 
       // Play with delay if specified
       if (options?.delay && options.delay > 0) {
         await new Promise((resolve) => setTimeout(resolve, options.delay));
       }
 
+      if (retrigger && playbackAudio.currentTime > 0) playbackAudio.currentTime = 0;
       await playbackAudio.play();
+      if (retrigger) return;
 
       // Auto cleanup non-looping sounds
       if (!playbackAudio.loop) {
