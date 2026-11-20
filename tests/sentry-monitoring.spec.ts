@@ -50,8 +50,8 @@ test('charts navigation stays usable without React errors', async ({ page }) => 
   for (let visit = 0; visit < 3; visit++) {
     await page.getByRole('contentinfo').getByRole('link', { name: 'Global Charts', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'FLAMES Global Charts', exact: true })).toBeVisible();
-    await expect(page.getByText('Total Matches', { exact: true })).toBeVisible();
-    await page.getByRole('button', { name: 'Back', exact: true }).click();
+    await expect(page.getByText('All games', { exact: true })).toBeVisible();
+    await page.getByRole('contentinfo').getByRole('link', { name: 'Play FLAMES', exact: true }).first().click();
     await expect(page.locator('#name1')).toBeVisible();
   }
   expect(errors).toEqual([]);

@@ -52,6 +52,11 @@ export const FOOTER_CONFIG = {
   navigation: {
     primary: [
       {
+        label: 'Play FLAMES',
+        to: '/',
+        description: 'Play the FLAMES name game',
+      },
+      {
         label: 'How It Works',
         to: '/how-it-works',
         description: 'Learn the FLAMES algorithm and methodology',
@@ -68,10 +73,10 @@ export const FOOTER_CONFIG = {
       },
     ],
     secondary: [
-      { label: 'Privacy Policy', to: '/privacy' },
-      { label: 'Terms of Service', to: '/terms' },
       { label: 'About Us', to: '/about' },
       { label: 'API Docs', to: '/api-docs' },
+      { label: 'Privacy Policy', to: '/privacy' },
+      { label: 'Terms of Service', to: '/privacy#terms' },
     ],
   },
 

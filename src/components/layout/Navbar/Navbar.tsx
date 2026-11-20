@@ -4,11 +4,12 @@ import Logo from '@components/ui/Logo';
 import { NAVBAR_CONFIG } from '@config/navigation';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
 import FloatingControlPanel from '@layout/FloatingControlPanel';
-import { motion, useScroll, useTransform, Variants } from 'framer-motion';
-import { Menu } from 'lucide-react';
+import { LayoutGroup, motion, useScroll, useSpring } from 'framer-motion';
+import { Flame, Menu } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import NavItem from './NavItem';
 
 // Lazy load MobileMenu since it's not needed on initial render
@@ -17,263 +18,150 @@ const MobileMenu = dynamic(() => import('./MobileMenu'), {
   loading: () => null,
 });
 
+/**
+ * Site header.
+ *
+ * Scroll state is read in a single rAF-throttled listener and expressed with
+ * CSS transitions (transform/opacity/background), so scrolling never runs
+ * per-frame React work. The reading-progress bar is a framer motion value that
+ * writes `transform` directly without re-rendering.
+ */
 function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
   const pathname = usePathname();
-  const { prefersReducedMotion } = useAnimationPreferences();
-
-  // For scroll direction detection
+  const { shouldAnimate, prefersReducedMotion } = useAnimationPreferences();
   const lastScrollTop = useRef(0);
-  const navbarRef = useRef<HTMLElement>(null);
+  const previousPath = useRef(pathname);
 
-  // Advanced scroll effects
-  const { scrollY } = useScroll();
-  const backgroundOpacity = useTransform(scrollY, [0, 100], [0.7, 0.95]);
-  const borderOpacity = useTransform(scrollY, [0, 50], [0, 0.3]);
-  const blur = useTransform(scrollY, [0, 100], [8, 16]);
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 220, damping: 32, restDelta: 0.001 });
 
-  // Throttled scroll handler for better performance
-  const handleScroll = useCallback(() => {
-    const currentScrollTop = window.scrollY;
-
-    // Detect if scrolled past threshold with improved sensitivity
-    setIsScrolled(currentScrollTop > 20);
-
-    // Enhanced auto-hide navbar when scrolling down on mobile
-    if (window.innerWidth < 768) {
-      if (currentScrollTop > lastScrollTop.current && currentScrollTop > 120) {
-        setIsVisible(false); // Scrolling down, hide navbar
-      } else if (currentScrollTop < lastScrollTop.current || currentScrollTop <= 50) {
-        setIsVisible(true); // Scrolling up or near top, show navbar
-      }
-    } else {
-      setIsVisible(true); // Always show on desktop
-    }
-
-    lastScrollTop.current = currentScrollTop;
-  }, []);
-
-  // Optimized scroll listener with throttling
   useEffect(() => {
     let ticking = false;
-
-    const scrollListener = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          handleScroll();
-          ticking = false;
-        });
-        ticking = true;
+    const update = () => {
+      ticking = false;
+      const top = window.scrollY;
+      setIsScrolled(top > 12);
+      // Auto-hide on small screens while reading downwards; reveal on any upward scroll.
+      if (window.innerWidth < 768) {
+        const delta = top - lastScrollTop.current;
+        if (top < 80 || delta < -6) setIsHidden(false);
+        else if (delta > 6) setIsHidden(true);
+      } else {
+        setIsHidden(false);
       }
+      lastScrollTop.current = top;
     };
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-    window.addEventListener('scroll', scrollListener, { passive: true });
-    return () => window.removeEventListener('scroll', scrollListener);
-  }, [handleScroll]);
+  // Let other fixed chrome (the floating settings button) follow the header.
+  useEffect(() => {
+    document.documentElement.dataset.navHidden = isHidden && !isMobileMenuOpen ? 'true' : 'false';
+  }, [isHidden, isMobileMenuOpen]);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.paddingRight = '0px'; // Prevent layout shift
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
-    }
-
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
     };
   }, [isMobileMenuOpen]);
 
-  // Reset visibility when pathname changes with smooth transition
+  // Scroll to top on client-side navigation (not on first load or hash changes).
   useEffect(() => {
-    // Smooth scroll to top on navigation
-    if (!prefersReducedMotion) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'auto' });
-    }
+    if (previousPath.current === pathname) return;
+    previousPath.current = pathname;
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+    setIsHidden(false);
   }, [pathname, prefersReducedMotion]);
 
-  // Enhanced navbar variants with micro-interactions
-  const navbarVariants: Variants = {
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: 'spring',
-        damping: 25,
-        stiffness: 200,
-        opacity: { duration: 0.2 },
-        when: 'beforeChildren',
-        staggerChildren: 0.1,
-      },
-    },
-    hidden: {
-      y: -100,
-      opacity: 0.8,
-      transition: {
-        type: 'spring',
-        damping: 25,
-        stiffness: 200,
-        opacity: { duration: 0.15 },
-        when: 'afterChildren',
-      },
-    },
-  };
-
-  const contentVariants: Variants = {
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { type: 'spring', damping: 20, stiffness: 300 },
-    },
-    hidden: {
-      y: -20,
-      opacity: 0,
-      transition: { duration: 0.2 },
-    },
-  };
+  const navItems = NAVBAR_CONFIG.items.filter((item) => !item.mobileOnly);
+  const onHome = pathname === '/';
 
   return (
     <>
-      <motion.header
-        ref={navbarRef}
-        className="fixed top-0 right-0 left-0 z-30 overflow-hidden transition-all duration-300 will-change-transform"
-        style={{
-          backdropFilter: prefersReducedMotion ? 'blur(12px)' : `blur(${blur}px)`,
-          WebkitBackdropFilter: prefersReducedMotion ? 'blur(12px)' : `blur(${blur}px)`,
-        }}
-        variants={navbarVariants}
-        initial="visible"
-        animate={isVisible ? 'visible' : 'hidden'}
+      <header
+        className="fixed top-0 right-0 left-0 z-30 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        style={{ transform: isHidden && !isMobileMenuOpen ? 'translateY(-100%)' : 'none' }}
         role="banner"
       >
-        {/* Enhanced gradient background with dynamic opacity */}
-        <motion.div
-          className="absolute inset-0"
-          style={{
-            background: isScrolled
-              ? 'hsl(var(--surface) / 0.95)'
-              : 'linear-gradient(135deg, hsl(var(--surface) / 0.7) 0%, hsl(var(--surface-container-low) / 0.75) 50%, hsl(var(--surface) / 0.7) 100%)',
-            opacity: prefersReducedMotion ? (isScrolled ? 1 : 0.7) : backgroundOpacity,
-            boxShadow: isScrolled ? '0 4px 20px -2px hsl(var(--shadow) / 0.1)' : 'none',
-          }}
+        {/* Surface: solid-ish on phones (cheap), frosted glass from md up */}
+        <div
+          aria-hidden="true"
+          className={`border-outline-variant/40 absolute inset-0 border-b transition-[opacity,box-shadow] duration-300 md:backdrop-blur-xl ${
+            isScrolled
+              ? 'bg-surface/95 md:bg-surface/80 opacity-100 shadow-[0_6px_24px_-12px_rgb(0_0_0/0.35)]'
+              : 'bg-surface/80 md:bg-surface/40 border-transparent opacity-100'
+          }`}
         />
 
-        {/* Dynamic border with scroll-based opacity */}
-        <motion.div
-          className="via-outline/30 absolute right-0 bottom-0 left-0 h-px bg-linear-to-r from-transparent to-transparent"
-          style={{
-            opacity: prefersReducedMotion ? (isScrolled ? 0.3 : 0) : borderOpacity,
-          }}
-        />
+        <div className="relative mx-auto flex h-14 max-w-7xl items-center justify-between px-4 md:h-16">
+          <Logo variant="animated" animationType="onHover" />
 
-        {/* Enhanced glow effect for modern look */}
-        {isScrolled && !prefersReducedMotion && (
-          <motion.div
-            className="from-primary/5 to-secondary/5 absolute inset-0 bg-linear-to-r via-transparent"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          />
-        )}
-
-        <div className="relative mx-auto max-w-7xl px-4 py-3">
-          <motion.div className="flex items-center justify-between" variants={contentVariants}>
-            {/* Enhanced Logo with hover effect */}
-            <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
-              <Logo variant="animated" animationType="onHover" className="transition-all duration-300" />
-            </motion.div>
-
-            {/* Enhanced Desktop Navigation Links */}
-            <nav className="hidden items-center space-x-2 md:flex" role="navigation" aria-label="Main navigation">
-              <motion.div className="flex items-center space-x-2" variants={contentVariants}>
-                {NAVBAR_CONFIG.items
-                  .filter((item) => !item.mobileOnly)
-                  .map((item) => (
-                    <NavItem
-                      key={item.path}
-                      label={item.label}
-                      icon={item.icon}
-                      to={item.path}
-                      isActive={pathname === item.path}
-                    />
-                  ))}
-              </motion.div>
-            </nav>
-
-            {/* Enhanced Mobile menu button */}
-            <motion.button
-              whileHover={{
-                scale: 1.05,
-                backgroundColor: 'hsl(var(--surface-container-lowest) / 0.8)',
-              }}
-              whileTap={{ scale: 0.95 }}
-              className="text-on-surface-variant hover:text-on-surface group relative rounded-lg p-2.5 transition-all duration-200 md:hidden"
-              onClick={() => setIsMobileMenuOpen(true)}
-              aria-label="Open mobile menu"
-              aria-expanded={isMobileMenuOpen}
-              aria-controls="mobile-menu"
-              variants={contentVariants}
-            >
-              {/* Animated background on hover */}
-              <motion.div
-                className="bg-surface-container-lowest/50 absolute inset-0 rounded-lg"
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileHover={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.2 }}
-              />
-
-              {/* Enhanced menu icon with micro-animation */}
-              <motion.div
-                whileHover={{ rotate: 90 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                className="relative z-10"
+          {/* Desktop navigation */}
+          <nav className="hidden items-center gap-1 md:flex" aria-label="Main navigation">
+            <LayoutGroup id="main-nav">
+              {navItems.map((item) => (
+                <NavItem
+                  key={item.path}
+                  label={item.label}
+                  icon={item.icon}
+                  to={item.path}
+                  isActive={pathname === item.path}
+                />
+              ))}
+            </LayoutGroup>
+            {!onHome && (
+              <Link
+                href="/"
+                className="ml-2 inline-flex items-center gap-1.5 rounded-xl bg-linear-to-r from-pink-500 via-rose-500 to-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-rose-500/25 transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-rose-500/30 focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:outline-none active:translate-y-0"
               >
-                <Menu className="h-6 w-6" aria-hidden="true" />
-              </motion.div>
+                <Flame className="h-4 w-4" aria-hidden="true" />
+                Play now
+              </Link>
+            )}
+          </nav>
 
-              {/* Subtle glow effect */}
-              <motion.div
-                className="bg-primary/20 absolute inset-0 rounded-lg"
-                initial={{ opacity: 0 }}
-                whileHover={{ opacity: 0.3 }}
-                transition={{ duration: 0.3 }}
-              />
-            </motion.button>
-          </motion.div>
+          {/* Mobile menu button (leaves room for the floating settings button) */}
+          <button
+            className="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high active:bg-surface-container-highest rounded-xl p-2.5 transition-colors duration-200 md:hidden"
+            onClick={() => setIsMobileMenuOpen(true)}
+            aria-label="Open mobile menu"
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-menu"
+          >
+            <Menu className="h-6 w-6" aria-hidden="true" />
+          </button>
         </div>
 
-        {/* Subtle animated accent line */}
-        {!prefersReducedMotion && (
+        {/* Reading progress */}
+        {shouldAnimate && (
           <motion.div
-            className="from-primary via-secondary to-tertiary absolute bottom-0 left-0 h-0.5 bg-linear-to-r will-change-transform"
-            initial={{ scaleX: 0, originX: 0 }}
-            animate={{
-              scaleX: isScrolled ? 1 : 0,
-              opacity: isScrolled ? 0.6 : 0,
-            }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            aria-hidden="true"
+            className="absolute right-0 bottom-0 left-0 h-0.5 origin-left bg-linear-to-r from-pink-500 via-orange-400 to-amber-300 transition-opacity duration-300"
+            style={{ scaleX: progress, opacity: isScrolled ? 0.9 : 0 }}
           />
         )}
-      </motion.header>
+      </header>
 
-      {/* Enhanced space filler with fixed height to prevent CLS */}
+      {/* Space filler with fixed height to prevent CLS */}
       <div className="h-14 md:h-16" aria-hidden="true" />
 
-      {/* Mobile menu */}
       <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} pathname={pathname || ''} />
 
-      {/* Floating Control Panel - now positioned independently outside the navbar */}
       <FloatingControlPanel />
     </>
   );
 }
 
-// Memoize Navbar to prevent unnecessary re-renders
 export default memo(Navbar);

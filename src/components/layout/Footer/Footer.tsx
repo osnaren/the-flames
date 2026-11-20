@@ -1,346 +1,227 @@
 'use client';
 
-import { useMediaQuery } from '@/hooks/useMediaQuery';
 import Logo from '@components/ui/Logo';
 import { FOOTER_CONFIG } from '@config/navigation';
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
-import { motion, useScroll, useTransform, Variants } from 'framer-motion';
-import { ExternalLink, Heart, Sparkles, TrendingUp } from 'lucide-react';
+import { ArrowUp, BookOpen, ExternalLink, Flame, Heart, Sparkles, Wand2 } from 'lucide-react';
 import Link from 'next/link';
-import { memo } from 'react';
+import { usePathname } from 'next/navigation';
+import { memo, type ReactNode } from 'react';
 import ProductHuntBadge from '../ProductHuntBadge';
-import type { FooterLinkProps } from './types';
+import type { IconComponent } from './types';
 
-function Footer() {
-  const { shouldAnimate, prefersReducedMotion } = useAnimationPreferences();
-  const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
-  const animateDecoration = shouldAnimate && !compactDevice;
-  const { scrollYProgress } = useScroll();
+const linkClass =
+  'group text-on-surface-variant hover:text-on-surface focus-visible:ring-primary/40 inline-flex items-center gap-2 rounded-md py-1 text-sm transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none';
 
-  // Enhanced scroll-based effects - use wider range to work on shorter pages
-  const footerOpacity = useTransform(scrollYProgress, [0.3, 0.7], [0.8, 1]);
-  const footerY = useTransform(scrollYProgress, [0.5, 0.9], [20, 0]);
-
-  // Animation variants
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        when: 'beforeChildren',
-        staggerChildren: prefersReducedMotion ? 0 : 0.1,
-        delayChildren: prefersReducedMotion ? 0 : 0.2,
-      },
-    },
-  };
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: 'spring',
-        stiffness: 300,
-        damping: 24,
-      },
-    },
-  };
-
-  const statsVariants: Variants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 400,
-        damping: 25,
-      },
-    },
-  };
-
-  // Enhanced footer link component
-  const FooterLink = ({
-    to,
-    href,
-    external = false,
-    children,
-    icon: Icon,
-    description,
-    className = '',
-    ...props
-  }: FooterLinkProps) => {
-    const linkClass = `
-      group relative inline-flex items-center gap-2 text-on-surface-variant 
-      hover:text-primary transition-all duration-300 text-sm
-      focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 
-      focus:ring-offset-surface rounded-md px-1 py-0.5
-      ${className}
-    `;
-
-    const content = (
-      <>
-        {Icon && <Icon className="h-4 w-4 transition-transform group-hover:scale-110" />}
-        <span className="relative">
-          {children}
-          {/* Animated underline */}
-          <motion.span
-            className="from-primary to-secondary absolute -bottom-0.5 left-0 h-0.5 rounded-full bg-linear-to-r"
-            initial={{ width: 0 }}
-            whileHover={{ width: '100%' }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
-          />
-        </span>
-        {external && <ExternalLink className="h-3 w-3 opacity-60 group-hover:opacity-100" />}
-      </>
-    );
-
-    if (to) {
-      return (
-        <Link href={to} className={linkClass} title={description} {...props}>
-          {content}
-        </Link>
-      );
-    }
-
-    return (
-      <a
-        href={href}
-        className={linkClass}
-        target={external ? '_blank' : undefined}
-        rel={external ? 'noopener noreferrer' : undefined}
-        title={description}
-        {...props}
-      >
-        {content}
-      </a>
-    );
-  };
-
+function Underline({ children }: { children: ReactNode }) {
   return (
-    <motion.footer
-      style={{
-        opacity: prefersReducedMotion || compactDevice ? 1 : footerOpacity,
-        y: prefersReducedMotion || compactDevice ? 0 : footerY,
-      }}
-      className="border-outline/10 from-surface-container-lowest/80 via-surface/50 relative mt-auto overflow-hidden border-t bg-linear-to-t to-transparent"
-      role="contentinfo"
-    >
-      {/* Enhanced background elements */}
-      {animateDecoration && (
-        <>
-          {/* Subtle gradient overlay */}
-          <div className="from-primary/5 to-secondary/5 absolute inset-0 bg-linear-to-br via-transparent" />
-
-          {/* Floating particles effect */}
-          <motion.div
-            className="bg-primary/30 absolute top-4 right-1/4 h-2 w-2 rounded-full blur-sm will-change-transform"
-            animate={{
-              y: [0, -20, 0],
-              opacity: [0.3, 0.8, 0.3],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          />
-          <motion.div
-            className="bg-secondary/40 absolute top-8 left-1/3 h-1.5 w-1.5 rounded-full blur-sm will-change-transform"
-            animate={{
-              y: [0, -15, 0],
-              x: [0, 10, 0],
-              opacity: [0.2, 0.6, 0.2],
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: 'easeInOut',
-              delay: 1,
-            }}
-          />
-        </>
-      )}
-
-      <div className="relative mx-auto max-w-7xl px-4 py-12">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
-          className="grid gap-12 md:grid-cols-2 lg:grid-cols-4"
-        >
-          {/* Brand Section */}
-          <motion.div variants={itemVariants} className="lg:col-span-1">
-            <div className="space-y-4">
-              <motion.div whileHover={{ scale: 1.05 }} transition={{ type: 'spring', stiffness: 400 }}>
-                <Logo variant="animated" animationType="onHover" className="mb-4" />
-              </motion.div>
-
-              <p className="text-on-surface-variant text-sm leading-relaxed">{FOOTER_CONFIG.brand.description}</p>
-
-              {/* Social Links */}
-              <div className="flex items-center gap-3 pt-2">
-                {FOOTER_CONFIG.social.map((social) => (
-                  <motion.a
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`text-on-surface-variant hover:bg-surface-container-low rounded-full p-2 transition-colors ${social.hoverColor}`}
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    whileTap={{ scale: 0.95 }}
-                    aria-label={social.label}
-                  >
-                    <social.icon className="h-5 w-5" />
-                  </motion.a>
-                ))}
-              </div>
-            </div>
-
-            {/* Product Hunt Badge */}
-            <div className="mt-6">
-              <ProductHuntBadge />
-            </div>
-          </motion.div>
-
-          {/* Navigation Section */}
-          <motion.div variants={itemVariants} className="lg:col-span-1">
-            <h2 className="text-on-surface mb-4 flex items-center gap-2 font-semibold" id="footer-nav-heading">
-              <Sparkles className="text-primary h-4 w-4" aria-hidden="true" />
-              Navigation
-            </h2>
-            <nav className="space-y-3" aria-labelledby="footer-nav-heading">
-              {FOOTER_CONFIG.navigation.primary.map((link) => (
-                <div key={link.to}>
-                  <FooterLink to={link.to} description={link.description}>
-                    {link.label}
-                  </FooterLink>
-                </div>
-              ))}
-              <div className="border-outline/10 mt-4 border-t pt-2">
-                {FOOTER_CONFIG.navigation.secondary.map((link) => (
-                  <div key={link.to} className="mb-2">
-                    <FooterLink to={link.to}>{link.label}</FooterLink>
-                  </div>
-                ))}
-              </div>
-            </nav>
-          </motion.div>
-
-          {/* Resources Section */}
-          <motion.div variants={itemVariants} className="lg:col-span-1">
-            <h2 className="text-on-surface mb-4 flex items-center gap-2 font-semibold" id="footer-resources-heading">
-              <ExternalLink className="text-primary h-4 w-4" aria-hidden="true" />
-              Resources
-            </h2>
-            <nav className="space-y-3" aria-labelledby="footer-resources-heading">
-              {FOOTER_CONFIG.external.map((link) => (
-                <div key={link.href}>
-                  <FooterLink href={link.href} external={true} icon={link.icon} description={link.description}>
-                    {link.label}
-                  </FooterLink>
-                </div>
-              ))}
-            </nav>
-          </motion.div>
-
-          {/* Stats Section */}
-          {FOOTER_CONFIG.showStats && (
-            <motion.div variants={itemVariants} className="lg:col-span-1">
-              <h2 className="text-on-surface mb-4 flex items-center gap-2 font-semibold" id="footer-stats-heading">
-                <TrendingUp className="text-primary h-4 w-4" aria-hidden="true" />
-                Our Impact
-              </h2>
-              <div className="grid grid-cols-2 gap-3" role="list" aria-labelledby="footer-stats-heading">
-                {FOOTER_CONFIG.stats.map((stat) => (
-                  <motion.div
-                    key={stat.label}
-                    variants={statsVariants}
-                    whileHover={{ scale: 1.05 }}
-                    className="bg-surface-container-low/50 border-outline/10 group hover:border-primary/20 rounded-lg border p-3 transition-colors"
-                    role="listitem"
-                  >
-                    <div className="flex flex-col items-center text-center">
-                      <stat.icon
-                        className="text-primary mb-1 h-5 w-5 transition-transform group-hover:scale-110"
-                        aria-hidden="true"
-                      />
-                      <div className="text-on-surface text-sm font-bold">{stat.value}</div>
-                      <div className="text-on-surface-variant text-xs leading-tight">{stat.label}</div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </motion.div>
-
-        {/* Bottom Section */}
-        <motion.div variants={itemVariants} className="border-outline/10 mt-12 border-t pt-8">
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            {/* Copyright */}
-            <div className="text-on-surface-variant text-sm">
-              © {FOOTER_CONFIG.brand.year} {FOOTER_CONFIG.brand.name}. All rights reserved.
-            </div>
-
-            {/* Location Badge */}
-            <motion.div
-              className="text-on-surface-variant flex items-center gap-2 text-sm"
-              whileHover={{ scale: 1.02 }}
-            >
-              <span>Made with</span>
-              <motion.div
-                animate={
-                  animateDecoration
-                    ? {
-                        scale: [1, 1.2, 1],
-                        rotate: [0, 10, -10, 0],
-                      }
-                    : {}
-                }
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-                aria-hidden="true"
-              >
-                <Heart className="text-error h-4 w-4 fill-current drop-shadow-sm" />
-              </motion.div>
-              <span className="sr-only">love</span>
-              <span>for love calculations</span>
-            </motion.div>
-          </div>
-
-          {/* Enhanced Disclaimer */}
-          <motion.div
-            className="mt-6 space-y-2 text-center"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-            viewport={{ once: true }}
-          >
-            <p className="text-on-surface-variant/80 text-xs italic">{FOOTER_CONFIG.disclaimer.text}</p>
-            <p className="text-on-surface-variant/60 text-xs">{FOOTER_CONFIG.disclaimer.note}</p>
-          </motion.div>
-        </motion.div>
-      </div>
-
-      {/* Decorative bottom accent */}
-      {animateDecoration && (
-        <motion.div
-          className="from-primary via-secondary to-tertiary absolute right-0 bottom-0 left-0 h-1 bg-linear-to-r opacity-60 will-change-transform"
-          initial={{ scaleX: 0 }}
-          whileInView={{ scaleX: 1 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          viewport={{ once: true }}
-        />
-      )}
-    </motion.footer>
+    <span className="relative">
+      {children}
+      <span
+        aria-hidden="true"
+        className="from-primary to-secondary absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-linear-to-r transition-transform duration-300 group-hover:scale-x-100"
+      />
+    </span>
   );
 }
 
-// Memoize Footer to prevent unnecessary re-renders
+function FooterHeading({ id, icon: Icon, children }: { id: string; icon: IconComponent; children: ReactNode }) {
+  return (
+    <h2 id={id} className="text-on-surface mb-4 flex items-center gap-2 text-sm font-semibold tracking-wide uppercase">
+      <Icon className="text-primary h-4 w-4" aria-hidden="true" />
+      {children}
+    </h2>
+  );
+}
+
+/**
+ * Site footer: a call-to-action band, link columns and the legal bar.
+ * Static by design — only hover/focus feedback (CSS) and one compositor-driven
+ * idle animation, so it costs nothing while the user scrolls.
+ */
+function Footer() {
+  const { shouldAnimate, prefersReducedMotion } = useAnimationPreferences();
+  const pathname = usePathname();
+  const onHome = pathname === '/';
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+
+  return (
+    <footer className="border-outline-variant/40 relative mt-auto overflow-hidden border-t" role="contentinfo">
+      {/* Soft backdrop */}
+      <div
+        aria-hidden="true"
+        className="from-surface-container-lowest/90 via-surface/60 pointer-events-none absolute inset-0 bg-linear-to-t to-transparent"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-40 left-1/2 h-80 w-[min(56rem,140vw)] -translate-x-1/2 rounded-full"
+        style={{ backgroundImage: 'radial-gradient(ellipse, rgb(249 115 22 / 0.12), transparent 70%)' }}
+      />
+
+      <div className="relative mx-auto max-w-6xl px-4 pt-10 pb-8 md:pt-14">
+        {/* Call to action */}
+        <div className="border-outline-variant/40 bg-surface-container-low/70 mb-12 flex flex-col items-center justify-between gap-5 rounded-3xl border p-6 text-center shadow-sm sm:flex-row sm:p-7 sm:text-left">
+          <div>
+            <p className="font-heading text-on-surface text-xl font-bold sm:text-2xl">
+              {onHome ? 'One more pair? ' : 'Got two names in mind? '}
+              <span
+                className={`inline-block ${shouldAnimate ? 'motion-wiggle' : ''}`}
+                style={{ ['--wiggle-duration' as string]: '4s' }}
+                aria-hidden="true"
+              >
+                🔥
+              </span>
+            </p>
+            <p className="text-on-surface-variant mt-1 text-sm">
+              Cancel the common letters, count around F-L-A-M-E-S, and see where you land.
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-wrap items-center justify-center gap-2">
+            {onHome ? (
+              <button
+                type="button"
+                onClick={scrollToTop}
+                className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-pink-500 via-rose-500 to-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-rose-500/25 transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:outline-none"
+              >
+                <Flame className="h-4 w-4" aria-hidden="true" />
+                Play again
+              </button>
+            ) : (
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-pink-500 via-rose-500 to-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-rose-500/25 transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:outline-none"
+              >
+                <Flame className="h-4 w-4" aria-hidden="true" />
+                Play FLAMES
+              </Link>
+            )}
+            <Link
+              href="/manual"
+              className="border-outline-variant/60 text-on-surface hover:bg-surface-container-high inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:outline-none"
+            >
+              <Wand2 className="h-4 w-4" aria-hidden="true" />
+              Try manual mode
+            </Link>
+          </div>
+        </div>
+
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          {/* Brand */}
+          <div className="space-y-4">
+            <Logo variant="animated" animationType="onHover" />
+            <p className="text-on-surface-variant max-w-xs text-sm leading-relaxed">
+              {FOOTER_CONFIG.brand.description} The classic notebook name game, reimagined for the browser.
+            </p>
+            <div className="flex items-center gap-1">
+              {FOOTER_CONFIG.social.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`text-on-surface-variant hover:bg-surface-container-high rounded-full p-2 transition-[color,background-color,transform] duration-200 hover:-translate-y-0.5 ${social.hoverColor}`}
+                  aria-label={social.label}
+                >
+                  <social.icon className="h-5 w-5" />
+                </a>
+              ))}
+            </div>
+            <ProductHuntBadge />
+          </div>
+
+          {/* Play */}
+          <nav aria-labelledby="footer-play-heading">
+            <FooterHeading id="footer-play-heading" icon={Sparkles}>
+              Play
+            </FooterHeading>
+            <ul className="space-y-2">
+              {FOOTER_CONFIG.navigation.primary.map((link) => (
+                <li key={link.to}>
+                  <Link href={link.to} className={linkClass} title={link.description}>
+                    <Underline>{link.label}</Underline>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Project */}
+          <nav aria-labelledby="footer-project-heading">
+            <FooterHeading id="footer-project-heading" icon={BookOpen}>
+              Project
+            </FooterHeading>
+            <ul className="space-y-2">
+              {FOOTER_CONFIG.navigation.secondary.map((link) => (
+                <li key={link.to}>
+                  <Link href={link.to} className={linkClass}>
+                    <Underline>{link.label}</Underline>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Resources */}
+          <nav aria-labelledby="footer-resources-heading">
+            <FooterHeading id="footer-resources-heading" icon={ExternalLink}>
+              Resources
+            </FooterHeading>
+            <ul className="space-y-2">
+              {FOOTER_CONFIG.external.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={linkClass}
+                    title={link.description}
+                  >
+                    <link.icon className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                    <Underline>{link.label}</Underline>
+                    <ExternalLink className="h-3 w-3 opacity-50 group-hover:opacity-100" aria-hidden="true" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="border-outline-variant/40 mt-12 flex flex-col items-center gap-4 border-t pt-6 text-center md:flex-row md:justify-between md:text-left">
+          <div className="space-y-1">
+            <p className="text-on-surface-variant text-sm">
+              © {FOOTER_CONFIG.brand.year} {FOOTER_CONFIG.brand.name}. All rights reserved.
+            </p>
+            <p className="text-on-surface-variant/70 text-xs">
+              {FOOTER_CONFIG.disclaimer.text} {FOOTER_CONFIG.disclaimer.note}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <p className="text-on-surface-variant flex items-center gap-1.5 text-sm">
+              Made with
+              <Heart
+                className={`text-error h-4 w-4 fill-current ${shouldAnimate ? 'motion-pulse' : ''}`}
+                style={{ ['--pulse-scale' as string]: '1.2', ['--pulse-duration' as string]: '1.4s' }}
+                aria-hidden="true"
+              />
+              <span className="sr-only">love</span>
+              for love calculations
+            </p>
+            <button
+              type="button"
+              onClick={scrollToTop}
+              className="border-outline-variant/60 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high inline-flex h-9 w-9 items-center justify-center rounded-full border transition-[color,background-color,transform] duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:outline-none"
+              aria-label="Back to top"
+            >
+              <ArrowUp className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 export default memo(Footer);

@@ -255,7 +255,7 @@ export default function FloatingControlPanel() {
   ];
 
   return (
-    <div className={cn('fixed top-20 right-5 z-50 md:right-6')}>
+    <div className={cn('floating-control fixed top-20 right-5 z-50 md:right-6')}>
       <div
         ref={panelRef}
         className={cn(

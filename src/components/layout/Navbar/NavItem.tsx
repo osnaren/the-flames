@@ -1,12 +1,10 @@
 'use client';
 
 import { useAnimationPreferences } from '@hooks/useAnimationPreferences';
-import { motion, Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { memo } from 'react';
-
-const MotionLink = motion.create(Link);
 
 interface NavItemProps {
   icon?: LucideIcon;
@@ -18,54 +16,11 @@ interface NavItemProps {
   className?: string;
 }
 
-const bgMotionSpanVariants: Variants = {
-  initial: { opacity: 0, scale: 0.8 },
-  animate: { opacity: 0, scale: 0.8 },
-  hover: { opacity: 1, scale: 1, transition: { duration: 0.2, ease: 'easeOut' } },
-};
-
-const BackgroundElement = ({ isActive, shouldAnimate }: { isActive: boolean; shouldAnimate: boolean }) => (
-  <>
-    {!isActive && (
-      <motion.span
-        className="from-secondary/15 via-primary/10 to-tertiary/15 absolute inset-0 rounded-xl bg-linear-to-r"
-        variants={bgMotionSpanVariants}
-      />
-    )}
-
-    {isActive && shouldAnimate && (
-      <motion.span
-        className="from-primary/5 via-primary-container/30 to-primary/5 absolute inset-0 rounded-xl bg-linear-to-r"
-        animate={{
-          opacity: [0.8, 1, 0.8],
-        }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-      />
-    )}
-
-    <motion.span
-      className="absolute inset-0 rounded-xl"
-      initial={{ scale: 0, opacity: 0 }}
-      whileTap={
-        shouldAnimate
-          ? {
-              scale: 1.5,
-              opacity: [0, 0.3, 0],
-              transition: { duration: 0.4 },
-            }
-          : {}
-      }
-      style={{
-        background: 'radial-gradient(circle, rgba(var(--primary-rgb), 0.3) 0%, transparent 70%)',
-      }}
-    />
-  </>
-);
-
+/**
+ * Navigation link. The active background is a shared-layout pill, so moving
+ * between pages slides it from the previous item instead of popping it in.
+ * Hover feedback is plain CSS.
+ */
 function NavItem({
   icon: Icon,
   label,
@@ -77,142 +32,56 @@ function NavItem({
 }: NavItemProps) {
   const { shouldAnimate } = useAnimationPreferences();
 
+  const classes = `group relative flex items-center rounded-xl px-4 py-2.5 text-sm font-medium transition-colors duration-200
+    focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:outline-none
+    ${isActive ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}
+    ${mobileOnly ? 'w-full' : ''} ${className}`;
+
   const content = (
     <>
-      {Icon && (
-        <motion.div
-          className="relative overflow-hidden"
-          whileHover={
-            shouldAnimate
-              ? {
-                  scale: 1.1,
-                  rotate: [0, -5, 5, 0],
-                  transition: {
-                    rotate: { duration: 0.4, ease: 'easeInOut' },
-                    scale: { duration: 0.2, ease: 'easeOut' },
-                  },
-                }
-              : {}
-          }
-        >
-          <Icon className="mr-2 h-4 w-4 transition-colors duration-200" />
-
-          {isActive && shouldAnimate && (
-            <motion.div
-              className="bg-primary/30 absolute inset-0 rounded-full blur-sm"
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.3, 0.6, 0.3],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-            />
-          )}
-        </motion.div>
+      {/* Hover wash */}
+      {!isActive && (
+        <span
+          aria-hidden="true"
+          className="bg-surface-container-high/70 absolute inset-0 scale-90 rounded-xl opacity-0 transition-[opacity,transform] duration-200 group-hover:scale-100 group-hover:opacity-100"
+        />
       )}
 
-      <motion.span
-        className="relative"
-        whileHover={
-          shouldAnimate
-            ? {
-                y: -1,
-                transition: { type: 'spring', stiffness: 400, damping: 25 },
-              }
-            : {}
-        }
-      >
-        {label}
+      {/* Active pill */}
+      {isActive && (
+        <motion.span
+          aria-hidden="true"
+          layoutId={mobileOnly ? undefined : 'nav-active-pill'}
+          className="bg-primary-container/20 ring-primary/25 absolute inset-0 rounded-xl ring-1"
+          transition={shouldAnimate ? { type: 'spring', stiffness: 420, damping: 34 } : { duration: 0 }}
+        />
+      )}
 
-        {isActive && (
-          <motion.div
-            className="from-primary to-secondary absolute -bottom-1 left-0 h-0.5 rounded-full bg-linear-to-r"
-            initial={{ width: 0 }}
-            animate={{ width: '100%' }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+      <span className="relative z-10 flex items-center">
+        {Icon && (
+          <Icon
+            className="mr-2 h-4 w-4 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6"
+            aria-hidden="true"
           />
         )}
-      </motion.span>
+        {label}
+      </span>
     </>
   );
 
-  const baseClasses = `
-    flex items-center px-4 py-2.5 text-sm font-medium rounded-xl
-    group relative overflow-hidden
-    transition-all duration-300 ease-out
-    ${
-      isActive
-        ? 'text-primary bg-primary-container/25 shadow-sm ring-1 ring-primary/20'
-        : 'text-on-surface-variant hover:text-on-surface'
-    }
-    ${mobileOnly ? 'md:hidden' : ''}
-    focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-surface
-    ${className}
-  `;
-
-  const motionVariants: Variants = {
-    hover: {
-      scale: shouldAnimate ? 1.02 : 1,
-      y: shouldAnimate ? -1 : 0,
-      transition: {
-        type: 'spring',
-        stiffness: 400,
-        damping: 25,
-      },
-    },
-    tap: {
-      scale: shouldAnimate ? 0.98 : 1,
-      transition: {
-        type: 'spring',
-        stiffness: 600,
-        damping: 30,
-      },
-    },
-    initial: {
-      opacity: 0,
-      y: 10,
-    },
-    animate: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: 'spring',
-        stiffness: 300,
-        damping: 25,
-      },
-    },
-  };
-
   if (to) {
     return (
-      <motion.div variants={motionVariants} initial="initial" animate="animate" whileHover="hover" whileTap="tap">
-        <MotionLink href={to} className={baseClasses} aria-current={isActive ? 'page' : undefined}>
-          <BackgroundElement isActive={isActive} shouldAnimate={shouldAnimate} />
-          <span className="relative z-10 flex items-center">{content}</span>
-        </MotionLink>
-      </motion.div>
+      <Link href={to} className={classes} aria-current={isActive ? 'page' : undefined}>
+        {content}
+      </Link>
     );
   }
 
   return (
-    <motion.button
-      onClick={onClick}
-      className={baseClasses}
-      variants={motionVariants}
-      initial="initial"
-      animate="animate"
-      whileHover="hover"
-      whileTap="tap"
-      aria-pressed={isActive}
-    >
-      <BackgroundElement isActive={isActive} shouldAnimate={shouldAnimate} />
-      <span className="relative z-10 flex items-center">{content}</span>
-    </motion.button>
+    <button type="button" onClick={onClick} className={classes} aria-current={isActive ? 'page' : undefined}>
+      {content}
+    </button>
   );
 }
 
-// Memoize the component to prevent unnecessary re-renders
 export default memo(NavItem);
