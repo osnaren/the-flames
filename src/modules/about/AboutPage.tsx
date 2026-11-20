@@ -3,6 +3,7 @@
 import { SparklesText } from '@/components/magicui/sparkles-text';
 import { Button } from '@/components/shadcn/button';
 import { FocusCards } from '@/components/ui/focus-cards';
+import { BGM_TRACKS } from '@/config/sound';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
@@ -55,53 +56,56 @@ const timelineData = [
         </p>
         <ul className="list-none space-y-3 pl-2 text-lg">
           <li className="flex items-center gap-3">
-            <span className="text-friendship bg-friendship-container/30 flex h-8 w-8 items-center justify-center rounded-lg text-xl font-bold">
+            <span className="bg-friendship-container/30 flex h-8 w-8 items-center justify-center rounded-lg text-xl font-bold text-amber-700 dark:text-amber-300">
               F
             </span>
             <span>
-              <span className="text-friendship font-semibold">Friends</span> — &quot;Let&apos;s pretend this
-              doesn&apos;t hurt&quot;
+              <span className="font-semibold text-amber-700 dark:text-amber-300">Friends</span> — &quot;Let&apos;s
+              pretend this doesn&apos;t hurt&quot;
             </span>
           </li>
           <li className="flex items-center gap-3">
-            <span className="text-love bg-love-container/30 flex h-8 w-8 items-center justify-center rounded-lg text-xl font-bold">
+            <span className="bg-love-container/30 flex h-8 w-8 items-center justify-center rounded-lg text-xl font-bold text-rose-700 dark:text-rose-300">
               L
             </span>
             <span>
-              <span className="text-love font-semibold">Love</span> — Jackpot! Time to panic! 💕
+              <span className="font-semibold text-rose-700 dark:text-rose-300">Love</span> — Jackpot! Time to panic! 💕
             </span>
           </li>
           <li className="flex items-center gap-3">
-            <span className="text-affection bg-affection-container/30 flex h-8 w-8 items-center justify-center rounded-lg text-xl font-bold">
+            <span className="bg-affection-container/30 flex h-8 w-8 items-center justify-center rounded-lg text-xl font-bold text-pink-700 dark:text-pink-300">
               A
             </span>
             <span>
-              <span className="text-affection font-semibold">Affection</span> — The &quot;it&apos;s complicated&quot;
-              zone
+              <span className="font-semibold text-pink-700 dark:text-pink-300">Affection</span> — The &quot;it&apos;s
+              complicated&quot; zone
             </span>
           </li>
           <li className="flex items-center gap-3">
-            <span className="text-marriage bg-marriage-container/30 flex h-8 w-8 items-center justify-center rounded-lg text-xl font-bold">
+            <span className="bg-marriage-container/30 flex h-8 w-8 items-center justify-center rounded-lg text-xl font-bold text-violet-700 dark:text-violet-300">
               M
             </span>
             <span>
-              <span className="text-marriage font-semibold">Marriage</span> — Start planning the wedding! 💍
+              <span className="font-semibold text-violet-700 dark:text-violet-300">Marriage</span> — Start planning the
+              wedding! 💍
             </span>
           </li>
           <li className="flex items-center gap-3">
-            <span className="text-enemy bg-enemy-container/30 flex h-8 w-8 items-center justify-center rounded-lg text-xl font-bold">
+            <span className="bg-enemy-container/30 flex h-8 w-8 items-center justify-center rounded-lg text-xl font-bold text-red-700 dark:text-red-300">
               E
             </span>
             <span>
-              <span className="text-enemy font-semibold">Enemies</span> — Plot twist! Grab popcorn 🍿
+              <span className="font-semibold text-red-700 dark:text-red-300">Enemies</span> — Plot twist! Grab popcorn
+              🍿
             </span>
           </li>
           <li className="flex items-center gap-3">
-            <span className="text-siblings bg-siblings-container/30 flex h-8 w-8 items-center justify-center rounded-lg text-xl font-bold">
+            <span className="bg-siblings-container/30 flex h-8 w-8 items-center justify-center rounded-lg text-xl font-bold text-teal-700 dark:text-teal-300">
               S
             </span>
             <span>
-              <span className="text-siblings font-semibold">Siblings</span> — Instant family expansion
+              <span className="font-semibold text-teal-700 dark:text-teal-300">Siblings</span> — Instant family
+              expansion
             </span>
           </li>
         </ul>
@@ -256,6 +260,38 @@ export default function AboutPage() {
           </div>
           <FocusCards cards={focusCards} />
         </div>
+      </section>
+
+      {/* Music credits (required by the CC BY licence) */}
+      <section className="mx-auto max-w-3xl px-4 pb-4" aria-labelledby="music-credits">
+        <details className="border-outline-variant/40 bg-surface-container-low/60 group rounded-2xl border p-5">
+          <summary className="text-on-surface flex cursor-pointer list-none items-center justify-between font-semibold">
+            <span id="music-credits">🎵 Music credits</span>
+            <span
+              className="text-on-surface-variant text-sm transition-transform group-open:rotate-180"
+              aria-hidden="true"
+            >
+              ▾
+            </span>
+          </summary>
+          <ul className="text-on-surface-variant mt-4 grid gap-1.5 text-sm sm:grid-cols-2">
+            {BGM_TRACKS.filter((track) => track.credit).map((track) => (
+              <li key={track.id}>
+                “{track.credit!.title}” — {track.credit!.artist}
+              </li>
+            ))}
+          </ul>
+          <p className="text-on-surface-variant mt-4 text-xs">
+            Licensed under{' '}
+            <a
+              href="https://creativecommons.org/licenses/by/4.0/"
+              className="text-primary underline underline-offset-4"
+            >
+              Creative Commons Attribution 4.0
+            </a>
+            . Other music and sound effects are original to FLAMES.
+          </p>
+        </details>
       </section>
 
       {/* Call to Action */}

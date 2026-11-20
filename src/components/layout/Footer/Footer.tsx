@@ -106,9 +106,9 @@ function Footer() {
           </div>
         </div>
 
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           {/* Brand */}
-          <div className="space-y-4">
+          <div className="col-span-2 space-y-4 lg:col-span-1">
             <Logo variant="animated" animationType="onHover" />
             <p className="text-on-surface-variant max-w-xs text-sm leading-relaxed">
               {FOOTER_CONFIG.brand.description} The classic notebook name game, reimagined for the browser.
@@ -163,7 +163,7 @@ function Footer() {
           </nav>
 
           {/* Resources */}
-          <nav aria-labelledby="footer-resources-heading">
+          <nav aria-labelledby="footer-resources-heading" className="col-span-2 sm:col-span-1">
             <FooterHeading id="footer-resources-heading" icon={ExternalLink}>
               Resources
             </FooterHeading>
