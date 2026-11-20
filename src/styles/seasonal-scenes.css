@@ -1,0 +1,223 @@
+/* ---------------------------------------------------------------------------
+   Seasonal scene illustrations (src/components/ui/SeasonalScene).
+   Every animation is transform/opacity on an HTML wrapper, so each moving
+   piece is its own compositor layer and never repaints the SVG inside it.
+   --------------------------------------------------------------------------- */
+
+.scene-root {
+  contain: strict;
+}
+
+.scene-piece {
+  position: absolute;
+  pointer-events: none;
+}
+
+.scene-piece > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@keyframes scene-sway {
+  0%,
+  100% {
+    transform: rotate(calc(var(--sway, 5deg) * -1));
+  }
+  50% {
+    transform: rotate(var(--sway, 5deg));
+  }
+}
+
+@keyframes scene-flicker {
+  0%,
+  100% {
+    transform: scale(1, 1);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(0.92, 1.08) translateY(-1px);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.06, 0.94);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(0.96, 1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes scene-twinkle {
+  0%,
+  100% {
+    opacity: var(--twinkle-min, 0.25);
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes scene-burst {
+  0% {
+    opacity: 0;
+    transform: scale(0.1);
+  }
+  12% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes scene-bob {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--bob-tilt, 0deg));
+  }
+  50% {
+    transform: translate3d(0, var(--bob, -8px), 0) rotate(calc(var(--bob-tilt, 0deg) * -1));
+  }
+}
+
+@keyframes scene-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scene-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 10vh, 0) rotate(-4deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate3d(var(--drift, 20px), -45vh, 0) rotate(4deg);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -110vh, 0) rotate(-4deg);
+  }
+}
+
+@keyframes scene-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(var(--drift, 30px), 0, 0);
+  }
+}
+
+@keyframes scene-rain {
+  from {
+    transform: translate3d(0, -50%, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes scene-flap {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.35);
+  }
+}
+
+@keyframes scene-fly {
+  0% {
+    transform: translate3d(-15vw, 0, 0);
+  }
+  50% {
+    transform: translate3d(50vw, -6vh, 0);
+  }
+  100% {
+    transform: translate3d(115vw, 2vh, 0);
+  }
+}
+
+@keyframes scene-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.scene-root {
+  animation: scene-fade-in 1.2s ease-out both;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .scene-sway {
+    transform-origin: top center;
+    animation: scene-sway var(--dur, 4s) ease-in-out var(--delay, 0s) infinite;
+  }
+  .scene-flicker {
+    transform-origin: bottom center;
+    animation: scene-flicker var(--dur, 1.6s) ease-in-out var(--delay, 0s) infinite;
+  }
+  .scene-twinkle {
+    animation: scene-twinkle var(--dur, 2.4s) ease-in-out var(--delay, 0s) infinite;
+  }
+  .scene-burst {
+    animation: scene-burst var(--dur, 3.2s) cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0s) infinite both;
+  }
+  .scene-bob {
+    animation: scene-bob var(--dur, 3.5s) ease-in-out var(--delay, 0s) infinite;
+  }
+  .scene-spin {
+    animation: scene-spin var(--dur, 60s) linear var(--delay, 0s) infinite;
+  }
+  .scene-rise {
+    animation: scene-rise var(--dur, 18s) linear var(--delay, 0s) infinite both;
+  }
+  .scene-drift {
+    animation: scene-drift var(--dur, 30s) ease-in-out var(--delay, 0s) infinite;
+  }
+  .scene-rain {
+    animation: scene-rain var(--dur, 0.7s) linear infinite;
+  }
+  .scene-flap {
+    transform-origin: center;
+    animation: scene-flap var(--dur, 0.35s) ease-in-out infinite;
+  }
+  .scene-fly {
+    animation: scene-fly var(--dur, 26s) linear var(--delay, 0s) infinite both;
+  }
+}
+
+html[data-animations='off'] .scene-root * {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-rise,
+  .scene-fly,
+  .scene-burst {
+    opacity: 0;
+  }
+}

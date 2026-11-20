@@ -4,6 +4,15 @@
 export { christmasTheme } from './christmas';
 export { defaultTheme } from './default';
 export { diwaliTheme } from './diwali';
+export {
+  autumnTheme,
+  eidTheme,
+  friendshipTheme,
+  lunarNewYearTheme,
+  monsoonTheme,
+  rakhiTheme,
+  springTheme,
+} from './extended';
 export { halloweenTheme } from './halloween';
 export { holiTheme } from './holi';
 export { newYearTheme } from './newYear';

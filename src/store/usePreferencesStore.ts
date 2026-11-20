@@ -1,4 +1,4 @@
-import { getMatchingMusicTheme } from '@/config/sound';
+import type { MusicThemeGroup } from '@/config/sound';
 import { create } from 'zustand';
 
 export type TransitionSpeed = 'instant' | 'fast' | 'normal' | 'slow';
@@ -20,8 +20,16 @@ interface PreferencesState {
     | 'diwali'
     | 'christmas'
     | 'newYear'
-    | 'pongal';
-  musicTheme: 'auto' | 'default' | 'chill' | 'valentine' | 'halloween' | 'christmas';
+    | 'pongal'
+    | 'lunarNewYear'
+    | 'eid'
+    | 'rakhi'
+    | 'friendship'
+    | 'spring'
+    | 'monsoon'
+    | 'autumn';
+  /** 'auto' follows the active seasonal theme. */
+  musicTheme: 'auto' | MusicThemeGroup;
   transitionSpeed: TransitionSpeed;
   hydrated: boolean;
 }
@@ -154,14 +162,9 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
       return { volume: clampedVolume };
     }),
   setSeasonalTheme: (theme: PreferencesState['seasonalTheme']) =>
-    set((state) => {
+    set(() => {
       safeLocalStorage.setItem('seasonalTheme', theme);
-      // Auto-sync music theme when seasonal theme changes (if music theme is set to 'auto')
-      if (state.musicTheme === 'auto') {
-        const matchingMusicTheme = getMatchingMusicTheme(theme);
-        safeLocalStorage.setItem('musicTheme', matchingMusicTheme);
-        return { seasonalTheme: theme, musicTheme: matchingMusicTheme };
-      }
+      // Music set to 'auto' follows the seasonal theme when it plays; keep it 'auto'.
       return { seasonalTheme: theme };
     }),
   setMusicTheme: (theme: PreferencesState['musicTheme']) =>

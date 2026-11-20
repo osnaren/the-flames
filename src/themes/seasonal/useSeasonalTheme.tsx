@@ -3,15 +3,23 @@
 import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
+import { detectSeasonalTheme } from './calendar';
 import {
+  autumnTheme,
   christmasTheme,
   defaultTheme,
   diwaliTheme,
+  eidTheme,
+  friendshipTheme,
   halloweenTheme,
   holiTheme,
+  lunarNewYearTheme,
+  monsoonTheme,
   newYearTheme,
   onamTheme,
   pongalTheme,
+  rakhiTheme,
+  springTheme,
   valentineTheme,
 } from './configs';
 import { SeasonalTheme, SeasonalThemeConfig, SeasonalThemeState } from './types';
@@ -27,20 +35,16 @@ const THEME_CONFIGS: Record<SeasonalTheme, SeasonalThemeConfig> = {
   christmas: christmasTheme,
   newYear: newYearTheme,
   pongal: pongalTheme,
+  lunarNewYear: lunarNewYearTheme,
+  eid: eidTheme,
+  rakhi: rakhiTheme,
+  friendship: friendshipTheme,
+  spring: springTheme,
+  monsoon: monsoonTheme,
+  autumn: autumnTheme,
 };
 
-// Theme order for detection (checked in order of date priority)
-// This determines which theme is auto-detected based on current date
-const SEASONAL_THEMES: SeasonalTheme[] = [
-  'pongal', // Jan 10-20
-  'valentine', // Feb 1-14
-  'holi', // Mar 1-20
-  'onam', // Aug 15 - Sep 15
-  'halloween', // Oct 1-31
-  'diwali', // Oct 15 - Nov 15
-  'christmas', // Dec 1-25
-  'newYear', // Dec 26 - Jan 5
-];
+export const SEASONAL_THEME_IDS = Object.keys(THEME_CONFIGS) as SeasonalTheme[];
 
 function useSeasonalThemeController() {
   const preferenceTheme = usePreferencesStore((state) => state.seasonalTheme);
@@ -50,35 +54,13 @@ function useSeasonalThemeController() {
   const [state, setState] = useState<SeasonalThemeState>({
     currentTheme: 'default',
     isTransitioning: false,
-    availableThemes: ['default', 'valentine', 'holi', 'onam', 'halloween', 'diwali', 'christmas', 'newYear', 'pongal'],
+    availableThemes: SEASONAL_THEME_IDS,
     detectedTheme: 'default',
     manualOverride: null,
   });
 
-  // Detect current seasonal theme based on date
-  const detectCurrentTheme = useCallback((): SeasonalTheme => {
-    const now = new Date();
-    const currentMonth = now.getMonth() + 1; // getMonth() returns 0-11
-    const currentDay = now.getDate();
-
-    for (const themeId of SEASONAL_THEMES) {
-      const theme = THEME_CONFIGS[themeId];
-      const { start, end } = theme.dateRange;
-
-      // Check if current date falls within theme range
-      if (
-        (currentMonth === start.month && currentDay >= start.day) ||
-        (currentMonth === end.month && currentDay <= end.day) ||
-        (currentMonth > start.month && currentMonth < end.month) ||
-        // Handle year wrapping (e.g., Christmas theme ending in January)
-        (start.month > end.month && (currentMonth >= start.month || currentMonth <= end.month))
-      ) {
-        return themeId;
-      }
-    }
-
-    return 'default';
-  }, []);
+  // Detect the current festival or season from the festival calendar.
+  const detectCurrentTheme = useCallback((): SeasonalTheme => detectSeasonalTheme(new Date()), []);
 
   // Get current theme configuration
   const currentThemeConfig = useMemo(() => THEME_CONFIGS[state.currentTheme], [state.currentTheme]);
@@ -207,7 +189,7 @@ function useSeasonalThemeController() {
 
   const preloadThemeAssets = useCallback(async (themeId: SeasonalTheme) => {
     const theme = THEME_CONFIGS[themeId];
-    const assets = theme.assets;
+    const assets = theme.assets ?? {};
 
     const preloadPromises: Promise<void>[] = [];
 

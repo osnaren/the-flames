@@ -7,7 +7,14 @@ export type SeasonalTheme =
   | 'diwali'
   | 'holi'
   | 'onam'
-  | 'pongal';
+  | 'pongal'
+  | 'lunarNewYear'
+  | 'eid'
+  | 'rakhi'
+  | 'friendship'
+  | 'spring'
+  | 'monsoon'
+  | 'autumn';
 
 export interface ThemeColors {
   primary: string;
@@ -68,6 +75,13 @@ export const THEME_EMOJIS: Record<SeasonalTheme, string[]> = {
   holi: ['🎨', '💜', '💙', '💚', '💛', '🧡', '❤️'],
   onam: ['🌸', '🌺', '🌼', '🪷', '🌻'],
   pongal: ['🍯', '🌾', '☀️', '🪴', '🎍'],
+  lunarNewYear: ['🏮', '🧧', '🐉', '🍊', '🌸'],
+  eid: ['🌙', '⭐', '🏮', '✨'],
+  rakhi: ['🪢', '🌼', '🍬', '💛', '🎁'],
+  friendship: ['🤝', '🎈', '💛', '🌻', '🫶'],
+  spring: ['🌸', '🌸', '🌷', '🦋', '🌱'],
+  monsoon: ['💧', '☔', '🌧️', '🍃'],
+  autumn: ['🍁', '🍂', '🍁', '🌰'],
 };
 
 export interface ParticleConfig {
@@ -129,9 +143,9 @@ export interface SeasonalThemeConfig {
   colors: ThemeColors;
   darkModeColors?: Partial<ThemeColors>; // Override colors for dark mode
   backgroundEffects: BackgroundEffects;
-  soundTheme: SoundTheme;
+  soundTheme?: SoundTheme;
   customCSS?: string;
-  assets: {
+  assets?: {
     logo?: string;
     background?: string;
     patterns?: string[];

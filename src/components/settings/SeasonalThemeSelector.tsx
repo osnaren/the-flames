@@ -15,9 +15,16 @@ import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 const THEME_ORDER: SeasonalTheme[] = [
   'default',
   'pongal', // January
+  'lunarNewYear', // January-February
   'valentine', // February
   'holi', // March
+  'eid', // Moves through the year
+  'spring', // March-April
+  'monsoon', // July
+  'friendship', // August
+  'rakhi', // August
   'onam', // August-September
+  'autumn', // October
   'halloween', // October
   'diwali', // October-November
   'christmas', // December

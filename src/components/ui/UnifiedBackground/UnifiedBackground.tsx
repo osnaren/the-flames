@@ -22,6 +22,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useBackgroundStore } from '@/store/useBackgroundStore';
 import { usePreferencesStore } from '@/store/usePreferencesStore';
 import { useSeasonalTheme } from '@/themes/seasonal/useSeasonalTheme';
+import dynamic from 'next/dynamic';
 import { memo, useEffect, useRef, useState } from 'react';
 
 import BackgroundEffects from './BackgroundEffects';
@@ -66,6 +67,12 @@ function useSettled(active: boolean, delay: number) {
   }, [active, delay]);
   return settled;
 }
+
+// Illustrated scenery is decorative: load it in its own chunk after hydration.
+const SeasonalScene = dynamic(() => import('@/components/ui/SeasonalScene/SeasonalScene'), {
+  ssr: false,
+  loading: () => null,
+});
 
 function UnifiedBackground() {
   const { shouldAnimate } = useAnimationPreferences();
@@ -116,6 +123,8 @@ function UnifiedBackground() {
         pulsing={bgEffects.pulsing}
         resultColors={config.colors}
       />
+
+      <SeasonalScene theme={currentTheme} dimmed={variant !== 'default'} />
 
       {particlesEnabled && (
         <canvas
