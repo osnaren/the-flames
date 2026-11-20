@@ -1,10 +1,10 @@
-/* Theme switches cross-fade through the View Transitions API (see
-   usePreferencesStore). Interpolating inherited root colours instead would
-   restyle every node on every frame, so the root itself never transitions. */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 0.35s;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+/* Theme switches apply instantly (see usePreferencesStore). While the class
+   flips, transitions are suppressed so hundreds of colour transitions don't
+   run on the main thread; hover and focus transitions work normally otherwise. */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
 }
 
 /* Let the browser skip long, below-the-fold editorial content. Only applied to
@@ -427,10 +427,10 @@ html[data-animations='off']
     opacity 0.3s ease;
 }
 
+/* Tuck up into the top corner while the header is hidden: still visible and
+   tappable, but no longer covering the content being read. */
 html[data-nav-hidden='true'] .floating-control {
-  transform: translate3d(0, -140px, 0);
-  opacity: 0;
-  pointer-events: none;
+  transform: translate3d(0, -3.75rem, 0) scale(0.9);
 }
 
 /* Sticky toolbars sit under the header and follow it when it auto-hides. */

@@ -159,7 +159,8 @@ function RecentMatchesSection({
 }: RecentMatchesSectionProps) {
   const { shouldAnimate: animationsEnabled } = useAnimationPreferences();
   const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
-  const shouldAnimate = animationsEnabled;
+  // JS-driven list animations stay on larger screens; phones keep the CSS motion.
+  const shouldAnimate = animationsEnabled && !compactDevice;
   const { sound } = useGameIntegration();
   const { displayMatches, totalCount, isLoading, hasMatches, removeMatch, clearAllMatches, getDisplayMatches } =
     useRecentMatches();

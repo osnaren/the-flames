@@ -1,6 +1,6 @@
 'use client';
 
-import { usePreferencesStore } from '@/store/usePreferencesStore';
+import { usePreferencesStore, withoutTransitions } from '@/store/usePreferencesStore';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { detectSeasonalTheme } from './calendar';
@@ -66,7 +66,7 @@ function useSeasonalThemeController() {
   const currentThemeConfig = useMemo(() => THEME_CONFIGS[state.currentTheme], [state.currentTheme]);
 
   // Apply theme to DOM
-  const applyTheme = useCallback((theme: SeasonalThemeConfig, isDark?: boolean) => {
+  const applyThemeNow = useCallback((theme: SeasonalThemeConfig, isDark?: boolean) => {
     const root = document.documentElement;
 
     // Merge base colors with dark mode overrides if applicable
@@ -113,6 +113,13 @@ function useSeasonalThemeController() {
     }
     metaTheme.setAttribute('content', theme.colors.primary);
   }, []);
+
+  const applyTheme = useCallback(
+    (theme: SeasonalThemeConfig, isDark?: boolean) => {
+      withoutTransitions(() => applyThemeNow(theme, isDark));
+    },
+    [applyThemeNow]
+  );
 
   // Transition to new theme
   const transitionToTheme = useCallback(

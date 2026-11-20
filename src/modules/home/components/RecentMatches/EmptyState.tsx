@@ -35,15 +35,6 @@ function EmptyState({ shouldAnimate }: EmptyStateProps) {
     },
   };
 
-  const floatAnimation = {
-    y: [0, -8, 0],
-    transition: {
-      duration: 3,
-      repeat: Infinity,
-      ease: 'easeInOut' as const,
-    },
-  };
-
   return (
     <motion.div
       variants={shouldAnimate ? containerVariants : undefined}
@@ -54,21 +45,26 @@ function EmptyState({ shouldAnimate }: EmptyStateProps) {
       aria-label="No recent matches"
     >
       {/* Decorative icons */}
-      <motion.div
-        variants={shouldAnimate ? itemVariants : undefined}
-        animate={shouldAnimate ? floatAnimation : undefined}
-        className="relative mb-4"
-      >
-        {/* Background glow */}
-        <div className="bg-primary/20 absolute inset-0 scale-150 rounded-full blur-xl" />
+      <motion.div variants={shouldAnimate ? itemVariants : undefined} className="relative mb-4">
+        {/* Gentle idle float: compositor-only CSS, not a per-frame JS loop */}
+        <div
+          className="motion-float"
+          style={{ '--float-distance': '-8px', '--float-duration': '3s' } as React.CSSProperties}
+        >
+          {/* Background glow (gradient, not a blur filter) */}
+          <div
+            className="absolute inset-0 scale-150 rounded-full"
+            style={{ backgroundImage: 'radial-gradient(circle, rgb(249 115 22 / 0.22), transparent 70%)' }}
+          />
 
-        {/* Icon stack */}
-        <div className="relative flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-amber-500/70" aria-hidden="true" />
-          <div className="border-primary/10 flex h-14 w-14 items-center justify-center rounded-2xl border bg-linear-to-br from-pink-500/20 to-purple-500/20">
-            <Heart className="text-primary/60 h-7 w-7" aria-hidden="true" />
+          {/* Icon stack */}
+          <div className="relative flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-amber-500/70" aria-hidden="true" />
+            <div className="border-primary/10 flex h-14 w-14 items-center justify-center rounded-2xl border bg-linear-to-br from-pink-500/20 to-purple-500/20">
+              <Heart className="text-primary/60 h-7 w-7" aria-hidden="true" />
+            </div>
+            <Sparkles className="h-5 w-5 text-amber-500/70" aria-hidden="true" />
           </div>
-          <Sparkles className="h-5 w-5 text-amber-500/70" aria-hidden="true" />
         </div>
       </motion.div>
 

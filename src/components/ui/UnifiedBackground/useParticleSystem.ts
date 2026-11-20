@@ -59,6 +59,20 @@ function getThemeColors(isDark: boolean): string[] {
   return colors;
 }
 
+// --- Input yielding ---
+// The particle layer is pure decoration. For a short window after any tap,
+// click or keypress it skips drawing, so the frame that shows the response to
+// the user's input never also pays for a canvas redraw (keeps INP low).
+const INPUT_QUIET_MS = 350;
+let lastInputAt = -Infinity;
+if (typeof window !== 'undefined') {
+  const markInput = () => {
+    lastInputAt = performance.now();
+  };
+  window.addEventListener('pointerdown', markInput, { capture: true, passive: true });
+  window.addEventListener('keydown', markInput, { capture: true, passive: true });
+}
+
 // --- Result Color Maps ---
 
 const RESULT_COLORS: Record<string, string[]> = {
@@ -134,31 +148,25 @@ export function useParticleSystem({
   // --- Dynamic Colors State ---
   const [canvasColors, setCanvasColors] = useState<string[]>([]);
 
-  // Update canvas colors when theme changes
+  // Update canvas colors when theme changes. Seasonal themes keep their own
+  // festival palette; only the classic theme reads the app palette, and that
+  // style read waits for idle time so it never lands inside a tap.
   useEffect(() => {
     if (!enabled || !shouldAnimate) return;
-    const timer = setTimeout(() => {
-      if (variant === 'default') {
-        const colors = getThemeColors(isDarkTheme);
-        if (colors.length > 0) {
-          setCanvasColors(colors);
-        } else {
-          let themeColors = themeParticleConfig.colors;
-          if (isDarkTheme) {
-            themeColors = themeColors.map((color) => {
-              if (color.startsWith('rgba')) {
-                return color.replace(/[\d.]+\)$/, '0.85)');
-              }
-              return color;
-            });
-          }
-          setCanvasColors(themeColors);
-        }
-      } else {
-        setCanvasColors(themeParticleConfig.colors);
-      }
-    }, 100);
-
+    const useAppPalette = variant === 'default' && currentTheme === 'default';
+    if (!useAppPalette) {
+      setCanvasColors(themeParticleConfig.colors);
+      return;
+    }
+    const apply = () => {
+      const colors = getThemeColors(isDarkTheme);
+      setCanvasColors(colors.length > 0 ? colors : themeParticleConfig.colors);
+    };
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(apply, { timeout: 1500 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = setTimeout(apply, 200);
     return () => clearTimeout(timer);
   }, [enabled, shouldAnimate, isDarkTheme, variant, themeParticleConfig, currentTheme]);
 
@@ -229,6 +237,24 @@ export function useParticleSystem({
     return particleConfig;
   }, [variant, result, intensity, themeParticleConfig, isMobile, isLowPowerMode, canvasColors]);
 
+  // Re-seed particles only when their structure changes. Colour changes (light /
+  // dark toggles, palette reads) recolour the existing particles in place so a
+  // theme switch never restarts the system on the main thread.
+  const structuralKey = `${config.enabled}|${config.count}|${config.shapes.join(',')}|${config.size.min}-${config.size.max}|${config.speed.min}-${config.speed.max}|${config.direction}|${config.animation}|${config.opacity.min}-${config.opacity.max}`;
+  const configRef = useRef(config);
+  const isDarkRef = useRef(isDarkTheme);
+  useEffect(() => {
+    configRef.current = config;
+    const colors = config.colors;
+    if (colors.length === 0) return;
+    particlesRef.current.forEach((particle, index) => {
+      particle.color = colors[index % colors.length];
+    });
+  }, [config]);
+  useEffect(() => {
+    isDarkRef.current = isDarkTheme;
+  }, [isDarkTheme]);
+
   // Get emojis for current theme
   const themeEmojis = useMemo(() => {
     return THEME_EMOJIS[currentTheme] || THEME_EMOJIS.default;
@@ -274,6 +300,7 @@ export function useParticleSystem({
 
   // --- Initialize Particles ---
   const initParticles = useCallback(() => {
+    const config = configRef.current;
     if (!enabled || !config.enabled || !shouldAnimate) {
       particlesRef.current = [];
       return;
@@ -290,7 +317,9 @@ export function useParticleSystem({
       newParticles.push(p);
     }
     particlesRef.current = newParticles;
-  }, [enabled, config, shouldAnimate, createParticle, canvasRef]);
+    // structuralKey stands in for the parts of `config` that need a re-seed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, structuralKey, shouldAnimate, createParticle, canvasRef]);
 
   // Re-init particles when config changes
   useEffect(() => {
@@ -299,7 +328,7 @@ export function useParticleSystem({
 
   // --- Animation Loop ---
   useEffect(() => {
-    if (!enabled || !shouldAnimate || !config.enabled) return;
+    if (!enabled || !shouldAnimate || !configRef.current.enabled) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -311,7 +340,7 @@ export function useParticleSystem({
         return;
       }
 
-      if (timestamp - lastFrameTimeRef.current < frameInterval) {
+      if (timestamp - lastFrameTimeRef.current < frameInterval || timestamp - lastInputAt < INPUT_QUIET_MS) {
         animationIdRef.current = requestAnimationFrame(animate);
         return;
       }
@@ -324,6 +353,8 @@ export function useParticleSystem({
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
       ctx.scale(dpr, dpr);
+      const config = configRef.current;
+      const opacityBoost = isDarkRef.current ? 1.2 : 1.5;
 
       // Update and Draw particles
       particlesRef.current.forEach((p) => {
@@ -363,7 +394,6 @@ export function useParticleSystem({
         ctx.rotate((p.rotation * Math.PI) / 180);
 
         // Enhanced visibility
-        const opacityBoost = isDarkTheme ? 1.2 : 1.5;
         ctx.globalAlpha = Math.min(p.opacity * opacityBoost, 1);
         ctx.fillStyle = p.color;
         ctx.strokeStyle = p.color;
@@ -422,7 +452,7 @@ export function useParticleSystem({
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(animationIdRef.current);
     };
-  }, [enabled, shouldAnimate, config, frameInterval, isDarkTheme, canvasRef, initParticles, isMobile]);
+  }, [enabled, shouldAnimate, frameInterval, canvasRef, initParticles, isMobile]);
 
   return { config, canvasColors };
 }

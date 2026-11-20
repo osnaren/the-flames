@@ -10,8 +10,8 @@
  *
  * Performance strategy:
  * - Colour fields drift with CSS transforms (GPU compositor, zero main-thread cost).
- * - The canvas particle layer starts only once the page is idle after load, so it
- *   never competes with LCP or hydration. Phones get a lighter particle budget.
+ * - The canvas particle layer (larger screens only) starts once the page is idle
+ *   after load, so it never competes with LCP, hydration or early taps.
  */
 
 'use client';
@@ -54,20 +54,6 @@ function useIdleReady(delay: number) {
   return ready;
 }
 
-/** True once `active` has stayed true for `delay` ms. */
-function useSettled(active: boolean, delay: number) {
-  const [settled, setSettled] = useState(false);
-  useEffect(() => {
-    if (!active) {
-      setSettled(false);
-      return;
-    }
-    const timer = setTimeout(() => setSettled(true), delay);
-    return () => clearTimeout(timer);
-  }, [active, delay]);
-  return settled;
-}
-
 // Illustrated scenery is decorative: load it in its own chunk after hydration.
 const SeasonalScene = dynamic(() => import('@/components/ui/SeasonalScene/SeasonalScene'), {
   ssr: false,
@@ -81,11 +67,10 @@ function UnifiedBackground() {
   const idleReady = useIdleReady(compactDevice ? 1800 : 600);
   const { currentThemeConfig, currentTheme } = useSeasonalTheme();
   const variant = useBackgroundStore((state) => state.variant);
-  // On phones the game's own animation gets the whole frame budget: the
-  // particle layer rests while names are processed and the result is revealed.
-  const resultSettled = useSettled(variant === 'result', 2600);
-  const gameBusy = variant === 'processing' || (variant === 'result' && !resultSettled);
-  const particlesEnabled = shouldAnimate && !isLowPowerMode && idleReady && !(compactDevice && gameBusy);
+  // Phones get their motion from the compositor-only scenes and colour fields;
+  // the main-thread canvas is reserved for larger screens so it can never sit
+  // between a tap and the response to it.
+  const particlesEnabled = shouldAnimate && !isLowPowerMode && idleReady && !compactDevice;
   const result = useBackgroundStore((state) => state.result);
   const intensity = useBackgroundStore((state) => state.intensity);
   const isDarkTheme = usePreferencesStore((state) => state.isDarkTheme);

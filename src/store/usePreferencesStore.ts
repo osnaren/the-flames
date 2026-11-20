@@ -76,31 +76,52 @@ const safeLocalStorage = {
   },
 };
 
+let switchingCleanup: (() => void) | undefined;
+
+/**
+ * Apply the light/dark class without letting every `transition-colors` element
+ * animate its colours (hundreds of main-thread colour transitions per toggle).
+ *
+ * Removing the suppression class restyles the whole page again, so it waits
+ * for a quiet moment: one full restyle per switch instead of two, and rapid
+ * toggles share a single cleanup. Hover transitions resume shortly after.
+ */
+export function withoutTransitions(update: () => void) {
+  const root = document.documentElement;
+  root.classList.add('theme-switching');
+  update();
+  switchingCleanup?.();
+  const release = () => {
+    root.classList.remove('theme-switching');
+    switchingCleanup = undefined;
+  };
+  // Wait for a quiet moment after the last switch, then release during idle time.
+  let idleId: number | undefined;
+  const timer = setTimeout(() => {
+    if ('requestIdleCallback' in window) idleId = window.requestIdleCallback(release, { timeout: 1000 });
+    else release();
+  }, 2500);
+  switchingCleanup = () => {
+    clearTimeout(timer);
+    if (idleId !== undefined) window.cancelIdleCallback(idleId);
+  };
+}
+
 function applyThemeClass(dark: boolean) {
   const root = document.documentElement;
-  root.classList.toggle('dark', dark);
-  root.setAttribute('data-theme', dark ? 'dark' : 'light');
+  withoutTransitions(() => {
+    root.classList.toggle('dark', dark);
+    root.setAttribute('data-theme', dark ? 'dark' : 'light');
+  });
 }
 
 /**
- * Cross-fade theme changes with the View Transitions API when available.
- * The browser snapshots the old and new page and blends them on the
- * compositor, so no element has to interpolate colours on the main thread.
+ * Apply the theme in the same frame as the tap. A View Transitions cross-fade
+ * looked nice but delayed the next paint (snapshotting the page) and pushed
+ * theme-toggle INP past budget on mid-range phones, so the switch is instant.
  */
 function switchTheme(dark: boolean) {
   if (typeof document === 'undefined') return;
-  const reduceMotion =
-    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ||
-    document.documentElement.dataset.animations === 'off';
-  const doc = document as Document & { startViewTransition?: (update: () => void) => unknown };
-  if (!reduceMotion && typeof doc.startViewTransition === 'function') {
-    try {
-      doc.startViewTransition(() => applyThemeClass(dark));
-      return;
-    } catch {
-      // Fall through to an instant switch.
-    }
-  }
   applyThemeClass(dark);
 }
 
