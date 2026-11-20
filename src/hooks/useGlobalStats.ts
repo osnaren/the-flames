@@ -1,6 +1,6 @@
 import { NonNullFlamesResult } from '@/utils/resultData';
 import { generateMockData, GlobalStats } from '@modules/charts';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { getStatsWithTrends, getUserCountry, StatsError, TimeWindow } from '../lib/supabase';
 
@@ -24,6 +24,8 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
   const [userCountry, setUserCountry] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [lastUpdate, setLastUpdate] = useState<number>(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const hasDataRef = useRef(false);
 
   // Fetch user's country on mount
   useEffect(() => {
@@ -83,120 +85,135 @@ export function useGlobalStats(timeWindow: TimeWindow = 'today') {
   }, []);
 
   // Fetch stats with error handling and retries
-  const fetchStats = useCallback(async () => {
-    try {
-      const cacheKey = `${timeWindow}-${userCountry || 'global'}`;
-      const cached = statsCache.get(cacheKey);
+  const fetchStats = useCallback(
+    async (force = false) => {
+      const hadData = hasDataRef.current;
+      try {
+        const cacheKey = `${timeWindow}-${userCountry || 'global'}`;
+        const cached = statsCache.get(cacheKey);
 
-      // Return cached data if still valid
-      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-        setData(cached.data);
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      setError(null);
-
-      // Check for mock data flag
-      if (process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true') {
-        const mockData = generateMockData();
-        setData(mockData);
-        setIsLoading(false);
-        return;
-      }
-
-      // Fetch global stats
-      const globalStats = await getStatsWithTrends(timeWindow);
-      const stats = transformStats(globalStats);
-
-      // If we have the user's country, fetch regional stats
-      if (userCountry) {
-        const regionalStats = await getStatsWithTrends(timeWindow, userCountry);
-        if (regionalStats && typeof regionalStats === 'object') {
-          const regional = regionalStats as Record<string, unknown>;
-          stats.regionalStats = {
-            country: userCountry,
-            results: (Array.isArray(regional.results) ? regional.results : []).map((result: unknown) => {
-              const resultObj = result as Record<string, unknown>;
-              return {
-                result:
-                  typeof resultObj?.result === 'string'
-                    ? (resultObj.result as NonNullFlamesResult)
-                    : ('' as NonNullFlamesResult),
-                count: typeof resultObj?.current_count === 'number' ? resultObj.current_count : 0,
-                trend: typeof resultObj?.trend_percentage === 'number' ? Number(resultObj.trend_percentage) : 0,
-              };
-            }),
-          };
+        // Return cached data if still valid (manual refresh bypasses this)
+        if (!force && cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+          setData(cached.data);
+          setLastUpdate(cached.timestamp);
+          hasDataRef.current = true;
+          setIsLoading(false);
+          return;
         }
-      }
 
-      setData(stats);
-      setLastUpdate(Date.now());
-      setRetryCount(0); // Reset retry count on success
+        // Only the very first load shows a loading state; refreshes keep the
+        // current charts on screen and swap the numbers in place.
+        if (!hadData) setIsLoading(true);
+        setIsRefreshing(true);
+        setError(null);
 
-      // Update cache
-      statsCache.set(cacheKey, { data: stats, timestamp: Date.now() });
-    } catch (err) {
-      const error = err as Error;
-
-      // Handle specific error types
-      if (error instanceof StatsError) {
-        switch (error.code) {
-          case 'STATS_FETCH_FAILED':
-            toast.error('Failed to fetch statistics. Please try again later.');
-            break;
-          case 'UNEXPECTED_ERROR':
-            toast.error('An unexpected error occurred. Please try again.');
-            break;
-          default:
-            toast.error('Error loading statistics.');
+        // Check for mock data flag
+        if (process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true') {
+          const mockData = generateMockData();
+          setData(mockData);
+          setIsLoading(false);
+          return;
         }
+
+        // Fetch global stats
+        const globalStats = await getStatsWithTrends(timeWindow);
+        const stats = transformStats(globalStats);
+
+        // If we have the user's country, fetch regional stats
+        if (userCountry) {
+          const regionalStats = await getStatsWithTrends(timeWindow, userCountry);
+          if (regionalStats && typeof regionalStats === 'object') {
+            const regional = regionalStats as Record<string, unknown>;
+            stats.regionalStats = {
+              country: userCountry,
+              results: (Array.isArray(regional.results) ? regional.results : []).map((result: unknown) => {
+                const resultObj = result as Record<string, unknown>;
+                return {
+                  result:
+                    typeof resultObj?.result === 'string'
+                      ? (resultObj.result as NonNullFlamesResult)
+                      : ('' as NonNullFlamesResult),
+                  count: typeof resultObj?.current_count === 'number' ? resultObj.current_count : 0,
+                  trend: typeof resultObj?.trend_percentage === 'number' ? Number(resultObj.trend_percentage) : 0,
+                };
+              }),
+            };
+          }
+        }
+
+        setData(stats);
+        hasDataRef.current = true;
+        setLastUpdate(Date.now());
+        setRetryCount(0); // Reset retry count on success
+
+        // Update cache
+        statsCache.set(cacheKey, { data: stats, timestamp: Date.now() });
+      } catch (err) {
+        const error = err as Error;
+
+        // Handle specific error types (only interrupt the user if nothing is on screen)
+        if (!hadData && error instanceof StatsError) {
+          switch (error.code) {
+            case 'STATS_FETCH_FAILED':
+              toast.error('Failed to fetch statistics. Please try again later.');
+              break;
+            case 'UNEXPECTED_ERROR':
+              toast.error('An unexpected error occurred. Please try again.');
+              break;
+            default:
+              toast.error('Error loading statistics.');
+          }
+        }
+
+        // Keep showing the last good data when a background refresh fails.
+        if (!hadData) {
+          setError(error);
+          setData(DEFAULT_STATS);
+        }
+
+        // Implement retry logic for certain errors
+        if (retryCount < 3 && !(error instanceof StatsError)) {
+          setTimeout(
+            () => {
+              setRetryCount((prev) => prev + 1);
+            },
+            Math.pow(2, retryCount) * 1000
+          ); // Exponential backoff
+        }
+      } finally {
+        setIsLoading(false);
+        setIsRefreshing(false);
       }
-
-      setError(error);
-
-      // Set default data in case of error
-      setData(DEFAULT_STATS);
-
-      // Implement retry logic for certain errors
-      if (retryCount < 3 && !(error instanceof StatsError)) {
-        setTimeout(
-          () => {
-            setRetryCount((prev) => prev + 1);
-          },
-          Math.pow(2, retryCount) * 1000
-        ); // Exponential backoff
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  }, [timeWindow, userCountry, retryCount, transformStats]);
+    },
+    [timeWindow, userCountry, retryCount, transformStats]
+  );
 
   // Fetch stats when dependencies change
   useEffect(() => {
     // Guard against SSR
     if (typeof window === 'undefined') return;
 
-    fetchStats();
+    void fetchStats();
 
     // Set up polling for live updates (every 30 seconds)
     const intervalId = setInterval(() => {
       if (!document.hidden) {
-        fetchStats();
+        void fetchStats();
       }
     }, 30000);
 
     return () => clearInterval(intervalId);
   }, [fetchStats, timeWindow, userCountry]);
 
+  const refetch = useCallback(() => fetchStats(true), [fetchStats]);
+
   return {
     data,
     isLoading,
+    isRefreshing,
     error,
     userCountry,
-    refetch: fetchStats,
+    refetch,
     lastUpdate,
   };
 }

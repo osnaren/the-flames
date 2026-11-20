@@ -1,24 +1,20 @@
 /**
  * Charts Module
  *
- * This module contains all components and utilities
- * for the FLAMES global statistics and charts page.
+ * Components and utilities for the FLAMES global statistics page.
  */
 
-// Main page component
 export { default as ChartsPage } from './ChartsPage';
 
-// Feature components
-export { default as ChartsContent } from './components/ChartsContent';
-export { default as ChartStats } from './components/ChartStats';
-export { default as GlobalCharts } from './components/GlobalCharts';
-export { default as RecentMatches } from './components/RecentMatches';
-export { default as RegionalStats } from './components/RegionalStats';
-export { default as ResultTrendBars } from './components/ResultTrendBars';
+export { default as LiveFeed } from './components/LiveFeed';
+export { default as PersonalStats } from './components/PersonalStats';
+export { default as RegionComparison } from './components/RegionComparison';
+export { default as ResultBars } from './components/ResultBars';
+export { default as ResultDonut } from './components/ResultDonut';
+export { default as StatTiles } from './components/StatTiles';
 export { default as TopCountries } from './components/TopCountries';
+export { default as VibeMeter } from './components/VibeMeter';
 
-// Types
+export * from './chartTheme';
 export * from './types';
-
-// Utils
 export * from './utils';
