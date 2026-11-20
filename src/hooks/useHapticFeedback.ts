@@ -23,20 +23,22 @@ interface HapticConfig {
 }
 
 // Haptic patterns for different events
+// Durations are deliberately short: modern phone motors feel crisp at 8-30ms,
+// while 100ms+ buzzes read as an error or a notification.
 const HAPTIC_PATTERNS: Record<HapticPattern, HapticConfig> = {
-  light: { duration: 50, intensity: 0.3 },
-  medium: { duration: 100, intensity: 0.6 },
-  heavy: { duration: 200, intensity: 1.0 },
-  selection: { duration: 30, intensity: 0.2 },
-  impact: { duration: 80, intensity: 0.8 },
-  notification: { pattern: [50, 50, 100], intensity: 0.5 },
-  success: { pattern: [100, 50, 100, 50, 200], intensity: 0.7 },
-  warning: { pattern: [200, 100, 200], intensity: 0.8 },
-  error: { pattern: [150, 75, 150, 75, 300], intensity: 0.9 },
-  heartbeat: { pattern: [100, 100, 150, 200], intensity: 0.6 },
-  pulse: { pattern: [80, 80, 80, 80], intensity: 0.4 },
-  countdown: { pattern: [50, 150, 50, 150, 50, 150], intensity: 0.5 },
-  celebration: { pattern: [100, 50, 100, 50, 100, 50, 200, 100, 200], intensity: 0.8 },
+  light: { duration: 12, intensity: 1 },
+  medium: { duration: 22, intensity: 1 },
+  heavy: { duration: 40, intensity: 1 },
+  selection: { duration: 8, intensity: 1 },
+  impact: { duration: 18, intensity: 1 },
+  notification: { pattern: [12, 60, 20], intensity: 1 },
+  success: { pattern: [14, 70, 28], intensity: 1 },
+  warning: { pattern: [30, 80, 30], intensity: 1 },
+  error: { pattern: [40, 60, 40, 60, 60], intensity: 1 },
+  heartbeat: { pattern: [24, 110, 36], intensity: 1 },
+  pulse: { duration: 10, intensity: 1 },
+  countdown: { pattern: [10, 120, 10, 120, 10], intensity: 1 },
+  celebration: { pattern: [18, 50, 18, 50, 36, 90, 60], intensity: 1 },
 };
 
 interface HapticCapabilities {

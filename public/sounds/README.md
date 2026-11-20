@@ -210,3 +210,29 @@ README.md
 ## 📞 Questions?
 
 If you need help finding specific sounds or have licensing questions, check the license page of each source before downloading.
+
+## 🎼 Licensed theme music
+
+Tracks below are by **Kevin MacLeod (incompetech.com)**, licensed under
+[Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/).
+They were trimmed to 2:30, loudness-normalised (-18 LUFS) and encoded at 96 kbps.
+Credits are shown in the music player and on the About page.
+
+| File                          | Title                    | Used for             |
+| ----------------------------- | ------------------------ | -------------------- |
+| `bgm/bgm-romantic-2.mp3`      | Heartwarming             | Romantic             |
+| `bgm/bgm-playful.mp3`         | Fluffing a Duck          | Playful              |
+| `bgm/bgm-playful-2.mp3`       | Monkeys Spinning Monkeys | Playful              |
+| `bgm/bgm-chill-2.mp3`         | Bossa Antigua            | Chill                |
+| `bgm/bgm-festive-india.mp3`   | Jalandhar                | Diwali, Onam, Pongal |
+| `bgm/bgm-festive-colours.mp3` | Sunflower Dance Party    | Holi                 |
+| `bgm/bgm-rakhi.mp3`           | Vadodora                 | Raksha Bandhan       |
+| `bgm/bgm-lunar.mp3`           | Guzheng City             | Lunar New Year       |
+| `bgm/bgm-eid.mp3`             | Ibn Al-Noor              | Eid                  |
+| `bgm/bgm-spring.mp3`          | Cherry Blossom           | Spring               |
+| `bgm/bgm-monsoon.mp3`         | Luminous Rain            | Monsoon              |
+| `bgm/bgm-autumn.mp3`          | Autumn Day               | Autumn               |
+| `bgm/bgm-friendship.mp3`      | Wholesome                | Friendship Day       |
+| `bgm/bgm-newyear.mp3`         | Celebration              | New Year             |
+| `bgm/bgm-halloween-2.mp3`     | Ghost Dance              | Halloween            |
+| `bgm/bgm-christmas-2.mp3`     | Jingle Bells (Calm)      | Christmas            |

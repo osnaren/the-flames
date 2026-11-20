@@ -13,8 +13,17 @@
  * - Browser autoplay policy handling
  */
 
-import { BGM_TRACKS, cycleTrackInTheme, getTracksForTheme, SOUND_ASSETS, SoundId, THEME_GROUPS } from '@/config/sound';
+import {
+  BGM_TRACKS,
+  cycleTrackInTheme,
+  getTracksForTheme,
+  resolveMusic,
+  SOUND_ASSETS,
+  SoundId,
+  THEME_GROUPS,
+} from '@/config/sound';
 import { usePreferencesStore } from '@/store/usePreferencesStore';
+import { detectSeasonalTheme } from '@/themes/seasonal/calendar';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -576,20 +585,18 @@ export function useSoundSystem() {
     // Don't auto-play theme BGM if game is in progress
     if (manager.isGameActive()) return;
 
-    const themeToCheck = musicTheme === 'auto' ? seasonalTheme : musicTheme;
+    const activeSeasonal = seasonalTheme === 'auto' ? detectSeasonalTheme() : seasonalTheme;
+    const { group, track } = resolveMusic(musicTheme, activeSeasonal);
+    if (!track) return;
 
-    // Get tracks for the theme
-    const tracks = getTracksForTheme(themeToCheck);
-    if (tracks.length === 0) return;
+    // Default to the preferred track of the resolved group
+    let targetBgmId: SoundId = track.id as SoundId;
 
-    // Default to first track of the theme
-    let targetBgmId: SoundId = tracks[0].id as SoundId;
-
-    // If current track is already in this theme, keep playing it (don't reset to first track)
+    // If the current track already belongs to this group, keep playing it
     const currentId = manager.getCurrentBGMId();
     if (currentId) {
       const currentTrack = BGM_TRACKS.find((t) => t.id === currentId);
-      if (currentTrack && currentTrack.themeGroup === themeToCheck) {
+      if (currentTrack && currentTrack.themeGroup === group) {
         targetBgmId = currentId as SoundId;
       }
     }

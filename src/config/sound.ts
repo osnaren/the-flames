@@ -20,6 +20,29 @@ export interface SoundAsset {
   description?: string;
 }
 
+export type MusicThemeGroup =
+  | 'default'
+  | 'playful'
+  | 'chill'
+  | 'valentine'
+  | 'festive'
+  | 'lunar'
+  | 'eid'
+  | 'spring'
+  | 'monsoon'
+  | 'autumn'
+  | 'friendship'
+  | 'party'
+  | 'halloween'
+  | 'christmas';
+
+export interface TrackCredit {
+  title: string;
+  artist: string;
+  license: string;
+  url: string;
+}
+
 export interface BGMTrack {
   id: string;
   label: string;
@@ -27,7 +50,9 @@ export interface BGMTrack {
   icon?: string;
   seasonal?: boolean;
   /** Theme group this track belongs to */
-  themeGroup: 'default' | 'chill' | 'valentine' | 'halloween' | 'christmas';
+  themeGroup: MusicThemeGroup;
+  /** Attribution for licensed music (shown in the player and credits). */
+  credit?: TrackCredit;
 }
 
 /** Theme group configuration for UI */
@@ -91,6 +116,155 @@ export const SOUND_ASSETS = {
     volume: 0.3,
     label: 'Chill',
     description: 'Relaxing lo-fi beats',
+  },
+
+  // -------------------------------------------------------------------------
+  // Licensed theme music (Kevin MacLeod, incompetech.com, CC BY 4.0).
+  // Served from /public so new tracks ship with the app.
+  // -------------------------------------------------------------------------
+  bgm_romantic_2: {
+    id: 'bgm_romantic_2',
+    src: '/sounds/bgm/bgm-romantic-2.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Heartwarming',
+    description: 'Tender piano warmth',
+  },
+  bgm_playful: {
+    id: 'bgm_playful',
+    src: '/sounds/bgm/bgm-playful.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Fluffing a Duck',
+    description: 'Bouncy, cheeky fun',
+  },
+  bgm_playful_2: {
+    id: 'bgm_playful_2',
+    src: '/sounds/bgm/bgm-playful-2.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Monkeys Spinning Monkeys',
+    description: 'Silly upbeat strut',
+  },
+  bgm_chill_2: {
+    id: 'bgm_chill_2',
+    src: '/sounds/bgm/bgm-chill-2.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Bossa Antigua',
+    description: 'Laid-back bossa nova',
+  },
+  bgm_festive_india: {
+    id: 'bgm_festive_india',
+    src: '/sounds/bgm/bgm-festive-india.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Jalandhar',
+    description: 'Groovy Indian percussion',
+  },
+  bgm_festive_colours: {
+    id: 'bgm_festive_colours',
+    src: '/sounds/bgm/bgm-festive-colours.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Sunflower Dance Party',
+    description: 'Bright, colourful celebration',
+  },
+  bgm_rakhi: {
+    id: 'bgm_rakhi',
+    src: '/sounds/bgm/bgm-rakhi.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Vadodora',
+    description: 'Warm South Asian groove',
+  },
+  bgm_lunar: {
+    id: 'bgm_lunar',
+    src: '/sounds/bgm/bgm-lunar.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Guzheng City',
+    description: 'Plucked guzheng and drums',
+  },
+  bgm_eid: {
+    id: 'bgm_eid',
+    src: '/sounds/bgm/bgm-eid.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Ibn Al-Noor',
+    description: 'Middle Eastern night breeze',
+  },
+  bgm_spring: {
+    id: 'bgm_spring',
+    src: '/sounds/bgm/bgm-spring.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Cherry Blossom',
+    description: 'Gentle blossom season',
+  },
+  bgm_monsoon: {
+    id: 'bgm_monsoon',
+    src: '/sounds/bgm/bgm-monsoon.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Luminous Rain',
+    description: 'Soft rainy-day glow',
+  },
+  bgm_autumn: {
+    id: 'bgm_autumn',
+    src: '/sounds/bgm/bgm-autumn.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Autumn Day',
+    description: 'Golden afternoon calm',
+  },
+  bgm_friendship: {
+    id: 'bgm_friendship',
+    src: '/sounds/bgm/bgm-friendship.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Wholesome',
+    description: 'Sunny feel-good vibes',
+  },
+  bgm_newyear: {
+    id: 'bgm_newyear',
+    src: '/sounds/bgm/bgm-newyear.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Celebration',
+    description: 'Countdown party energy',
+  },
+  bgm_halloween_2: {
+    id: 'bgm_halloween_2',
+    src: '/sounds/bgm/bgm-halloween-2.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Ghost Dance',
+    description: 'Mischievous spooky waltz',
+  },
+  bgm_christmas_2: {
+    id: 'bgm_christmas_2',
+    src: '/sounds/bgm/bgm-christmas-2.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Jingle Bells (Calm)',
+    description: 'Cosy fireside jingle',
   },
 
   // -------------------------------------------------------------------------
@@ -314,11 +488,33 @@ export type SoundId = keyof typeof SOUND_ASSETS;
 
 export const THEME_GROUPS: ThemeGroup[] = [
   { id: 'default', label: 'Romantic', icon: '💕', description: 'Playful romantic melodies' },
-  { id: 'chill', label: 'Chill', icon: '🎧', description: 'Relaxing lo-fi beats' },
+  { id: 'playful', label: 'Playful', icon: '🎈', description: 'Bouncy, cheeky tunes' },
+  { id: 'chill', label: 'Chill', icon: '🎧', description: 'Relaxing lo-fi and bossa' },
+  { id: 'friendship', label: 'Friendship', icon: '🤝', description: 'Sunny feel-good vibes', seasonal: true },
   { id: 'valentine', label: 'Valentine', icon: '❤️', description: 'Soft romantic ballads', seasonal: true },
+  {
+    id: 'festive',
+    label: 'Desi Festive',
+    icon: '🪔',
+    description: 'Diwali, Holi, Onam, Pongal & Rakhi',
+    seasonal: true,
+  },
+  { id: 'lunar', label: 'Lunar New Year', icon: '🏮', description: 'Guzheng and festival drums', seasonal: true },
+  { id: 'eid', label: 'Eid Nights', icon: '🌙', description: 'Middle Eastern evening calm', seasonal: true },
+  { id: 'spring', label: 'Spring', icon: '🌸', description: 'Blossom-season melodies', seasonal: true },
+  { id: 'monsoon', label: 'Monsoon', icon: '🌧️', description: 'Rainy-day ambience', seasonal: true },
+  { id: 'autumn', label: 'Autumn', icon: '🍂', description: 'Golden afternoon calm', seasonal: true },
   { id: 'halloween', label: 'Spooky', icon: '🎃', description: 'Playful spooky tunes', seasonal: true },
   { id: 'christmas', label: 'Festive', icon: '🎄', description: 'Holiday jingles', seasonal: true },
+  { id: 'party', label: 'New Year', icon: '🎉', description: 'Countdown party energy', seasonal: true },
 ];
+
+const MACLEOD = (title: string): TrackCredit => ({
+  title,
+  artist: 'Kevin MacLeod (incompetech.com)',
+  license: 'CC BY 4.0',
+  url: 'https://creativecommons.org/licenses/by/4.0/',
+});
 
 // ============================================================================
 // BGM TRACKS FOR UI SELECTION (Supports multiple tracks per theme)
@@ -370,6 +566,150 @@ export const BGM_TRACKS: BGMTrack[] = [
     seasonal: true,
     themeGroup: 'christmas',
   },
+  {
+    id: 'bgm_romantic_2',
+    label: 'Heartwarming',
+    description: 'Tender piano warmth',
+    icon: '💗',
+    seasonal: false,
+    themeGroup: 'default',
+    credit: MACLEOD('Heartwarming'),
+  },
+  {
+    id: 'bgm_playful',
+    label: 'Fluffing a Duck',
+    description: 'Bouncy, cheeky fun',
+    icon: '🦆',
+    seasonal: false,
+    themeGroup: 'playful',
+    credit: MACLEOD('Fluffing a Duck'),
+  },
+  {
+    id: 'bgm_playful_2',
+    label: 'Monkeys Spinning Monkeys',
+    description: 'Silly upbeat strut',
+    icon: '🐒',
+    seasonal: false,
+    themeGroup: 'playful',
+    credit: MACLEOD('Monkeys Spinning Monkeys'),
+  },
+  {
+    id: 'bgm_chill_2',
+    label: 'Bossa Antigua',
+    description: 'Laid-back bossa nova',
+    icon: '☕',
+    seasonal: false,
+    themeGroup: 'chill',
+    credit: MACLEOD('Bossa Antigua'),
+  },
+  {
+    id: 'bgm_festive_india',
+    label: 'Jalandhar',
+    description: 'Groovy Indian percussion',
+    icon: '🪔',
+    seasonal: true,
+    themeGroup: 'festive',
+    credit: MACLEOD('Jalandhar'),
+  },
+  {
+    id: 'bgm_festive_colours',
+    label: 'Sunflower Dance Party',
+    description: 'Bright, colourful celebration',
+    icon: '🎨',
+    seasonal: true,
+    themeGroup: 'festive',
+    credit: MACLEOD('Sunflower Dance Party'),
+  },
+  {
+    id: 'bgm_rakhi',
+    label: 'Vadodora',
+    description: 'Warm South Asian groove',
+    icon: '🪢',
+    seasonal: true,
+    themeGroup: 'festive',
+    credit: MACLEOD('Vadodora'),
+  },
+  {
+    id: 'bgm_lunar',
+    label: 'Guzheng City',
+    description: 'Plucked guzheng and drums',
+    icon: '🏮',
+    seasonal: true,
+    themeGroup: 'lunar',
+    credit: MACLEOD('Guzheng City'),
+  },
+  {
+    id: 'bgm_eid',
+    label: 'Ibn Al-Noor',
+    description: 'Middle Eastern night breeze',
+    icon: '🌙',
+    seasonal: true,
+    themeGroup: 'eid',
+    credit: MACLEOD('Ibn Al-Noor'),
+  },
+  {
+    id: 'bgm_spring',
+    label: 'Cherry Blossom',
+    description: 'Gentle blossom season',
+    icon: '🌸',
+    seasonal: true,
+    themeGroup: 'spring',
+    credit: MACLEOD('Cherry Blossom'),
+  },
+  {
+    id: 'bgm_monsoon',
+    label: 'Luminous Rain',
+    description: 'Soft rainy-day glow',
+    icon: '🌧️',
+    seasonal: true,
+    themeGroup: 'monsoon',
+    credit: MACLEOD('Luminous Rain'),
+  },
+  {
+    id: 'bgm_autumn',
+    label: 'Autumn Day',
+    description: 'Golden afternoon calm',
+    icon: '🍂',
+    seasonal: true,
+    themeGroup: 'autumn',
+    credit: MACLEOD('Autumn Day'),
+  },
+  {
+    id: 'bgm_friendship',
+    label: 'Wholesome',
+    description: 'Sunny feel-good vibes',
+    icon: '🤝',
+    seasonal: true,
+    themeGroup: 'friendship',
+    credit: MACLEOD('Wholesome'),
+  },
+  {
+    id: 'bgm_newyear',
+    label: 'Celebration',
+    description: 'Countdown party energy',
+    icon: '🎉',
+    seasonal: true,
+    themeGroup: 'party',
+    credit: MACLEOD('Celebration'),
+  },
+  {
+    id: 'bgm_halloween_2',
+    label: 'Ghost Dance',
+    description: 'Mischievous spooky waltz',
+    icon: '👻',
+    seasonal: true,
+    themeGroup: 'halloween',
+    credit: MACLEOD('Ghost Dance'),
+  },
+  {
+    id: 'bgm_christmas_2',
+    label: 'Jingle Bells (Calm)',
+    description: 'Cosy fireside jingle',
+    icon: '🔔',
+    seasonal: true,
+    themeGroup: 'christmas',
+    credit: MACLEOD('Jingle Bells (Calm)'),
+  },
 ];
 
 /** Get tracks for a specific theme group */
@@ -405,23 +745,51 @@ export function cycleTrackInTheme(currentTrackId: string, direction: 'next' | 'p
   return themeTracks[newIndex];
 }
 
-/** Map seasonal theme to music theme */
-export function getMatchingMusicTheme(
-  seasonalTheme: string
-): 'default' | 'chill' | 'valentine' | 'halloween' | 'christmas' {
-  const themeMap: Record<string, 'default' | 'chill' | 'valentine' | 'halloween' | 'christmas'> = {
+/** Map a seasonal (visual) theme to the music group that suits it. */
+export function getMatchingMusicTheme(seasonalTheme: string): MusicThemeGroup {
+  const themeMap: Record<string, MusicThemeGroup> = {
     valentine: 'valentine',
     halloween: 'halloween',
     christmas: 'christmas',
-    newYear: 'christmas',
-    diwali: 'default',
-    holi: 'default',
-    onam: 'default',
-    pongal: 'default',
+    newYear: 'party',
+    diwali: 'festive',
+    holi: 'festive',
+    onam: 'festive',
+    pongal: 'festive',
+    rakhi: 'festive',
+    lunarNewYear: 'lunar',
+    eid: 'eid',
+    spring: 'spring',
+    monsoon: 'monsoon',
+    autumn: 'autumn',
+    friendship: 'friendship',
     default: 'default',
-    auto: 'default',
   };
   return themeMap[seasonalTheme] || 'default';
+}
+
+/**
+ * Resolve which music group and starting track should play.
+ * `musicTheme` 'auto' follows the active seasonal theme (itself possibly auto-detected).
+ */
+export function resolveMusic(
+  musicTheme: string,
+  activeSeasonalTheme: string
+): { group: MusicThemeGroup; track?: BGMTrack } {
+  if (musicTheme !== 'auto') {
+    const group = musicTheme as MusicThemeGroup;
+    return { group, track: getTracksForTheme(group)[0] };
+  }
+  return { group: getMatchingMusicTheme(activeSeasonalTheme), track: getPreferredTrackForTheme(activeSeasonalTheme) };
+}
+
+/** Preferred first track for a seasonal theme within its music group. */
+export function getPreferredTrackForTheme(seasonalTheme: string): BGMTrack | undefined {
+  const group = getMatchingMusicTheme(seasonalTheme);
+  const tracks = getTracksForTheme(group);
+  if (seasonalTheme === 'rakhi') return tracks.find((t) => t.id === 'bgm_rakhi') ?? tracks[0];
+  if (seasonalTheme === 'holi') return tracks.find((t) => t.id === 'bgm_festive_colours') ?? tracks[0];
+  return tracks[0];
 }
 
 // ============================================================================

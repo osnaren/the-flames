@@ -14,16 +14,17 @@
  */
 
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/shadcn/select';
-import { BGM_TRACKS, getTracksForTheme, SoundId, THEME_GROUPS } from '@/config/sound';
+import { BGM_TRACKS, getTracksForTheme, resolveMusic, SoundId, THEME_GROUPS } from '@/config/sound';
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useSoundSystem } from '@/hooks/useSoundSystem';
 import { usePreferencesStore } from '@/store/usePreferencesStore';
+import { useSeasonalTheme } from '@/themes/seasonal/useSeasonalTheme';
 import { cn } from '@/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Disc3, Music2, Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 interface MusicPlayerProps {
@@ -58,12 +59,14 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0, comp
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const volumeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Get current theme group
-  const currentThemeGroup =
-    THEME_GROUPS.find((tg) => tg.id === (musicTheme === 'auto' ? 'default' : musicTheme)) || THEME_GROUPS[0];
+  // 'auto' follows the active seasonal theme (Diwali -> Desi Festive, etc.)
+  const { currentTheme: activeSeasonalTheme } = useSeasonalTheme();
+  const resolvedGroupId = resolveMusic(musicTheme, activeSeasonalTheme).group;
+  const currentThemeGroup = THEME_GROUPS.find((tg) => tg.id === resolvedGroupId) || THEME_GROUPS[0];
+  const selectValue = musicTheme === 'auto' ? 'auto' : currentThemeGroup.id;
 
   // Get tracks for current theme group
-  const themeTracks = getTracksForTheme(currentThemeGroup.id);
+  const themeTracks = useMemo(() => getTracksForTheme(currentThemeGroup.id), [currentThemeGroup.id]);
 
   // Get current track (based on index within theme)
   const currentTrack = themeTracks[currentTrackIndex] || themeTracks[0] || BGM_TRACKS[0];
@@ -73,12 +76,15 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0, comp
     const checkPlayingState = () => {
       const state = getBGMState();
       setIsPlaying(state.isPlaying);
+      // Keep the shown track in sync with what is actually playing.
+      const playingIndex = themeTracks.findIndex((t) => t.id === state.currentTrackId);
+      if (playingIndex >= 0) setCurrentTrackIndex((index) => (index === playingIndex ? index : playingIndex));
     };
 
     checkPlayingState();
     const interval = setInterval(checkPlayingState, 500);
     return () => clearInterval(interval);
-  }, [getBGMState]);
+  }, [getBGMState, themeTracks]);
 
   // Reset track index when theme changes
   useEffect(() => {
@@ -220,13 +226,14 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0, comp
       >
         <select
           aria-label="Music theme"
-          value={currentThemeGroup.id}
+          value={selectValue}
           onChange={(event) => {
             void handleThemeSelect(event.target.value);
           }}
           className="bg-surface-container-high/50 text-on-surface h-8 w-full rounded-md px-2 text-xs [color-scheme:light] dark:[color-scheme:dark]"
           tabIndex={isExpanded ? tabIndex : -1}
         >
+          <option value="auto">✨ Auto · {currentThemeGroup.label}</option>
           {THEME_GROUPS.map((group) => (
             <option key={group.id} value={group.id}>
               {group.icon} {group.label}
@@ -299,6 +306,14 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0, comp
         <p className="text-on-surface-variant h-4 truncate text-[10px]">
           {isPlaying ? 'Now playing' : 'Track'}: {currentTrack.label}
         </p>
+        {currentTrack.credit && (
+          <p className="text-on-surface-variant/90 truncate text-[9px]">
+            Music: {currentTrack.credit.artist} ·{' '}
+            <a href={currentTrack.credit.url} target="_blank" rel="noopener noreferrer" className="underline">
+              {currentTrack.credit.license}
+            </a>
+          </p>
+        )}
       </div>
     );
   }
@@ -346,14 +361,14 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0, comp
         {/* Controls */}
         <div className="flex flex-1 flex-col gap-1.5">
           {/* Theme Selector */}
-          <Select value={currentThemeGroup.id} onValueChange={handleThemeSelect}>
+          <Select value={selectValue} onValueChange={handleThemeSelect}>
             <SelectTrigger
               className="bg-surface-container-high/50 hover:bg-surface-container-highest/50 focus:ring-primary/50 h-7 w-full border-none px-2 py-1 text-xs font-medium"
               tabIndex={isExpanded ? tabIndex : -1}
             >
               <div className="flex items-center gap-1.5">
-                <span>{currentThemeGroup.icon}</span>
-                <span>{currentThemeGroup.label}</span>
+                <span>{musicTheme === 'auto' ? '✨' : currentThemeGroup.icon}</span>
+                <span>{musicTheme === 'auto' ? `Auto · ${currentThemeGroup.label}` : currentThemeGroup.label}</span>
                 {themeTracks.length > 1 && (
                   <span className="text-on-surface-variant text-[9px]">
                     ({currentTrackIndex + 1}/{themeTracks.length})
@@ -362,6 +377,13 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0, comp
               </div>
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="auto" className="text-xs">
+                <div className="flex w-full items-center gap-2">
+                  <span>✨</span>
+                  <span>Auto</span>
+                  <span className="text-muted-foreground text-[9px]">matches the season</span>
+                </div>
+              </SelectItem>
               {THEME_GROUPS.map((themeGroup) => {
                 const trackCount = getTracksForTheme(themeGroup.id).length;
                 return (
@@ -513,11 +535,19 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0, comp
           className="text-on-surface-variant mt-2 flex items-center gap-1.5 text-[10px]"
         >
           <Music2 className="h-3 w-3" />
-          <span>
+          <span className="truncate">
             Now playing: {currentTrack.label}
             {themeTracks.length > 1 && ` (${currentTrackIndex + 1}/${themeTracks.length})`}
           </span>
         </motion.div>
+      )}
+      {currentTrack.credit && (
+        <p className="text-on-surface-variant/90 mt-1 truncate text-[9px]">
+          Music: “{currentTrack.credit.title}” by {currentTrack.credit.artist} ·{' '}
+          <a href={currentTrack.credit.url} target="_blank" rel="noopener noreferrer" className="underline">
+            {currentTrack.credit.license}
+          </a>
+        </p>
       )}
     </div>
   );
