@@ -382,6 +382,8 @@ export function getRandomResultContent(
 // ============================================================================
 
 export const HERO_TRANSITION_TIMING = {
-  BURST_DURATION: 460,
-  SHRINK_DURATION: 0.26,
+  /** How long the large icon holds the stage (ms). */
+  BURST_DURATION: 950,
+  /** Length of the CSS hero-exit animation (ms); keep in sync with result-motion.css. */
+  EXIT_DURATION: 380,
 } as const;

@@ -23,12 +23,25 @@ const FlamesProcessor = dynamic(
 );
 
 const loadResult = () => import('./components/ResultCard');
+const loadProcessor = () => import('./components/FlamesProcessor');
 const ResultCard = lazy(() => loadResult().then(({ ResultCard }) => ({ default: ResultCard })));
 
 function prepareResult(result: NonNullFlamesResult) {
   void loadResult()
     .then(({ preloadResultIcon }) => preloadResultIcon(result))
     .catch(() => {});
+}
+
+// Fetch the game chunks once the player shows intent (focus or tap on the form),
+// so pressing "Reveal" never waits on the network or a cold parse.
+let gameChunksRequested = false;
+function prefetchGameChunks() {
+  if (gameChunksRequested) return;
+  gameChunksRequested = true;
+  void loadProcessor().catch(() => {
+    gameChunksRequested = false;
+  });
+  void loadResult().catch(() => {});
 }
 
 // Lightweight loading placeholders
@@ -78,6 +91,7 @@ function HomePage() {
   const workspaceRef = useRef<HTMLDivElement>(null);
   const [workspaceHeight, setWorkspaceHeight] = useState<number>();
   const [skipHero, setSkipHero] = useState(false);
+  const [hasPlayed, setHasPlayed] = useState(false);
 
   // FLAMES game engine state and actions
   const [
@@ -101,6 +115,23 @@ function HomePage() {
     setBackgroundState({ variant, result });
   }, [stage, result, setBackgroundState]);
 
+  // The reserved height only protects the page from jumping while the game is
+  // running. Release it when the player is back on the form.
+  useEffect(() => {
+    if (stage === 'input') setWorkspaceHeight(undefined);
+  }, [stage]);
+
+  // Warm the game chunks during idle time as a fallback for players who paste
+  // names or arrive with a shared link.
+  useEffect(() => {
+    if (!('requestIdleCallback' in window)) {
+      const timer = setTimeout(prefetchGameChunks, 4000);
+      return () => clearTimeout(timer);
+    }
+    const id = window.requestIdleCallback(prefetchGameChunks, { timeout: 6000 });
+    return () => window.cancelIdleCallback(id);
+  }, []);
+
   const scrollToResult = useCallback(() => {
     const compact = window.matchMedia('(max-width: 767px), (pointer: coarse)').matches;
     resultSectionRef.current?.scrollIntoView({
@@ -114,6 +145,8 @@ function HomePage() {
     (e: React.FormEvent) => {
       // Keep the guide and title still throughout delayed game transitions.
       if (workspaceRef.current) setWorkspaceHeight(workspaceRef.current.getBoundingClientRect().height);
+      prefetchGameChunks();
+      setHasPlayed(true);
       handleSubmit(e);
     },
     [handleSubmit]
@@ -147,9 +180,11 @@ function HomePage() {
 
   return (
     <section
-      className="relative flex min-h-screen flex-col items-center justify-center px-4 py-8 md:py-12"
+      className="relative flex flex-col items-center px-4 pt-4 pb-10 md:pt-8 md:pb-16"
       ref={containerRef}
       aria-label="FLAMES Game"
+      onFocusCapture={prefetchGameChunks}
+      onPointerDownCapture={prefetchGameChunks}
     >
       <Suspense fallback={null}>
         <NameQuerySync setName1={setName1} setName2={setName2} />
@@ -165,8 +200,8 @@ function HomePage() {
             {stage === 'input' && (
               <motion.div
                 key="input-stage"
-                initial={false}
-                animate={{ opacity: 1, y: 0 }}
+                initial={hasPlayed && shouldAnimate ? { opacity: 0, y: 24 } : false}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={
                   shouldAnimate
                     ? {
@@ -193,11 +228,9 @@ function HomePage() {
                   isProcessing={isProcessing}
                 />
 
-                <motion.div
-                  className="mt-12 space-y-3 text-center"
-                  initial={shouldAnimate ? { opacity: 0 } : { opacity: 1 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8, duration: 0.6 }}
+                <div
+                  className="motion-rise mt-8 space-y-2 text-center md:mt-10"
+                  style={{ '--rise-delay': '0.35s' } as React.CSSProperties}
                   role="note"
                   aria-label="FLAMES meaning legend"
                 >
@@ -211,16 +244,11 @@ function HomePage() {
                   <p className="font-handwriting text-on-surface-variant/60 text-xs">
                     ✨ The classic relationship game, reimagined with modern magic ✨
                   </p>
-                </motion.div>
+                </div>
 
-                <motion.div
-                  className="mt-8"
-                  initial={shouldAnimate ? { opacity: 0, y: 20 } : { opacity: 1 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1, duration: 0.5 }}
-                >
+                <div className="motion-rise mt-6" style={{ '--rise-delay': '0.5s' } as React.CSSProperties}>
                   <RecentMatchesSection displayCount={5} onMatchClick={handleMatchReplay} />
-                </motion.div>
+                </div>
               </motion.div>
             )}
 

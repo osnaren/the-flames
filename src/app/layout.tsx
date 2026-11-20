@@ -78,6 +78,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     document.documentElement.classList.remove('dark');
                     document.documentElement.setAttribute('data-theme', 'light');
                   }
+                  if (localStorage.getItem('animations') === 'false') {
+                    document.documentElement.setAttribute('data-animations', 'off');
+                  }
                 } catch (e) {}
               })();
             `,
@@ -96,7 +99,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <ClientLayout>
           <Navbar />
-          <main id="main-content" className="pt-6" role="main">
+          <main id="main-content" className="relative pt-6" role="main">
             <GlobalErrorBoundary>{children}</GlobalErrorBoundary>
           </main>
           <Footer />

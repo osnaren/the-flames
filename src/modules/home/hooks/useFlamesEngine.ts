@@ -134,7 +134,16 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
     processingRef.current = false;
     setStage('result');
     setIsProcessing(false);
-    if (game.result) addPairing(name1, name2, game.result);
+    // History and badge bookkeeping (localStorage + JSON) is not needed for the
+    // reveal itself; run it once the reveal has settled.
+    if (game.result) {
+      const recorded = { name1, name2, result: game.result };
+      const save = () => addPairing(recorded.name1, recorded.name2, recorded.result);
+      setTimeout(() => {
+        if ('requestIdleCallback' in window) window.requestIdleCallback(save, { timeout: 2000 });
+        else save();
+      }, 1600);
+    }
   }, [addPairing, name1, name2]);
 
   /**
@@ -189,24 +198,15 @@ export function useFlamesEngine(): [FlamesEngineState, FlamesEngineActions] {
         // Bump runId so processors remount even if names repeat
         setRunId((id) => id + 1);
 
-        // Loading the optional statistics SDK can take a long task. Give the
-        // calculator's first frame priority before starting that work.
+        // Record the anonymous result once the animation has had the main
+        // thread to itself. This is a single small fetch (no SDK).
         if (gameData.result) {
           const recordedResult = gameData.result;
-          const recordMatch = () =>
-            void import('@lib/supabase')
-              .then(async ({ getUserCountry, insertMatch }) => {
-                const country = await getUserCountry();
-                await insertMatch(recordedResult, country || undefined);
-              })
-              .catch(() => {
-                // Recording is optional; the local calculator stays available.
-              });
-          if ('requestIdleCallback' in window) {
-            window.requestIdleCallback(recordMatch, { timeout: 1500 });
-          } else {
-            requestAnimationFrame(() => setTimeout(recordMatch, 0));
-          }
+          const record = () => void import('@lib/record-match').then(({ recordMatch }) => recordMatch(recordedResult));
+          setTimeout(() => {
+            if ('requestIdleCallback' in window) window.requestIdleCallback(record, { timeout: 4000 });
+            else record();
+          }, 2500);
         }
 
         // Transition to processing stage with form collapse effect

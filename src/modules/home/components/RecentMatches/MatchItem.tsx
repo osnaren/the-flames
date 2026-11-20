@@ -138,14 +138,14 @@ function MatchItem({ match, index, onClick, shouldAnimate }: MatchItemProps) {
             <span className="max-w-[45%] truncate" title={match.name1}>
               {match.displayName1}
             </span>
-            <span className="text-on-surface-variant/60 shrink-0">×</span>
+            <span className="text-on-surface-variant shrink-0">×</span>
             <span className="max-w-[45%] truncate" title={match.name2}>
               {match.displayName2}
             </span>
           </div>
 
           {/* Result & Time */}
-          <div className="text-on-surface-variant/70 flex w-full items-center gap-2 text-xs">
+          <div className="text-on-surface-variant flex w-full items-center gap-2 text-xs">
             <span
               className={`bg-linear-to-r font-medium ${match.resultData.gradientClass} bg-clip-text text-transparent`}
             >

@@ -1,45 +1,210 @@
-:root,
-[data-theme],
-.dark,
-.light,
-.dark-hc,
-.dark-mc,
-.light-hc,
-.light-mc {
-  transition:
-    background-color var(--duration, 0.3s) cubic-bezier(0.23, 1, 0.32, 1),
-    color var(--duration, 0.3s) cubic-bezier(0.23, 1, 0.32, 1),
-    border-color var(--duration, 0.3s) cubic-bezier(0.23, 1, 0.32, 1),
-    box-shadow var(--duration, 0.3s) cubic-bezier(0.23, 1, 0.32, 1),
-    background var(--duration, 0.3s) cubic-bezier(0.23, 1, 0.32, 1);
+/* Theme switches cross-fade through the View Transitions API (see
+   usePreferencesStore). Interpolating inherited root colours instead would
+   restyle every node on every frame, so the root itself never transitions. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Color changes are immediate on every device. Interpolating an inherited root
-   color restyles the whole page on each frame; keep opacity and transform motion. */
-*,
-*::before,
-*::after {
-  transition-property: opacity, transform !important;
+/* Let the browser skip long, below-the-fold editorial content. Only applied to
+   prose sections whose height is stable, never to interactive UI. */
+.deferred-content {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 900px;
 }
 
-/* Let the browser skip offscreen editorial content while retaining its last
-   rendered height. Keep interactive game and canvas layouts outside containment. */
-@media (max-width: 767px), (pointer: coarse) {
-  /* Native body text avoids a late font swap during mobile hydration. */
-  body {
-    font-family: Arial, sans-serif;
+/* ---------------------------------------------------------------------------
+   Compositor-only motion utilities.
+   Every keyframe below animates transform/opacity only, so it runs on the GPU
+   compositor thread and never competes with input handling on the main thread.
+   --------------------------------------------------------------------------- */
+@keyframes flames-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--rise-distance, 14px), 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Letters stay painted (opacity 1) so the wordmark never delays LCP. */
+@keyframes flames-letter-pop {
+  0% {
+    transform: translate3d(0, 0.35em, 0) scale(0.55) rotate(-8deg);
+  }
+  60% {
+    transform: translate3d(0, -0.06em, 0) scale(1.08) rotate(2deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes flames-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, var(--float-distance, -10px), 0);
+  }
+}
+
+@keyframes flames-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(var(--drift-x, 4%), var(--drift-y, -3%), 0) scale(1.08);
+  }
+  66% {
+    transform: translate3d(calc(var(--drift-x, 4%) * -0.6), calc(var(--drift-y, -3%) * -1), 0) scale(0.96);
+  }
+}
+
+@keyframes flames-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(var(--pulse-scale, 1.12));
+  }
+}
+
+@keyframes flames-wiggle {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0) scale(1);
+  }
+  80% {
+    transform: rotate(14deg) scale(1.15);
+  }
+  90% {
+    transform: rotate(-12deg) scale(1.15);
+  }
+}
+
+@keyframes flames-sweep {
+  0% {
+    transform: translate3d(-120%, 0, 0);
+  }
+  45%,
+  100% {
+    transform: translate3d(120%, 0, 0);
+  }
+}
+
+@keyframes flames-ring {
+  0% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes flames-grow-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes flames-grow-y {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes flames-twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .motion-rise {
+    animation: flames-rise var(--rise-duration, 0.6s) cubic-bezier(0.22, 1, 0.36, 1) var(--rise-delay, 0s) both;
   }
 
-  .deferred-content,
-  footer {
-    content-visibility: auto;
-    contain-intrinsic-block-size: auto 700px;
+  .motion-letter-pop {
+    animation: flames-letter-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) var(--letter-delay, 0s) both;
   }
 
-  #charts-content-panel > * {
-    content-visibility: auto;
-    contain-intrinsic-block-size: auto 400px;
+  .motion-float {
+    animation: flames-float var(--float-duration, 4s) ease-in-out var(--float-delay, 0s) infinite;
   }
+
+  .motion-drift {
+    animation: flames-drift var(--drift-duration, 22s) ease-in-out var(--drift-delay, 0s) infinite;
+  }
+
+  .motion-pulse {
+    animation: flames-pulse var(--pulse-duration, 2.4s) ease-in-out infinite;
+  }
+
+  .motion-wiggle {
+    animation: flames-wiggle var(--wiggle-duration, 5s) ease-in-out infinite;
+  }
+
+  .motion-sweep {
+    animation: flames-sweep var(--sweep-duration, 4.5s) ease-in-out var(--sweep-delay, 0.8s) infinite both;
+  }
+
+  .motion-ring {
+    animation: flames-ring var(--ring-duration, 2.2s) ease-out infinite;
+  }
+
+  .motion-grow-x {
+    transform-origin: left center;
+    animation: flames-grow-x var(--grow-duration, 0.9s) cubic-bezier(0.22, 1, 0.36, 1) var(--grow-delay, 0s) both;
+  }
+
+  .motion-grow-y {
+    transform-origin: center bottom;
+    animation: flames-grow-y var(--grow-duration, 0.9s) cubic-bezier(0.22, 1, 0.36, 1) var(--grow-delay, 0s) both;
+  }
+
+  .motion-twinkle {
+    animation: flames-twinkle var(--twinkle-duration, 3s) ease-in-out var(--twinkle-delay, 0s) infinite;
+  }
+}
+
+/* The user's in-app "animations off" switch disables decorative CSS motion too. */
+html[data-animations='off']
+  :is(
+    .motion-rise,
+    .motion-letter-pop,
+    .motion-float,
+    .motion-drift,
+    .motion-pulse,
+    .motion-wiggle,
+    .motion-sweep,
+    .motion-ring,
+    .motion-grow-x,
+    .motion-grow-y,
+    .motion-twinkle
+  ) {
+  animation: none !important;
 }
 
 @theme {
@@ -253,4 +418,26 @@
   --shadow-elevation-xlarge:
     0 8px 16px var(--color-outline-variant), 0 16px 32px var(--color-outline-variant),
     0 32px 64px var(--color-outline-variant);
+}
+
+/* Floating settings button slides away with the auto-hiding mobile header. */
+.floating-control {
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease;
+}
+
+html[data-nav-hidden='true'] .floating-control {
+  transform: translate3d(0, -140px, 0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Sticky toolbars sit under the header and follow it when it auto-hides. */
+.sticky-under-nav {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html[data-nav-hidden='true'] .sticky-under-nav {
+  transform: translate3d(0, -3.25rem, 0);
 }

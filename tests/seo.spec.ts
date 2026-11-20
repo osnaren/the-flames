@@ -37,7 +37,7 @@ test('supporting pages show their primary content before JavaScript', async ({ p
   await expect(page.getByText(/Remember the days when your biggest worry/)).toBeVisible();
   await page.goto('/charts');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  await expect(page.getByText('Total Matches', { exact: true })).toBeVisible();
+  await expect(page.getByText('All games', { exact: true })).toBeVisible();
 });
 
 test('the hydrated calculator and visible guide fit the viewport', async ({ browser }, testInfo) => {

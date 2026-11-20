@@ -1,5 +1,5 @@
 import { copyShareUrl } from '@lib/share';
-import { memo, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
+import { memo, startTransition, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 import SharePopover from '@/components/ui/SharePopover';
@@ -47,20 +47,37 @@ function ResultCardContainer({
   const [isSharePopoverOpen, setIsSharePopoverOpen] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
 
-  const [heroTransitionComplete, setHeroTransitionComplete] = useState(!shouldAnimate || skipHero);
+  const playHero = shouldAnimate && !skipHero;
+  const [heroTransitionComplete, setHeroTransitionComplete] = useState(!playHero);
+  // The card mounts (hidden, animations paused) underneath the hero so React's
+  // mount work happens while the compositor-driven hero is on screen. When the
+  // hero starts leaving, revealing the card is just a class change.
+  const [cardRevealed, setCardRevealed] = useState(!playHero);
   const isVisible = stage === 'result' && result !== null;
-  const showHero = isVisible && shouldAnimate && !skipHero && !heroTransitionComplete;
+  const showHero = isVisible && playHero && !heroTransitionComplete;
   const notifyResultVisible = useEffectEvent(() => onResultVisible?.());
 
   useEffect(() => {
-    if (!isVisible || showHero) return;
-    setHeroTransitionComplete(true);
+    if (!isVisible || !cardRevealed) return;
     const frame = requestAnimationFrame(notifyResultVisible);
     return () => cancelAnimationFrame(frame);
-  }, [isVisible, showHero]);
+  }, [isVisible, cardRevealed]);
+
+  // Mount the (heavier) card a moment after the hero's first paint, inside a
+  // transition so React renders it in interruptible slices instead of one long
+  // task competing with the hero's opening frames.
+  const [cardMounted, setCardMounted] = useState(!playHero);
+  useEffect(() => {
+    if (cardMounted || !isVisible) return;
+    const timer = setTimeout(() => startTransition(() => setCardMounted(true)), 140);
+    return () => clearTimeout(timer);
+  }, [cardMounted, isVisible]);
+
+  const handleHeroExitStart = useCallback(() => setCardRevealed(true), []);
 
   // Handle hero transition completion
   const handleHeroTransitionComplete = useCallback(() => {
+    setCardRevealed(true);
     setHeroTransitionComplete(true);
   }, []);
 
@@ -157,42 +174,53 @@ function ResultCardContainer({
 
   if (!isVisible || !result) return null;
 
-  if (showHero) {
-    return <ResultHeroTransition result={result} onTransitionComplete={handleHeroTransitionComplete} />;
-  }
-
   return (
-    <div className="flex flex-col items-center">
-      {/* Result Card Display */}
-      <ResultCardDisplay
-        ref={resultCardRef}
-        result={result}
-        stage={stage}
-        name1={name1}
-        name2={name2}
-        className={isCapturing ? 'pointer-events-none' : ''}
-      />
+    <div
+      className={`flex flex-col items-center ${cardRevealed ? '' : 'result-pending'}`}
+      aria-hidden={cardRevealed ? undefined : true}
+    >
+      {showHero && (
+        <ResultHeroTransition
+          result={result}
+          onExitStart={handleHeroExitStart}
+          onTransitionComplete={handleHeroTransitionComplete}
+        />
+      )}
 
-      {/* Actions Dock */}
-      <ResultActionsDock
-        isVisible={isVisible}
-        onRetry={onRetry}
-        onShare={handleShare}
-        onShareAsImage={handleShareAsImage}
-        onCopyLink={handleCopyLink}
-        onNavigateToManual={onNavigateToManual}
-        onNavigateToStats={onNavigateToStats}
-      />
+      {cardMounted && (
+        <>
+          {/* Result Card Display */}
+          <ResultCardDisplay
+            ref={resultCardRef}
+            result={result}
+            stage={stage}
+            name1={name1}
+            name2={name2}
+            className={isCapturing ? 'pointer-events-none' : ''}
+          />
 
-      {/* Share Popover */}
-      <SharePopover
-        isOpen={isSharePopoverOpen}
-        onClose={() => setIsSharePopoverOpen(false)}
-        resultCardRef={resultCardRef}
-        shareData={shareData}
-        onShareAsImage={handleShareAsImage}
-        isCapturingImage={isCapturing}
-      />
+          {/* Actions Dock */}
+          <ResultActionsDock
+            isVisible={isVisible}
+            onRetry={onRetry}
+            onShare={handleShare}
+            onShareAsImage={handleShareAsImage}
+            onCopyLink={handleCopyLink}
+            onNavigateToManual={onNavigateToManual}
+            onNavigateToStats={onNavigateToStats}
+          />
+
+          {/* Share Popover */}
+          <SharePopover
+            isOpen={isSharePopoverOpen}
+            onClose={() => setIsSharePopoverOpen(false)}
+            resultCardRef={resultCardRef}
+            shareData={shareData}
+            onShareAsImage={handleShareAsImage}
+            isCapturingImage={isCapturing}
+          />
+        </>
+      )}
     </div>
   );
 }

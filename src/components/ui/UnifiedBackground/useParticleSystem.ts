@@ -375,18 +375,29 @@ export function useParticleSystem({
       });
 
       ctx.restore();
-      // Ambient particles keep their appearance without a perpetual idle loop.
-      if (variant !== 'default') animationIdRef.current = requestAnimationFrame(animate);
+      animationIdRef.current = requestAnimationFrame(animate);
     };
 
     // Resize Handler
+    let lastWidth = 0;
+    let lastHeight = 0;
     const handleResize = () => {
+      // Mobile browsers resize the viewport when the URL bar shows or hides
+      // while scrolling. Keep the particles in place unless the layout really
+      // changed (rotation, desktop window resize).
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      if (width === lastWidth && Math.abs(height - lastHeight) < 160) return;
+      const reseed = width !== lastWidth || lastWidth === 0;
+      lastWidth = width;
+      lastHeight = height;
+
       // Keep CSS and backing-store coordinates consistent at a bounded DPR.
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.25 : 1.5);
       pixelRatioRef.current = dpr;
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      initParticles();
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      if (reseed) initParticles();
       lastFrameTimeRef.current = 0;
       cancelAnimationFrame(animationIdRef.current);
       animationIdRef.current = requestAnimationFrame(animate);
@@ -411,7 +422,7 @@ export function useParticleSystem({
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(animationIdRef.current);
     };
-  }, [enabled, shouldAnimate, config, frameInterval, isDarkTheme, canvasRef, variant, initParticles]);
+  }, [enabled, shouldAnimate, config, frameInterval, isDarkTheme, canvasRef, initParticles, isMobile]);
 
   return { config, canvasColors };
 }

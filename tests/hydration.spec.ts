@@ -37,7 +37,7 @@ for (const route of ['/', '/manual', '/charts']) {
     await page.goto(route);
     expect(await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(true);
     if (route === '/charts') {
-      await expect(page.getByText('Total Matches', { exact: true })).toBeVisible({ timeout: 20000 });
+      await expect(page.getByText('All games', { exact: true })).toBeVisible({ timeout: 20000 });
     } else {
       await page.locator('#name1').fill('Regression');
       await expect(page.locator('#name1')).toHaveValue('Regression');

@@ -68,6 +68,39 @@ const safeLocalStorage = {
   },
 };
 
+function applyThemeClass(dark: boolean) {
+  const root = document.documentElement;
+  root.classList.toggle('dark', dark);
+  root.setAttribute('data-theme', dark ? 'dark' : 'light');
+}
+
+/**
+ * Cross-fade theme changes with the View Transitions API when available.
+ * The browser snapshots the old and new page and blends them on the
+ * compositor, so no element has to interpolate colours on the main thread.
+ */
+function switchTheme(dark: boolean) {
+  if (typeof document === 'undefined') return;
+  const reduceMotion =
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ||
+    document.documentElement.dataset.animations === 'off';
+  const doc = document as Document & { startViewTransition?: (update: () => void) => unknown };
+  if (!reduceMotion && typeof doc.startViewTransition === 'function') {
+    try {
+      doc.startViewTransition(() => applyThemeClass(dark));
+      return;
+    } catch {
+      // Fall through to an instant switch.
+    }
+  }
+  applyThemeClass(dark);
+}
+
+function applyAnimationAttribute(enabled: boolean) {
+  if (typeof document === 'undefined') return;
+  document.documentElement.dataset.animations = enabled ? 'on' : 'off';
+}
+
 // Module-level variable to store cleanup function (avoids global namespace pollution)
 let themeCleanup: (() => void) | null = null;
 
@@ -86,21 +119,14 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
     set((s) => {
       const newTheme = !s.isDarkTheme;
       safeLocalStorage.setItem('theme', newTheme ? 'dark' : 'light');
-      if (typeof document !== 'undefined') {
-        if (newTheme) {
-          document.documentElement.classList.add('dark');
-          document.documentElement.setAttribute('data-theme', 'dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-          document.documentElement.setAttribute('data-theme', 'light');
-        }
-      }
+      switchTheme(newTheme);
       return { isDarkTheme: newTheme };
     }),
   toggleAnimations: () =>
     set((s) => {
       const value = !s.animationsEnabled;
       safeLocalStorage.setItem('animations', String(value));
+      applyAnimationAttribute(value);
       return { animationsEnabled: value };
     }),
   toggleSound: () =>
@@ -188,6 +214,8 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
       document.documentElement.classList.remove('dark');
       document.documentElement.setAttribute('data-theme', 'light');
     }
+
+    applyAnimationAttribute(storedAnimations !== 'false');
 
     set({
       isDarkTheme,

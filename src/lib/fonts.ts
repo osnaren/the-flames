@@ -3,11 +3,13 @@ import { DM_Serif_Text, Josefin_Sans, Noto_Sans, Patrick_Hand, Space_Grotesk } f
 // Primary body font
 export const notoSans = Noto_Sans({
   subsets: ['latin'],
+  // 'optional' never swaps after first paint (zero CLS); preloading gives the
+  // brand font a real chance to arrive inside that window on mobile too.
   display: 'optional',
   variable: '--font-noto-sans',
   weight: ['400', '500', '600', '700'],
-  // Keep body text readable without delaying the render-blocking stylesheet.
-  preload: false,
+  preload: true,
+  adjustFontFallback: true,
 });
 
 // Display/heading font

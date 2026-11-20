@@ -401,7 +401,41 @@ export const drawKolam = (ctx: CanvasRenderingContext2D, size: number): void => 
 
 // --- Emoji Drawing ---
 
+// Text shaping + colour-glyph rasterisation is the most expensive canvas call we
+// make. Render each emoji once into a small sprite and blit it afterwards.
+const EMOJI_SPRITE_SIZE = 48;
+const emojiSprites = new Map<string, HTMLCanvasElement | null>();
+
+function getEmojiSprite(emoji: string): HTMLCanvasElement | null {
+  if (emojiSprites.has(emoji)) return emojiSprites.get(emoji) ?? null;
+  let sprite: HTMLCanvasElement | null = null;
+  try {
+    sprite = document.createElement('canvas');
+    sprite.width = EMOJI_SPRITE_SIZE;
+    sprite.height = EMOJI_SPRITE_SIZE;
+    const sctx = sprite.getContext('2d');
+    if (sctx) {
+      sctx.font = `${EMOJI_SPRITE_SIZE * 0.8}px sans-serif`;
+      sctx.textAlign = 'center';
+      sctx.textBaseline = 'middle';
+      sctx.fillText(emoji, EMOJI_SPRITE_SIZE / 2, EMOJI_SPRITE_SIZE / 2);
+    } else {
+      sprite = null;
+    }
+  } catch {
+    sprite = null;
+  }
+  emojiSprites.set(emoji, sprite);
+  return sprite;
+}
+
 export const drawEmoji = (ctx: CanvasRenderingContext2D, size: number, emoji: string): void => {
+  const sprite = getEmojiSprite(emoji);
+  if (sprite) {
+    const drawn = size * 1.25;
+    ctx.drawImage(sprite, -drawn / 2, -drawn / 2, drawn, drawn);
+    return;
+  }
   ctx.font = `${size}px sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';

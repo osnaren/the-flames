@@ -90,7 +90,7 @@ function SectionHeader({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={handleClearClick}
-              className="text-on-surface-variant/60 hover:text-error hover:bg-error/10 focus-visible:ring-error/50 rounded-lg p-1.5 transition-colors duration-150 focus-visible:ring-2 focus-visible:outline-none"
+              className="text-on-surface-variant hover:text-error hover:bg-error/10 focus-visible:ring-error/50 rounded-lg p-1.5 transition-colors duration-150 focus-visible:ring-2 focus-visible:outline-none"
               aria-label="Clear all matches"
               type="button"
             >
@@ -129,7 +129,7 @@ function SectionHeader({
               playSound('whoosh');
               onToggleExpand();
             }}
-            className="text-on-surface-variant/60 hover:text-primary hover:bg-primary/10 focus-visible:ring-primary/50 rounded-lg p-1.5 transition-colors duration-150 focus-visible:ring-2 focus-visible:outline-none"
+            className="text-on-surface-variant hover:text-primary hover:bg-primary/10 focus-visible:ring-primary/50 rounded-lg p-1.5 transition-colors duration-150 focus-visible:ring-2 focus-visible:outline-none"
             aria-label={isExpanded ? 'Show less' : 'Show more'}
             aria-expanded={isExpanded}
             type="button"
@@ -159,7 +159,7 @@ function RecentMatchesSection({
 }: RecentMatchesSectionProps) {
   const { shouldAnimate: animationsEnabled } = useAnimationPreferences();
   const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
-  const shouldAnimate = animationsEnabled && !compactDevice;
+  const shouldAnimate = animationsEnabled;
   const { sound } = useGameIntegration();
   const { displayMatches, totalCount, isLoading, hasMatches, removeMatch, clearAllMatches, getDisplayMatches } =
     useRecentMatches();
@@ -200,20 +200,6 @@ function RecentMatchesSection({
     };
   }, [removeMatch]);
 
-  // Section animation variants
-  const sectionVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: RECENT_MATCHES_CONFIG.ANIMATION.SECTION_DURATION,
-        delay: RECENT_MATCHES_CONFIG.ANIMATION.SECTION_DELAY,
-        ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
-      },
-    },
-  };
-
   const listVariants = {
     hidden: {},
     visible: {
@@ -239,10 +225,9 @@ function RecentMatchesSection({
 
   return (
     <motion.section
-      variants={shouldAnimate ? sectionVariants : undefined}
-      initial={shouldAnimate ? 'hidden' : false}
+      initial={false}
       animate="visible"
-      className={`deferred-content w-full ${className}`}
+      className={`w-full ${className}`}
       aria-label="Recent matches history"
     >
       {/* Section container with glass effect */}

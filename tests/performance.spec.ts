@@ -174,12 +174,14 @@ test('initial calculator loading does not fetch optional media or external fonts
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
   await expect(page.locator('#name1')).toBeVisible();
-  await page.waitForTimeout(2000);
-  expect(optionalRequests).toEqual([]);
   if (isMobile) {
-    await expect(page.locator('[data-background="static"]')).toBeAttached();
+    // Phones start with the compositor-only ambient background; the particle
+    // canvas is only added once the page has loaded and gone idle.
+    await expect(page.locator('[data-background="ambient"]')).toBeAttached();
     await expect(page.locator('[data-background] canvas')).toHaveCount(0);
   }
+  await page.waitForTimeout(2000);
+  expect(optionalRequests).toEqual([]);
   // Deferred music must remain available after a real interaction.
   await page.getByRole('button', { name: 'Open settings', exact: true }).click();
   await expect

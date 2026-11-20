@@ -10,6 +10,7 @@
 @import '../styles/theme/dark.css';
 
 @import '../styles/theme.css';
+@import '../styles/result-motion.css';
 
 /* Import seasonal theme styles */
 @import '../styles/seasonal-themes.css';
@@ -30,8 +31,9 @@
 
   body {
     min-height: 100%;
-    overflow-y: hidden; /* Prevent vertical scrolling */
-    overflow-x: hidden; /* Prevent horizontal scrolling */
+    /* clip (unlike hidden) does not turn body into a scroll container, so
+       position: sticky keeps working against the viewport. */
+    overflow-x: clip;
   }
 
   #root {

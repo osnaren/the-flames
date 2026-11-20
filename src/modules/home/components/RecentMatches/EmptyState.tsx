@@ -75,7 +75,7 @@ function EmptyState({ shouldAnimate }: EmptyStateProps) {
       {/* Main text */}
       <motion.div variants={shouldAnimate ? itemVariants : undefined}>
         <h4 className="text-on-surface mb-1 text-base font-medium">No matches yet</h4>
-        <p className="text-on-surface-variant/70 max-w-60 text-sm">
+        <p className="text-on-surface-variant max-w-60 text-sm">
           Enter two names above to discover your FLAMES connection!
         </p>
       </motion.div>
@@ -83,7 +83,7 @@ function EmptyState({ shouldAnimate }: EmptyStateProps) {
       {/* Subtle hint */}
       <motion.p
         variants={shouldAnimate ? itemVariants : undefined}
-        className="text-on-surface-variant/50 mt-4 flex items-center gap-1 text-xs"
+        className="text-on-surface-variant mt-4 flex items-center gap-1 text-xs"
       >
         <span className="text-blue-500">F</span>
         <span className="text-pink-500">L</span>

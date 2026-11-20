@@ -2,7 +2,7 @@ import { useDeferredAction } from '@/hooks/useDeferredAction';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { motion } from 'framer-motion';
 import { BarChart3, ImageDown, Link2, RotateCcw, Share2 } from 'lucide-react';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback } from 'react';
 
 import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { cn } from '@/utils';
@@ -49,7 +49,6 @@ function DockButton({
   pendingLabel,
 }: DockButtonProps) {
   const { shouldAnimate } = useAnimationPreferences();
-  const [isPressed, setIsPressed] = useState(false);
   const ButtonElement = compact ? 'button' : motion.button;
 
   return (
@@ -58,20 +57,17 @@ function DockButton({
       onClick={onClick}
       disabled={isBusy}
       aria-busy={isBusy || undefined}
+      style={{ '--rise-delay': `${0.45 + delay}s`, '--rise-distance': '16px' } as React.CSSProperties}
       {...(!compact && {
-        onPointerDown: () => setIsPressed(true),
-        onPointerUp: () => setIsPressed(false),
-        onPointerLeave: () => setIsPressed(false),
-        initial: shouldAnimate ? { opacity: 0, y: 20, scale: 0.8 } : false,
-        animate: { opacity: 1, y: 0, scale: isPressed ? 0.95 : 1 },
-        transition: { delay: shouldAnimate ? delay : 0, type: 'spring', stiffness: 400, damping: 25 },
         whileHover: shouldAnimate ? { scale: 1.1, y: -4 } : {},
-        whileTap: { scale: 0.9 },
+        whileTap: { scale: 0.92 },
+        transition: { type: 'spring', stiffness: 400, damping: 25 },
       })}
       className={cn(
         'group relative flex cursor-pointer flex-col items-center gap-1.5 rounded-2xl px-3 py-2.5',
         'bg-linear-to-br shadow-lg',
-        'transition-all duration-200',
+        'transition-[opacity,box-shadow] duration-200 active:scale-95',
+        shouldAnimate && 'result-stagger',
         'disabled:cursor-wait disabled:opacity-60',
         'focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-transparent focus:outline-none',
         variantStyles[variant]
@@ -166,18 +162,11 @@ function ResultActionsDock({
   if (!isVisible) return null;
 
   return (
-    <motion.div
+    <div
       data-result-actions
-      initial={shouldAnimate ? { opacity: 0, y: 30, scale: 0.9 } : false}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 20, scale: 0.9 }}
-      transition={{
-        type: 'spring',
-        stiffness: 300,
-        damping: 25,
-        delay: shouldAnimate ? 0.3 : 0,
-      }}
+      style={{ '--rise-delay': '0.35s', '--rise-distance': '24px' } as React.CSSProperties}
       className={cn(
+        shouldAnimate && 'result-stagger',
         'mt-4 flex flex-wrap items-center justify-center gap-2 sm:gap-3',
         'rounded-3xl border border-white/10 px-3 py-3',
         compactDevice ? 'bg-surface-container-high' : 'bg-black/20 backdrop-blur-xl',
@@ -240,7 +229,7 @@ function ResultActionsDock({
           compact={compactDevice}
         />
       )}
-    </motion.div>
+    </div>
   );
 }
 

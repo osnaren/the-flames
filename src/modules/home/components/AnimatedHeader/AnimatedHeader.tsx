@@ -1,7 +1,6 @@
 import { useGameIntegration } from '@/hooks/useGameIntegration';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { AnimatePresence, motion, Variants } from 'framer-motion';
-import { memo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { memo, useState, type CSSProperties } from 'react';
 import { FLAMES_LETTERS } from '../../constants';
 import type { GameStage } from '../../types';
 
@@ -10,191 +9,123 @@ interface AnimatedHeaderProps {
   stage: GameStage;
 }
 
-const letterContainerVariants: Variants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.1,
-    },
-  },
-};
+const FLOATERS = [
+  { emoji: '💖', left: '2%', top: '6%', duration: 4.2, delay: 0 },
+  { emoji: '✨', left: '91%', top: '2%', duration: 3.6, delay: -1.2 },
+  { emoji: '💕', left: '94%', top: '44%', duration: 4.8, delay: -2.1 },
+  { emoji: '💫', left: '0%', top: '50%', duration: 5.2, delay: -0.6 },
+  { emoji: '💝', left: '86%', top: '22%', duration: 4.4, delay: -3 },
+] as const;
 
-const letterVariants: Variants = {
-  hidden: { opacity: 0, y: 30, scale: 0.8, rotateX: -90 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    rotateX: 0,
-    transition: {
-      type: 'spring',
-      stiffness: 150,
-      damping: 12,
-      duration: 0.6,
-    },
-  },
-};
-
+/**
+ * The FLAMES wordmark.
+ *
+ * Entrance and idle motion are CSS keyframes on transform/opacity, so they start
+ * with the very first paint (before hydration) and run on the compositor. The
+ * letters are never transparent, which keeps them out of the LCP critical path.
+ */
 function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const { sound } = useGameIntegration();
-  const compactDevice = useMediaQuery('(max-width: 767px), (pointer: coarse)');
-  const animateDecoration = shouldAnimate && !compactDevice;
-
   const isCompact = stage === 'processing' || stage === 'result';
 
   return (
-    <motion.div
+    <div
       role="group"
       aria-label="FLAMES title"
-      className="font-handwriting relative mb-8 text-center md:mb-12"
-      initial={false}
-      animate={{
-        opacity: 1,
-        y: 0,
-        scale: isCompact ? 0.85 : 1,
-      }}
-      transition={{
-        duration: 0.5,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      }}
+      className="font-handwriting relative mb-6 origin-top text-center transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:mb-10"
+      style={{ transform: isCompact ? 'scale(0.85)' : undefined }}
     >
       {/* Main FLAMES Title */}
-      <motion.div
-        className="relative mb-4 flex items-center justify-center gap-1 md:gap-2"
-        variants={letterContainerVariants}
-        initial="visible"
-        animate="visible"
-        style={{ perspective: '1000px' }}
-      >
+      <div className="relative mb-3 flex items-center justify-center gap-1 md:mb-4 md:gap-2">
         {FLAMES_LETTERS.map((item, index) => (
-          <motion.div
+          <div
             key={item.char}
-            variants={letterVariants}
-            className="group relative cursor-pointer"
-            onHoverStart={() => {
-              if (shouldAnimate) {
+            className="motion-letter-pop relative"
+            style={{ '--letter-delay': `${0.08 + index * 0.07}s` } as CSSProperties}
+          >
+            <motion.div
+              className="relative cursor-default select-none"
+              onHoverStart={() => {
+                if (!shouldAnimate) return;
                 sound.playSound('hover');
                 setHoveredIndex(index);
-              }
-            }}
-            onHoverEnd={() => shouldAnimate && setHoveredIndex(null)}
-            whileHover={
-              shouldAnimate
-                ? {
-                    scale: 1.15,
-                    y: -8,
-                    rotateY: 15,
-                    transition: { type: 'spring', stiffness: 400, damping: 15 },
-                  }
-                : {}
-            }
-          >
-            {/* Letter with gradient */}
-            <span
-              className={`relative inline-block bg-linear-to-br ${item.color} bg-clip-text text-5xl font-black text-transparent drop-shadow-lg md:text-6xl lg:text-7xl xl:text-8xl`}
-              style={{
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
               }}
+              onHoverEnd={() => setHoveredIndex(null)}
+              whileHover={shouldAnimate ? { scale: 1.15, y: -8, rotate: index % 2 ? 4 : -4 } : undefined}
+              transition={{ type: 'spring', stiffness: 400, damping: 15 }}
             >
-              {item.char}
-            </span>
+              <span
+                className={`relative inline-block bg-linear-to-br ${item.color} bg-clip-text text-5xl font-black text-transparent drop-shadow-lg md:text-6xl lg:text-7xl xl:text-8xl`}
+                style={{ WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
+              >
+                {item.char}
+              </span>
 
-            {/* Glow effect on hover */}
-            {shouldAnimate && hoveredIndex === index && (
-              <motion.div
-                className={`absolute inset-0 -z-10 bg-linear-to-br ${item.color} opacity-30 blur-xl`}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 0.4, scale: 1.2 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-              />
-            )}
-
-            {/* Emoji tooltip on hover */}
-            <AnimatePresence>
-              {shouldAnimate && hoveredIndex === index && (
-                <motion.div
-                  className="pointer-events-none absolute -top-12 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center md:-top-16"
-                  initial={{ opacity: 0, y: 8, scale: 0.5 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -8, scale: 0.5, transition: { duration: 0.15 } }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-                >
-                  <span className="text-3xl md:text-4xl">{item.emoji}</span>
-                  <span className="mt-1 rounded-full bg-black/70 px-2 py-0.5 text-xs font-medium text-white backdrop-blur-sm">
-                    {item.full}
-                  </span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
+              {/* Emoji tooltip on hover (pointer devices only) */}
+              <AnimatePresence>
+                {shouldAnimate && hoveredIndex === index && (
+                  <motion.div
+                    className="pointer-events-none absolute -top-12 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center md:-top-16"
+                    initial={{ opacity: 0, y: 8, scale: 0.5 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.5, transition: { duration: 0.15 } }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+                  >
+                    <span className="text-3xl md:text-4xl">{item.emoji}</span>
+                    <span className="mt-1 rounded-full bg-black/70 px-2 py-0.5 text-xs font-medium whitespace-nowrap text-white">
+                      {item.full}
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </div>
         ))}
-      </motion.div>
+      </div>
 
-      <h1 className="font-heading text-on-surface mb-3 text-xl font-bold md:text-2xl">
+      <h1 className="font-heading text-on-surface mb-2 text-xl font-bold md:text-2xl">
         FLAMES Calculator — Play the Name Game
       </h1>
 
       {/* Subtitle */}
-      <motion.p
-        className="font-heading text-on-surface-variant mx-auto max-w-md text-lg font-medium md:text-xl lg:text-2xl"
-        initial={false}
-        animate={{ opacity: isCompact ? 0.7 : 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
+      <p
+        className="font-heading text-on-surface-variant mx-auto max-w-md text-lg font-medium transition-opacity duration-500 md:text-xl lg:text-2xl"
+        style={{ opacity: isCompact ? 0.7 : 1 }}
       >
         <span className="inline-block">Discover your relationship destiny</span>
-        <motion.span
-          className="ml-2 inline-block"
-          animate={
-            animateDecoration && !isCompact
-              ? {
-                  rotate: [0, 15, -15, 0],
-                  scale: [1, 1.2, 1.2, 1],
-                }
-              : {}
-          }
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            repeatDelay: 3,
-            ease: 'easeInOut',
-          }}
-        >
+        <span className={`ml-2 inline-block ${shouldAnimate && !isCompact ? 'motion-wiggle' : ''}`} aria-hidden="true">
           ✨
-        </motion.span>
-      </motion.p>
+        </span>
+      </p>
 
       {/* Floating decorative elements */}
-      {animateDecoration && !isCompact && (
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          {[...Array(5)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute text-2xl opacity-60"
-              style={{
-                left: `${15 + i * 18}%`,
-                top: `${20 + (i % 3) * 25}%`,
-              }}
-              animate={{
-                y: [0, -20, 0],
-                opacity: [0.3, 0.7, 0.3],
-                scale: [0.9, 1.1, 0.9],
-              }}
-              transition={{
-                duration: 3 + i * 0.5,
-                repeat: Infinity,
-                delay: i * 0.4,
-                ease: 'easeInOut',
-              }}
+      {shouldAnimate && !isCompact && (
+        <div
+          className="motion-rise pointer-events-none absolute -inset-x-2 inset-y-0 overflow-hidden"
+          style={{ '--rise-distance': '0px' } as CSSProperties}
+          aria-hidden="true"
+        >
+          {FLOATERS.map((floater) => (
+            <span
+              key={floater.emoji}
+              className="motion-float absolute text-xl opacity-60 md:text-2xl"
+              style={
+                {
+                  left: floater.left,
+                  top: floater.top,
+                  '--float-duration': `${floater.duration}s`,
+                  '--float-delay': `${floater.delay}s`,
+                  '--float-distance': '-14px',
+                } as CSSProperties
+              }
             >
-              {['💖', '💕', '✨', '💫', '💝'][i]}
-            </motion.div>
+              {floater.emoji}
+            </span>
           ))}
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }
 

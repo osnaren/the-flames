@@ -169,31 +169,48 @@ function InputFormComponent({
             : {}
         }
       >
-        {/* Decorative gradient blob */}
-        {!compactDevice && (
-          <>
-            <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-linear-to-br from-pink-500/20 to-purple-500/20 blur-3xl" />
-            <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-linear-to-br from-blue-500/20 to-cyan-500/20 blur-3xl" />
-          </>
-        )}
+        {/* Decorative colour blobs: soft radial gradients instead of blur filters */}
+        <div
+          aria-hidden="true"
+          className={`pointer-events-none absolute -top-24 -right-24 h-56 w-56 rounded-full ${shouldAnimate ? 'motion-drift' : ''}`}
+          style={
+            {
+              backgroundImage:
+                'radial-gradient(circle, rgb(236 72 153 / 0.22), rgb(168 85 247 / 0.08) 45%, transparent 70%)',
+              '--drift-duration': '14s',
+            } as React.CSSProperties
+          }
+        />
+        <div
+          aria-hidden="true"
+          className={`pointer-events-none absolute -bottom-24 -left-24 h-56 w-56 rounded-full ${shouldAnimate ? 'motion-drift' : ''}`}
+          style={
+            {
+              backgroundImage:
+                'radial-gradient(circle, rgb(59 130 246 / 0.2), rgb(6 182 212 / 0.08) 45%, transparent 70%)',
+              '--drift-duration': '17s',
+              '--drift-delay': '-6s',
+            } as React.CSSProperties
+          }
+        />
 
         <form onSubmit={handleSubmit} className="relative space-y-6">
           {/* Header */}
           <div className="mb-6 text-center">
-            <motion.div
-              className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-pink-500 to-rose-500 shadow-lg"
-              animate={
-                animateDecorations
-                  ? {
-                      scale: [1, 1.05, 1],
-                      rotate: [0, 5, -5, 0],
-                    }
-                  : {}
-              }
-              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              <Heart className="h-6 w-6 text-white" fill="currentColor" />
-            </motion.div>
+            <div className="relative mx-auto mb-3 h-12 w-12">
+              {shouldAnimate && (
+                <span
+                  aria-hidden="true"
+                  className="motion-ring absolute inset-0 rounded-full border-2 border-pink-400/60"
+                />
+              )}
+              <div
+                className={`relative flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-pink-500 to-rose-500 shadow-lg shadow-pink-500/30 ${shouldAnimate ? 'motion-pulse' : ''}`}
+                style={{ '--pulse-scale': '1.08', '--pulse-duration': '2.6s' } as React.CSSProperties}
+              >
+                <Heart className="h-6 w-6 text-white" fill="currentColor" />
+              </div>
+            </div>
             <h2 className="font-heading text-on-surface text-xl font-bold md:text-2xl">Enter Two Names</h2>
             <p className="text-on-surface-variant mt-1 text-sm">Find out what destiny has in store</p>
           </div>
@@ -257,13 +274,13 @@ function InputFormComponent({
             {/* Heart divider */}
             <div className="flex items-center justify-center py-1">
               <div className="h-px flex-1 bg-linear-to-r from-transparent via-gray-300 to-transparent dark:via-gray-600" />
-              <motion.span
-                className="mx-4 text-2xl"
-                animate={animateDecorations && name1 && name2 ? { scale: [1, 1.2, 1] } : {}}
-                transition={{ duration: 1, repeat: Infinity }}
+              <span
+                aria-hidden="true"
+                className={`mx-4 inline-block text-2xl transition-transform duration-300 ${shouldAnimate && name1 && name2 ? 'motion-pulse' : ''}`}
+                style={{ '--pulse-scale': '1.22', '--pulse-duration': '1s' } as React.CSSProperties}
               >
                 💕
-              </motion.span>
+              </span>
               <div className="h-px flex-1 bg-linear-to-r from-transparent via-gray-300 to-transparent dark:via-gray-600" />
             </div>
 
@@ -338,7 +355,7 @@ function InputFormComponent({
           <SubmitButton
             type="submit"
             disabled={!hydrated || !isFormValid || isBusy}
-            className="group relative w-full overflow-hidden rounded-xl bg-linear-to-r from-pink-500 via-rose-500 to-red-500 px-6 py-4 font-bold text-white shadow-lg transition-[box-shadow,opacity,transform] duration-300 disabled:cursor-not-allowed disabled:opacity-50"
+            className="group relative w-full overflow-hidden rounded-xl bg-linear-to-r from-pink-500 via-rose-500 to-red-500 px-6 py-4 font-bold text-white shadow-lg shadow-rose-500/25 transition-[box-shadow,opacity,transform] duration-300 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             {...(!compactDevice && {
               whileHover:
                 animateDecorations && isFormValid && !isBusy
@@ -348,21 +365,9 @@ function InputFormComponent({
             })}
           >
             {/* Shine effect */}
-            <motion.div
-              className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/30 to-transparent"
-              animate={
-                animateDecorations && isFormValid && !isBusy
-                  ? {
-                      translateX: ['-100%', '100%'],
-                    }
-                  : {}
-              }
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatDelay: 3,
-                ease: 'easeInOut',
-              }}
+            <span
+              aria-hidden="true"
+              className={`absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent ${shouldAnimate && isFormValid && !isBusy ? 'motion-sweep' : 'opacity-0'}`}
             />
 
             <span className="relative flex items-center justify-center gap-2">
