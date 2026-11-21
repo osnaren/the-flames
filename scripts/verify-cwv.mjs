@@ -5,6 +5,12 @@ import os from 'node:os';
 import process from 'node:process';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { chromium, devices } from 'playwright';
+// Local Core Web Vitals check. Settings come from CWV_* env vars or `--key=value`
+// flags (e.g. `npm run cwv -- --scenario=game --base=http://127.0.0.1:3000`).
+for (const arg of process.argv.slice(2)) {
+  const match = /^--([a-z-]+)=(.*)$/.exec(arg);
+  if (match) process.env[`CWV_${match[1].replaceAll('-', '_').toUpperCase()}`] = match[2];
+}
 const dir = process.env.CWV_OUTPUT_DIR || '.cwv';
 await fs.mkdir(dir, { recursive: true });
 const base = process.env.CWV_BASE || 'https://theflames.app';

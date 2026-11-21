@@ -55,3 +55,6 @@ yarn-error.log*
 seo-audit-evidence
 .cwv/
 docs/audits/
+
+# Local SEO audit output
+theflames.app-audit/

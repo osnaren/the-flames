@@ -22,7 +22,10 @@
     "test:debug": "playwright test --debug",
     "test:a11y": "playwright test tests/a11y.spec.ts",
     "test:a11y:headed": "playwright test tests/a11y.spec.ts --headed",
-    "test:a11y:debug": "playwright test tests/a11y.spec.ts --debug"
+    "test:a11y:debug": "playwright test tests/a11y.spec.ts --debug",
+    "cwv": "node scripts/verify-cwv.mjs --device=mobile --cpu=4 --slow-network=true --interact=true",
+    "cwv:desktop": "node scripts/verify-cwv.mjs --device=desktop --cpu=1 --slow-network=true --interact=true",
+    "cwv:game": "node scripts/verify-cwv.mjs --device=mobile --cpu=4 --scenario=game --slow-network=true --interact=true"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --fix",
