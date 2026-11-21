@@ -136,7 +136,7 @@ const SponsorFAB: React.FC = () => {
                   className={cn(
                     'h-14 w-14 overflow-hidden rounded-full shadow-lg transition-colors duration-200 ease-in-out',
                     isOpen
-                      ? 'bg-error-container text-on-error-container hover:bg-destructive/90'
+                      ? 'bg-error-container text-on-error-container hover:bg-error-container/90'
                       : 'bg-primary text-on-primary hover:bg-primary/90'
                   )}
                   onClick={toggleFab}

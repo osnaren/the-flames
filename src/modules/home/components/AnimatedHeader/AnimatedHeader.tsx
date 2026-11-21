@@ -11,13 +11,17 @@ interface AnimatedHeaderProps {
   stage: GameStage;
 }
 
-/** Positions and timing for the five hero floaters; the emoji changes per season. */
+/**
+ * Positions and timing for the five hero floaters; the emoji changes per season.
+ * The two mid-height ones sit beside the H1, which wraps to full width on phones,
+ * so they only appear from the `sm` breakpoint up.
+ */
 const FLOATER_SLOTS = [
-  { left: '2%', top: '6%', duration: 4.2, delay: 0 },
-  { left: '91%', top: '2%', duration: 3.6, delay: -1.2 },
-  { left: '94%', top: '44%', duration: 4.8, delay: -2.1 },
-  { left: '0%', top: '50%', duration: 5.2, delay: -0.6 },
-  { left: '86%', top: '22%', duration: 4.4, delay: -3 },
+  { left: '2%', top: '6%', duration: 4.2, delay: 0, wideOnly: false },
+  { left: '91%', top: '2%', duration: 3.6, delay: -1.2, wideOnly: false },
+  { left: '94%', top: '44%', duration: 4.8, delay: -2.1, wideOnly: true },
+  { left: '0%', top: '50%', duration: 5.2, delay: -0.6, wideOnly: true },
+  { left: '86%', top: '22%', duration: 4.4, delay: -3, wideOnly: false },
 ] as const;
 
 const HERO_FLOATERS: Record<SeasonalTheme, readonly [string, string, string, string, string]> = {
@@ -131,7 +135,7 @@ function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) 
           {FLOATER_SLOTS.map((floater, index) => (
             <span
               key={`${currentTheme}-${index}`}
-              className="motion-float absolute text-xl opacity-60 md:text-2xl"
+              className={`motion-float absolute text-xl opacity-60 md:text-2xl ${floater.wideOnly ? 'hidden sm:inline' : ''}`}
               style={
                 {
                   left: floater.left,

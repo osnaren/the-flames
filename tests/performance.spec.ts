@@ -70,13 +70,17 @@ test('settings do not preload sound effects for unplayed game stages', async ({ 
 });
 
 test('touch settings preserve season, music and volume choices', async ({ page, isMobile }) => {
-  test.skip(!isMobile, 'Native controls are used on touch screens.');
+  test.skip(!isMobile, 'Covers the compact touch settings panel.');
   await page.goto('/');
   await expect(page.locator('#name1')).toBeEnabled();
   await page.getByRole('button', { name: 'Open settings', exact: true }).click();
-  await page.getByRole('combobox', { name: 'Seasonal theme', exact: true }).selectOption('default');
+  const choose = async (combobox: string, option: string) => {
+    await page.getByRole('combobox', { name: combobox, exact: true }).tap();
+    await page.getByRole('option', { name: option, exact: true }).tap();
+  };
+  await choose('Seasonal theme', 'Default');
   await expect(page.locator('body')).toHaveClass(/default-theme/);
-  await page.getByRole('combobox', { name: 'Music theme', exact: true }).selectOption('chill');
+  await choose('Music theme', 'Chill');
   await expect.poll(() => page.evaluate(() => localStorage.getItem('musicTheme'))).toBe('chill');
   const volume = page.getByRole('slider', { name: 'Volume control', exact: true });
   await volume.focus();
@@ -88,8 +92,8 @@ test('touch settings preserve season, music and volume choices', async ({ page, 
   await expect(page.getByRole('button', { name: 'Unmute music', exact: true })).toBeVisible();
   await page.reload();
   await page.getByRole('button', { name: 'Open settings', exact: true }).click();
-  await expect(page.getByRole('combobox', { name: 'Seasonal theme', exact: true })).toHaveValue('default');
-  await expect(page.getByRole('combobox', { name: 'Music theme', exact: true })).toHaveValue('chill');
+  await expect(page.getByRole('combobox', { name: 'Seasonal theme', exact: true })).toHaveText(/Default/);
+  await expect(page.getByRole('combobox', { name: 'Music theme', exact: true })).toHaveText(/Chill/);
   await expect(page.getByRole('slider', { name: 'Volume control', exact: true })).toHaveValue('0.15');
 });
 

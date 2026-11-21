@@ -139,6 +139,8 @@ export default function FloatingControlPanel() {
       if (!isExpanded) return;
 
       if (e.key === 'Escape') {
+        // An open dropdown closes itself first; only a second Escape closes the panel.
+        if (document.querySelector('[data-radix-select-viewport]')) return;
         setIsExpanded(false);
         toggleButtonRef.current?.focus();
       }
@@ -385,7 +387,8 @@ export default function FloatingControlPanel() {
                         Seasonal Theme
                       </span>
                     </div>
-                    <div className="min-h-16">
+                    {/* Reserves the dropdown's height while the selector loads. */}
+                    <div className="min-h-10">
                       <SeasonalThemeSelector isExpanded={isExpanded} compact />
                     </div>
                   </div>

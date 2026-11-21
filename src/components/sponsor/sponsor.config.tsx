@@ -14,6 +14,8 @@ export interface SponsorOptionConfig {
   textColor: string; // Made textColor mandatory
   action: SponsorAction;
   id: string; // Added unique id for key prop
+  /** Kept for later but not shown in the support menu. */
+  hidden?: boolean;
 }
 
 // UPI Constants
@@ -21,7 +23,7 @@ export const UPI_ID = '66naren-2@okicici';
 export const UPI_NAME = 'Obuli Sai Naren';
 
 // Sponsor Options Array
-export const sponsorOptions: SponsorOptionConfig[] = [
+const allSponsorOptions: SponsorOptionConfig[] = [
   {
     id: 'bmc',
     label: 'Buy Me a Coffee',
@@ -29,6 +31,7 @@ export const sponsorOptions: SponsorOptionConfig[] = [
     bgColor: 'bg-[#FFDD00] hover:bg-[#FFDD00]/90',
     textColor: 'text-black',
     action: { type: 'link', href: 'https://www.buymeacoffee.com/osnaren' },
+    hidden: true,
   },
   {
     id: 'github',
@@ -37,6 +40,7 @@ export const sponsorOptions: SponsorOptionConfig[] = [
     bgColor: 'bg-[#db61a2] hover:bg-[#db61a2]/90',
     textColor: 'text-white',
     action: { type: 'link', href: 'https://github.com/sponsors/osnaren' },
+    hidden: true,
   },
   {
     id: 'paypal',
@@ -63,3 +67,6 @@ export const sponsorOptions: SponsorOptionConfig[] = [
     action: { type: 'modal', modalId: 'upi' },
   },
 ];
+
+/** Options shown in the support menu. */
+export const sponsorOptions = allSponsorOptions.filter((option) => !option.hidden);

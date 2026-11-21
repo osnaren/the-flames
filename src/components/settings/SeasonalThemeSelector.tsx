@@ -1,6 +1,14 @@
 'use client';
 
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/shadcn/carousel';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/shadcn/select';
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { useGameIntegration } from '@/hooks/useGameIntegration';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -199,27 +207,44 @@ function SeasonalThemeSelector({ isExpanded, compact = false }: SeasonalThemeSel
   if (compact || compactDevice) {
     return (
       <div role="group" aria-label="Seasonal theme selector">
-        <select
-          aria-label="Seasonal theme"
+        <Select
           value={manualOverride ?? 'auto'}
-          onChange={(event) => {
-            if (event.target.value === 'auto') {
+          onValueChange={(value) => {
+            if (value === 'auto') {
               uiInteraction('select');
               setManualTheme(null);
             } else {
-              handleThemeSelect(event.target.value as SeasonalTheme);
+              handleThemeSelect(value as SeasonalTheme);
             }
           }}
-          className="bg-surface-container-high/50 border-outline/20 text-on-surface h-10 w-full rounded-lg border px-2 text-xs [color-scheme:light] dark:[color-scheme:dark]"
-          tabIndex={isExpanded ? 0 : -1}
         >
-          <option value="auto">Automatic ({themes[detectedTheme].name})</option>
-          {orderedThemes.map((theme) => (
-            <option key={theme.id} value={theme.id}>
-              {theme.emoji} {theme.name}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger aria-label="Seasonal theme" className="h-10 text-xs" tabIndex={isExpanded ? 0 : -1}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="max-h-[min(20rem,var(--radix-select-content-available-height))]">
+            <SelectItem value="auto" className="text-xs">
+              <span className="flex items-center gap-2">
+                <span aria-hidden="true">✨</span>
+                <span>
+                  Automatic
+                  <span className="text-on-surface-variant font-normal">
+                    {' '}
+                    · {themes[detectedTheme].emoji} {themes[detectedTheme].name}
+                  </span>
+                </span>
+              </span>
+            </SelectItem>
+            <SelectSeparator />
+            {orderedThemes.map((theme) => (
+              <SelectItem key={theme.id} value={theme.id} className="text-xs">
+                <span className="flex items-center gap-2">
+                  <span aria-hidden="true">{theme.emoji}</span>
+                  <span>{theme.name}</span>
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     );
   }
