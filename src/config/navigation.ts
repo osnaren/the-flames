@@ -57,9 +57,14 @@ export const FOOTER_CONFIG = {
         description: 'Play the FLAMES name game',
       },
       {
-        label: 'How It Works',
+        label: 'How to Play FLAMES',
         to: '/how-it-works',
-        description: 'Learn the FLAMES algorithm and methodology',
+        description: 'FLAMES rules, step by step',
+      },
+      {
+        label: 'FLAMES Meaning',
+        to: '/flames-meaning',
+        description: 'What each FLAMES letter stands for',
       },
       {
         label: 'Manual Mode',

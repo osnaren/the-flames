@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
+import { CONTENT_UPDATED } from '../src/lib/seo/content';
 import { calculateFlamesResult, findCommonLetters } from '../src/modules/home/utils';
 
 test.use({ javaScriptEnabled: false, baseURL: 'http://127.0.0.1:3000' });
@@ -7,7 +8,7 @@ test.use({ javaScriptEnabled: false, baseURL: 'http://127.0.0.1:3000' });
 test('the calculator form renders in the first HTML without JavaScript', async ({ page }) => {
   await page.goto('/');
   await expect(
-    page.getByRole('heading', { name: 'FLAMES Calculator — Play the Name Game', exact: true })
+    page.getByRole('heading', { name: 'FLAMES Calculator — Play the FLAMES Game Online', exact: true })
   ).toBeVisible();
   await expect(page.locator('#name1')).toBeVisible();
   await expect(page.locator('#name2')).toBeVisible();
@@ -16,9 +17,11 @@ test('the calculator form renders in the first HTML without JavaScript', async (
 
 test('the homepage guide and contextual links are readable without JavaScript', async ({ page }) => {
   await page.goto('/');
-  await expect(page).toHaveTitle('FLAMES Calculator — Free Online Name Game');
-  await expect(page.getByRole('heading', { name: 'What is the FLAMES calculator?', exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Worked example: Rahul and Priya' })).toBeVisible();
+  await expect(page).toHaveTitle('FLAMES Calculator: Free FLAMES Game & Love Test Online');
+  await expect(
+    page.getByRole('heading', { name: 'FLAMES calculator: play the FLAMES game online', exact: true })
+  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Rahul and Priya → Marriage' })).toBeVisible();
   const article = page.locator('article').filter({ has: page.locator('#flames-calculator-guide') });
   await expect(article.getByRole('link', { name: 'manual FLAMES mode' })).toHaveAttribute('href', '/manual');
   await expect(article.getByRole('link', { name: 'privacy policy' })).toHaveAttribute('href', '/privacy');
@@ -51,7 +54,7 @@ test('the hydrated calculator and visible guide fit the viewport', async ({ brow
   const page = await context.newPage();
   await page.route('**/*.supabase.co/**', (route) => route.abort());
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'FLAMES Calculator — Play the Name Game' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'FLAMES Calculator — Play the FLAMES Game Online' })).toBeVisible();
   await expect(page.locator('#flames-calculator-guide')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({
@@ -123,8 +126,13 @@ test('sitemap contains canonical public pages without synthetic update dates', a
   const response = await request.get('/sitemap.xml');
   expect(response.status()).toBe(200);
   const xml = await response.text();
-  expect([...xml.matchAll(/<loc>/g)]).toHaveLength(7);
-  expect(xml).not.toContain('<lastmod>');
+  expect([...xml.matchAll(/<loc>/g)]).toHaveLength(8);
+  expect(xml).toContain('/flames-meaning</loc>');
+  // lastmod is only the real content-edit date, never a build timestamp.
+  const lastmods = [...xml.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((m) => m[1]);
+  expect(lastmods).toHaveLength(7);
+  for (const lastmod of lastmods) expect(lastmod.startsWith(CONTENT_UPDATED)).toBe(true);
+  expect(xml).toMatch(/\/charts<\/loc>\s*<changefreq>/);
   expect(xml).not.toContain('/share');
   expect(xml).not.toContain('/terms');
 });

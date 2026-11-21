@@ -53,11 +53,15 @@ export const socialLinks = {
  */
 export const pagesSEO = {
   home: {
-    title: 'FLAMES Calculator — Free Online Name Game',
+    title: 'FLAMES Calculator: Free FLAMES Game & Love Test Online',
     description:
-      'Use the free FLAMES calculator with two names. Watch common letters cancel, see your result, or try manual mode. No sign-up; a name game just for fun.',
+      'Calculate FLAMES with two names. Watch the letters cancel and see if you are Friends, Love, Affection, Marriage, Enemies or Siblings. Free, no sign-up.',
     keywords: [
+      'FLAMES',
       'FLAMES game',
+      'FLAMES calculate',
+      'flames love calculator',
+      'flames calculator by name',
       'flames online',
       'flame game',
       'flames game online',
@@ -69,38 +73,55 @@ export const pagesSEO = {
     ogImage: 'https://cdn.osnaren.com/the-flames/v1/og/og.png',
   },
   about: {
-    title: 'About FLAMES Game - The Story Behind the Classic Game',
+    title: 'About FLAMES: The Story Behind the Classic Name Game',
     description:
       'Meet the FLAMES Game project by osLabs: a free online name game with animated calculations, manual play, and shareable results. Explore the source and rules.',
     keywords: ['FLAMES game history', 'FLAMES game origin', 'schoolyard games', 'nostalgic games'],
     ogImage: 'https://cdn.osnaren.com/the-flames/v1/og/about-og.png',
   },
   howItWorks: {
-    title: 'How FLAMES Game Works - Step by Step Guide',
+    title: 'How to Play FLAMES: Rules & Step-by-Step Guide',
     description:
-      'Learn exactly how the FLAMES game works with our interactive step-by-step guide. Understand the algorithm behind calculating relationship compatibility with names.',
+      'Learn how to play FLAMES with two names: cross out common letters, count what is left and strike F-L-A-M-E-S until one letter remains. With examples.',
     keywords: [
       'how FLAMES works',
       'FLAMES algorithm',
       'FLAMES game tutorial',
       'FLAMES game rules',
       'how to play FLAMES',
+      'how to do FLAMES',
+      'FLAMES rules',
+      'how to play flames with names',
     ],
     ogImage: 'https://cdn.osnaren.com/the-flames/v1/og/og.png',
   },
   charts: {
-    title: 'FLAMES Global Charts - Relationship Trends & Statistics',
+    title: 'FLAMES Charts: Live Results & Trends Worldwide',
     description:
-      'Explore global FLAMES game statistics and trends. See the most popular relationship results, trending name pairings, and worldwide compatibility data.',
+      'See how FLAMES games are ending today: the live result mix, top countries, the romance meter and a real-time feed of anonymous results from players worldwide.',
     keywords: ['FLAMES statistics', 'relationship trends', 'love calculator stats', 'popular name pairings'],
     ogImage: 'https://cdn.osnaren.com/the-flames/v1/og/charts-og.png',
   },
   manual: {
-    title: 'Manual FLAMES Mode - Paper & Pencil Style Game',
+    title: 'Play FLAMES by Hand: Manual Paper & Pencil Mode',
     description:
-      'Play FLAMES the traditional way with our manual mode. Cross out letters by hand, just like in school notebooks. A nostalgic paper-and-pencil experience!',
+      'Play FLAMES the traditional way: cross out the common letters yourself, count around F-L-A-M-E-S and draw on a virtual notebook page. Free and nostalgic.',
     keywords: ['manual FLAMES', 'paper FLAMES game', 'traditional FLAMES', 'interactive FLAMES'],
     ogImage: 'https://cdn.osnaren.com/the-flames/v1/og/manual-og.png',
+  },
+  flamesMeaning: {
+    title: 'FLAMES Meaning & Full Form: What Each Letter Stands For',
+    description:
+      'FLAMES stands for Friends, Love, Affection, Marriage, Enemies and Siblings. What each letter means, regional versions and how your result is chosen.',
+    keywords: [
+      'FLAMES meaning',
+      'FLAMES full form',
+      'what does FLAMES stand for',
+      'what does A stand for in FLAMES',
+      'FLAMES meaning in game',
+      'FLAMES meaning Philippines',
+    ],
+    ogImage: 'https://cdn.osnaren.com/the-flames/v1/og/og.png',
   },
   apiDocs: {
     title: 'FLAMES API Documentation - Developer Guide',

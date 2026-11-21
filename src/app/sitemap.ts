@@ -1,3 +1,4 @@
+import { CONTENT_UPDATED } from '@/lib/seo/content';
 import type { MetadataRoute } from 'next';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://theflames.app';
@@ -18,6 +19,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${BASE_URL}/about`,
       changeFrequency: 'monthly',
       priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/flames-meaning`,
+      changeFrequency: 'monthly',
+      priority: 0.9,
     },
     {
       url: `${BASE_URL}/how-it-works`,
@@ -46,5 +52,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  return staticPages;
+  // Content pages carry the real date the guide content last changed. The live
+  // charts page gets no lastmod: a build timestamp would be a synthetic date.
+  const lastModified = new Date(`${CONTENT_UPDATED}T00:00:00Z`);
+  return staticPages.map((page) => (page.url.endsWith('/charts') ? page : { ...page, lastModified }));
 }

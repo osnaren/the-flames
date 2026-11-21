@@ -28,3 +28,16 @@ export {
   generateWebPageSchema,
   generateWebSiteSchema,
 } from './structured-data';
+
+// Long-form content shared by pages and JSON-LD
+export {
+  CONTENT_PUBLISHED,
+  CONTENT_UPDATED,
+  HOME_FAQ,
+  HOW_TO_STEPS,
+  RESULT_MEANINGS,
+  WORKED_EXAMPLES,
+  faqPageSchema,
+  howToSchema,
+} from './content';
+export type { FaqEntry } from './content';
