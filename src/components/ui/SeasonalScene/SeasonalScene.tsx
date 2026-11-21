@@ -3,6 +3,7 @@
 import type { SeasonalTheme } from '@/themes/seasonal/types';
 import { memo, type CSSProperties, type ReactNode } from 'react';
 import * as P from './pieces';
+import { RainRipples, RainSheets } from './Rain';
 
 type Vars = Record<`--${string}`, string>;
 
@@ -754,38 +755,33 @@ function SpringScene() {
 function MonsoonScene() {
   return (
     <>
-      <div className="scene-piece inset-0 overflow-hidden opacity-40">
-        <div
-          className="scene-rain absolute inset-x-0 -top-full h-[200%]"
-          style={
-            {
-              '--dur': '0.6s',
-              backgroundImage:
-                'repeating-linear-gradient(105deg, transparent 0 14px, rgb(125 211 252 / 0.55) 14px 15px, transparent 15px 42px)',
-              backgroundSize: '100% 120px',
-            } as CSSProperties
-          }
-        />
-      </div>
+      {/* Overcast sky: a soft grey wash under the header. */}
+      <div
+        className="scene-piece inset-x-0 top-0 h-[28vh]"
+        style={{ backgroundImage: 'linear-gradient(to bottom, rgb(100 116 139 / 0.22), transparent)' }}
+      />
       {[
-        ['-4%', 'clamp(140px,22vw,300px)', '38s', '0s', '60px'],
-        ['30%', 'clamp(120px,18vw,240px)', '44s', '-12s', '-50px'],
-        ['70%', 'clamp(150px,24vw,320px)', '40s', '-20s', '40px'],
-      ].map(([left, w, dur, delay, drift]) => (
+        ['-6%', 'clamp(160px,22vw,320px)', '46s', '0s', '50px', 0.45, '#94a3b8'],
+        ['27%', 'clamp(120px,15vw,220px)', '52s', '-14s', '-40px', 0.3, '#cbd5e1'],
+        ['63%', 'clamp(170px,23vw,340px)', '48s', '-24s', '45px', 0.4, '#94a3b8'],
+        ['89%', 'clamp(110px,14vw,200px)', '56s', '-8s', '-35px', 0.3, '#cbd5e1'],
+      ].map(([left, w, dur, delay, drift, opacity, fill]) => (
         <Piece
-          key={left}
+          key={left as string}
           anim="scene-drift"
-          className="top-14 opacity-60 md:top-16"
-          style={{ left, width: w, height: `calc(${w} * 0.45)` }}
-          vars={v({ '--dur': dur, '--delay': delay, '--drift': drift })}
+          className="top-16 md:top-[4.5rem]"
+          style={{ left: left as string, width: w as string, height: `calc(${w} * 0.45)`, opacity: opacity as number }}
+          vars={v({ '--dur': dur as string, '--delay': delay as string, '--drift': drift as string })}
         >
-          <P.Cloud fill="#94a3b8" />
+          <P.Cloud fill={fill as string} />
         </Piece>
       ))}
+      <RainSheets />
       <div
-        className="scene-piece inset-x-0 bottom-0 h-[5vh]"
-        style={{ backgroundImage: 'linear-gradient(to top, rgb(14 116 144 / 0.35), transparent)' }}
+        className="scene-piece inset-x-0 bottom-0 h-[6vh]"
+        style={{ backgroundImage: 'linear-gradient(to top, rgb(14 116 144 / 0.3), transparent)' }}
       />
+      <RainRipples />
       {['8%', '76%'].map((left, i) => (
         <Piece
           key={left}

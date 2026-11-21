@@ -191,10 +191,10 @@ export function Skyline({ fill = '#1e1b4b', windows = '#fde68a' }: { fill?: stri
   return (
     <svg viewBox="0 0 800 160" preserveAspectRatio="none">
       <path
-        d="M0 160V96h40V70h30v26h24V50h44v46h20V80h36V30h12V14h8v16h12v66h28V64h46v32h22V44h40v52h26V76h36v20h30V36h50v60h24V60h40v36h30V84h40v-30h34v106z"
+        d="M0 160V96h40V70h30v26h24V50h44v46h20V80h36V30h12V14h8v16h12v66h28V64h46v32h22V44h40v52h26V76h36v20h30V36h50v60h24V60h40v36h30V84h40v-30h34v30h40V40h30v40h28V66h30V160z"
         fill={fill}
       />
-      {[60, 112, 190, 206, 270, 318, 392, 450, 530, 600, 616, 700, 740].map((x, i) => (
+      {[60, 112, 190, 206, 270, 318, 392, 450, 530, 600, 616, 700, 750, 776].map((x, i) => (
         <rect key={x} x={x} y={70 + (i % 4) * 14} width="6" height="8" fill={windows} opacity={0.5 + (i % 3) * 0.2} />
       ))}
     </svg>
@@ -205,7 +205,7 @@ export function MosqueSkyline({ fill = '#064e3b' }: { fill?: string }) {
   return (
     <svg viewBox="0 0 800 170" preserveAspectRatio="none">
       <path
-        d="M0 170V120h60v-20c0-18 22-30 22-30s22 12 22 30v20h40V40l6-14 6 14v80h30V96c0-36 60-58 74-76 14 18 74 40 74 76v24h30V40l6-14 6 14v80h50v-16c0-14 16-24 16-24s16 10 16 24v16h70V50l6-12 6 12v70h40v-14c0-16 18-26 18-26s18 10 18 26v14h82v50z"
+        d="M0 170V120h60v-20c0-18 22-30 22-30s22 12 22 30v20h40V40l6-14 6 14v80h30V96c0-36 60-58 74-76 14 18 74 40 74 76v24h30V40l6-14 6 14v80h50v-16c0-14 16-24 16-24s16 10 16 24v16h70V50l6-12 6 12v70h40v-14c0-16 18-26 18-26s18 10 18 26v14h42V58l6-12 6 12v62h48v-16c0-12 14-20 14-20s14 8 14 20v16h54V170z"
         fill={fill}
       />
     </svg>

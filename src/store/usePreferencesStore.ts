@@ -185,8 +185,10 @@ export const usePreferencesStore = create<PreferencesState & PreferencesActions>
   setSeasonalTheme: (theme: PreferencesState['seasonalTheme']) =>
     set(() => {
       safeLocalStorage.setItem('seasonalTheme', theme);
-      // Music set to 'auto' follows the seasonal theme when it plays; keep it 'auto'.
-      return { seasonalTheme: theme };
+      // Picking a theme brings its music with it: the music returns to 'auto',
+      // which follows the seasonal theme. Choosing music afterwards stays independent.
+      safeLocalStorage.setItem('musicTheme', 'auto');
+      return { seasonalTheme: theme, musicTheme: 'auto' };
     }),
   setMusicTheme: (theme: PreferencesState['musicTheme']) =>
     set(() => {

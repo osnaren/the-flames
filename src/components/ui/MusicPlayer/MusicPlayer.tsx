@@ -13,7 +13,7 @@
  * - Responsive design
  */
 
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/shadcn/select';
+import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger } from '@/components/shadcn/select';
 import { BGM_TRACKS, getTracksForTheme, resolveMusic, SoundId, THEME_GROUPS } from '@/config/sound';
 import { useAnimationPreferences } from '@/hooks/useAnimationPreferences';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
@@ -108,7 +108,10 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0, comp
       // Ensure we have a track playing
       const state = getBGMState();
       try {
-        if (!state.currentTrackId) {
+        // Resume only if the paused track still belongs to the selected music;
+        // after a theme change, start that theme's track instead.
+        const pausedTrack = BGM_TRACKS.find((t) => t.id === state.currentTrackId);
+        if (!pausedTrack || pausedTrack.themeGroup !== currentThemeGroup.id) {
           await playBGM(currentTrack.id as SoundId, true);
         } else {
           await resumeBGM();
@@ -119,7 +122,18 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0, comp
         setIsPlaying(false);
       }
     }
-  }, [isBGMEnabled, isPlaying, toggleBGM, pauseBGM, resumeBGM, playBGM, getBGMState, currentTrack.id, hapticFeedback]);
+  }, [
+    isBGMEnabled,
+    isPlaying,
+    toggleBGM,
+    pauseBGM,
+    resumeBGM,
+    playBGM,
+    getBGMState,
+    currentTrack.id,
+    currentThemeGroup.id,
+    hapticFeedback,
+  ]);
 
   // Handle theme selection
   const handleThemeSelect = useCallback(
@@ -224,22 +238,41 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0, comp
         aria-label="Music player"
         className={cn('border-outline/20 bg-surface-container-low/80 space-y-2 rounded-xl border p-2', className)}
       >
-        <select
-          aria-label="Music theme"
-          value={selectValue}
-          onChange={(event) => {
-            void handleThemeSelect(event.target.value);
-          }}
-          className="bg-surface-container-high/50 text-on-surface h-8 w-full rounded-md px-2 text-xs [color-scheme:light] dark:[color-scheme:dark]"
-          tabIndex={isExpanded ? tabIndex : -1}
-        >
-          <option value="auto">✨ Auto · {currentThemeGroup.label}</option>
-          {THEME_GROUPS.map((group) => (
-            <option key={group.id} value={group.id}>
-              {group.icon} {group.label}
-            </option>
-          ))}
-        </select>
+        <Select value={selectValue} onValueChange={(value) => void handleThemeSelect(value)}>
+          <SelectTrigger aria-label="Music theme" className="h-10 text-xs" tabIndex={isExpanded ? tabIndex : -1}>
+            <span className="flex min-w-0 items-center gap-2">
+              <span aria-hidden="true">{musicTheme === 'auto' ? '✨' : currentThemeGroup.icon}</span>
+              <span className="truncate">
+                {musicTheme === 'auto' ? (
+                  <>
+                    Auto <span className="text-on-surface-variant">· {currentThemeGroup.label}</span>
+                  </>
+                ) : (
+                  currentThemeGroup.label
+                )}
+              </span>
+            </span>
+          </SelectTrigger>
+          <SelectContent className="max-h-[min(20rem,var(--radix-select-content-available-height))]">
+            <SelectItem value="auto" className="text-xs">
+              <span className="flex items-center gap-2">
+                <span aria-hidden="true">✨</span>
+                <span>
+                  Auto <span className="text-on-surface-variant font-normal">· follows the theme</span>
+                </span>
+              </span>
+            </SelectItem>
+            <SelectSeparator />
+            {THEME_GROUPS.map((group) => (
+              <SelectItem key={group.id} value={group.id} className="text-xs">
+                <span className="flex items-center gap-2">
+                  <span aria-hidden="true">{group.icon}</span>
+                  <span>{group.label}</span>
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <div className="flex items-center justify-between">
           <button
             type="button"
@@ -362,10 +395,7 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0, comp
         <div className="flex flex-1 flex-col gap-1.5">
           {/* Theme Selector */}
           <Select value={selectValue} onValueChange={handleThemeSelect}>
-            <SelectTrigger
-              className="bg-surface-container-high/50 hover:bg-surface-container-highest/50 focus:ring-primary/50 h-7 w-full border-none px-2 py-1 text-xs font-medium"
-              tabIndex={isExpanded ? tabIndex : -1}
-            >
+            <SelectTrigger className="h-9 px-2.5 text-xs font-medium" tabIndex={isExpanded ? tabIndex : -1}>
               <div className="flex items-center gap-1.5">
                 <span>{musicTheme === 'auto' ? '✨' : currentThemeGroup.icon}</span>
                 <span>{musicTheme === 'auto' ? `Auto · ${currentThemeGroup.label}` : currentThemeGroup.label}</span>
@@ -381,7 +411,7 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0, comp
                 <div className="flex w-full items-center gap-2">
                   <span>✨</span>
                   <span>Auto</span>
-                  <span className="text-muted-foreground text-[9px]">matches the season</span>
+                  <span className="text-on-surface-variant text-[9px] font-normal">matches the season</span>
                 </div>
               </SelectItem>
               {THEME_GROUPS.map((themeGroup) => {
@@ -392,9 +422,11 @@ function MusicPlayerComponent({ isExpanded = true, className, tabIndex = 0, comp
                       <span>{themeGroup.icon}</span>
                       <div className="flex flex-1 items-center gap-1">
                         <span>{themeGroup.label}</span>
-                        {themeGroup.seasonal && <span className="text-muted-foreground text-[9px]">(Seasonal)</span>}
+                        {themeGroup.seasonal && (
+                          <span className="text-on-surface-variant text-[9px] font-normal">(Seasonal)</span>
+                        )}
                         {trackCount > 1 && (
-                          <span className="text-muted-foreground text-[9px]">• {trackCount} tracks</span>
+                          <span className="text-on-surface-variant text-[9px] font-normal">• {trackCount} tracks</span>
                         )}
                       </div>
                     </div>

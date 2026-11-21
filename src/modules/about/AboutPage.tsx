@@ -276,19 +276,17 @@ export default function AboutPage() {
           <ul className="text-on-surface-variant mt-4 grid gap-1.5 text-sm sm:grid-cols-2">
             {BGM_TRACKS.filter((track) => track.credit).map((track) => (
               <li key={track.id}>
-                “{track.credit!.title}” — {track.credit!.artist}
+                “{track.credit!.title}” — {track.credit!.artist} (
+                <a href={track.credit!.url} className="text-primary underline underline-offset-4">
+                  {track.credit!.license}
+                </a>
+                )
               </li>
             ))}
           </ul>
           <p className="text-on-surface-variant mt-4 text-xs">
-            Licensed under{' '}
-            <a
-              href="https://creativecommons.org/licenses/by/4.0/"
-              className="text-primary underline underline-offset-4"
-            >
-              Creative Commons Attribution 4.0
-            </a>
-            . Other music and sound effects are original to FLAMES.
+            Each track is used under the Creative Commons licence shown. Other music and sound effects are original to
+            FLAMES.
           </p>
         </details>
       </section>

@@ -601,6 +601,10 @@ export function useSoundSystem() {
       }
     }
 
+    // While paused, never start playback on our own: the player picks up the
+    // new theme's track when the user presses play again.
+    if (currentId && !manager.isBGMPlaying()) return;
+
     if (currentId !== targetBgmId) {
       manager.playBGM(targetBgmId, volume);
     }

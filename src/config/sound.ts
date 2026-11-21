@@ -214,12 +214,21 @@ export const SOUND_ASSETS = {
   },
   bgm_monsoon: {
     id: 'bgm_monsoon',
-    src: '/sounds/bgm/bgm-monsoon.mp3',
+    src: '/sounds/bgm/bgm-monsoon-lofi.mp3',
     category: 'bgm',
     loop: true,
     volume: 0.35,
-    label: 'Luminous Rain',
-    description: 'Soft rainy-day glow',
+    label: 'Time To Think (Rain)',
+    description: 'Lo-fi beats with soft rain',
+  },
+  bgm_romance: {
+    id: 'bgm_romance',
+    src: '/sounds/bgm/bgm-romance.mp3',
+    category: 'bgm',
+    loop: true,
+    volume: 0.35,
+    label: 'Sleep',
+    description: 'Tender piano and strings',
   },
   bgm_autumn: {
     id: 'bgm_autumn',
@@ -509,6 +518,21 @@ export const THEME_GROUPS: ThemeGroup[] = [
   { id: 'party', label: 'New Year', icon: '🎉', description: 'Countdown party energy', seasonal: true },
 ];
 
+/** Lo-fi by Purrple Cat (CC BY-SA 3.0), mixed with a CC0 rain recording from Wikimedia Commons. */
+const PURRPLE_CAT_RAIN: TrackCredit = {
+  title: 'Time To Think (with rain)',
+  artist: 'Purrple Cat (purrplecat.com); rain: Wikimedia Commons, CC0',
+  license: 'CC BY-SA 3.0',
+  url: 'https://creativecommons.org/licenses/by-sa/3.0/',
+};
+
+const SCOTT_BUCKLEY = (title: string): TrackCredit => ({
+  title,
+  artist: 'Scott Buckley (scottbuckley.com.au)',
+  license: 'CC BY 4.0',
+  url: 'https://creativecommons.org/licenses/by/4.0/',
+});
+
 const MACLEOD = (title: string): TrackCredit => ({
   title,
   artist: 'Kevin MacLeod (incompetech.com)',
@@ -540,6 +564,15 @@ export const BGM_TRACKS: BGMTrack[] = [
     themeGroup: 'chill',
   },
   // Valentine theme tracks
+  {
+    id: 'bgm_romance',
+    label: 'Sleep',
+    description: 'Tender piano and strings',
+    icon: '💞',
+    seasonal: true,
+    themeGroup: 'valentine',
+    credit: SCOTT_BUCKLEY('Sleep'),
+  },
   {
     id: 'bgm_valentine',
     label: 'Love Ballad',
@@ -658,12 +691,12 @@ export const BGM_TRACKS: BGMTrack[] = [
   },
   {
     id: 'bgm_monsoon',
-    label: 'Luminous Rain',
-    description: 'Soft rainy-day glow',
+    label: 'Time To Think (Rain)',
+    description: 'Lo-fi beats with soft rain',
     icon: '🌧️',
     seasonal: true,
     themeGroup: 'monsoon',
-    credit: MACLEOD('Luminous Rain'),
+    credit: PURRPLE_CAT_RAIN,
   },
   {
     id: 'bgm_autumn',

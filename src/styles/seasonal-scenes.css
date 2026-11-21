@@ -127,15 +127,6 @@
   }
 }
 
-@keyframes scene-rain {
-  from {
-    transform: translate3d(0, -50%, 0);
-  }
-  to {
-    transform: translate3d(0, 0, 0);
-  }
-}
-
 @keyframes scene-flap {
   0%,
   100% {
@@ -171,7 +162,42 @@
   animation: scene-fade-in 1.2s ease-out both;
 }
 
+/* Rain sheets slide down exactly one mask tile per loop, so the loop is seamless. */
+@keyframes scene-rainfall {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, var(--tile, 300px), 0);
+  }
+}
+
+@keyframes scene-ripple {
+  0% {
+    transform: scale(0.15);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+/* Without motion, rain stays as faint still streaks and ripples are hidden. */
+.scene-ripple {
+  opacity: 0;
+}
+
 @media (prefers-reduced-motion: no-preference) {
+  .scene-rainfall {
+    animation: scene-rainfall var(--dur, 1s) linear infinite;
+  }
+  .scene-ripple {
+    animation: scene-ripple var(--dur, 2s) ease-out var(--delay, 0s) infinite;
+  }
   .scene-sway {
     transform-origin: top center;
     animation: scene-sway var(--dur, 4s) ease-in-out var(--delay, 0s) infinite;
@@ -197,9 +223,6 @@
   }
   .scene-drift {
     animation: scene-drift var(--dur, 30s) ease-in-out var(--delay, 0s) infinite;
-  }
-  .scene-rain {
-    animation: scene-rain var(--dur, 0.7s) linear infinite;
   }
   .scene-flap {
     transform-origin: center;
