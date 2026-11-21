@@ -28,9 +28,9 @@ export function SEOContent() {
         <p className="text-on-surface-variant text-sm leading-7">
           FLAMES is the classic notebook name game. Write two names, cancel the letters they share, and count what is
           left around the word <strong>F-L-A-M-E-S</strong> to find out if you are{' '}
-          <strong>Friends, Love, Affection, Marriage, Enemies or Siblings</strong>. This free FLAMES calculator does the
-          counting for you and shows every crossed-out letter, so you can check the result just like on paper. Prefer to
-          do it by hand? Try{' '}
+          <strong>Friends, Love, Affection, Marriage, Enemies or Siblings</strong>. This free FLAMES love calculator
+          does the counting for you and shows every crossed-out letter, so you can check the result just like on paper.
+          Prefer to do it by hand? Try{' '}
           <Link href="/manual" className={linkClass}>
             manual FLAMES mode
           </Link>

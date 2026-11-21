@@ -82,11 +82,9 @@ export const baseMetadata: Metadata = {
     shortcut: 'https://cdn.osnaren.com/the-flames/v1/favicon/favicon.ico',
   },
   manifest: '/favicon/site.webmanifest',
+  // English-only site: a self-referencing hreflang adds nothing, so only the canonical is set.
   alternates: {
     canonical: '/',
-    languages: {
-      'en-US': '/',
-    },
   },
   verification: {},
   appleWebApp: {
@@ -131,9 +129,6 @@ export function generatePageMetadata(options: {
     keywords: [...siteConfig.keywords, ...keywords],
     alternates: {
       canonical: url,
-      languages: {
-        'en-US': url,
-      },
     },
     openGraph: {
       title,

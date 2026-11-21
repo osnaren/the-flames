@@ -527,7 +527,7 @@ export default function PrivacyPage() {
             </p>
             <p className="text-on-surface text-sm">— The FLAMES Team 💜</p>
             <p className="text-on-surface mt-6 text-xs">
-              Last updated: January 2025 • Made with ❤️ and a healthy respect for your data
+              Last updated: December 2025 • Made with ❤️ and a healthy respect for your data
             </p>
           </motion.div>
         </div>

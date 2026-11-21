@@ -57,7 +57,7 @@ export const HOME_FAQ: FaqEntry[] = [
   {
     question: 'Are the names I enter saved?',
     answer:
-      'Your recent pairings stay in your own browser so you can replay them. Global charts only count anonymous results (the result letter and a country code), never names.',
+      'Your recent pairings stay in your own browser so you can replay them. Global charts only count anonymous results (the result letter and a country code), never names. If you share a result, the link contains both names so the other person can see it.',
   },
 ];
 

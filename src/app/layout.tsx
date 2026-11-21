@@ -6,7 +6,6 @@ import GlobalErrorBoundary from '@layout/GlobalErrorBoundary';
 import Navbar from '@layout/Navbar';
 import {
   baseMetadata,
-  generateGameSchema,
   generateOrganizationSchema,
   generateWebApplicationSchema,
   generateWebSiteSchema,
@@ -49,7 +48,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const webSiteSchema = generateWebSiteSchema();
   const organizationSchema = generateOrganizationSchema();
   const webAppSchema = generateWebApplicationSchema();
-  const gameSchema = generateGameSchema();
 
   return (
     <html lang="en" className={fontVariables} suppressHydrationWarning>
@@ -137,13 +135,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(webAppSchema),
-          }}
-        />
-        <script
-          key="json-ld-game"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(gameSchema),
           }}
         />
       </body>

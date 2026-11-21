@@ -22,7 +22,6 @@ export {
   generateAPISchema,
   generateArticleSchema,
   generateBreadcrumbSchema,
-  generateGameSchema,
   generateOrganizationSchema,
   generateWebApplicationSchema,
   generateWebPageSchema,

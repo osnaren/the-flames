@@ -166,19 +166,18 @@ export default function AboutPage() {
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="z-10"
         >
-          <SparklesText
-            as="h1"
-            className="mb-4 text-6xl font-extrabold tracking-tighter md:text-8xl"
-            colors={{ first: '#FF5733', second: '#C70039' }}
-          >
-            FLAMES
-          </SparklesText>
-          <h2
-            id="about-hero-title"
-            className="font-heading text-on-surface-variant text-2xl font-light tracking-wide md:text-4xl"
-          >
-            The Nostalgia Project
-          </h2>
+          <h1 id="about-hero-title">
+            <SparklesText
+              as="span"
+              className="mb-4 block text-6xl font-extrabold tracking-tighter md:text-8xl"
+              colors={{ first: '#FF5733', second: '#C70039' }}
+            >
+              FLAMES
+            </SparklesText>{' '}
+            <span className="font-heading text-on-surface-variant block text-2xl font-light tracking-wide md:text-4xl">
+              The Nostalgia Project
+            </span>
+          </h1>
         </motion.div>
 
         <div className="z-10 mx-auto mt-8 max-w-2xl space-y-4">

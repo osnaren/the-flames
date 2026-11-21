@@ -1,201 +1,75 @@
-# FLAMES Game - Full Documentation for AI Assistants
+# FLAMES Game: full reference
 
-> Comprehensive reference for AI/LLM systems about FLAMES Game
+> FLAMES Game (https://theflames.app) is a free online FLAMES calculator: enter two names and it works out the classic FLAMES name-game result (Friends, Love, Affection, Marriage, Enemies or Siblings), showing every step. Built by osLabs (https://osnaren.com). Hosted on Netlify. Last updated 2026-11-21.
 
-## Application Overview
+FLAMES is a fun paper-and-pencil counting game, not a scientific compatibility test. The same two spellings always give the same result.
 
-FLAMES Game (https://theflames.app) is a free online relationship compatibility game. It modernizes the classic paper-and-pencil game that was popular among students, transforming it into an engaging web experience with animations, sharing capabilities, and global statistics.
+## What FLAMES stands for
 
-## Complete Feature List
+FLAMES stands for Friends, Love, Affection, Marriage, Enemies and Siblings. Each letter is a possible result.
 
-### 1. Main Game (Auto Mode)
-- Two text input fields for names
-- Real-time validation (non-empty, alphabetic characters)
-- Animated letter striking visualization
-- Slot-machine style result reveal
-- Confetti celebration effects
-- Result card with emoji and description
-- Share functionality (social media, download image, copy link)
+| Version | F | L | A | M | E | S |
+|---|---|---|---|---|---|---|
+| Most common | Friends | Love | Affection | Marriage | Enemies | Siblings |
+| Alternate wording | Friendship | Lovers | Affectionate / Adore | Marriage | Enemy | Sister |
+| Philippines | Friends | Lovers | Anger | Marriage | Engagement | Soulmates |
 
-### 2. Manual Mode
-- Paper-and-pencil aesthetic
-- User manually strikes out common letters
-- Interactive FLAMES elimination
-- Undo/redo capabilities
-- Nostalgic handwriting-style fonts
+- F (Friends): an easy-going, loyal friendship.
+- L (Love, or Lovers): a romantic match.
+- A (Affection): fondness and care, more than friendship but not quite love. Adore or Affectionate in some versions; Anger in the Filipino version.
+- M (Marriage): the wedding result.
+- E (Enemies): a playful rivalry. Engagement in some Filipino versions.
+- S (Siblings): a brother-and-sister style bond. Sweethearts or Soulmates in some versions.
 
-### 3. Global Charts
-- Total matches worldwide
-- Daily match statistics
-- Trending relationship results
-- Time-based filtering (Today, This Week, All Time)
-- Geographic distribution (when available)
+More: https://theflames.app/flames-meaning
 
-### 4. How It Works Tutorial
-- Step-by-step animated guide
-- Visual demonstration with example names
-- Interactive learning experience
-- Explanation of the algorithm
+## How to play FLAMES (rules)
 
-### 5. Settings & Preferences
-- Dark/Light theme toggle
-- Animation enable/disable
-- Sound effects toggle
-- Reduced motion support
+1. Write both names. Ignore spaces, capital letters and punctuation.
+2. Cross out letters that appear in both names, one pair at a time. A repeated letter only cancels while the other name still has a match.
+3. Count every letter left in both names. That number is the count.
+4. Write F-L-A-M-E-S and count from F up to the count, wrapping back to F if needed. Strike out the letter you land on.
+5. Start counting again from the letter after the one you struck out. Repeat until one letter remains: that is the result.
 
-## Algorithm Explanation
+The order of the two names does not change the result. If every letter cancels (anagrams such as Mary and Army), the count is zero; this calculator still completes the count and lands on Affection.
 
-### Step 1: Name Input
-Accept two names (typically romantic interests, friends, or any two people).
+More: https://theflames.app/how-it-works
 
-### Step 2: Letter Comparison
-Compare both names letter by letter, identifying common letters.
+## Worked examples (computed by the calculator)
 
-Example:
-- Name 1: ROMEO
-- Name 2: JULIET
-- Common letters: E, O
+- Rahul + Priya: R and A cancel, leaving "hul" + "piy" = 6 letters. Counting 6 strikes S, F, A, L, E in turn. Result: M, Marriage.
+- Romeo + Juliet: one E cancels, leaving "romo" + "julit" = 9 letters. Counting 9 strikes A, F, L, S, M. Result: E, Enemies.
+- Jack + Rose: no shared letters, so 4 + 4 = 8 letters. Counting 8 strikes L, E, M, F, S. Result: A, Affection.
+- Alice + Bob: no shared letters, so 5 + 3 = 8 letters. Result: A, Affection.
 
-### Step 3: Letter Removal
-Remove common letters from both names, keeping count of remaining letters.
+## Frequently asked questions
 
-Example:
-- ROMEO → RM (E, O removed) = 2 letters
-- JULIET → JULIT (E removed) = 5 letters
-- Total remaining: 7 letters
+**Is the FLAMES calculator accurate?** It is accurate to the rules of the game: the same spellings always give the same result. It is a game, not a scientific test.
 
-### Step 4: FLAMES Elimination
-Using the count (7 in our example), count through "FLAMES" repeatedly, eliminating the letter landed on.
+**First names or full names?** Either works. First names are traditional; full names or nicknames change the letters and can change the result.
 
-FLAMES = F L A M E S (6 letters)
-Count to 7:
-1-F, 2-L, 3-A, 4-M, 5-E, 6-S, 7-F → Eliminate F
-Remaining: L A M E S
-Continue counting from where we left off...
-Repeat until one letter remains.
+**Is it free?** Yes. No sign-up, and it works on phones, tablets and computers.
 
-### Step 5: Result
-The final remaining letter determines the relationship:
-- F = Friends
-- L = Lovers  
-- A = Affection
-- M = Marriage
-- E = Enemies
-- S = Siblings
+**Are names saved?** Recent pairings stay in your own browser. Global charts count only anonymous results (the result letter and a country code), never names. A share link contains both names so the recipient can see the result.
 
-## Result Interpretations
+## Site pages
 
-### F - Friends
-A strong platonic bond. This indicates compatibility as friends who support each other through life's challenges.
+- https://theflames.app : the FLAMES calculator, with a complete guide below it
+- https://theflames.app/how-it-works : interactive tutorial and the full rules
+- https://theflames.app/flames-meaning : FLAMES meaning and full form
+- https://theflames.app/manual : paper-and-pencil mode
+- https://theflames.app/charts : anonymous global result statistics
+- https://theflames.app/about : the story behind the project
+- https://theflames.app/api-docs : developer API reference
+- https://theflames.app/privacy : privacy policy and terms
 
-### L - Lovers
-Romantic compatibility. There's potential for a romantic relationship with passion and emotional connection.
+## API
 
-### A - Affection
-Mutual fondness and care. A warm, caring relationship built on respect and genuine liking.
-
-### M - Marriage
-Strong long-term compatibility. Indicates potential for a lasting, committed partnership.
-
-### E - Enemies
-Opposing personalities or values. May experience friction or disagreement, but could also indicate passionate tension.
-
-### S - Siblings
-A familial-like bond. Comfortable, familiar relationship similar to that of siblings.
-
-## Technical Stack
-
-- **Frontend**: Next.js 16, React 19, TypeScript
-- **Styling**: Tailwind CSS v4
-- **Animations**: Framer Motion
-- **Database**: Supabase (PostgreSQL)
-- **Hosting**: Vercel
-- **State Management**: Zustand
-
-## API Reference
-
-### Calculate FLAMES Result
-
-**Endpoint**: `GET /api/flames`
-
-**Parameters**:
-- `name1` (required): First name
-- `name2` (required): Second name
-
-**Example Request**:
 ```
-GET https://theflames.app/api/flames?name1=Alice&name2=Bob
+POST https://theflames.app/api/flames
+Content-Type: application/json
+
+{ "name1": "Rahul", "name2": "Priya" }
 ```
 
-**Example Response**:
-```json
-{
-  "success": true,
-  "data": {
-    "name1": "Alice",
-    "name2": "Bob",
-    "result": "M",
-    "meaning": "Marriage",
-    "commonLetters": ["a", "b"],
-    "remainingCount": 5
-  }
-}
-```
-
-**Error Response**:
-```json
-{
-  "success": false,
-  "error": "Both names are required"
-}
-```
-
-## Common User Queries
-
-### "How do I play FLAMES?"
-1. Go to https://theflames.app
-2. Enter your name and another person's name
-3. Click the button to calculate
-4. Watch the animated result
-5. Share with friends!
-
-### "Is FLAMES accurate?"
-FLAMES is a fun, entertainment-based game. It's not scientifically validated and should be enjoyed as a lighthearted activity, not taken as relationship advice.
-
-### "Can I use FLAMES for my app?"
-Yes! FLAMES Game offers a free API. See https://theflames.app/api-docs for documentation.
-
-### "Is my data private?"
-Yes. FLAMES Game doesn't store the names you enter. Only anonymous statistics are collected for the global charts feature.
-
-## Accessibility Features
-
-- WCAG 2.1 AA compliant
-- Keyboard navigation support
-- Screen reader compatible
-- Reduced motion option
-- High contrast themes
-- Proper ARIA labels
-
-## SEO Keywords
-
-Primary: FLAMES game, FLAMES calculator, love calculator, relationship game
-Secondary: compatibility test, name compatibility, free love calculator, online FLAMES
-
-## Social Media
-
-- Share results as images
-- Copy shareable links
-- Native mobile sharing
-- Customizable result cards
-
-## Support
-
-For issues or questions:
-- Website: https://theflames.app
-- Developer: osLabs (https://osnaren.com)
-
----
-
-Last Updated: 2025-12-07
-Version: 1.0.0
+The response is JSON: `success` (boolean) and `data` with `name1`, `name2`, `result` (one of F, L, A, M, E, S), `resultMeaning` and a `tagline`. Full reference: https://theflames.app/api-docs

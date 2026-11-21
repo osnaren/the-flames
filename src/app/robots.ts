@@ -2,82 +2,40 @@ import type { MetadataRoute } from 'next';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://theflames.app';
 
+/** Every public page is crawlable; API routes are not (social preview images excepted). */
+const RULE = { allow: ['/', '/api/og/'], disallow: ['/api/'] };
+
 /**
- * Robots.txt Generator
- * Configures search engine crawling behavior
+ * Search engines and AI crawlers (search, answer engines and training) all get
+ * the same access. They are listed by name so the policy is explicit: an
+ * answer engine that cites the guide is a source of visits for this site.
  */
+const AI_AGENTS = [
+  'GPTBot',
+  'OAI-SearchBot',
+  'ChatGPT-User',
+  'ClaudeBot',
+  'Claude-SearchBot',
+  'Claude-User',
+  'anthropic-ai',
+  'PerplexityBot',
+  'Perplexity-User',
+  'Google-Extended',
+  'Applebot-Extended',
+  'CCBot',
+  'Bytespider',
+  'Amazonbot',
+  'FacebookBot',
+  'meta-externalagent',
+];
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      {
-        userAgent: '*',
-        allow: ['/', '/api/og/'],
-        disallow: ['/api/'],
-      },
-      {
-        // Google specific rules for better crawling
-        userAgent: 'Googlebot',
-        allow: ['/', '/api/og/'],
-        disallow: ['/api/'],
-      },
-      {
-        // Bing specific rules
-        userAgent: 'Bingbot',
-        allow: ['/', '/api/og/'],
-        disallow: ['/api/'],
-      },
-      {
-        // GPTBot for LLMO (Large Language Model Optimization)
-        userAgent: 'GPTBot',
-        allow: '/',
-      },
-      {
-        // Claude for LLMO
-        userAgent: 'ClaudeBot',
-        allow: '/',
-      },
-      {
-        // Anthropic crawler
-        userAgent: 'anthropic-ai',
-        allow: '/',
-      },
-      {
-        // CCBot (Common Crawl)
-        userAgent: 'CCBot',
-        allow: '/',
-      },
-      {
-        // Google Extended for AI training
-        userAgent: 'Google-Extended',
-        allow: '/',
-      },
-      {
-        // OpenAI user-triggered browsing and retrieval
-        userAgent: 'ChatGPT-User',
-        allow: '/',
-      },
-      {
-        // Perplexity answer and citation crawler
-        userAgent: 'PerplexityBot',
-        allow: '/',
-      },
-      {
-        // Apple AI training opt-in policy
-        userAgent: 'Applebot-Extended',
-        allow: '/',
-      },
-      {
-        // ByteDance crawler
-        userAgent: 'Bytespider',
-        allow: '/',
-      },
-      {
-        // Social preview and AI retrieval crawlers
-        userAgent: ['FacebookBot', 'Amazonbot'],
-        allow: '/',
-      },
+      { userAgent: '*', ...RULE },
+      { userAgent: ['Googlebot', 'Bingbot'], ...RULE },
+      { userAgent: AI_AGENTS, ...RULE },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,
-    host: BASE_URL,
   };
 }

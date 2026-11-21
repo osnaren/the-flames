@@ -1,4 +1,5 @@
 import {
+  CONTENT_UPDATED,
   generateBreadcrumbSchema,
   generatePageMetadata,
   HOW_TO_STEPS,
@@ -66,6 +67,25 @@ export default function Page() {
               ))}
             </ul>
           </div>
+          <div className="space-y-2">
+            <h3 className="text-on-surface font-semibold">Rules that vary between players</h3>
+            <ul className="text-on-surface-variant list-disc space-y-1 pl-5 text-sm leading-7">
+              <li>
+                <strong className="text-on-surface">Does the order of the names matter?</strong> No. Swapping the two
+                names leaves the same letters, so the count and the result stay the same.
+              </li>
+              <li>
+                <strong className="text-on-surface">Repeated letters.</strong> This calculator cancels shared letters
+                one pair at a time, the most common rule. Some players cross out every copy of a shared letter instead,
+                which can change the result: Sarah + Max is 6 letters and Marriage with pairs, but 5 letters and Friends
+                when every A is crossed out.
+              </li>
+              <li>
+                <strong className="text-on-surface">No letters left.</strong> If every letter cancels (Mary + Army), the
+                count is zero. This calculator still finishes the count and lands on Affection.
+              </li>
+            </ul>
+          </div>
           <p className="text-on-surface-variant text-sm leading-7">
             Ready? Try it with any two names in the{' '}
             <Link href="/" className="text-primary font-medium underline underline-offset-4">
@@ -76,6 +96,9 @@ export default function Page() {
               what each FLAMES letter means
             </Link>
             .
+          </p>
+          <p className="text-on-surface-variant text-xs">
+            Updated <time dateTime={CONTENT_UPDATED}>21 November 2026</time> · FLAMES Game team, osLabs
           </p>
         </div>
       </section>

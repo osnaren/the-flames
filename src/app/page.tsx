@@ -4,7 +4,6 @@ import {
   faqPageSchema,
   generatePageMetadata,
   HOME_FAQ,
-  howToSchema,
   pagesSEO,
   siteConfig,
 } from '@/lib/seo';
@@ -40,10 +39,9 @@ const homeSchemas = [
     about: { '@type': 'Thing', name: 'FLAMES (game)', sameAs: 'https://en.wikipedia.org/wiki/FLAMES_(game)' },
     mainEntity: { '@id': `${siteConfig.url}/#application` },
     primaryImageOfPage: { '@type': 'ImageObject', url: siteConfig.ogImage, width: 1200, height: 630 },
-    publisher: { '@type': 'Organization', name: siteConfig.publisher, url: siteConfig.author.url },
+    publisher: { '@id': `${siteConfig.author.url}/#organization` },
   },
   faqPageSchema(HOME_FAQ, pageUrl),
-  howToSchema(pageUrl),
 ];
 
 export default function Page() {

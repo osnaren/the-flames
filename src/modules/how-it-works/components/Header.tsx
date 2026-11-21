@@ -163,7 +163,7 @@ export default function Header() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6, ease: 'easeOut' }}
         >
-          The Secret Behind{' '}
+          How to Play{' '}
           <motion.span
             className="text-primary-container relative inline-block"
             whileHover={{ scale: 1.05, rotate: 1 }}
@@ -173,7 +173,9 @@ export default function Header() {
             {/* Subtle glow effect */}
             {shouldAnimate && (
               <motion.span
-                className="text-primary-container absolute inset-0"
+                aria-hidden="true"
+                data-text="FLAMES"
+                className="text-primary-container absolute inset-0 after:content-[attr(data-text)]"
                 animate={{
                   textShadow: [
                     '0 0 0px rgba(249, 115, 22, 0)',
@@ -186,9 +188,7 @@ export default function Header() {
                   repeat: Infinity,
                   ease: 'easeInOut',
                 }}
-              >
-                FLAMES
-              </motion.span>
+              />
             )}
           </motion.span>
         </motion.h1>
@@ -220,7 +220,13 @@ export default function Header() {
             It&apos;s not magic (well, maybe a little ✨). The results aren&apos;t some secret prophecy—just good
             old-fashioned letter-crossing chaos from playgrounds worldwide.
           </p>
-          <p className="text-on-surface-variant/70 mx-auto mt-3 max-w-xl text-base italic">
+          <p className="border-outline-variant/40 bg-surface-container-low/80 text-on-surface-variant mx-auto mt-6 max-w-2xl rounded-2xl border px-5 py-4 text-left text-base leading-7">
+            <strong className="text-on-surface">In short:</strong> cross out the letters both names share, count the
+            letters that are left, then count that many steps around F-L-A-M-E-S. Strike out the letter you land on and
+            keep counting from the next one until a single letter remains. Rahul and Priya leave 6 letters, which ends
+            on <strong className="text-on-surface">M for Marriage</strong>.
+          </p>
+          <p className="text-on-surface-variant/70 mx-auto mt-4 max-w-xl text-base italic">
             But here&apos;s the real mystery: <span className="text-on-surface font-medium">who invented this?</span> No
             one knows. Could be ancient love gods. Could be a bored kid in math class. We prefer the divine magic
             theory. 🔮

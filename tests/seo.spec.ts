@@ -72,9 +72,14 @@ test('the homepage has a canonical URL and accurate JSON-LD in the initial HTML'
   const blocks = [...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>(.*?)<\/script>/gs)].map((match) =>
     JSON.parse(match[1])
   );
-  expect(blocks.map((block) => block['@type'])).toEqual(expect.arrayContaining(['WebSite', 'WebApplication']));
+  const types = blocks.flatMap((block) => [block['@type']].flat());
+  expect(types).toEqual(expect.arrayContaining(['WebSite', 'Organization', 'WebApplication', 'Game']));
   expect(blocks.some((block) => block.potentialAction?.['@type'] === 'SearchAction')).toBe(false);
-  expect(blocks.find((block) => block['@type'] === 'Game')).not.toHaveProperty('playMode');
+  // The calculator is one entity (WebApplication + Game) that points at the single Organization node.
+  const app = blocks.find((block) => [block['@type']].flat().includes('Game'));
+  expect(app['@type']).toEqual(['WebApplication', 'Game']);
+  expect(app).not.toHaveProperty('playMode');
+  expect(app.author).toEqual({ '@id': 'https://osnaren.com/#organization' });
 });
 
 test('all shared preview variants opt out of indexing and preserve social previews', async ({ request }) => {
