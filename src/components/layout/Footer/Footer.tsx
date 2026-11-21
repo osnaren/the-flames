@@ -189,14 +189,9 @@ function Footer() {
 
         {/* Bottom bar */}
         <div className="border-outline-variant/40 mt-12 flex flex-col items-center gap-4 border-t pt-6 text-center md:flex-row md:justify-between md:text-left">
-          <div className="space-y-1">
-            <p className="text-on-surface-variant text-sm">
-              © {FOOTER_CONFIG.brand.year} {FOOTER_CONFIG.brand.name}. All rights reserved.
-            </p>
-            <p className="text-on-surface-variant/70 text-xs">
-              {FOOTER_CONFIG.disclaimer.text} {FOOTER_CONFIG.disclaimer.note}
-            </p>
-          </div>
+          <p className="text-on-surface-variant text-sm">
+            © {FOOTER_CONFIG.brand.year} {FOOTER_CONFIG.brand.name}. All rights reserved.
+          </p>
 
           <div className="flex items-center gap-4">
             <p className="text-on-surface-variant flex items-center gap-1.5 text-sm">
@@ -218,6 +213,12 @@ function Footer() {
               <ArrowUp className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
+        </div>
+
+        {/* Disclaimer: two centred lines */}
+        <div className="mt-6 space-y-1.5 text-center">
+          <p className="text-on-surface-variant text-xs italic">{FOOTER_CONFIG.disclaimer.text}</p>
+          <p className="text-on-surface-variant/80 text-xs">{FOOTER_CONFIG.disclaimer.note}</p>
         </div>
       </div>
     </footer>

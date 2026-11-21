@@ -557,7 +557,7 @@ function LunarScene() {
         style={{ transformOrigin: 'left center' }}
         vars={v({ '--dur': '8s', '--sway': '2deg' })}
       >
-        <P.Branch blossom="#fecdd3" center="#e11d48" />
+        <P.PlumBranch />
       </Piece>
       {[
         ['20%', '12s'],
@@ -811,7 +811,7 @@ function AutumnScene() {
         vars={v({ '--dur': '7.5s', '--sway': '2deg' })}
       >
         <div className="h-full w-full -scale-x-100">
-          <P.Branch leaf />
+          <P.MapleBranch />
         </div>
       </Piece>
       {[
@@ -827,11 +827,8 @@ function AutumnScene() {
           vars={v({ '--dur': dur, '--delay': delay })}
         >
           <div className="scene-spin h-full w-full" style={{ '--dur': '6s' } as CSSProperties}>
-            <svg viewBox="0 0 40 40">
-              <path
-                d="M20 2l4 10 8-4-2 9 8 2-7 5 4 7-9-2-1 9-5-7-5 7-1-9-9 2 4-7-7-5 8-2-2-9 8 4z"
-                fill={i % 2 ? '#d97706' : '#c2410c'}
-              />
+            <svg viewBox="-20 -20 40 40">
+              <path d={P.MAPLE_LEAF} fill={['#c2410c', '#d97706', '#b91c1c'][i % 3]} />
             </svg>
           </div>
         </Piece>

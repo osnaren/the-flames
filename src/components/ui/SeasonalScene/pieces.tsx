@@ -279,57 +279,183 @@ export function Balloon({ color = '#ec4899' }: { color?: string }) {
   );
 }
 
-export function Branch({
-  blossom = '#f9a8d4',
-  center = '#be185d',
-  leaf,
-}: {
-  blossom?: string;
-  center?: string;
-  leaf?: boolean;
-}) {
+/** Spring: a soft, curving cherry branch with notched sakura petals, buds and fresh leaves. */
+export function Branch({ blossom = '#f9a8d4', center = '#be185d' }: { blossom?: string; center?: string }) {
   const flowers = [
-    [70, 40],
-    [120, 70],
-    [160, 52],
-    [200, 96],
-    [240, 80],
-    [100, 110],
-    [270, 120],
-    [180, 130],
+    [70, 40, 1],
+    [122, 68, 0.9],
+    [162, 50, 1.1],
+    [204, 96, 1],
+    [244, 80, 0.85],
+    [98, 108, 0.9],
+    [272, 122, 1],
+    [182, 132, 0.8],
+  ];
+  const buds = [
+    [140, 40],
+    [226, 66],
+    [62, 72],
+    [292, 104],
+  ];
+  const leaves = [
+    [108, 52, -30],
+    [186, 76, 40],
+    [258, 104, -20],
+    [140, 96, 70],
   ];
   return (
     <svg viewBox="0 0 320 200">
       <path
         d="M0 10c60 10 110 40 150 70s80 50 160 60"
-        stroke="#5b3a29"
-        strokeWidth="9"
+        stroke="#6b4434"
+        strokeWidth="8"
         fill="none"
         strokeLinecap="round"
       />
       <path
         d="M90 46c10 30 0 60-10 70M190 90c20-20 40-30 70-30M150 80c10 20 30 40 40 54"
-        stroke="#5b3a29"
-        strokeWidth="5"
+        stroke="#6b4434"
+        strokeWidth="4"
         fill="none"
         strokeLinecap="round"
       />
-      {flowers.map(([x, y], i) =>
-        leaf ? (
+      {leaves.map(([x, y, r], i) => (
+        <path
+          key={`l${i}`}
+          d="M0 0c6-6 16-6 22 0-6 6-16 6-22 0z"
+          fill="#86c06c"
+          transform={`translate(${x} ${y}) rotate(${r})`}
+        />
+      ))}
+      {buds.map(([x, y], i) => (
+        <ellipse key={`b${i}`} cx={x} cy={y} rx="3.5" ry="5" fill={center} opacity="0.75" />
+      ))}
+      {flowers.map(([x, y, k], i) => (
+        <g key={i} transform={`translate(${x} ${y}) scale(${k}) rotate(${i * 17})`}>
+          {Array.from({ length: 5 }, (_, p) => (
+            <path
+              key={p}
+              d="M0 0C-6-4-7-12-3.5-15L0-12.5 3.5-15C7-12 6-4 0 0z"
+              fill={blossom}
+              transform={`rotate(${p * 72})`}
+            />
+          ))}
+          <circle r="2.6" fill={center} />
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+/** Lunar New Year: an angular ink-brush plum branch with round red blossoms and gold stamens. */
+export function PlumBranch() {
+  const flowers = [
+    [86, 132, 1],
+    [128, 104, 1.15],
+    [176, 92, 0.9],
+    [214, 58, 1.05],
+    [258, 44, 0.85],
+    [150, 60, 0.8],
+    [236, 100, 0.95],
+  ];
+  return (
+    <svg viewBox="0 0 320 200">
+      <path
+        d="M0 190l40-24 30 4 44-42 30-8 40-34 34-6 36-36 40-10"
+        stroke="#2b1a14"
+        strokeWidth="9"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M114 128l10-30-6-18M184 88l40 6 22 18M224 52l-8-26M144 120l40-4"
+        stroke="#2b1a14"
+        strokeWidth="4.5"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {flowers.map(([x, y, k], i) => (
+        <g key={i} transform={`translate(${x} ${y}) scale(${k}) rotate(${i * 23})`}>
+          {Array.from({ length: 5 }, (_, p) => (
+            <circle
+              key={p}
+              cx="0"
+              cy="-7"
+              r="6"
+              fill={i % 3 === 2 ? '#f43f5e' : '#dc2626'}
+              transform={`rotate(${p * 72})`}
+            />
+          ))}
+          <circle r="3.2" fill="#fde68a" />
+          {Array.from({ length: 6 }, (_, p) => (
+            <circle key={`s${p}`} cx="0" cy="-5" r="0.9" fill="#f59e0b" transform={`rotate(${p * 60 + 30})`} />
+          ))}
+        </g>
+      ))}
+      {[
+        [104, 84],
+        [198, 112],
+        [282, 30],
+        [60, 160],
+      ].map(([x, y], i) => (
+        <circle key={`b${i}`} cx={x} cy={y} r="3.5" fill="#b91c1c" />
+      ))}
+    </svg>
+  );
+}
+
+export const MAPLE_LEAF = 'M0-18 4-8 12-12 9-3 18-2 10 4 13 11 4 8 1 15H-1L-4 8-13 11-10 4-18-2-9-3-12-12-4-8z';
+
+/** Autumn: a slender twig hung with five-lobed maple leaves and a pair of acorns. */
+export function MapleBranch() {
+  const leaves = [
+    [66, 52, -20, '#c2410c', 1],
+    [116, 84, 15, '#d97706', 1.15],
+    [168, 70, -35, '#b91c1c', 0.95],
+    [214, 112, 25, '#ea580c', 1.1],
+    [262, 102, -10, '#ca8a04', 0.9],
+    [146, 124, 40, '#9a3412', 0.85],
+  ] as const;
+  return (
+    <svg viewBox="0 0 320 200">
+      <path
+        d="M0 22c50 4 96 26 140 46s100 34 176 40"
+        stroke="#57361f"
+        strokeWidth="6"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M100 52c8 14 12 22 16 32M196 88c6 10 12 18 18 24M150 74c-2 20-2 34-4 50"
+        stroke="#57361f"
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+      />
+      {leaves.map(([x, y, r, fill, k], i) => (
+        <g key={i} transform={`translate(${x} ${y + 18}) rotate(${r}) scale(${k})`}>
+          <path d="M0 15v10" stroke="#57361f" strokeWidth="1.6" strokeLinecap="round" />
+          <path d={MAPLE_LEAF} fill={fill} />
           <path
-            key={i}
-            d={`M${x} ${y}l6-14 4 8 8-6-2 10 10 2-8 6 6 6-10 0-2 10-6-8-6 8-2-10-10 0 6-6-8-6 10-2-2-10 8 6z`}
-            fill={i % 3 === 0 ? '#c2410c' : i % 3 === 1 ? '#d97706' : '#b91c1c'}
+            d="M0 14V-14M0 4 12-8M0 4-12-8M0 8 11 2M0 8-11 2"
+            stroke="rgb(0 0 0 / 0.18)"
+            strokeWidth="0.9"
+            fill="none"
           />
-        ) : (
-          <g key={i} transform={`translate(${x} ${y})`}>
-            {Array.from({ length: 5 }, (_, p) => (
-              <ellipse key={p} cx="0" cy="-8" rx="6" ry="8" fill={blossom} transform={`rotate(${p * 72})`} />
-            ))}
-            <circle r="3.5" fill={center} />
-          </g>
-        )
-      )}
+        </g>
+      ))}
+      {[
+        [236, 132],
+        [248, 136],
+      ].map(([x, y], i) => (
+        <g key={`a${i}`} transform={`translate(${x} ${y}) rotate(${i ? 14 : -10})`}>
+          <ellipse cx="0" cy="6" rx="5.5" ry="7" fill="#a16207" />
+          <path d="M-6.5 1a6.5 4 0 0 1 13 0z" fill="#713f12" />
+          <path d="M0-3v-4" stroke="#713f12" strokeWidth="1.6" strokeLinecap="round" />
+        </g>
+      ))}
     </svg>
   );
 }

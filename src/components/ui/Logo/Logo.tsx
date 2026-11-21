@@ -5,7 +5,7 @@ import { motion, Variants } from 'framer-motion';
 import { Flame } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { memo, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 
 type LogoProps = {
   variant?: 'static' | 'animated';
@@ -29,10 +29,16 @@ function Logo({
   const playOnHover = animationType === 'onHover';
   const [isHovering, setIsHovering] = useState(false);
   const [animationRequested, setAnimationRequested] = useState(false);
+  const [animationReady, setAnimationReady] = useState(false);
+  const handleReady = useCallback(() => setAnimationReady(true), []);
 
+  const showAnimated = isAnimated && shouldAnimate && animationRequested;
+  const animatedVisible = showAnimated && animationReady && (isHovering || !playOnHover);
   const staticElement = (
     <Flame
-      className="text-primary-container text-glow-sm h-6 w-6 transition-transform group-hover:scale-110"
+      className={`text-primary-container text-glow-sm h-6 w-6 transition-[transform,opacity] duration-200 group-hover:scale-110 ${
+        animatedVisible ? 'opacity-0' : 'opacity-100'
+      }`}
       aria-hidden="true"
     />
   );
@@ -57,12 +63,7 @@ function Logo({
     >
       <Link href="/" className="group flex items-center gap-2" aria-label={showText ? 'FLAMES Home' : 'Home'}>
         <div className="relative flex h-8 w-8 shrink-0 items-center justify-center">
-          {staticElement}
-          {isAnimated && shouldAnimate && animationRequested && (
-            <div className="bg-surface absolute inset-0">
-              <AnimatedLogo playing={!playOnHover || isHovering} />
-            </div>
-          )}
+          {/* Soft circular glow behind the mark while hovering */}
           {isAnimated && shouldAnimate && isHovering && (
             <motion.div
               className="bg-primary-container/20 absolute h-8 w-8 rounded-full"
@@ -77,6 +78,16 @@ function Logo({
               }}
               aria-hidden="true"
             />
+          )}
+          {staticElement}
+          {/* The animated mark is transparent: it swaps in over the static icon
+              without a background box, so only the round glow shows behind it. */}
+          {showAnimated && (
+            <div
+              className={`absolute inset-0 transition-opacity duration-200 ${animatedVisible ? 'opacity-100' : 'opacity-0'}`}
+            >
+              <AnimatedLogo playing={!playOnHover || isHovering} onReady={handleReady} />
+            </div>
           )}
         </div>
 

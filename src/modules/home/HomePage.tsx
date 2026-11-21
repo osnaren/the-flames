@@ -246,7 +246,7 @@ function HomePage() {
                   </p>
                 </div>
 
-                <div className="motion-rise mt-6" style={{ '--rise-delay': '0.5s' } as React.CSSProperties}>
+                <div className="motion-rise mt-10 md:mt-14" style={{ '--rise-delay': '0.5s' } as React.CSSProperties}>
                   <RecentMatchesSection displayCount={5} onMatchClick={handleMatchReplay} />
                 </div>
               </motion.div>

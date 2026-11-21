@@ -1,4 +1,6 @@
 import { useGameIntegration } from '@/hooks/useGameIntegration';
+import type { SeasonalTheme } from '@/themes/seasonal/types';
+import { useSeasonalTheme } from '@/themes/seasonal/useSeasonalTheme';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useState, type CSSProperties } from 'react';
 import { FLAMES_LETTERS } from '../../constants';
@@ -9,13 +11,33 @@ interface AnimatedHeaderProps {
   stage: GameStage;
 }
 
-const FLOATERS = [
-  { emoji: '💖', left: '2%', top: '6%', duration: 4.2, delay: 0 },
-  { emoji: '✨', left: '91%', top: '2%', duration: 3.6, delay: -1.2 },
-  { emoji: '💕', left: '94%', top: '44%', duration: 4.8, delay: -2.1 },
-  { emoji: '💫', left: '0%', top: '50%', duration: 5.2, delay: -0.6 },
-  { emoji: '💝', left: '86%', top: '22%', duration: 4.4, delay: -3 },
+/** Positions and timing for the five hero floaters; the emoji changes per season. */
+const FLOATER_SLOTS = [
+  { left: '2%', top: '6%', duration: 4.2, delay: 0 },
+  { left: '91%', top: '2%', duration: 3.6, delay: -1.2 },
+  { left: '94%', top: '44%', duration: 4.8, delay: -2.1 },
+  { left: '0%', top: '50%', duration: 5.2, delay: -0.6 },
+  { left: '86%', top: '22%', duration: 4.4, delay: -3 },
 ] as const;
+
+const HERO_FLOATERS: Record<SeasonalTheme, readonly [string, string, string, string, string]> = {
+  default: ['💖', '✨', '💕', '💫', '💝'],
+  valentine: ['💘', '🌹', '💌', '💗', '🍫'],
+  halloween: ['🎃', '🦇', '👻', '🕸️', '🍬'],
+  christmas: ['🎄', '❄️', '🎁', '⛄', '🔔'],
+  newYear: ['🎆', '🥂', '🎉', '🎇', '🕛'],
+  diwali: ['🪔', '🎆', '✨', '🌼', '🎇'],
+  holi: ['🎨', '💦', '🌈', '🟣', '🟡'],
+  onam: ['🌼', '🛶', '🌺', '🍌', '🪷'],
+  pongal: ['🌾', '☀️', '🍚', '🐄', '🪁'],
+  lunarNewYear: ['🏮', '🧧', '🐉', '🍊', '🧨'],
+  eid: ['🌙', '⭐', '🕌', '🏮', '✨'],
+  rakhi: ['🪢', '🍬', '🌼', '🎁', '💛'],
+  friendship: ['🤝', '🎈', '🫶', '🌻', '🍦'],
+  spring: ['🌸', '🦋', '🌷', '🐝', '🌱'],
+  monsoon: ['☔', '💧', '🌧️', '🐸', '⛵'],
+  autumn: ['🍁', '🍂', '🌰', '🍄', '☕'],
+};
 
 /**
  * The FLAMES wordmark.
@@ -27,6 +49,8 @@ const FLOATERS = [
 function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const { sound } = useGameIntegration();
+  const { currentTheme } = useSeasonalTheme();
+  const floaterEmojis = HERO_FLOATERS[currentTheme] ?? HERO_FLOATERS.default;
   const isCompact = stage === 'processing' || stage === 'result';
 
   return (
@@ -66,16 +90,14 @@ function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) 
               <AnimatePresence>
                 {shouldAnimate && hoveredIndex === index && (
                   <motion.div
-                    className="pointer-events-none absolute -top-12 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center md:-top-16"
-                    initial={{ opacity: 0, y: 8, scale: 0.5 }}
+                    className="pointer-events-none absolute -top-6 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/75 py-1 pr-3 pl-1.5 whitespace-nowrap text-white shadow-lg md:-top-5 lg:-top-2"
+                    initial={{ opacity: 0, y: 6, scale: 0.6 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -8, scale: 0.5, transition: { duration: 0.15 } }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+                    exit={{ opacity: 0, y: 4, scale: 0.6, transition: { duration: 0.15 } }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 22 }}
                   >
-                    <span className="text-3xl md:text-4xl">{item.emoji}</span>
-                    <span className="mt-1 rounded-full bg-black/70 px-2 py-0.5 text-xs font-medium whitespace-nowrap text-white">
-                      {item.full}
-                    </span>
+                    <span className="text-xl leading-none">{item.emoji}</span>
+                    <span className="text-xs font-semibold">{item.full}</span>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -85,7 +107,7 @@ function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) 
       </div>
 
       <h1 className="font-heading text-on-surface mb-2 text-xl font-bold md:text-2xl">
-        FLAMES Calculator — Play the Name Game
+        FLAMES Calculator — Play the FLAMES Game Online
       </h1>
 
       {/* Subtitle */}
@@ -106,9 +128,9 @@ function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) 
           style={{ '--rise-distance': '0px' } as CSSProperties}
           aria-hidden="true"
         >
-          {FLOATERS.map((floater) => (
+          {FLOATER_SLOTS.map((floater, index) => (
             <span
-              key={floater.emoji}
+              key={`${currentTheme}-${index}`}
               className="motion-float absolute text-xl opacity-60 md:text-2xl"
               style={
                 {
@@ -120,7 +142,7 @@ function AnimatedHeaderComponent({ shouldAnimate, stage }: AnimatedHeaderProps) 
                 } as CSSProperties
               }
             >
-              {floater.emoji}
+              {floaterEmojis[index]}
             </span>
           ))}
         </div>

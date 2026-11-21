@@ -31,9 +31,11 @@ function HowItWorksPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
+            {/* The interactive steps stay out of content-visibility containment: their
+                real height differs from any placeholder, so rendering them on scroll
+                would move the Start button under the user's finger. */}
             {/* Step 1: Names */}
             <motion.div
-              className="deferred-content"
               initial={shouldAnimate ? { opacity: 0, y: 30 } : { opacity: 1, y: 0 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
@@ -44,7 +46,6 @@ function HowItWorksPage() {
 
             {/* Step 2: Common Letters */}
             <motion.div
-              className="deferred-content"
               initial={shouldAnimate ? { opacity: 0, y: 30 } : { opacity: 1, y: 0 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
@@ -55,7 +56,6 @@ function HowItWorksPage() {
 
             {/* Step 3: FLAMES Simulation */}
             <motion.div
-              className="deferred-content"
               initial={shouldAnimate ? { opacity: 0, y: 30 } : { opacity: 1, y: 0 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
