@@ -4,6 +4,11 @@ on:
   push:
     branches: [codex/netlify-temporary]
   workflow_dispatch:
+    inputs:
+      trace:
+        description: Record a Chrome trace of the settings interactions
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -38,6 +43,7 @@ jobs:
       CWV_SLOW_NETWORK: 'true'
       CWV_INTERACT: 'true'
       CWV_TAG: ${{ matrix.device }}
+      CWV_TRACE: ${{ inputs.trace && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

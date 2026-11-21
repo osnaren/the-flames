@@ -117,6 +117,24 @@ for (const route of routes) {
       await expect(page.locator('#name1')).toBeVisible();
     }
     if (scenario !== 'load' || process.env.CWV_INTERACT !== 'false') {
+      // Opt-in Chrome trace of the settings interactions, for diagnosing INP on CI hardware.
+      const tracing = process.env.CWV_TRACE === 'true';
+      if (tracing)
+        await browser.startTracing(page, {
+          path: `${dir}/${tag}-${scenario}-${route.replaceAll('/', '') || 'home'}-trace.json`,
+          categories: [
+            'devtools.timeline',
+            'disabled-by-default-devtools.timeline',
+            'disabled-by-default-devtools.timeline.frame',
+            'blink.user_timing',
+            'loading',
+            'latencyInfo',
+            'cc',
+            'gpu',
+            'v8.execute',
+            'disabled-by-default-devtools.timeline.stack',
+          ],
+        });
       await activate(page.getByRole('button', { name: 'Open settings', exact: true }));
       await expect(page.getByRole('group', { name: 'Seasonal theme selector' })).toBeVisible({ timeout: 45000 });
       await expect(page.getByRole('button', { name: /^(Play|Pause) music$/ })).toBeVisible({ timeout: 45000 });
@@ -124,6 +142,7 @@ for (const route of routes) {
         await activate(page.getByRole('switch', { name: /Switch to (dark|light) theme/i }).first());
       await activate(page.getByRole('button', { name: 'Close settings', exact: true }));
       await page.waitForTimeout(1500);
+      if (tracing) await browser.stopTracing();
     }
     const result = await page.evaluate(() => ({
       ...globalThis.cwv,
