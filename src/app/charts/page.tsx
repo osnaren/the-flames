@@ -1,4 +1,5 @@
 import { generateBreadcrumbSchema, generatePageMetadata, pagesSEO } from '@/lib/seo';
+import ChartsHeadline from '@modules/charts/ChartsHeadline';
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 
@@ -6,6 +7,9 @@ import dynamic from 'next/dynamic';
 const ChartsPage = dynamic(() => import('@modules/charts/ChartsPage'), {
   ssr: true,
 });
+
+// Server-rendered headline stats refresh hourly (ISR).
+export const revalidate = 3600;
 
 // Page-specific SEO metadata
 export const metadata: Metadata = generatePageMetadata({
@@ -34,6 +38,7 @@ export default function Page() {
         }}
       />
       <ChartsPage />
+      <ChartsHeadline />
     </>
   );
 }
